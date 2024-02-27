@@ -10,7 +10,7 @@ using std::vector;
 
 void random_neighbors(vector<Node *> nodes, int number_neighbors);
 int main() {
-  int num_nodes = 5;
+  int num_nodes = 3;
 
   vector<Node *> nodes(num_nodes);
   for (int i = 0; i < num_nodes; i++) {
@@ -19,13 +19,13 @@ int main() {
     nodes[i] = node;
   }
 
-  random_neighbors(nodes, 6);
-
-  nodes[0]->activate();
+  random_neighbors(nodes, 2);
 
   for (Node *node : nodes) {
     node->start_thread();
   }
+  nodes[0]->activate();
+  pthread_cond_signal(nodes[0]->get_cond());
 
   for (Node *node : nodes) {
     node->join_thread();

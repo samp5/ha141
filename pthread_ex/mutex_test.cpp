@@ -1,8 +1,8 @@
 #include <iostream>
 #include <pthread.h>
 
-// volatile ensures that each modification of the variable reads and writes that variable
-// in memory
+// volatile ensures that each modification of the variable reads and writes that
+// variable in memory
 volatile int counter = 0;
 pthread_mutex_t mutex;
 void *mutex_test(void *arg) {
