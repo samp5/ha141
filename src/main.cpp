@@ -1,4 +1,6 @@
 #include "node.hpp"
+#include <cstdlib>
+#include <ctime>
 #include <pthread.h>
 #include <vector>
 
@@ -6,10 +8,9 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 int value = 1;
 using std::vector;
 
+void random_neighbors(vector<Node *> nodes, int number_neighbors);
 int main() {
-  int num_nodes = 3;
-
-  vector<bool> activation(num_nodes, false);
+  int num_nodes = 5;
 
   vector<Node *> nodes(num_nodes);
   for (int i = 0; i < num_nodes; i++) {
@@ -18,10 +19,7 @@ int main() {
     nodes[i] = node;
   }
 
-  nodes[0]->add_neighbor(nodes[1], 2);
-  cout << "Node 2 added as neighbor to Node 1\n";
-  nodes[1]->add_neighbor(nodes[2], 3);
-  cout << "Node 3 added as neighbor to Node 2\n";
+  random_neighbors(nodes, 6);
 
   nodes[0]->activate();
 
@@ -41,4 +39,21 @@ int main() {
 
   pthread_mutex_destroy(&mutex);
   return 0;
+}
+void random_neighbors(vector<Node *> nodes, int number_neighbors) {
+  cout << "Adding Random Neighbors\n";
+  int size = nodes.size();
+  int i = 0;
+  while (i < number_neighbors) {
+    int from = rand() % size;
+    int to = rand() % size;
+    if (from == to) {
+      continue;
+    }
+
+    nodes[from]->add_neighbor(nodes[to], rand() % 5 + 1);
+    cout << "Edge from Node " << from + 1 << " to Node " << to + 1
+         << " added\n";
+    i++;
+  }
 }
