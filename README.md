@@ -7,7 +7,7 @@ Project for CS 141 Honors Supplement
 ├── src
 │   ├── main.cpp
 │   └── node.hpp
-├── pthred_ex //practice pthread examples)
+├── pthred_ex //practice pthread examples
 │   └── ...
 └── .gitignore
 ```
