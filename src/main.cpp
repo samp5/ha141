@@ -1,27 +1,43 @@
 #include "node.hpp"
 #include <pthread.h>
+#include <vector>
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+int value = 1;
+using std::vector;
 
 int main() {
-  Node *node1 = new Node(1);
-  Node *node2 = new Node(2);
-  Node *node3 = new Node(3);
+  int num_nodes = 3;
 
-  node1->add_neighbor(node2);
-  node2->add_neighbor(node3);
+  vector<bool> activation(num_nodes, false);
 
-  node1->start_thread();
-  node2->start_thread();
-  node3->start_thread();
+  vector<Node *> nodes(num_nodes);
+  for (int i = 0; i < num_nodes; i++) {
+    cout << "Node " << i + 1 << " added\n";
+    Node *node = new Node(i + 1);
+    nodes[i] = node;
+  }
 
-  node1->join_thread();
-  node2->join_thread();
-  node3->join_thread();
+  nodes[0]->add_neighbor(nodes[1], 2);
+  cout << "Node 2 added as neighbor to Node 1\n";
+  nodes[1]->add_neighbor(nodes[2], 3);
+  cout << "Node 3 added as neighbor to Node 2\n";
 
-  delete node1;
-  delete node2;
-  delete node3;
+  nodes[0]->activate();
+
+  for (Node *node : nodes) {
+    node->start_thread();
+  }
+
+  for (Node *node : nodes) {
+    node->join_thread();
+  }
+
+  cout << value;
+
+  for (Node *node : nodes) {
+    delete node;
+  }
 
   pthread_mutex_destroy(&mutex);
   return 0;
