@@ -19,9 +19,9 @@ int main() {
     nodes[i] = node;
   }
 
-  random_neighbors(nodes, 2);
+  // random_neighbors(nodes, 2);
 
-  // nodes[0]->add_neighbor(nodes[1], 3);
+  nodes[0]->add_neighbor(nodes[1], 3);
   nodes[0]->add_neighbor(nodes[2], 2);
 
   for (Node *node : nodes) {

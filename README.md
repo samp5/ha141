@@ -15,7 +15,43 @@ Project for CS 141 Honors Supplement
 ### Update 2/28
 
 <details>
-<summary> Example Output </summary>
+<summary> Example Output 2 </summary>
+<br>
+
+```
+Node 1 added
+Node 2 added
+Node 3 added
+Edge from Node 1 to Node 2 added
+Edge from Node 1 to Node 3 added
+Node 1 is waiting
+Node 2 is waiting
+Node 3 is waiting
+Activate? 1
+Node 1 is activated, accumulated set to 1
+Node 1 is running
+Node 1 is sending a message to Node 2
+Accumulated value for Node 1 is 1
+Weight for Node 1 to Node 2 is 3
+Message is 3
+Node 2 is activated, accumulated set to 3
+Node 2 is running
+Node 2 does not have any neigbors!
+Node 1 is sending a message to Node 3
+Accumulated value for Node 1 is 1
+Weight for Node 1 to Node 3 is 2
+Message is 2
+Node 3 is activated, accumulated set to 2
+Node 3 is running
+Node 3 does not have any neigbors!
+Node 1 has an accumulated value of 1
+Node 2 has an accumulated value of 3
+Node 3 has an accumulated value of 2
+```
+</details>
+
+<details>
+<summary> Example Output 1 </summary>
 <br>
 
 ```
