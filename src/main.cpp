@@ -4,7 +4,7 @@
 #include <vector>
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-int value = 1;
+volatile int value = 1;
 using std::vector;
 
 void random_neighbors(vector<Node *> nodes, int number_neighbors);
