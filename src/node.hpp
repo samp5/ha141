@@ -1,7 +1,6 @@
 #include <iostream>
 #include <map>
 #include <pthread.h>
-#include <vector>
 
 using std::cout;
 extern pthread_mutex_t mutex;
@@ -11,7 +10,8 @@ class Node {
 private:
   double accumulated = 4;
   int id;
-  std::map<Node *, double> neighbors;
+  std::map<Node *, double> _next;
+  std::map<Node *, double> _previous;
   pthread_t thread;
   pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
   bool active = false;
@@ -21,6 +21,8 @@ public:
   Node(int _id) : id(_id) {}
   ~Node();
   void add_neighbor(Node *neighbor, double weight);
+  void add_next(Node *neighbor, double weight);
+  void add_previous(Node *neighbor, double weight);
   void *run();
   void start_thread();
   void join_thread();

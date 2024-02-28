@@ -7,7 +7,12 @@ Node::~Node() { pthread_cond_destroy(&cond); }
 void Node::add_neighbor(Node *neighbor, double weight) {
   cout << "Edge from Node " << id << " to Node " << neighbor->get_id()
        << " added\n";
-  neighbors[neighbor] = weight;
+  _next[neighbor] = weight;
+  neighbor->add_previous(this, weight);
+}
+
+void Node::add_previous(Node *neighbor, double weight) {
+  _previous[neighbor] = weight;
 }
 
 void *Node::run() {
@@ -29,18 +34,18 @@ void *Node::run() {
   cout << "Node " << id << " is running\n";
 
   pthread_mutex_unlock(&mutex);
-  if (neighbors.empty()) {
+  if (_next.empty()) {
     cout << "Node " << id << " does not have any neigbors!\n";
   }
 
-  for (const auto &pair : neighbors) {
+  for (const auto &pair : _next) {
 
     cout << "Node " << id << " is sending a message to Node " << pair.first->id
          << '\n';
 
     pthread_mutex_lock(&mutex);
 
-    double message = accumulated * neighbors[pair.first];
+    double message = accumulated * _next[pair.first];
     cout << "Accumulated value for Node " << id << " is " << accumulated
          << '\n';
     cout << "Weight for Node " << id << " to Node " << pair.first->id << " is "

@@ -105,6 +105,7 @@ void random_neighbors(vector<Node *> nodes, int number_neighbors) {
 }
 ```
 </details>
+
 <details>
 <summary>Basic Node class that can send and recieve messages from other nodes:</summary>
 <br>
