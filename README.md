@@ -10,7 +10,8 @@ Project for CS 141 Honors Supplement
 │   └── node.cpp
 ├── pthred_ex //practice pthread examples
 │   └── ...
-└── .gitignore
+├── .gitignore
+└── makefile
 ```
 
 ### Update 2/28
