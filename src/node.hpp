@@ -13,7 +13,7 @@ private:
   int id;
   std::map<Node *, double> neighbors;
   pthread_t thread;
-  pthread_cond_t cond;
+  pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
   bool active = false;
   bool recieved = false;
 
