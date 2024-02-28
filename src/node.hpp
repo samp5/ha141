@@ -15,12 +15,15 @@ private:
   pthread_t thread;
   pthread_cond_t cond;
   bool active = false;
+  bool recieved = false;
 
 public:
   Node(int _id) : id(_id) {}
   ~Node() { pthread_cond_destroy(&cond); }
 
   void add_neighbor(Node *neighbor, double weight) {
+    cout << "Edge from Node " << id << " to Node " << neighbor->get_id()
+         << " added\n";
     neighbors[neighbor] = weight;
   }
 
@@ -31,15 +34,28 @@ public:
       cout << "Node " << id << " is waiting\n";
       pthread_cond_wait(&cond, &mutex);
     }
+    pthread_mutex_unlock(&mutex);
 
+    pthread_mutex_lock(&mutex);
     accumulated = value;
-    cout << "Node " << id << " is activated, setting accumulated to " << value
+    cout << "Node " << id << " is activated, accumulated set to " << accumulated
          << "\n";
+    recieved = true;
+    pthread_cond_broadcast(&cond);
 
     cout << "Node " << id << " is running\n";
+
+    pthread_mutex_unlock(&mutex);
+    if (neighbors.empty()) {
+      cout << "Node " << id << " does not have any neigbors!\n";
+    }
+
     for (const auto &pair : neighbors) {
-      cout << "Node " << id << " is sending a message to Node" << pair.first->id
-           << '\n';
+
+      cout << "Node " << id << " is sending a message to Node "
+           << pair.first->id << '\n';
+
+      pthread_mutex_lock(&mutex);
 
       double message = accumulated * neighbors[pair.first];
       cout << "Accumulated value for Node " << id << " is " << accumulated
@@ -48,18 +64,25 @@ public:
            << " is " << pair.second << '\n';
       cout << "Message is " << message << '\n';
 
-      pthread_mutex_unlock(&mutex);
       value = message;
+
+      // activate neighbor
+      pair.first->activate();
+      // get condition
+      pthread_cond_t *neighbor_con = pair.first->get_cond();
+      // signal start
+      pthread_cond_signal(neighbor_con);
       pthread_mutex_unlock(&mutex);
 
-      pair.first->activate();
-
-      pthread_cond_t *neighbor_con = pair.first->get_cond();
-
-      pthread_cond_signal(neighbor_con);
+      pthread_mutex_lock(&mutex);
+      while (!pair.first->recieved) {
+        pthread_cond_wait(neighbor_con, &mutex);
+      }
+      pthread_mutex_unlock(&mutex);
     }
-    pthread_mutex_unlock(&mutex);
-    return 0;
+    // active = false;
+    // this->run();
+    pthread_exit(NULL);
   }
 
   void start_thread() {
@@ -72,6 +95,8 @@ public:
 
   void activate() { active = true; }
   void deactivate() { active = false; }
+  int get_id() { return id; }
+  double get_accumulated() { return accumulated; }
 
   // POSIX needs a void* (*)(void*) function signature
   // This function allows us to use the run() member funciton

@@ -49,7 +49,7 @@ Total Value is 12
 <summary> Random neighbor function </summary>
 <br>
 
-- This funciton still needs adjustments to avoid reflexive edges and repeat edges
+- This funciton still needs adjustments to avoid repeat edges
 
 ```cpp
 void random_neighbors(vector<Node *> nodes, int number_neighbors) {
