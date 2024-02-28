@@ -1,2 +1,5 @@
+# ignore notes
 notes.md
-src/*.out
+
+# exclude all build executables
+build/*
