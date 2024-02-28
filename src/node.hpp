@@ -5,7 +5,7 @@
 
 using std::cout;
 extern pthread_mutex_t mutex;
-extern int value;
+extern volatile int value;
 
 class Node {
 private:
