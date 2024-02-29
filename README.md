@@ -19,14 +19,21 @@ Project for CS 141 Honors Supplement
 ```
 | Date   | Key Points    |  Issues   |
 |--------------- | --------------- |--------------- |
-| 2/29   | Updated Neuron Class with with membrane potentials, refractory phases  | "Quit" functionality does not work for the menu ([Issue 2](#issue-2))|
-| 2/28   | Basic Node class that sends and recieves messages   | `random_neighbors` may repeat edges.|
+| 2/29   | Updated Neuron Class with with membrane potentials, refractory phases, Update to edge weights, fixed issue 1, guard clauses on header files.   | "Quit" functionality does not work for the menu ([Issue 2](#issue-2))|
+| 2/28   | Basic Node class that sends and recieves messages   | `random_neighbors` may repeat edges. [~~Issue 1~~](#issue-1)|
 
 ### Update 2/29
 
 <details>
 <summary> Example Output 3 </summary>
 <br>
+
+New addtions:
+- Choose neuron to activate
+- Activation based on membrane potential
+- Refractory period
+- Edge weights are [0, 1]
+- Constants are preprocessor defintions
 
 ```
 Neuron 1 added (inhibitory type)
@@ -97,51 +104,39 @@ Input:
 </details>
 
 <details>
-<summary> Random neighbor function </summary>
-<br>
-
-- This funciton still needs adjustments to avoid repeat edges
-
-```cpp
-void random_neighbors(vector<Node *> nodes, int number_neighbors) {
-  cout << "Adding Random Neighbors\n";
-  int size = nodes.size();
-  int i = 0;
-  while (i < number_neighbors) {
-    int from = rand() % size;
-    int to = rand() % size;
-    if (from == to) {
-      continue;
-    }
-    nodes[from]->add_neighbor(nodes[to], rand() % 5 + 1);
-    i++;
-  }
-}
-```
-</details>
-
-<details>
-<summary>Basic Node class that can send and recieve messages from other nodes:</summary>
+<summary>Upadated Neuron Class</summary>
 <br>
 
 ```cpp
-class Node {
+class Neuron {
 private:
-  double accumulated = 4;
+  double membrane_potential = INITIAL_MEMBRANE_POTENTIAL;
   int id;
-  std::map<Node *, double> neighbors;
+
+  typedef std::map<Neuron *, double> weight_map;
+
+  weight_map _postsynaptic;
+  weight_map _presynaptic;
+
   pthread_t thread;
-  pthread_cond_t cond;
+  pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+
   bool active = false;
   bool recieved = false;
 
+  int excit_inhib_value;
+
 public:
-  Node(int _id) : id(_id) {}
-  ~Node();
-  void add_neighbor(Node *neighbor, double weight);
+  Neuron(int _id, int inhibitory);
+  ~Neuron();
+  void add_neighbor(Neuron *neighbor, double weight);
+  void add_next(Neuron *neighbor, double weight);
+  void add_previous(Neuron *neighbor, double weight);
   void *run();
   void start_thread();
   void join_thread();
+
+  void refractory();
 
   void activate() { active = true; }
   void deactivate() { active = false; }
@@ -149,21 +144,93 @@ public:
   //>>>>>>>>>>>>>> Access to private variables <<<<<<<<<<<
   pthread_cond_t *get_cond() { return &cond; }
   int get_id() { return id; }
-  double get_accumulated() { return accumulated; }
+  double get_potential() { return membrane_potential; }
+  const weight_map *get_presynaptic() {
+    const weight_map *p_presynaptic = &_presynaptic;
+    return p_presynaptic;
+  }
 
+  const weight_map *get_postsynaptic() {
+    const weight_map *p_postsynaptic = &_postsynaptic;
+    return p_postsynaptic;
+  }
   /*--------------------------------------------------------------*\
    *                  Thread helper:
    *    POSIX needs a void* (*)(void*) function signature
    *    This function allows us to use the run() member funciton
   \--------------------------------------------------------------*/
   static void *thread_helper(void *instance) {
-    return ((Node *)instance)->run();
+    return ((Neuron *)instance)->run();
   }
 };
 ```
 </details>
 
-##### Issue 1
+##### Issue 2
+- I think the quit functionality of the menu sticks executable in a thread lock. Not sure how to fix it.
+- I tried
+    - Adjusting the mutex positioning to inside the for loop even through it should be on the outside
+    - using a pthread barrier to align thread execution before quitting
+
+<details>
+<summary> Issue 2 code </summary>
+<br>
+
+``` cpp
+// main.cpp
+while (!finish) {
+
+// sleep for menu timing
+    usleep(100000);
+    cout << "Activate neuron ( or [-1] to quit )\n";
+    for (Neuron *neuron : neurons) {
+      cout << " Neuron " << neuron->get_id() << '\n';
+    }
+    cout << "Input: ";
+    cin >> activate;
+
+    if (activate == -1) {
+      //locking mutex
+      pthread_mutex_lock(&mutex);
+
+      // adjusting variable
+      finish = true;
+      
+      // signaling each neuron to pthread_exit()
+      // At this point all neurons should be the in the "waiting state"
+      for (Neuron *neuron : neurons) {
+
+        // activate neuron and signal
+        neuron->activate();
+        pthread_cond_signal(neuron->get_cond());
+
+      }
+
+      // unlock
+      pthread_mutex_unlock(&mutex);
+
+    } else if (activate <= num_neurons && activate >= 0) {
+      neurons[activate - 1]->activate();
+      pthread_cond_signal(neurons[activate - 1]->get_cond());
+    }
+}
+
+// neuron.cpp
+//...
+  pthread_mutex_lock(&mutex);
+  while (!active) {
+    cout << "Neuron " << id << " is waiting\n";
+    pthread_cond_wait(&cond, &mutex);
+  }
+
+  if (finish) {
+    pthread_exit(NULL);
+  }
+
+  pthread_mutex_unlock(&mutex);
+//...
+```
+</details>
 
 
 ### Update 2/28
@@ -235,11 +302,12 @@ Node 3 has an accumulated value of 2
 ```
 </details>
 
+###### ~~Issue 1~~
+- Random neighbor funciton still needs adjustments to avoid repeat edges
 <details>
 <summary> Random neighbor function </summary>
 <br>
 
-- This funciton still needs adjustments to avoid repeat edges
 
 ```cpp
 void random_neighbors(vector<Node *> nodes, int number_neighbors) {
