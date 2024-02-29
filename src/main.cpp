@@ -46,13 +46,13 @@ int main() {
     cin >> activate;
     if (activate == -1) {
 
-      pthread_mutex_lock(&mutex);
       finish = true;
       for (Neuron *neuron : neurons) {
+        pthread_mutex_lock(&mutex);
         neuron->activate();
         pthread_cond_signal(neuron->get_cond());
+        pthread_mutex_unlock(&mutex);
       }
-      pthread_mutex_unlock(&mutex);
     } else if (activate <= num_neurons && activate >= 0) {
       neurons[activate - 1]->activate();
       pthread_cond_signal(neurons[activate - 1]->get_cond());
