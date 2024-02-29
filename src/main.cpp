@@ -1,72 +1,75 @@
-#include "node.hpp"
-#include <cstdlib>
+#include "functions.hpp"
+#include "neuron.hpp"
 #include <pthread.h>
-#include <vector>
+#include <unistd.h>
+
+#define RAND_SEED 100123
+#define NUMBER_NODES 3
+#define NUMBER_EDGES 2
+
+using std::cin;
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-volatile int value = 1;
-using std::vector;
+pthread_barrier_t barrier;
+volatile double value = 0;
+bool finish = false;
 
-void random_neighbors(vector<Node *> nodes, int number_neighbors);
-void print_node_values(vector<Node *> nodes);
 int main() {
-  int num_nodes = 3;
 
-  vector<Node *> nodes(num_nodes);
-  for (int i = 0; i < num_nodes; i++) {
-    cout << "Node " << i + 1 << " added\n";
-    Node *node = new Node(i + 1);
-    nodes[i] = node;
+  srand(RAND_SEED);
+
+  int num_neurons = NUMBER_NODES;
+
+  pthread_barrier_init(&barrier, NULL, NUMBER_NODES + 1);
+
+  vector<Neuron *> neurons(num_neurons);
+  for (int i = 0; i < num_neurons; i++) {
+    Neuron *neuron = new Neuron(i + 1, get_inhibitory_status());
+    neurons[i] = neuron;
   }
 
-  // random_neighbors(nodes, 2);
+  random_neighbors(neurons, NUMBER_EDGES);
 
-  nodes[0]->add_neighbor(nodes[1], 3);
-  nodes[0]->add_neighbor(nodes[2], 2);
-
-  for (Node *node : nodes) {
+  for (Neuron *node : neurons) {
     node->start_thread();
   }
 
   int activate;
-  std::cout << "Activate? ";
-  std::cin >> activate;
-  if (activate) {
-    nodes[0]->activate();
-    pthread_cond_signal(nodes[0]->get_cond());
+  while (!finish) {
+
+    usleep(100000);
+    cout << "Activate neuron ( or [-1] to quit )\n";
+    for (Neuron *neuron : neurons) {
+      cout << " Neuron " << neuron->get_id() << '\n';
+    }
+    cout << "Input: ";
+    cin >> activate;
+    if (activate == -1) {
+
+      pthread_mutex_lock(&mutex);
+      finish = true;
+      for (Neuron *neuron : neurons) {
+        neuron->activate();
+        pthread_cond_signal(neuron->get_cond());
+      }
+      pthread_mutex_unlock(&mutex);
+    } else if (activate <= num_neurons && activate >= 0) {
+      neurons[activate - 1]->activate();
+      pthread_cond_signal(neurons[activate - 1]->get_cond());
+    }
   }
 
-  for (Node *node : nodes) {
+  for (Neuron *node : neurons) {
     node->join_thread();
   }
 
-  print_node_values(nodes);
+  print_node_values(neurons);
 
-  for (Node *node : nodes) {
+  for (Neuron *node : neurons) {
     delete node;
   }
 
   pthread_mutex_destroy(&mutex);
+  pthread_barrier_destroy(&barrier);
   return 0;
-}
-void random_neighbors(vector<Node *> nodes, int number_neighbors) {
-  cout << "Adding Random Neighbors\n";
-  int size = nodes.size();
-  int i = 0;
-  while (i < number_neighbors) {
-    int from = rand() % size;
-    int to = rand() % size;
-    if (from == to) {
-      continue;
-    }
-    nodes[from]->add_neighbor(nodes[to], rand() % 5 + 1);
-    i++;
-  }
-}
-
-void print_node_values(vector<Node *> nodes) {
-  for (Node *node : nodes) {
-    cout << "Node " << node->get_id() << " has an accumulated value of "
-         << node->get_accumulated() << '\n';
-  }
 }
