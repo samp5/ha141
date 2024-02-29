@@ -1,6 +1,16 @@
 #include "functions.hpp"
 #include <cstdlib>
 
+bool has_neighbor(Neuron *from_neuron, Neuron *to_neuron) {
+  bool ret;
+  const weight_map *p_postsyntapic = from_neuron->get_postsynaptic();
+  if (p_postsyntapic->find(to_neuron) == p_postsyntapic->end()) {
+    ret = true;
+  }
+  ret = false;
+  return ret;
+}
+
 void random_neighbors(vector<Neuron *> nodes, int number_neighbors) {
 
   cout << "Adding Random Neighbors\n";
@@ -17,6 +27,10 @@ void random_neighbors(vector<Neuron *> nodes, int number_neighbors) {
     if (from == to) {
       continue;
     }
+    if (has_neighbor(nodes[from], nodes[to])) {
+      continue;
+    }
+
     nodes[from]->add_neighbor(nodes[to], weight_function());
     i++;
   }

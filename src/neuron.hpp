@@ -20,8 +20,10 @@ private:
   double membrane_potential = INITIAL_MEMBRANE_POTENTIAL;
   int id;
 
-  std::map<Neuron *, double> _postsynaptic;
-  std::map<Neuron *, double> _presynaptic;
+  typedef std::map<Neuron *, double> weight_map;
+
+  weight_map _postsynaptic;
+  weight_map _presynaptic;
 
   pthread_t thread;
   pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
@@ -50,7 +52,15 @@ public:
   pthread_cond_t *get_cond() { return &cond; }
   int get_id() { return id; }
   double get_potential() { return membrane_potential; }
+  const weight_map *get_presynaptic() {
+    const weight_map *p_presynaptic = &_presynaptic;
+    return p_presynaptic;
+  }
 
+  const weight_map *get_postsynaptic() {
+    const weight_map *p_postsynaptic = &_postsynaptic;
+    return p_postsynaptic;
+  }
   /*--------------------------------------------------------------*\
    *                  Thread helper:
    *    POSIX needs a void* (*)(void*) function signature
