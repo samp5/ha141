@@ -1,9 +1,10 @@
 #include "functions.hpp"
 #include "neuron.hpp"
+#include <chrono>
 #include <pthread.h>
 #include <unistd.h>
 
-#define RAND_SEED 100123
+#define RAND_SEED std::time(0)
 #define NUMBER_NODES 3
 #define NUMBER_EDGES 2
 
