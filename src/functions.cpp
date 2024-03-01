@@ -5,9 +5,9 @@ bool has_neighbor(Neuron *from_neuron, Neuron *to_neuron) {
   bool ret;
   const weight_map *p_postsyntapic = from_neuron->get_postsynaptic();
   if (p_postsyntapic->find(to_neuron) == p_postsyntapic->end()) {
-    ret = true;
+    ret = false;
   }
-  ret = false;
+  ret = true;
   return ret;
 }
 
