@@ -16,11 +16,14 @@ void Neuron::add_neighbor(Neuron *neighbor, double weight) {
   cout << "Edge from Neuron " << id << " to Neuron " << neighbor->get_id()
        << " added\n";
   _postsynaptic[neighbor] = weight;
-  neighbor->add_previous(this, weight);
+  Neuron *this_neuron = this;
+  neighbor->add_previous(this_neuron, weight);
 }
 
 void Neuron::add_previous(Neuron *neighbor, double weight) {
   _presynaptic[neighbor] = weight;
+  cout << "Neuron " << neighbor->id << " added to _presynaptic of Neuron " << id
+       << '\n';
 }
 
 void *Neuron::run() {

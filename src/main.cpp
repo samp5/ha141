@@ -1,10 +1,10 @@
 #include "functions.hpp"
 #include "neuron.hpp"
-#include <chrono>
 #include <pthread.h>
 #include <unistd.h>
 
-#define RAND_SEED std::time(0)
+#define RAND_SEED time(0)
+// #define RAND_SEED 1
 #define NUMBER_NODES 3
 #define NUMBER_EDGES 2
 
@@ -46,7 +46,6 @@ int main() {
     cout << "Input: ";
     cin >> activate;
     if (activate == -1) {
-
       pthread_mutex_lock(&mutex);
       finish = true;
       for (Neuron *neuron : neurons) {
@@ -57,6 +56,8 @@ int main() {
     } else if (activate <= num_neurons && activate >= 0) {
       neurons[activate - 1]->activate();
       pthread_cond_signal(neurons[activate - 1]->get_cond());
+    } else {
+      continue;
     }
   }
 
