@@ -81,5 +81,6 @@ int main() {
 
   pthread_mutex_destroy(&mutex);
   pthread_barrier_destroy(&barrier);
+
   return 0;
 }
