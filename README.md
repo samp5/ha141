@@ -105,6 +105,7 @@ Activate neuron ( or [-1] to quit )
  Neuron 5
  Neuron 6
 Input: 6
+
 |11:9:36:226487| Neuron 6 is activated, accumulated equal to -55
 |11:9:36:226578| Neuron 6 is sending a message to Neuron 1
 |11:9:36:226584| Accumulated value for Neuron 6 is -55
