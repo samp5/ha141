@@ -19,10 +19,64 @@ Project for CS 141 Honors Supplement
 ```
 | Date   | Key Points    |  Issues   |
 |--------------- | --------------- |--------------- |
-| 2/29   | Updated Neuron Class with with membrane potentials, refractory phases, Update to edge weights, fixed issue 1, guard clauses on header files.   | "Quit" functionality does not work for the menu ([Issue 2](#issue-2))|
-| 2/28   | Basic Node class that sends and recieves messages   | `random_neighbors` may repeat edges. [~~Issue 1~~](#issue-1)|
+| [3/3](#update-3-3)   | Added time stamps to logging messages| |
+| [2/29](#update-2-29)   | Updated Neuron Class with with membrane potentials, refractory phases, Update to edge weights, fixed issue 1, guard clauses on header files.   | "Quit" functionality does not work for the menu [Issue 2](#issue-2)|
+| [2/28](#update-2-28)   | Basic Node class that sends and recieves messages   | `random_neighbors` may repeat edges. [~~Issue 1~~](#issue-1)|
 
-### Update 2/29
+### Update 3/3
+
+<details>
+<summary> Example Output 4 </summary>
+<br>
+
+New addtions:
+- Time stamps on logging messages
+
+
+``` cpp
+Time format is |HH:MM:SS:mircroseconds|
+
+Adding Neurons
+----------------
+
+|10:24:53:508828| Neuron 1 added (excitatory type)
+|10:24:53:508890| Neuron 2 added (excitatory type)
+|10:24:53:508894| Neuron 3 added (excitatory type)
+|10:24:53:508897| Neuron 4 added (excitatory type)
+|10:24:53:508901| Neuron 5 added (excitatory type)
+|10:24:53:508904| Neuron 6 added (excitatory type)
+
+Adding Random Neighbors
+--------------------------
+
+|10:24:53:508911| Edge from Neuron 5 to Neuron 6 added
+|10:24:53:508918| Neuron 5 added to _presynaptic of Neuron 6
+|10:24:53:508970| Neuron 6 has connections from
+|10:24:53:508980| - Neuron5
+|10:24:53:508987| Edge from Neuron 6 to Neuron 3 added
+|10:24:53:508998| Neuron 6 added to _presynaptic of Neuron 3
+|10:24:53:509087| Neuron 5 is connected to:
+|10:24:53:509101| - Neuron6
+|10:24:53:509107| Edge from Neuron 5 to Neuron 4 added
+|10:24:53:509115| Neuron 5 added to _presynaptic of Neuron 4
+|10:24:53:509126| Neuron 4 has connections from
+|10:24:53:509137| - Neuron5
+|10:24:53:509142| Edge from Neuron 4 to Neuron 2 added
+|10:24:53:509149| Neuron 4 added to _presynaptic of Neuron 2
+|10:24:53:509154| Neuron 3 has connections from
+|10:24:53:509157| - Neuron6
+|10:24:53:509163| Edge from Neuron 3 to Neuron 1 added
+|10:24:53:509168| Neuron 3 added to _presynaptic of Neuron 1
+|10:24:53:509479| Neuron 1 is waiting
+|10:24:53:509687| Neuron 3 is waiting
+|10:24:53:509840| Neuron 2 is waiting
+|10:24:53:510043| Neuron 6 is waiting
+|10:24:53:510116| Neuron 5 is waiting
+|10:24:53:510304| Neuron 4 is waiting
+```
+</details>
+
+### Update 2-29
 
 <details>
 <summary> Example Output 3 </summary>
@@ -233,7 +287,7 @@ while (!finish) {
 </details>
 
 
-### Update 2/28
+### Update 2-28
 
 <details>
 <summary> Example Output 1 </summary>
