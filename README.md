@@ -20,8 +20,8 @@ Project for CS 141 Honors Supplement
 | Date  | Key Points    |  Issues 🐛   |
 |--------------- | --------------- |--------------- |
 | [3/3](#-update-3-3)   | Added time stamps to logging messages. Added function descriptions.| |
-| [2/29](#-update-2-29)   | Updated Neuron Class with with membrane potentials, refractory phases, Update to edge weights, fixed issue 1, guard clauses on header files.   | "Quit" functionality does not work for the menu [Issue 2](#issue-2)|
-| [2/28](#-update-2-28)   | Basic Node class that sends and recieves messages   | `random_neighbors` may repeat edges. [~~Issue 1~~](#issue-1)|
+| [2/29](#-update-2-29)   | Updated Neuron Class with with membrane potentials, refractory phases, Update to edge weights, fixed issue 1, guard clauses on header files.   | "Quit" functionality does not work for the menu [Issue 2](#-issue-2)|
+| [2/28](#-update-2-28)   | Basic Node class that sends and recieves messages   | `random_neighbors` may repeat edges. [~~Issue 1~~](#-issue-1)|
 
 ### 📌 Update 3-3
 
