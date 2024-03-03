@@ -32,47 +32,90 @@ Project for CS 141 Honors Supplement
 New addtions:
 - Time stamps on logging messages
 
-
-``` cpp
+``` text
 Time format is |HH:MM:SS:mircroseconds|
 
 Adding Neurons
 ----------------
 
-|10:24:53:508828| Neuron 1 added (excitatory type)
-|10:24:53:508890| Neuron 2 added (excitatory type)
-|10:24:53:508894| Neuron 3 added (excitatory type)
-|10:24:53:508897| Neuron 4 added (excitatory type)
-|10:24:53:508901| Neuron 5 added (excitatory type)
-|10:24:53:508904| Neuron 6 added (excitatory type)
+|11:52:26:434641| Neuron 1 added (excitatory type)
+|11:52:26:434669| Neuron 2 added (inhibitory type)
+|11:52:26:434672| Neuron 3 added (excitatory type)
+|11:52:26:434674| Neuron 4 added (inhibitory type)
+|11:52:26:434676| Neuron 5 added (excitatory type)
+|11:52:26:434679| Neuron 6 added (excitatory type)
 
-Adding Random Neighbors
+Adding Random Edges
 --------------------------
 
-|10:24:53:508911| Edge from Neuron 5 to Neuron 6 added
-|10:24:53:508918| Neuron 5 added to _presynaptic of Neuron 6
-|10:24:53:508970| Neuron 6 has connections from
-|10:24:53:508980| - Neuron5
-|10:24:53:508987| Edge from Neuron 6 to Neuron 3 added
-|10:24:53:508998| Neuron 6 added to _presynaptic of Neuron 3
-|10:24:53:509087| Neuron 5 is connected to:
-|10:24:53:509101| - Neuron6
-|10:24:53:509107| Edge from Neuron 5 to Neuron 4 added
-|10:24:53:509115| Neuron 5 added to _presynaptic of Neuron 4
-|10:24:53:509126| Neuron 4 has connections from
-|10:24:53:509137| - Neuron5
-|10:24:53:509142| Edge from Neuron 4 to Neuron 2 added
-|10:24:53:509149| Neuron 4 added to _presynaptic of Neuron 2
-|10:24:53:509154| Neuron 3 has connections from
-|10:24:53:509157| - Neuron6
-|10:24:53:509163| Edge from Neuron 3 to Neuron 1 added
-|10:24:53:509168| Neuron 3 added to _presynaptic of Neuron 1
-|10:24:53:509479| Neuron 1 is waiting
-|10:24:53:509687| Neuron 3 is waiting
-|10:24:53:509840| Neuron 2 is waiting
-|10:24:53:510043| Neuron 6 is waiting
-|10:24:53:510116| Neuron 5 is waiting
-|10:24:53:510304| Neuron 4 is waiting
+|11:52:26:434707| Edge from Neuron 1 to Neuron 5 added
+|11:52:26:434734| Neuron 1 added to _presynaptic of Neuron 5
+|11:52:26:434742| Neuron 5 has connections from
+|11:52:26:434746| - Neuron1
+|11:52:26:434768| Edge from Neuron 5 to Neuron 2 added
+|11:52:26:434774| Neuron 5 added to _presynaptic of Neuron 2
+|11:52:26:434797| Edge from Neuron 3 to Neuron 6 added
+|11:52:26:434804| Neuron 3 added to _presynaptic of Neuron 6
+|11:52:26:434827| Neuron 2 has connections from
+|11:52:26:434832| - Neuron5
+|11:52:26:434835| Edge from Neuron 4 to Neuron 2 added
+|11:52:26:434838| Neuron 4 added to _presynaptic of Neuron 2
+|11:52:26:434841| Neuron 5 is connected to:
+|11:52:26:434843| - Neuron2
+|11:52:26:434845| Neuron 5 has connections from
+|11:52:26:434847| - Neuron1
+|11:52:26:434849| Neuron 6 has connections from
+|11:52:26:434851| - Neuron3
+|11:52:26:434853| Edge from Neuron 5 to Neuron 6 added
+|11:52:26:434856| Neuron 5 added to _presynaptic of Neuron 6
+
+|11:52:26:434943| Neuron 1 is waiting
+|11:52:26:434982| Neuron 2 is waiting
+|11:52:26:435038| Neuron 3 is waiting
+|11:52:26:435085| Neuron 4 is waiting
+|11:52:26:435141| Neuron 5 is waiting
+|11:52:26:435197| Neuron 6 is waiting
+
+Activate neuron ( or [-1] to quit )
+ Neuron 1
+ Neuron 2
+ Neuron 3
+ Neuron 4
+ Neuron 5
+ Neuron 6
+Input: 1
+
+|11:52:30:499664| Neuron 1 is activated, accumulated equal to -55
+|11:52:30:500392| Neuron 1 is sending a message to Neuron 5
+|11:52:30:500416| Accumulated value for Neuron 1 is -55
+|11:52:30:500431| Weight for Neuron 1 to Neuron 5 is 0.833798
+|11:52:30:500444| Neuron 1 modifier is -1
+|11:52:30:500453| Message is 45.8589
+|11:52:30:500645| Neuron 5 is activated, accumulated equal to -9.14112
+|11:52:30:500827| Neuron 5 is sending a message to Neuron 2
+|11:52:30:500848| Accumulated value for Neuron 5 is -9.14112
+|11:52:30:500860| Weight for Neuron 5 to Neuron 2 is 0.0295779
+|11:52:30:500868| Neuron 5 modifier is -1
+|11:52:30:500927| Message is 0.270375
+|11:52:30:501054| Neuron 2 is activated, accumulated equal to -54.7296
+|11:52:30:501296| Neuron 2 does not have any neigbors!
+|11:52:30:501326| Neuron 2 is waiting
+|11:52:30:501347| Neuron 5 is sending a message to Neuron 6
+|11:52:30:501615| Accumulated value for Neuron 5 is -9.14112
+|11:52:30:501765| Weight for Neuron 5 to Neuron 6 is 0.22352
+|11:52:30:501922| Neuron 5 modifier is -1
+|11:52:30:501952| Message is 2.04322
+|11:52:30:501349| Neuron 1 fired, entering refractory phase
+|11:52:30:502118| Neuron 6 is activated, accumulated equal to -52.9568
+|11:52:30:502135| Neuron 1 potential set to -70|
+11:52:30:502389| Neuron 6 does not have any neigbors!
+|11:52:30:502682| Neuron 6 is waiting
+|11:52:30:502431| Neuron 5 fired, entering refractory phase
+|11:52:30:502956| Neuron 5 potential set to -70
+|11:52:30:505017| Neuron 1 completed refractory phase, running
+|11:52:30:505085| Neuron 1 is waiting
+|11:52:30:514351| Neuron 5 completed refractory phase, running
+|11:52:30:514546| Neuron 5 is waiting
 
 Activate neuron ( or [-1] to quit )
  Neuron 1
@@ -83,19 +126,9 @@ Activate neuron ( or [-1] to quit )
  Neuron 6
 Input: 2
 
-|11:8:53:669752| Neuron 2 is activated, accumulated equal to -55
-|11:8:53:670240| Neuron 2 is sending a message to Neuron 3
-|11:8:53:670262| Accumulated value for Neuron 2 is -55
-|11:8:53:670355| Weight for Neuron 2 to Neuron 3 is 0.628871
-|11:8:53:670472| Neuron 2 modifier is 1
-|11:8:53:670492| Message is -34.5879
-|11:8:53:670632| Neuron 3 is activated, accumulated equal to -89.5879
-|11:8:53:670852| Membrane potential for Neuron 3 is below the threshold, not firing
-|11:8:53:670879| Neuron 3 is waiting
-|11:8:53:670959| Neuron 2 fired, entering refractory phase
-|11:8:53:671058| Neuron 2 potential set to -70
-|11:8:53:673609| Neuron 2 completed refractory phase, running
-|11:8:53:673867| Neuron 2 is waiting
+|11:52:31:823041| Neuron 2 is activated, accumulated equal to -54.7296
+|11:52:31:823208| Neuron 2 does not have any neigbors!
+|11:52:31:823215| Neuron 2 is waiting
 
 Activate neuron ( or [-1] to quit )
  Neuron 1
@@ -104,29 +137,30 @@ Activate neuron ( or [-1] to quit )
  Neuron 4
  Neuron 5
  Neuron 6
-Input: 6
+Input: 3
 
-|11:9:36:226487| Neuron 6 is activated, accumulated equal to -55
-|11:9:36:226578| Neuron 6 is sending a message to Neuron 1
-|11:9:36:226584| Accumulated value for Neuron 6 is -55
-|11:9:36:226589| Weight for Neuron 6 to Neuron 1 is 0.61264
-|11:9:36:226594| Neuron 6 modifier is 1
-|11:9:36:226598| Message is -33.6952
-|11:9:36:226711| Neuron 1 is activated, accumulated equal to -88.6952
-|11:9:36:226833| Neuron 1 does not have any neigbors!
-|11:9:36:226931| Neuron 1 is waiting
-|11:9:36:226865| Neuron 6 is sending a message to Neuron 5
-|11:9:36:226987| Accumulated value for Neuron 6 is -55
-|11:9:36:227038| Weight for Neuron 6 to Neuron 5 is 0.635712
-|11:9:36:227046| Neuron 6 modifier is 1
-|11:9:36:227050| Message is -34.9641
-|11:9:36:227141| Neuron 5 is activated, accumulated equal to -89.9641
-|11:9:36:227227| Membrane potential for Neuron 5 is below the threshold, not firing
-|11:9:36:227242| Neuron 5 is waiting
-|11:9:36:227253| Neuron 6 fired, entering refractory phase
-|11:9:36:227277| Neuron 6 potential set to -70
-|11:9:36:230011| Neuron 6 completed refractory phase, running
-|11:9:36:230090| Neuron 6 is waiting
+|11:52:32:926770| Neuron 3 is activated, accumulated equal to -55
+|11:52:32:926912| Neuron 3 is sending a message to Neuron 6
+|11:52:32:926932| Accumulated value for Neuron 3 is -55
+|11:52:32:926944| Weight for Neuron 3 to Neuron 6 is 0.191137
+|11:52:32:926952| Neuron 3 modifier is -1
+|11:52:32:927043| Message is 10.5125
+|11:52:32:927120| Neuron 3 fired, entering refractory phase
+|11:52:32:927190| Neuron 3 potential set to -70
+|11:52:32:927203| Neuron 6 is activated, accumulated equal to -42.4443
+|11:52:32:927395| Neuron 6 does not have any neigbors!
+|11:52:32:927481| Neuron 6 is waiting
+|11:52:32:929689| Neuron 3 completed refractory phase, running
+|11:52:32:929789| Neuron 3 is waiting
+
+Activate neuron ( or [-1] to quit )
+ Neuron 1
+ Neuron 2
+ Neuron 3
+ Neuron 4
+ Neuron 5
+ Neuron 6
+Input:
 
 ```
 </details>

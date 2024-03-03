@@ -16,23 +16,28 @@ extern volatile double value;
 extern bool finish;
 extern pthread_barrier_t barrier;
 
+enum Neuron_t { Input, Hidden };
+
 class Neuron {
 private:
+  // Neuron vaules
   double membrane_potential = INITIAL_MEMBRANE_POTENTIAL;
+  int excit_inhib_value;
   int id;
+  Neuron_t type;
 
+  // Edge values
   typedef std::map<Neuron *, double> weight_map;
-
   weight_map _postsynaptic;
   weight_map _presynaptic;
 
+  // pthread values
   pthread_t thread;
   pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 
+  // Conditional execution values
   bool active = false;
   bool recieved = false;
-
-  int excit_inhib_value;
 
 public:
   Neuron(int _id, int inhibitory);
@@ -43,9 +48,7 @@ public:
   void *run();
   void start_thread();
   void join_thread();
-
   void refractory();
-
   void activate() { active = true; }
   void deactivate() { active = false; }
 
@@ -63,6 +66,7 @@ public:
     const weight_map *p_postsynaptic = &_postsynaptic;
     return p_postsynaptic;
   }
+
   /*--------------------------------------------------------------*\
    *                  Thread helper:
    *    POSIX needs a void* (*)(void*) function signature
