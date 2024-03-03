@@ -52,6 +52,7 @@ int main() {
     }
     cout << "Input: ";
     cin >> activate;
+    cout << '\n';
     if (activate == -1) {
       pthread_mutex_lock(&mutex);
       finish = true;
