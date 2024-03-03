@@ -1,7 +1,7 @@
 ## Honors Supplement for CS 141
 Project for CS 141 Honors Supplement
 
-### Folder Structure
+### 📁 Folder Structure
 
 ```
 ├── src
@@ -17,20 +17,21 @@ Project for CS 141 Honors Supplement
 └── makefile
 
 ```
-| Date   | Key Points    |  Issues   |
+| Date  | Key Points    |  Issues 🐛   |
 |--------------- | --------------- |--------------- |
 | [3/3](#update-3-3)   | Added time stamps to logging messages. Added function descriptions.| |
 | [2/29](#update-2-29)   | Updated Neuron Class with with membrane potentials, refractory phases, Update to edge weights, fixed issue 1, guard clauses on header files.   | "Quit" functionality does not work for the menu [Issue 2](#issue-2)|
 | [2/28](#update-2-28)   | Basic Node class that sends and recieves messages   | `random_neighbors` may repeat edges. [~~Issue 1~~](#issue-1)|
 
-### Update 3/3
+### 📌 Update 3/3
+
+###### New addtions:
+- Time stamps on logging messages
 
 <details>
 <summary> Example Output 4 </summary>
 <br>
 
-New addtions:
-- Time stamps on logging messages
 
 ``` text
 Time format is |HH:MM:SS:mircroseconds|
@@ -165,18 +166,19 @@ Input:
 ```
 </details>
 
-### Update 2-29
+### 📌 Update 2-29
 
-<details>
-<summary> Example Output 3 </summary>
-<br>
-
-New addtions:
+###### New addtions:
 - Choose neuron to activate
 - Activation based on membrane potential
 - Refractory period
 - Edge weights are [0, 1]
 - Constants are preprocessor defintions
+
+<details>
+<summary> Example Output 3 </summary>
+<br>
+
 
 ```
 Neuron 1 added (inhibitory type)
@@ -309,7 +311,7 @@ public:
 ```
 </details>
 
-##### Issue 2
+##### 🐛 Issue 2
 - I think the quit functionality of the menu sticks executable in a thread lock. Not sure how to fix it.
 - I tried
     - Adjusting the mutex positioning to inside the for loop even through it should be on the outside
@@ -376,8 +378,10 @@ while (!finish) {
 </details>
 
 
-### Update 2-28
+### 📌 Update 2-28
 
+###### New Additions:
+- First update
 <details>
 <summary> Example Output 1 </summary>
 <br>
@@ -445,7 +449,7 @@ Node 3 has an accumulated value of 2
 ```
 </details>
 
-###### ~~Issue 1~~
+###### 🐛~~Issue 1~~
 - Random neighbor funciton still needs adjustments to avoid repeat edges
 <details>
 <summary> Random neighbor function </summary>
