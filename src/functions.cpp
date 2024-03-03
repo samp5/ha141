@@ -110,9 +110,12 @@ void random_neighbors(vector<Neuron *> nodes, int number_neighbors) {
 }
 
 void print_node_values(vector<Neuron *> nodes) {
+  cout << "\nFinal Neuron Values\n";
+  cout << "-------------------\n\n";
   for (Neuron *node : nodes) {
-    cout << "Neuron " << node->get_id() << " has an accumulated value of "
-         << node->get_potential() << '\n';
+    print_time();
+    cout << "Neuron " << node->get_id() << ": " << node->get_potential()
+         << '\n';
   }
 }
 

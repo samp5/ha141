@@ -80,11 +80,13 @@ void *Neuron::run() {
     pthread_cond_wait(&cond, &mutex);
   }
 
+  pthread_mutex_unlock(&mutex);
   if (finish) {
+    print_time();
+    cout << "Neuron " << id << " is exiting\n";
+
     pthread_exit(NULL);
   }
-
-  pthread_mutex_unlock(&mutex);
 
   pthread_mutex_lock(&mutex);
   membrane_potential = ::value == INITIAL_MEMBRANE_POTENTIAL
@@ -109,13 +111,6 @@ void *Neuron::run() {
          << " is below the threshold, not firing\n";
   } else {
     for (const auto &pair : _postsynaptic) {
-      if (membrane_potential < ACTIVATION_THRESHOLD) {
-        print_time();
-        cout << "Membrane potential for Neuron " << id
-             << " is below the threshold, not firing\n";
-        break;
-      }
-
       print_time();
       cout << "Neuron " << id << " is sending a message to Neuron "
            << pair.first->id << '\n';

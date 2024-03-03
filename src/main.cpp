@@ -54,13 +54,14 @@ int main() {
     cin >> activate;
     cout << '\n';
     if (activate == -1) {
-      pthread_mutex_lock(&mutex);
-      finish = true;
+      print_time();
+      cout << "Exiting...\n";
       for (Neuron *neuron : neurons) {
+        finish = true;
         neuron->activate();
-        pthread_cond_signal(neuron->get_cond());
+        pthread_cond_t *this_cond = neuron->get_cond();
+        pthread_cond_signal(this_cond);
       }
-      pthread_mutex_unlock(&mutex);
     } else if (activate <= num_neurons && activate >= 0) {
       neurons[activate - 1]->activate();
       pthread_cond_signal(neurons[activate - 1]->get_cond());
@@ -75,8 +76,12 @@ int main() {
 
   print_node_values(neurons);
 
-  for (Neuron *node : neurons) {
-    delete node;
+  cout << "\nDeallocation\n";
+  cout << "------------\n\n";
+  for (Neuron *neuron : neurons) {
+    print_time();
+    cout << "Deleting Neuron " << neuron->get_id() << '\n';
+    delete neuron;
   }
 
   pthread_mutex_destroy(&mutex);
