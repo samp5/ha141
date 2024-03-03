@@ -70,7 +70,7 @@ int main() {
   }
 
   for (Neuron *node : neurons) {
-    node->join_thread();
+    pthread_join(node->get_thread_id(), NULL);
   }
 
   print_node_values(neurons);

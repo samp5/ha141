@@ -8,6 +8,7 @@
 
 #define INITIAL_MEMBRANE_POTENTIAL -55
 #define ACTIVATION_THRESHOLD -55
+#define REFRACTORY_MEMBRANE_POTENTIAL -70
 
 using std::cout;
 extern pthread_mutex_t mutex;
@@ -49,6 +50,7 @@ public:
   void deactivate() { active = false; }
 
   //>>>>>>>>>>>>>> Access to private variables <<<<<<<<<<<
+  pthread_t get_thread_id() { return thread; }
   pthread_cond_t *get_cond() { return &cond; }
   int get_id() { return id; }
   double get_potential() { return membrane_potential; }
