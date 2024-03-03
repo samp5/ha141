@@ -19,6 +19,7 @@ void print_time(std::ostream &os) {
      << microseconds << "|"
      << " ";
 }
+
 void print_maps(Neuron *neuron) {
   const weight_map *p_postsyntapic = neuron->get_postsynaptic();
   const weight_map *p_presyntapic = neuron->get_presynaptic();
@@ -51,17 +52,21 @@ void print_maps(Neuron *neuron) {
 bool has_neighbor(Neuron *from_neuron, Neuron *to_neuron) {
   bool ret;
   const weight_map *p_postsyntapic = from_neuron->get_postsynaptic();
-  const weight_map *p_presyntapic = to_neuron->get_presynaptic();
+  const weight_map *p_presyntapic = from_neuron->get_presynaptic();
 
+  // print maps as debugging measure
   print_maps(from_neuron);
   print_maps(to_neuron);
 
+  // check for connection FROM from_neuron TO to_neuron
   if (p_postsyntapic->find(to_neuron) != p_postsyntapic->end()) {
     cout << "Neuron " << from_neuron->get_id() << " is already connected to "
          << to_neuron->get_id() << '\n';
     // if the to neuron is not already in the postsynaptic map
     ret = true;
-  } else if (p_presyntapic->find(from_neuron) != p_presyntapic->end()) {
+  }
+  // check for connections FROM to_neuron TO from_neuron
+  else if (p_presyntapic->find(to_neuron) != p_presyntapic->end()) {
     cout << "Neuron " << to_neuron->get_id()
          << " already has a connection from " << from_neuron->get_id() << '\n';
     // if the to_neuron is in the presynaptic list
@@ -69,13 +74,12 @@ bool has_neighbor(Neuron *from_neuron, Neuron *to_neuron) {
   } else {
     ret = false;
   }
-
   return ret;
 }
 
 void random_neighbors(vector<Neuron *> nodes, int number_neighbors) {
 
-  cout << "\nAdding Random Neighbors\n";
+  cout << "\nAdding Random Edges\n";
   cout << "--------------------------\n\n";
   int size = nodes.size();
   int i = 0;
@@ -102,6 +106,7 @@ void random_neighbors(vector<Neuron *> nodes, int number_neighbors) {
     nodes[from]->add_neighbor(nodes[to], weight_function());
     i++;
   }
+  cout << '\n';
 }
 
 void print_node_values(vector<Neuron *> nodes) {
