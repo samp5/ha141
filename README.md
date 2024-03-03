@@ -19,9 +19,128 @@ Project for CS 141 Honors Supplement
 ```
 | Date  | Key Points    |  Issues 🐛   |
 |--------------- | --------------- |--------------- |
+| [3/3](#-update-3-3-part-2)   | Fixed [Issue 2](#-issue-2)| |
 | [3/3](#-update-3-3)   | Added time stamps to logging messages. Added function descriptions.| |
-| [2/29](#-update-2-29)   | Updated Neuron Class with with membrane potentials, refractory phases, Update to edge weights, fixed issue 1, guard clauses on header files.   | "Quit" functionality does not work for the menu [Issue 2](#-issue-2)|
+| [2/29](#-update-2-29)   | Updated Neuron Class with with membrane potentials, refractory phases, Update to edge weights, fixed issue 1, guard clauses on header files.   | "Quit" functionality does not work for the menu [~~Issue 2~~](#-issue-2)|
 | [2/28](#-update-2-28)   | Basic Node class that sends and recieves messages   | `random_neighbors` may repeat edges. [~~Issue 1~~](#-issue-1)|
+
+### 📌 Update 3-3 Part 2
+
+###### New addtions:
+- Working quit functionality on menu! 
+- Memory deallocation working.
+- Additional logging
+
+<details>
+<summary> Example Output 5 </summary>
+<br>
+
+
+``` text
+Time format is |HH:MM:SS:mircroseconds|
+
+Adding Neurons
+----------------
+
+|14:30:0:926336| Neuron 1 added (excitatory type)
+|14:30:0:926380| Neuron 2 added (excitatory type)
+|14:30:0:926383| Neuron 3 added (inhibitory type)
+
+Adding Random Edges
+--------------------------
+
+|14:30:0:926387| Edge from Neuron 2 to Neuron 3 added
+|14:30:0:926391| Neuron 2 added to _presynaptic of Neuron 3
+|14:30:0:926416| Neuron 2 is connected to:
+|14:30:0:926481| - Neuron3
+|14:30:0:926487| Edge from Neuron 1 to Neuron 2 added
+|14:30:0:926491| Neuron 1 added to _presynaptic of Neuron 2
+
+|14:30:0:926609| Neuron 1 is waiting
+|14:30:0:926647| Neuron 3 is waiting
+|14:30:0:926870| Neuron 2 is waiting
+
+Activate neuron ( or [-1] to quit )
+ Neuron 1
+ Neuron 2
+ Neuron 3
+Input: 1
+
+|14:30:7:536435| Neuron 1 is activated, accumulated equal to -55
+|14:30:7:536569| Neuron 1 is sending a message to Neuron 2
+|14:30:7:536580| Accumulated value for Neuron 1 is -55
+|14:30:7:536587| Weight for Neuron 1 to Neuron 2 is 0.517304
+|14:30:7:536596| Neuron 1 modifier is -1
+|14:30:7:536602| Message is 28.4517
+|14:30:7:536788| Neuron 2 is activated, accumulated equal to -26.5483
+|14:30:7:536944| Neuron 2 is sending a message to Neuron 3
+|14:30:7:536964| Accumulated value for Neuron 2 is -26.5483
+|14:30:7:536964| Neuron 1 fired, entering refractory phase
+|14:30:7:537079| Neuron 1 potential set to -70
+|14:30:7:536983| Weight for Neuron 2 to Neuron 3 is 0.352867
+|14:30:7:537319| Neuron 2 modifier is -1
+|14:30:7:537327| Message is 9.36803
+|14:30:7:537535| Neuron 3 is activated, accumulated equal to -45.632
+|14:30:7:537721| Neuron 3 does not have any neigbors!
+|14:30:7:537742| Neuron 3 is waiting
+|14:30:7:537744| Neuron 2 fired, entering refractory phase
+|14:30:7:537842| Neuron 2 potential set to -70
+|14:30:7:539698| Neuron 1 completed refractory phase, running
+|14:30:7:539861| Neuron 1 is waiting
+|14:30:7:540311| Neuron 2 completed refractory phase, running
+|14:30:7:540440| Neuron 2 is waiting
+
+Activate neuron ( or [-1] to quit )
+ Neuron 1
+ Neuron 2
+ Neuron 3
+Input: 3
+
+|14:30:10:979676| Neuron 3 is activated, accumulated equal to -45.632
+|14:30:10:979797| Neuron 3 does not have any neigbors!
+|14:30:10:979805| Neuron 3 is waiting
+
+Activate neuron ( or [-1] to quit )
+ Neuron 1
+ Neuron 2
+ Neuron 3
+Input: -1
+
+|14:30:15:945951| Exiting...
+|14:30:15:946038| Neuron 1 is exiting
+|14:30:15:946054| Neuron 2 is exiting
+|14:30:15:946085| Neuron 3 is exiting
+
+Final Neuron Values
+-------------------
+
+|14:30:15:946269| Neuron 1: -70
+|14:30:15:946316| Neuron 2: -70
+|14:30:15:946354| Neuron 3: -45.632
+
+Deallocation
+------------
+
+|14:30:15:946390| Deleting Neuron 1
+|14:30:15:946397| Deleting Neuron 2
+|14:30:15:946400| Deleting Neuron 3
+```
+</details>
+
+<details>
+<summary>Valgrind Output</summary>
+<br>
+```
+==229124==
+==229124== HEAP SUMMARY:
+==229124==     in use at exit: 0 bytes in 0 blocks
+==229124==   total heap usage: 54 allocs, 54 frees, 86,137 bytes allocated
+==229124==
+==229124== All heap blocks were freed -- no leaks are possible
+==229124==
+==229124== For lists of detected and suppressed errors, rerun with: -s
+==229124== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+```
 
 ### 📌 Update 3-3
 
@@ -29,7 +148,7 @@ Project for CS 141 Honors Supplement
 - Time stamps on logging messages
 
 <details>
-<summary> Example Output 4 </summary>
+<summary> Example output 4 </summary>
 <br>
 
 
@@ -311,7 +430,7 @@ public:
 ```
 </details>
 
-##### 🐛 Issue 2
+##### 🐛 ~~Issue 2~~
 - I think the quit functionality of the menu sticks executable in a thread lock. Not sure how to fix it.
 - I tried
     - Adjusting the mutex positioning to inside the for loop even through it should be on the outside
