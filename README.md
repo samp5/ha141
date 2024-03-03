@@ -17,12 +17,12 @@ Project for CS 141 Honors Supplement
 └── makefile
 
 ```
-| Date  | Key Points    |  Issues 🐛   |
+| Date  | Key Points 🔑   |  Issues 🐛   |
 |--------------- | --------------- |--------------- |
-| [3/3](#-update-3-3-part-2)   | Fixed [Issue 2](#-issue-2)| |
-| [3/3](#-update-3-3)   | Added time stamps to logging messages. Added function descriptions.| |
-| [2/29](#-update-2-29)   | Updated Neuron Class with with membrane potentials, refractory phases, Update to edge weights, fixed issue 1, guard clauses on header files.   | "Quit" functionality does not work for the menu [~~Issue 2~~](#-issue-2)|
-| [2/28](#-update-2-28)   | Basic Node class that sends and recieves messages   | `random_neighbors` may repeat edges. [~~Issue 1~~](#-issue-1)|
+| [3-3 pt.2](#-update-3-3-part-2)   | Fixed [Issue 2](#-issue-2)| |
+| [3-3](#-update-3-3)   | Added time stamps to logging messages. Added function descriptions.| |
+| [2-29](#-update-2-29)   | Updated Neuron Class with with membrane potentials, refractory phases, Update to edge weights, fixed issue 1, guard clauses on header files.   | "Quit" functionality does not work for the menu [~~Issue 2~~](#-issue-2)|
+| [2-28](#-update-2-28)   | Basic Node class that sends and recieves messages   | `random_neighbors` may repeat edges. [~~Issue 1~~](#-issue-1)|
 
 ### 📌 Update 3-3 Part 2
 
@@ -130,6 +130,8 @@ Deallocation
 <details>
 <summary>Valgrind Output</summary>
 <br>
+
+- No Memory Leaks
 ```
 ==229124==
 ==229124== HEAP SUMMARY:
@@ -139,8 +141,8 @@ Deallocation
 ==229124== All heap blocks were freed -- no leaks are possible
 ==229124==
 ==229124== For lists of detected and suppressed errors, rerun with: -s
-==229124== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
 ```
+</details>
 
 ### 📌 Update 3-3
 
