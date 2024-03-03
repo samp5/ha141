@@ -6,8 +6,10 @@
 Neuron::Neuron(int _id, int _excit_inhib_value) {
   id = _id;
   excit_inhib_value = _excit_inhib_value;
+
   const char *inhib =
       _excit_inhib_value == -1 ? "excitatory\0" : "inhibitory\0";
+
   print_time();
   cout << "Neuron " << id << " added (" << inhib << " type) \n";
 }
