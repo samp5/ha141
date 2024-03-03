@@ -25,6 +25,7 @@ void print_node_values(vector<Neuron *> nodes);
 
 void print_maps(Neuron *neuron);
 
+void print_time(std::ostream &os = std::cout);
 double weight_function();
 int get_inhibitory_status();
 

@@ -5,8 +5,9 @@
 
 #define RAND_SEED time(0)
 // #define RAND_SEED 1
-#define NUMBER_NODES 3
-#define NUMBER_EDGES 2
+
+#define NUMBER_NODES 6
+#define NUMBER_EDGES 5
 
 using std::cin;
 
@@ -24,6 +25,12 @@ int main() {
   pthread_barrier_init(&barrier, NULL, NUMBER_NODES + 1);
 
   vector<Neuron *> neurons(num_neurons);
+
+  cout << "Time format is |HH:MM:SS:mircroseconds|\n";
+
+  cout << "\nAdding Neurons\n";
+  cout << "----------------\n\n";
+
   for (int i = 0; i < num_neurons; i++) {
     Neuron *neuron = new Neuron(i + 1, get_inhibitory_status());
     neurons[i] = neuron;
@@ -39,7 +46,7 @@ int main() {
   while (!finish) {
 
     usleep(100000);
-    cout << "Activate neuron ( or [-1] to quit )\n";
+    cout << "\nActivate neuron ( or [-1] to quit )\n";
     for (Neuron *neuron : neurons) {
       cout << " Neuron " << neuron->get_id() << '\n';
     }

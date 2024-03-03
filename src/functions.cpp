@@ -1,6 +1,24 @@
 #include "functions.hpp"
+#include <chrono>
 #include <cstdlib>
+#include <ctime>
+#include <iostream>
+#include <ostream>
 
+void print_time(std::ostream &os) {
+  unsigned long long now =
+      std::chrono::duration_cast<std::chrono::microseconds>(
+          std::chrono::system_clock::now().time_since_epoch())
+          .count();
+  time_t time_now = time(0);
+  long int microseconds = now - 1e6 * time_now;
+
+  tm *ltm = localtime(&time_now);
+
+  os << "|" << ltm->tm_hour << ":" << ltm->tm_min << ":" << ltm->tm_sec << ":"
+     << microseconds << "|"
+     << " ";
+}
 void print_maps(Neuron *neuron) {
   const weight_map *p_postsyntapic = neuron->get_postsynaptic();
   const weight_map *p_presyntapic = neuron->get_presynaptic();
@@ -8,8 +26,10 @@ void print_maps(Neuron *neuron) {
   if (!p_postsyntapic->empty()) {
     // print post synaptic
     weight_map::const_iterator post_it = p_postsyntapic->begin();
+    print_time();
     cout << "Neuron " << neuron->get_id() << " is connected to:\n";
     while (post_it != p_postsyntapic->end()) {
+      print_time();
       cout << "- Neuron" << post_it->first->get_id() << '\n';
       ++post_it;
     }
@@ -18,8 +38,10 @@ void print_maps(Neuron *neuron) {
   if (!p_presyntapic->empty()) {
     // print pre synaptic
     weight_map::const_iterator pre_it = p_presyntapic->begin();
+    print_time();
     cout << "Neuron " << neuron->get_id() << " has connections from\n";
     while (pre_it != p_presyntapic->end()) {
+      print_time();
       cout << "- Neuron" << pre_it->first->get_id() << '\n';
       ++pre_it;
     }
@@ -39,17 +61,12 @@ bool has_neighbor(Neuron *from_neuron, Neuron *to_neuron) {
          << to_neuron->get_id() << '\n';
     // if the to neuron is not already in the postsynaptic map
     ret = true;
-
   } else if (p_presyntapic->find(from_neuron) != p_presyntapic->end()) {
-
     cout << "Neuron " << to_neuron->get_id()
          << " already has a connection from " << from_neuron->get_id() << '\n';
-
-    // if the to_neuron is not in the presynaptic list
+    // if the to_neuron is in the presynaptic list
     ret = true;
-
   } else {
-
     ret = false;
   }
 
@@ -58,7 +75,8 @@ bool has_neighbor(Neuron *from_neuron, Neuron *to_neuron) {
 
 void random_neighbors(vector<Neuron *> nodes, int number_neighbors) {
 
-  cout << "Adding Random Neighbors\n";
+  cout << "\nAdding Random Neighbors\n";
+  cout << "--------------------------\n\n";
   int size = nodes.size();
   int i = 0;
   if (number_neighbors > size) {

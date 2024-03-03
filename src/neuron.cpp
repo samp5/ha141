@@ -1,4 +1,5 @@
 #include "neuron.hpp"
+#include "functions.hpp"
 #include <pthread.h>
 #include <unistd.h>
 
@@ -7,12 +8,14 @@ Neuron::Neuron(int _id, int _excit_inhib_value) {
   excit_inhib_value = _excit_inhib_value;
   const char *inhib =
       _excit_inhib_value == -1 ? "excitatory\0" : "inhibitory\0";
+  print_time();
   cout << "Neuron " << id << " added (" << inhib << " type) \n";
 }
 
 Neuron::~Neuron() { pthread_cond_destroy(&cond); }
 
 void Neuron::add_neighbor(Neuron *neighbor, double weight) {
+  print_time();
   cout << "Edge from Neuron " << id << " to Neuron " << neighbor->get_id()
        << " added\n";
   _postsynaptic[neighbor] = weight;
@@ -22,6 +25,7 @@ void Neuron::add_neighbor(Neuron *neighbor, double weight) {
 
 void Neuron::add_previous(Neuron *neighbor, double weight) {
   _presynaptic[neighbor] = weight;
+  print_time();
   cout << "Neuron " << neighbor->id << " added to _presynaptic of Neuron " << id
        << '\n';
 }
@@ -30,6 +34,7 @@ void *Neuron::run() {
 
   pthread_mutex_lock(&mutex);
   while (!active) {
+    print_time();
     cout << "Neuron " << id << " is waiting\n";
     pthread_cond_wait(&cond, &mutex);
   }
@@ -45,6 +50,7 @@ void *Neuron::run() {
                            ? membrane_potential
                            : membrane_potential + value;
   value = INITIAL_MEMBRANE_POTENTIAL;
+  print_time();
   cout << "Neuron " << id << " is activated, accumulated equal to "
        << membrane_potential << "\n";
   recieved = true;
@@ -54,18 +60,22 @@ void *Neuron::run() {
 
   if (_postsynaptic.empty()) {
 
+    print_time();
     cout << "Neuron " << id << " does not have any neigbors!\n";
   } else if (membrane_potential < ACTIVATION_THRESHOLD) {
+    print_time();
     cout << "Membrane potential for Neuron " << id
          << " is below the threshold, not firing\n";
   } else {
     for (const auto &pair : _postsynaptic) {
       if (membrane_potential < ACTIVATION_THRESHOLD) {
+        print_time();
         cout << "Membrane potential for Neuron " << id
              << " is below the threshold, not firing\n";
         break;
       }
 
+      print_time();
       cout << "Neuron " << id << " is sending a message to Neuron "
            << pair.first->id << '\n';
 
@@ -73,11 +83,15 @@ void *Neuron::run() {
 
       double message =
           membrane_potential * _postsynaptic[pair.first] * excit_inhib_value;
+      print_time();
       cout << "Accumulated value for Neuron " << id << " is "
            << membrane_potential << '\n';
+      print_time();
       cout << "Weight for Neuron " << id << " to Neuron " << pair.first->id
            << " is " << pair.second << '\n';
+      print_time();
       cout << "Neuron " << id << " modifier is " << excit_inhib_value << '\n';
+      print_time();
       cout << "Message is " << message << '\n';
 
       value = message;
@@ -96,8 +110,10 @@ void *Neuron::run() {
       }
       pthread_mutex_unlock(&mutex);
     }
+    print_time();
     cout << "Neuron " << id << " fired, entering refractory phase\n";
     this->refractory();
+    print_time();
     cout << "Neuron " << id << " completed refractory phase, running\n";
   }
 
@@ -114,6 +130,7 @@ void Neuron::join_thread() { pthread_join(thread, NULL); }
 
 void Neuron::refractory() {
   membrane_potential = -70;
+  print_time();
   cout << "Neuron " << id << " potential set to " << membrane_potential << '\n';
   usleep(2000);
 }
