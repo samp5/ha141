@@ -73,6 +73,60 @@ Adding Random Neighbors
 |10:24:53:510043| Neuron 6 is waiting
 |10:24:53:510116| Neuron 5 is waiting
 |10:24:53:510304| Neuron 4 is waiting
+
+Activate neuron ( or [-1] to quit )
+ Neuron 1
+ Neuron 2
+ Neuron 3
+ Neuron 4
+ Neuron 5
+ Neuron 6
+Input: 2
+
+|11:8:53:669752| Neuron 2 is activated, accumulated equal to -55
+|11:8:53:670240| Neuron 2 is sending a message to Neuron 3
+|11:8:53:670262| Accumulated value for Neuron 2 is -55
+|11:8:53:670355| Weight for Neuron 2 to Neuron 3 is 0.628871
+|11:8:53:670472| Neuron 2 modifier is 1
+|11:8:53:670492| Message is -34.5879
+|11:8:53:670632| Neuron 3 is activated, accumulated equal to -89.5879
+|11:8:53:670852| Membrane potential for Neuron 3 is below the threshold, not firing
+|11:8:53:670879| Neuron 3 is waiting
+|11:8:53:670959| Neuron 2 fired, entering refractory phase
+|11:8:53:671058| Neuron 2 potential set to -70
+|11:8:53:673609| Neuron 2 completed refractory phase, running
+|11:8:53:673867| Neuron 2 is waiting
+
+Activate neuron ( or [-1] to quit )
+ Neuron 1
+ Neuron 2
+ Neuron 3
+ Neuron 4
+ Neuron 5
+ Neuron 6
+Input: 6
+|11:9:36:226487| Neuron 6 is activated, accumulated equal to -55
+|11:9:36:226578| Neuron 6 is sending a message to Neuron 1
+|11:9:36:226584| Accumulated value for Neuron 6 is -55
+|11:9:36:226589| Weight for Neuron 6 to Neuron 1 is 0.61264
+|11:9:36:226594| Neuron 6 modifier is 1
+|11:9:36:226598| Message is -33.6952
+|11:9:36:226711| Neuron 1 is activated, accumulated equal to -88.6952
+|11:9:36:226833| Neuron 1 does not have any neigbors!
+|11:9:36:226931| Neuron 1 is waiting
+|11:9:36:226865| Neuron 6 is sending a message to Neuron 5
+|11:9:36:226987| Accumulated value for Neuron 6 is -55
+|11:9:36:227038| Weight for Neuron 6 to Neuron 5 is 0.635712
+|11:9:36:227046| Neuron 6 modifier is 1
+|11:9:36:227050| Message is -34.9641
+|11:9:36:227141| Neuron 5 is activated, accumulated equal to -89.9641
+|11:9:36:227227| Membrane potential for Neuron 5 is below the threshold, not firing
+|11:9:36:227242| Neuron 5 is waiting
+|11:9:36:227253| Neuron 6 fired, entering refractory phase
+|11:9:36:227277| Neuron 6 potential set to -70
+|11:9:36:230011| Neuron 6 completed refractory phase, running
+|11:9:36:230090| Neuron 6 is waiting
+
 ```
 </details>
 
