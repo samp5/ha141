@@ -20,8 +20,9 @@ class Log {
 public:
   // constructor
 
-  void write_data(vector<int> id, vector<double> data,
-                  const char *filesname = "%d.log");
+  void add_data(int id, double data);
+
+  void write_data(const char *filesname = "./logs/%ld.log");
 
   void log(LogLevel level, const char *message, std::ostream &os = std::cout);
 
@@ -38,6 +39,10 @@ public:
 
   void log_neuron_type(LogLevel level, const char *message, int id,
                        const char *type);
+
+private:
+  vector<double> data;
+  vector<int> id;
 };
 
 #endif // !LOG

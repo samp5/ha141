@@ -92,6 +92,7 @@ int main() {
     delete neuron;
   }
 
+  lg.write_data();
   pthread_mutex_destroy(&mutex);
   // pthread_barrier_destroy(&barrier);
 

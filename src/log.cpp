@@ -114,8 +114,14 @@ void Log::log_neuron_type(LogLevel level, const char *message, int id,
   // deallocate
   delete[] formatted_msg;
 }
-void Log::write_data(vector<int> id, vector<double> data,
-                     const char *filename) {
+
+void Log::add_data(int curr_id, double curr_data) {
+  this->data.push_back(curr_data);
+  this->id.push_back(curr_id);
+}
+
+void Log::write_data(const char *filename) {
+
   struct timeval tv;
   gettimeofday(&tv, NULL);
 
@@ -126,17 +132,26 @@ void Log::write_data(vector<int> id, vector<double> data,
   // format
   snprintf(file_name, length + 1, filename, tv.tv_sec);
 
-  if (id.size() != data.size()) {
+  if (this->id.size() != this->data.size()) {
     this->log(ERROR, "write_data: Data size and ID size do not match?");
+    delete[] file_name;
     return;
   }
 
-  std::ofstream file(file_name);
-  if (file.is_open()) {
+  std::ofstream file;
+  file.open(file_name);
+
+  if (!file.is_open()) {
+    this->log(ERROR, "write_data: Unable to open file");
+    delete[] file_name;
+    return;
   }
 
-  for (int i = 0; i < id.size(); i++) {
+  for (vector<int>::size_type i = 0; i < id.size(); i++) {
+    file << this->id[i] << " " << this->data[i] << '\n';
   }
+
+  file.close();
   // deallocate
   delete[] file_name;
 }
