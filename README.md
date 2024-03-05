@@ -21,7 +21,7 @@ Project for CS 141 Honors Supplement
 ```
 
 ### In-Progress 🚀
-- [x] Create and integrate Log Class 
+- [x] ~~Create and integrate Log Class~~
 - [ ] Neuron Group Class
 - [ ] Neuron Types for differentiated functionality (input, output)
 - [ ] Possion Process for Neuron Activation
