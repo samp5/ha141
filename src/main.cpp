@@ -1,4 +1,5 @@
 #include "functions.hpp"
+#include "log.hpp"
 #include "neuron.hpp"
 #include <pthread.h>
 #include <unistd.h>
@@ -15,6 +16,15 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_barrier_t barrier;
 volatile double value = 0;
 bool finish = false;
+Log lg;
+
+/*
+  1 - ERROR,
+  2 - WARNING,
+  3 - INFO,
+  4 - DEBUG,
+*/
+LogLevel level = DEBUG;
 
 int main() {
 
@@ -22,7 +32,7 @@ int main() {
 
   int num_neurons = NUMBER_NODES;
 
-  pthread_barrier_init(&barrier, NULL, NUMBER_NODES + 1);
+  // pthread_barrier_init(&barrier, NULL, NUMBER_NODES + 1);
 
   vector<Neuron *> neurons(num_neurons);
 
@@ -54,7 +64,6 @@ int main() {
     cin >> activate;
     cout << '\n';
     if (activate == -1) {
-      print_time();
       cout << "Exiting...\n";
       for (Neuron *neuron : neurons) {
         finish = true;
@@ -79,13 +88,12 @@ int main() {
   cout << "\nDeallocation\n";
   cout << "------------\n\n";
   for (Neuron *neuron : neurons) {
-    print_time();
-    cout << "Deleting Neuron " << neuron->get_id() << '\n';
+    lg.log_neuron_state(INFO, "Deleting Neuron %d", neuron->get_id());
     delete neuron;
   }
 
   pthread_mutex_destroy(&mutex);
-  pthread_barrier_destroy(&barrier);
+  // pthread_barrier_destroy(&barrier);
 
   return 0;
 }

@@ -1,6 +1,7 @@
 #ifndef NEURON
 #define NEURON
 
+#include "log.hpp"
 #include <iostream>
 #include <map>
 #include <pthread.h>
@@ -15,6 +16,7 @@ extern pthread_mutex_t mutex;
 extern volatile double value;
 extern bool finish;
 extern pthread_barrier_t barrier;
+extern Log lg;
 
 enum Neuron_t { Input, Hidden };
 

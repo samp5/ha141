@@ -1,4 +1,4 @@
-## Honors Supplement for CS 141
+# Honors Supplement for CS 141
 Project for CS 141 Honors Supplement
 
 ### 📁 Folder Structure
@@ -19,7 +19,7 @@ Project for CS 141 Honors Supplement
 ```
 
 ### In-Progress 🚀
-- [ ] Create and integrate Logging Class 
+- [ ] Create and integrate Log Class 
 - [ ] Neuron Group Class
 - [ ] Neuron Types for differentiated functionality (input, output)
 - [ ] Possion Process for Neuron Activation

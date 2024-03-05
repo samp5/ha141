@@ -1,12 +1,14 @@
 #ifndef FUNCTIONS
 #define FUNCTIONS
 
+#include "log.hpp"
 #include "neuron.hpp"
 #include <iostream>
 #include <vector>
 
 using std::cout;
 using std::vector;
+extern Log lg;
 
 typedef std::map<Neuron *, double> weight_map;
 
