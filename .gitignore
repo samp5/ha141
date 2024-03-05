@@ -1,5 +1,8 @@
 # ignore notes
 notes.md
 
+# ignore log files
+*.log
+
 # exclude all build executables
 build/*
