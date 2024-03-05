@@ -17,6 +17,14 @@ Project for CS 141 Honors Supplement
 └── makefile
 
 ```
+
+### In-Progress 🚀
+- [ ] Create and integrate Logging Class 
+- [ ] Neuron Group Class
+- [ ] Neuron Types for differentiated functionality (input, output)
+- [ ] Possion Process for Neuron Activation
+- [ ] Activate Neuron from file inputs (or other arbitrary input)
+
 | Date  | Key Points 🔑   |  Issues 🐛   |
 |--------------- | --------------- |--------------- |
 | [3-3 pt.2](#-update-3-3-part-2)   | Fixed [Issue 2](#-issue-2)| |
