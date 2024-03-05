@@ -12,6 +12,8 @@ Project for CS 141 Honors Supplement
 │   └── neuron.cpp
 ├── pthred_ex //practice pthread examples
 │   └── ...
+├── logs 
+│   └── // all .log files ignored 
 ├── .gitignore
 ├── README.md
 └── makefile
@@ -19,7 +21,7 @@ Project for CS 141 Honors Supplement
 ```
 
 ### In-Progress 🚀
-- [ ] Create and integrate Log Class 
+- [x] Create and integrate Log Class 
 - [ ] Neuron Group Class
 - [ ] Neuron Types for differentiated functionality (input, output)
 - [ ] Possion Process for Neuron Activation
@@ -27,14 +29,103 @@ Project for CS 141 Honors Supplement
 
 | Date  | Key Points 🔑   |  Issues 🐛   |
 |--------------- | --------------- |--------------- |
-| [3-3 pt.2](#-update-3-3-part-2)   | Fixed [Issue 2](#-issue-2)| |
-| [3-3](#-update-3-3)   | Added time stamps to logging messages. Added function descriptions.| |
+| [3-5](#-update-3-5)   | New fully integrated Log class. Write neuron ids and potential values to a `<current_time>.log` file. | None |
+| [3-3 pt.2](#-update-3-3-part-2)   | Fixed [Issue 2](#-issue-2)| None |
+| [3-3](#-update-3-3)   | Added time stamps to logging messages. Added function descriptions.| None |
 | [2-29](#-update-2-29)   | Updated Neuron Class with with membrane potentials, refractory phases, Update to edge weights, fixed issue 1, guard clauses on header files.   | "Quit" functionality does not work for the menu [~~Issue 2~~](#-issue-2)|
 | [2-28](#-update-2-28)   | Basic Node class that sends and recieves messages   | `random_neighbors` may repeat edges. [~~Issue 1~~](#-issue-1)|
 
+### 📌 Update 3-5
+**New addtions:**
+- Fully integrated `Log` class with Debug Level functionality. 
+- Collect Neuron ID and Membrane Potential durring execution and write to a `<current_time>.log` file for later use in graphing potential vs time. 
+    - Logs are stored in `./logs` 
+- Swapped out bare data member refrences with `this->data_member` for readability
+- Debug Levels:
+    - level is set in `main.cpp:27`
+```cpp
+enum LogLevel {
+  DATA,
+  ERROR,
+  WARNING,
+  INFO,
+  DEBUG,
+};
+```
+
+
+
+<details>
+<summary>Log File Example</summary>
+<br>
+
+- Format is "time neuron_id memabrane_potential"
+```
+1709662312.633490 1 -55.000000
+1709662317.948280 2 -55.000000
+1709662314.449250 3 -55.000000
+1709662314.452480 2 -106.695394
+1709662314.455150 5 -90.316228
+1709662314.457940 6 -92.203995
+1709662314.158270 4 -55.000000
+1709662321.825460 5 -90.316228
+1709662320.091510 6 -92.203995
+1709662318.345790 1 -55.000000
+```
+</details>
+
+
+<details>
+
+<summary> Log Class </summary>
+<br>
+
+```cpp
+using std::vector;
+
+enum LogLevel {
+  DATA,
+  ERROR,
+  WARNING,
+  INFO,
+  DEBUG,
+};
+
+extern LogLevel level;
+
+class Log {
+public:
+  // constructor
+
+  void add_data(int id, double data);
+
+  void write_data(const char *filesname = "./logs/%ld.log");
+
+  void log(LogLevel level, const char *message, std::ostream &os = std::cout);
+
+  void log_neuron_state(LogLevel level, const char *message, int id);
+
+  void log_neuron_interaction(LogLevel level, const char *message, int id1,
+                              int id2);
+  void log_neuron_interaction(LogLevel level, const char *message, int id1,
+                              int id2, double value);
+  void log_neuron_value(LogLevel level, const char *message, int id,
+                        double accumulated);
+  void log_neuron_type(LogLevel level, const char *message, int id,
+                       const char *type);
+
+private:
+  vector<double> time;
+  vector<double> data;
+  vector<int> id;
+};
+```
+
+</details>
+
 ### 📌 Update 3-3 Part 2
 
-###### New addtions:
+**New addtions:**
 - Working quit functionality on menu! 
 - Memory deallocation working.
 - Additional logging
@@ -154,7 +245,7 @@ Deallocation
 
 ### 📌 Update 3-3
 
-###### New addtions:
+**New addtions:**
 - Time stamps on logging messages
 
 <details>
@@ -297,7 +388,7 @@ Input:
 
 ### 📌 Update 2-29
 
-###### New addtions:
+**New Additions:**
 - Choose neuron to activate
 - Activation based on membrane potential
 - Refractory period
@@ -509,7 +600,7 @@ while (!finish) {
 
 ### 📌 Update 2-28
 
-###### New Additions:
+**New Additions:**
 - First update
 <details>
 <summary> Example Output 1 </summary>
