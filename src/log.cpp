@@ -1,6 +1,7 @@
 #include "log.hpp"
 #include <bits/types/struct_timeval.h>
 #include <fstream>
+#include <ios>
 #include <iostream>
 #include <ostream>
 #include <stdio.h>
@@ -116,6 +117,11 @@ void Log::log_neuron_type(LogLevel level, const char *message, int id,
 }
 
 void Log::add_data(int curr_id, double curr_data) {
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  double time_stamp = (double)tv.tv_sec + (double)tv.tv_usec / 100000;
+
+  this->time.push_back(time_stamp);
   this->data.push_back(curr_data);
   this->id.push_back(curr_id);
 }
@@ -148,7 +154,8 @@ void Log::write_data(const char *filename) {
   }
 
   for (vector<int>::size_type i = 0; i < id.size(); i++) {
-    file << this->id[i] << " " << this->data[i] << '\n';
+    file << std::fixed << this->time[i] << " " << this->id[i] << " "
+         << this->data[i] << '\n';
   }
 
   file.close();

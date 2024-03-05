@@ -93,7 +93,8 @@ void *Neuron::run() {
   ::value = INITIAL_MEMBRANE_POTENTIAL;
 
   lg.log_neuron_value(INFO, "Neuron %d is activated, accumulated equal to %f",
-                      this->id, this->membrane_potential); lg.add_data(this->id, this->membrane_potential);
+                      this->id, this->membrane_potential);
+  lg.add_data(this->id, this->membrane_potential);
   recieved = true;
 
   pthread_cond_broadcast(&cond);

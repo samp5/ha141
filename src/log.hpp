@@ -34,13 +34,11 @@ public:
                               int id2, double value);
   void log_neuron_value(LogLevel level, const char *message, int id,
                         double accumulated);
-  void log_accumulated_stdout(LogLevel level, const char *message, int id,
-                              double accumulated);
-
   void log_neuron_type(LogLevel level, const char *message, int id,
                        const char *type);
 
 private:
+  vector<double> time;
   vector<double> data;
   vector<int> id;
 };
