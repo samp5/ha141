@@ -24,7 +24,7 @@ Log lg;
   3 - INFO,
   4 - DEBUG,
 */
-LogLevel level = DEBUG;
+LogLevel level = INFO;
 
 int main() {
 

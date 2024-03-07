@@ -124,6 +124,7 @@ void Log::add_data(int curr_id, double curr_data) {
   this->time.push_back(time_stamp);
   this->data.push_back(curr_data);
   this->id.push_back(curr_id);
+  this->group_id.push_back(0);
 }
 
 void Log::write_data(const char *filename) {
@@ -154,8 +155,8 @@ void Log::write_data(const char *filename) {
   }
 
   for (vector<int>::size_type i = 0; i < id.size(); i++) {
-    file << std::fixed << this->time[i] << " " << this->id[i] << " "
-         << this->data[i] << '\n';
+    file << std::fixed << this->time[i] << " " << this->group_id[i] << " "
+         << this->id[i] << " " << this->data[i] << '\n';
   }
 
   file.close();
@@ -221,4 +222,15 @@ void Log::log_group_neuron_interaction(LogLevel level, const char *message,
   this->log(level, formatted_msg);
   // deallocate
   delete[] formatted_msg;
+}
+
+void Log::add_data(int group_id, int curr_id, double curr_data) {
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  double time_stamp = (double)tv.tv_sec + (double)tv.tv_usec / 100000;
+
+  this->time.push_back(time_stamp);
+  this->data.push_back(curr_data);
+  this->id.push_back(curr_id);
+  this->group_id.push_back(group_id);
 }

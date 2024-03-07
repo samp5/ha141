@@ -48,11 +48,13 @@ public:
   void log_group_neuron_interaction(LogLevel level, const char *message,
                                     int group_id1, int id1, int group_id2,
                                     int id2, double value);
+  void add_data(int group_id, int curr_id, double curr_data);
 
 private:
   vector<double> time;
   vector<double> data;
   vector<int> id;
+  vector<int> group_id;
 };
 
 #endif // !LOG

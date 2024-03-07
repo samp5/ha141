@@ -68,67 +68,109 @@ void Neuron::add_previous(Neuron *neighbor, double weight) {
 
 void Neuron::run_in_group() {
   if (!this->active) {
-    lg.log_neuron_state(
+    lg.log_group_neuron_state(
         WARNING, "run_in_group: Neuron %d tried to run when it was not active",
-        this->id);
+        this->group->get_id(), this->id);
     return;
   }
 
   pthread_mutex_lock(&mutex);
+
+  // set membrane potential to either the incoming message or the
+  // INITIAL_MEMBRANE_POTENTIAL
   this->membrane_potential =
       this->group->get_message() == INITIAL_MEMBRANE_POTENTIAL
           ? this->membrane_potential
           : this->membrane_potential + this->group->get_message();
 
+  // reset the group message to INITIAL_MEMBRANE_POTENTIAL
   this->group->set_message(INITIAL_MEMBRANE_POTENTIAL);
 
   lg.log_group_neuron_value(
       INFO, "Neuron %d is activated, accumulated equal to %f",
       this->group->get_id(), this->id, this->membrane_potential);
 
-  lg.add_data(this->id, this->membrane_potential);
+  lg.add_data(this->group->get_id(), this->id, this->membrane_potential);
 
   recieved = true;
-
   pthread_cond_broadcast(&cond);
+
   pthread_mutex_unlock(&mutex);
 
+  // Check for empty neighbor list
   if (this->_postsynaptic.empty()) {
     lg.log_group_neuron_state(INFO,
                               "Group %d: Neuron %d does not have any neighbors",
                               this->group->get_id(), this->id);
-  } else if (membrane_potential < ACTIVATION_THRESHOLD) {
-    lg.log_group_neuron_state(
-        INFO,
-        "Membrane potential for Neuron %d is below the threshold, not firing",
-        this->group->get_id(), this->id);
-  } else {
-    for (const auto &pair : _postsynaptic) {
+    active = false;
+    this->run();
+    return;
+  }
 
-      lg.log_neuron_interaction(INFO,
-                                "Neuron %d is sending a mesage to Neuron %d",
-                                this->id, pair.first->id);
+  // Check for activation threshold
+  if (membrane_potential < ACTIVATION_THRESHOLD) {
 
-      pthread_mutex_lock(&mutex);
+    lg.log_group_neuron_state(INFO,
+                              "Membrane potential for Group %d: Neuron %d is "
+                              "below the threshold, not firing",
+                              this->group->get_id(), this->id);
+    active = false;
+    return;
+  }
 
-      double message =
-          membrane_potential * _postsynaptic[pair.first] * excit_inhib_value;
+  // loop through all neighbors
+  for (const auto &pair : _postsynaptic) {
 
-      lg.log_neuron_value(DEBUG, "Accumulated for Neuron %d is %f", this->id,
-                          this->membrane_potential);
-      lg.log_neuron_interaction(DEBUG,
-                                "Weight for Neuron %d to Neuron %d is %f",
-                                this->id, pair.first->id, pair.second);
-      lg.log_neuron_value(DEBUG, "Neuron %d modifier is %d", this->id,
-                          this->excit_inhib_value);
-      lg.log_neuron_interaction(INFO,
-                                "Message from Neuron %d to Neuron %d is %f",
-                                this->id, pair.first->id, message);
+    lg.log_group_neuron_interaction(
+        INFO, "Group %d: Neuron %d is sending a mesage to Group %d: Neuron %d",
+        this->group->get_id(), this->id, pair.first->group->get_id(),
+        pair.first->id);
 
-      ::value = message;
+    pthread_mutex_lock(&mutex);
 
-      // activate neighbor
-      pair.first->activate();
+    // set message
+    double message =
+        membrane_potential * _postsynaptic[pair.first] * excit_inhib_value;
+
+    lg.log_group_neuron_value(
+        DEBUG, "Accumulated for Group %d: Neuron %d is %f",
+        this->group->get_id(), this->id, this->membrane_potential);
+    lg.log_group_neuron_interaction(
+        DEBUG, "Weight for Group %d: Neuron %d to Group %d: Neuron %d is %f",
+        this->group->get_id(), this->id, pair.first->group->get_id(),
+        pair.first->id, pair.second);
+    lg.log_group_neuron_value(DEBUG, "Group %d: Neuron %d modifier is %d",
+                              this->group->get_id(), this->id,
+                              this->excit_inhib_value);
+    lg.log_group_neuron_interaction(
+        INFO, "Message from Group %d: Neuron %d to Group %d: Neuron %d is %f",
+        this->group->get_id(), this->id, pair.first->group->get_id(),
+        pair.first->id, message);
+
+    // set recievers group value to message
+    pair.first->group->set_message(message);
+
+    /*
+     * We need to have different logic for if the neuron is in the same group
+     * or different groups
+     *
+     * Same group:
+     *  We can activate it directly
+     *
+     * Different Groups
+     *  Pause this thread until we get a recieved signal
+     */
+    // activate neighbor
+    pair.first->activate();
+
+    if (this->group->get_id() == pair.first->group->get_id()) {
+      // I am a little unsure about this sequencing.
+      // If we activate it directly, and this neuron has neighbor x and the
+      // actiavted neuron has neighbor x
+      //  neuron x would get the message of the neighbor before the message of
+      //  this neuron?
+      pair.first->group->group_run();
+    } else {
       // get condition
       pthread_cond_t *neighbor_con = pair.first->get_cond();
       // signal start
@@ -141,16 +183,18 @@ void Neuron::run_in_group() {
       }
       pthread_mutex_unlock(&mutex);
     }
-    lg.log_neuron_state(INFO, "Neuron %d fired, entering refractory phase",
-                        this->id);
-    this->refractory();
-    lg.log_neuron_state(INFO, "Neuron %d completed refractory phase, running",
-                        this->id);
+
+    this->deactivate();
   }
+
+  lg.log_neuron_state(INFO, "Neuron %d fired, entering refractory phase",
+                      this->id);
+  this->refractory();
+  lg.log_neuron_state(INFO, "Neuron %d completed refractory phase, running",
+                      this->id);
 
   active = false;
   this->run();
-  pthread_exit(NULL);
 }
 // Start the run cycle for a neuron
 //
