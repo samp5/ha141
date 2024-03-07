@@ -74,6 +74,59 @@ enum LogLevel {
 ```
 </details>
 
+<details>
+<summary> Example Output 6 </summary>
+<br>
+
+```
+Adding Neurons
+----------------
+
+[1709787252:721647] [Info] Neuron 1 added: inhibitory
+[1709787252:721652] [Info] Neuron 2 added: inhibitory
+[1709787252:721654] [Info] Neuron 3 added: excitatory
+[1709787252:721655] [Info] Neuron 4 added: excitatory
+[1709787252:721657] [Info] Neuron 5 added: inhibitory
+[1709787252:721659] [Info] Neuron 6 added: excitatory
+
+Adding Random Edges
+--------------------------
+
+[1709787252:721663] [Info] Edge from Neuron 3 to Neuron 4 added.
+[1709787252:721670] [Info] Edge from Neuron 4 to Neuron 5 added.
+[1709787252:721673] [Info] Edge from Neuron 3 to Neuron 2 added.
+[1709787252:721676] [Info] Edge from Neuron 1 to Neuron 5 added.
+[1709787252:721680] [Info] Edge from Neuron 4 to Neuron 6 added.
+
+[1709787252:721815] [Info] Neuron 1 is waiting
+[1709787252:721907] [Info] Neuron 3 is waiting
+[1709787252:722201] [Info] Neuron 2 is waiting
+[1709787252:722283] [Info] Neuron 6 is waiting
+[1709787252:722379] [Info] Neuron 5 is waiting
+[1709787252:722471] [Info] Neuron 4 is waiting
+
+Activate neuron ( or [-1] to quit )
+ Neuron 1
+ Neuron 2
+ Neuron 3
+ Neuron 4
+ Neuron 5
+ Neuron 6
+Input: 1
+
+[1709787256:21207] [Info] Neuron 1 is activated, accumulated equal to -55.0000
+[1709787256:21345] [Info] Neuron 1 is sending a mesage to Neuron 5
+[1709787256:21569] [Info] Message from Neuron 1 to Neuron 5 is -43.278355
+[1709787256:21765] [Info] Neuron 5 is activated, accumulated equal to -98.2783
+[1709787256:21869] [Info] Neuron 5 does not have any neighbors
+[1709787256:22018] [Info] Neuron 5 is waiting
+[1709787256:21929] [Info] Neuron 1 fired, entering refractory phase
+[1709787256:22238] [Info] Neuron 1 portential set to -70.0000
+[1709787256:24797] [Info] Neuron 1 completed refractory phase, running
+[1709787256:24959] [Info] Neuron 1 is waiting
+```
+
+</details>
 
 <details>
 
