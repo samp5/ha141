@@ -1,5 +1,5 @@
 # Honors Supplement for CS 141
-Project for CS 141 Honors Supplement
+Project for CS 141 Honors Supplement: Toy spiking neural network using a multithreaded approach.
 
 ### 📁 Folder Structure
 
