@@ -36,6 +36,18 @@ public:
                         double accumulated);
   void log_neuron_type(LogLevel level, const char *message, int id,
                        const char *type);
+  void log_group_neuron_state(LogLevel level, const char *message, int group_id,
+                              int id);
+  void log_group_neuron_value(LogLevel level, const char *message, int group_id,
+                              int id, double value);
+
+  void log_group_neuron_interaction(LogLevel level, const char *message,
+                                    int group_id1, int id1, int group_id2,
+                                    int id2);
+
+  void log_group_neuron_interaction(LogLevel level, const char *message,
+                                    int group_id1, int id1, int group_id2,
+                                    int id2, double value);
 
 private:
   vector<double> time;

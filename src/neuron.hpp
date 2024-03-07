@@ -2,6 +2,7 @@
 #define NEURON
 
 #include "log.hpp"
+#include "neuron_group.hpp"
 #include <iostream>
 #include <map>
 #include <pthread.h>
@@ -18,6 +19,8 @@ extern bool finish;
 extern pthread_barrier_t barrier;
 extern Log lg;
 
+class NeuronGroup;
+
 enum Neuron_t { Input, Hidden };
 
 class Neuron {
@@ -27,6 +30,7 @@ private:
   int excit_inhib_value;
   int id;
   Neuron_t type;
+  NeuronGroup *group;
 
   // Edge values
   typedef std::map<Neuron *, double> weight_map;
@@ -53,21 +57,16 @@ public:
   void refractory();
   void activate() { active = true; }
   void deactivate() { active = false; }
+  void run_in_group();
 
   //>>>>>>>>>>>>>> Access to private variables <<<<<<<<<<<
   pthread_t get_thread_id() { return thread; }
   pthread_cond_t *get_cond() { return &cond; }
   int get_id() { return id; }
   double get_potential() { return membrane_potential; }
-  const weight_map *get_presynaptic() {
-    const weight_map *p_presynaptic = &_presynaptic;
-    return p_presynaptic;
-  }
-
-  const weight_map *get_postsynaptic() {
-    const weight_map *p_postsynaptic = &_postsynaptic;
-    return p_postsynaptic;
-  }
+  const weight_map *get_presynaptic() const;
+  const weight_map *get_postsynaptic() const;
+  bool is_activated() const;
 
   /*--------------------------------------------------------------*\
    *                  Thread helper:
@@ -78,4 +77,5 @@ public:
     return ((Neuron *)instance)->run();
   }
 };
+
 #endif // !NEURON

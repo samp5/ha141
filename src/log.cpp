@@ -162,3 +162,63 @@ void Log::write_data(const char *filename) {
   // deallocate
   delete[] file_name;
 }
+
+void Log::log_group_neuron_state(LogLevel level, const char *message,
+                                 int group_id, int id) {
+  // length
+  int length = snprintf(nullptr, 0, message, group_id, id);
+  // allocate
+  char *formatted_msg = new char[length + 1];
+  // format
+  snprintf(formatted_msg, length + 1, message, group_id, id);
+  // log
+  this->log(level, formatted_msg);
+  // deallocate
+  delete[] formatted_msg;
+}
+
+void Log::log_group_neuron_value(LogLevel level, const char *message,
+                                 int group_id, int id, double accumulated) {
+  // length of message
+  int length = snprintf(nullptr, 0, message, group_id, id, accumulated);
+  // allocate
+  char *formatted_msg = new char[length + 1];
+  // format
+  snprintf(formatted_msg, length + 1, message, group_id, id, accumulated);
+  // log
+  this->log(level, formatted_msg);
+  // deallocate
+  delete[] formatted_msg;
+}
+
+void Log::log_group_neuron_interaction(LogLevel level, const char *message,
+                                       int group_id1, int id1, int group_id2,
+                                       int id2, double value) {
+  // length
+  int length =
+      snprintf(nullptr, 0, message, group_id1, id1, group_id2, id2, value);
+  // allocate
+  char *formatted_msg = new char[length + 1];
+  // format
+  snprintf(formatted_msg, length + 1, message, group_id1, id1, group_id2, id2,
+           value);
+  // log
+  this->log(level, formatted_msg);
+  // deallocate
+  delete[] formatted_msg;
+}
+
+void Log::log_group_neuron_interaction(LogLevel level, const char *message,
+                                       int group_id1, int id1, int group_id2,
+                                       int id2) {
+  // length
+  int length = snprintf(nullptr, 0, message, group_id1, id1, group_id2, id2);
+  // allocate
+  char *formatted_msg = new char[length + 1];
+  // format
+  snprintf(formatted_msg, length + 1, message, group_id1, id1, group_id2, id2);
+  // log
+  this->log(level, formatted_msg);
+  // deallocate
+  delete[] formatted_msg;
+}
