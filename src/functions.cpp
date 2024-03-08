@@ -110,7 +110,7 @@ double weight_function() { return (double)rand() / RAND_MAX; }
 int get_inhibitory_status() {
   int ret;
   double x = (double)rand() / RAND_MAX;
-  if (x >= 0.5) {
+  if (x >= 0.2) {
     ret = -1;
   } else {
     ret = 1;

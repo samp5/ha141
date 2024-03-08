@@ -2,6 +2,7 @@
 #define NEURON_GROUP
 
 #include "log.hpp"
+#include <pthread.h>
 
 class Neuron;
 

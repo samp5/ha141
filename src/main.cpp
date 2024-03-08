@@ -11,6 +11,7 @@
 #define NUMBER_EDGES 5
 
 using std::cin;
+using std::cout;
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_barrier_t barrier;

@@ -4,6 +4,8 @@
 #include <iostream>
 #include <vector>
 
+using std::cout;
+using std::ostream;
 using std::vector;
 
 enum LogLevel {
@@ -24,7 +26,7 @@ public:
 
   void write_data(const char *filesname = "./logs/%ld.log");
 
-  void log(LogLevel level, const char *message, std::ostream &os = std::cout);
+  void log(LogLevel level, const char *message, ostream &os = cout);
 
   void log_neuron_state(LogLevel level, const char *message, int id);
 

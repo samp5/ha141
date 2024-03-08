@@ -183,19 +183,17 @@ void Neuron::run_in_group() {
       }
       pthread_mutex_unlock(&mutex);
     }
-
-    this->deactivate();
   }
 
-  lg.log_neuron_state(INFO, "Neuron %d fired, entering refractory phase",
-                      this->id);
+  lg.log_group_neuron_state(INFO, "Neuron %d fired, entering refractory phase",
+                            this->group->get_id(), this->id);
   this->refractory();
-  lg.log_neuron_state(INFO, "Neuron %d completed refractory phase, running",
-                      this->id);
-
-  active = false;
-  this->run();
+  lg.log_group_neuron_state(INFO,
+                            "Neuron %d completed refractory phase, running",
+                            this->group->get_id(), this->id);
+  this->deactivate();
 }
+
 // Start the run cycle for a neuron
 //
 // Neuron waits on datamember cond. When activated, Neuron sends
