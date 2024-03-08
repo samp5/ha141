@@ -5,7 +5,6 @@
 #include <unistd.h>
 
 #define RAND_SEED time(0)
-// #define RAND_SEED 1
 
 #define NUMBER_NODES 6
 #define NUMBER_EDGES 5
