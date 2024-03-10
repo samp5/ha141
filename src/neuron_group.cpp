@@ -1,16 +1,30 @@
 #include "functions.hpp"
+#include "log.hpp"
 #include "neuron.hpp"
 
 NeuronGroup::NeuronGroup(int _id, int number_neurons) {
-  this->id = _id;
 
+  lg.log_group_state(DEBUG, "Adding Group %d", _id);
+
+  this->id = _id;
   // make space for number of neurons
   this->neurons.reserve(number_neurons);
 
   // add neurons;
+  lg.log_group_state(INFO, "Group %d", this->id);
   for (int i = 0; i < number_neurons; i++) {
     Neuron *neuron = new Neuron(i + 1, get_inhibitory_status());
     neurons[i] = neuron;
+  }
+}
+
+NeuronGroup::~NeuronGroup() {
+  for (auto neuron : this->neurons) {
+
+    lg.log_group_neuron_state(DEBUG, "Deleteing Group %d Neuron %d", this->id,
+                              neuron->get_id());
+
+    delete neuron;
   }
 }
 void *NeuronGroup::group_run() {

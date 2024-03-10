@@ -234,3 +234,31 @@ void Log::add_data(int group_id, int curr_id, double curr_data) {
   this->id.push_back(curr_id);
   this->group_id.push_back(group_id);
 }
+
+void Log::log_group_state(LogLevel level, const char *message, int group_id) {
+  // length
+  int length = snprintf(nullptr, 0, message, group_id);
+  // allocate
+  char *formatted_msg = new char[length + 1];
+  // format
+  snprintf(formatted_msg, length + 1, message, group_id);
+  // log
+  this->log(level, formatted_msg);
+  // deallocate
+  delete[] formatted_msg;
+}
+
+void Log::log_group_neuron_type(LogLevel level, const char *message,
+                                int group_id, int id, const char *type) {
+
+  // length
+  int length = snprintf(nullptr, 0, message, group_id, id, type);
+  // allocate
+  char *formatted_msg = new char[length + 1];
+  // format
+  snprintf(formatted_msg, length + 1, message, group_id, id, type);
+  // log
+  this->log(level, formatted_msg);
+  // deallocate
+  delete[] formatted_msg;
+}

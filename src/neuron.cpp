@@ -67,6 +67,8 @@ void Neuron::add_previous(Neuron *neighbor, double weight) {
 }
 
 void Neuron::run_in_group() {
+  
+  // Check active status
   if (!this->active) {
     lg.log_group_neuron_state(
         WARNING, "run_in_group: Neuron %d tried to run when it was not active",
