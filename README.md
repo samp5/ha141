@@ -29,12 +29,29 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 
 | Date  | Key Points 🔑   |  Issues 🐛   |
 |--------------- | --------------- |--------------- |
+| [3-11](#-update-3-11)   | Start of Neruon Group Class| None |
 | [3-5](#-update-3-5)   | New fully integrated Log class. Write neuron ids and potential values to a `<current_time>.log` file. | None |
 | [3-3 pt.2](#-update-3-3-part-2)   | Fixed [Issue 2](#-issue-2)| None |
 | [3-3](#-update-3-3)   | Added time stamps to logging messages. Added function descriptions.| None |
 | [2-29](#-update-2-29)   | Updated Neuron Class with with membrane potentials, refractory phases, Update to edge weights, fixed issue 1, guard clauses on header files.   | "Quit" functionality does not work for the menu [~~Issue 2~~](#-issue-2)|
 | [2-28](#-update-2-28)   | Basic Node class that sends and recieves messages   | `random_neighbors` may repeat edges. [~~Issue 1~~](#-issue-1)|
 
+### 📌 Update 3-11
+**New addtions:**
+- Neuron Group Class
+    - Add intergroup and intragroup edges
+    - New functions for adding neigbors between groups and within groups
+    - New logging functions for reporting group values, state, and grouped neuron interactions
+    - Not complete!
+        - Unable to send messages
+        - Some functions that are aimed to do that, but they are not tested at all
+- Some new logging functionality
+    - `NeuronGroup` logging; 
+    - `DEBUG2` debug level
+    - `NeuronGroup` versions of other logging
+- Updated makefile
+    - To build without groups use the `build1` target (and `run1` target to run)
+    - To build with groups use the `build2` target (and `run2` target to run)
 ### 📌 Update 3-5
 **New addtions:**
 - Fully integrated `Log` class with Debug Level functionality. 
@@ -44,7 +61,7 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 - Debug Levels:
     - level is set in `main.cpp:27`
 ```cpp
-enum LogLevel {
+enum LogLevel { 
   DATA,
   ERROR,
   WARNING,
