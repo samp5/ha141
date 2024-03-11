@@ -6,8 +6,11 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 ```
 ├── src
 │   ├── main.cpp
+│   ├── main_neuron_groups.cpp
 │   ├── functions.hpp
 │   ├── functions.cpp
+│   ├── neuron_group.hpp
+│   ├── neuron_group.cpp
 │   ├── neuron.hpp
 │   └── neuron.cpp
 ├── pthred_ex //practice pthread examples
