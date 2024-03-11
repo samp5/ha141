@@ -20,6 +20,15 @@ typedef std::map<Neuron *, double> weight_map;
 // @param2: desired number of edges in the entire graph
 void random_neighbors(vector<Neuron *> nodes, int number_neighbors);
 
+// Assign random neighbors to all nodes in each group in group
+// vector
+//
+// Reflexive edges and duplicate edges are not allowed.
+// Edge weightes are randomly generated and are between [0, 1]
+// @param1: vector of NeuronGroup pointers
+// @param2: desired number of edges in the entire graph
+void random_group_neighbors(vector<NeuronGroup *> groups, int number_neighbors);
+
 // Print membrane potential of all neurons in vector
 //
 // @param1: vector of Neuron pointers
@@ -29,6 +38,12 @@ void print_node_values(vector<Neuron *> nodes);
 //
 // @param1: Neuron pointer
 void print_maps(Neuron *neuron);
+
+// Print out presynaptic and postsynapic connections of a neuron
+// with group data
+//
+// @param1: Neuron pointer
+void print_group_maps(Neuron *neuron);
 
 // Prints out the current time with microsecond granularity
 //
@@ -51,5 +66,17 @@ double weight_function();
 //
 // @return: 1 or -1
 int get_inhibitory_status();
+
+// Get total number of neurons in a group
+//
+//@param1 const reference to the NeuronGroup vector
+//@returns total neuron count
+int get_neuron_count(const vector<NeuronGroup *> &groups);
+
+// Get a random neuron from the group list
+//
+//@param1 const reference to the NeuronGroup vector
+//@return pointer to neuron
+Neuron *get_random_neuron(const vector<NeuronGroup *> &group);
 
 #endif // !FUNCTIONS

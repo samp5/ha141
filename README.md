@@ -350,6 +350,7 @@ Adding Random Edges
 |11:52:26:435141| Neuron 5 is waiting
 |11:52:26:435197| Neuron 6 is waiting
 
+
 Activate neuron ( or [-1] to quit )
  Neuron 1
  Neuron 2

@@ -27,6 +27,9 @@ void Log::log(LogLevel level, const char *message,
   case LogLevel::DEBUG:
     _level = "[%d:%d] [Debug] ";
     break;
+  case LogLevel::DEBUG2:
+    _level = "[%d:%d] [Debug2] ";
+    break;
   case LogLevel::ERROR:
     _level = "[%d:%d] [Error] ";
     break;
@@ -124,6 +127,7 @@ void Log::add_data(int curr_id, double curr_data) {
   this->time.push_back(time_stamp);
   this->data.push_back(curr_data);
   this->id.push_back(curr_id);
+  this->group_id.push_back(0);
 }
 
 void Log::write_data(const char *filename) {
@@ -154,11 +158,131 @@ void Log::write_data(const char *filename) {
   }
 
   for (vector<int>::size_type i = 0; i < id.size(); i++) {
-    file << std::fixed << this->time[i] << " " << this->id[i] << " "
-         << this->data[i] << '\n';
+    file << std::fixed << this->time[i] << " " << this->group_id[i] << " "
+         << this->id[i] << " " << this->data[i] << '\n';
   }
 
   file.close();
   // deallocate
   delete[] file_name;
+}
+
+void Log::log_group_neuron_state(LogLevel level, const char *message,
+                                 int group_id, int id) {
+  // length
+  int length = snprintf(nullptr, 0, message, group_id, id);
+  // allocate
+  char *formatted_msg = new char[length + 1];
+  // format
+  snprintf(formatted_msg, length + 1, message, group_id, id);
+  // log
+  this->log(level, formatted_msg);
+  // deallocate
+  delete[] formatted_msg;
+}
+
+void Log::log_group_neuron_value(LogLevel level, const char *message,
+                                 int group_id, int id, double accumulated) {
+  // length of message
+  int length = snprintf(nullptr, 0, message, group_id, id, accumulated);
+  // allocate
+  char *formatted_msg = new char[length + 1];
+  // format
+  snprintf(formatted_msg, length + 1, message, group_id, id, accumulated);
+  // log
+  this->log(level, formatted_msg);
+  // deallocate
+  delete[] formatted_msg;
+}
+
+void Log::log_group_neuron_interaction(LogLevel level, const char *message,
+                                       int group_id1, int id1, int group_id2,
+                                       int id2, double value) {
+  // length
+  int length =
+      snprintf(nullptr, 0, message, group_id1, id1, group_id2, id2, value);
+  // allocate
+  char *formatted_msg = new char[length + 1];
+  // format
+  snprintf(formatted_msg, length + 1, message, group_id1, id1, group_id2, id2,
+           value);
+  // log
+  this->log(level, formatted_msg);
+  // deallocate
+  delete[] formatted_msg;
+}
+
+void Log::log_group_neuron_interaction(LogLevel level, const char *message,
+                                       int group_id1, int id1, int group_id2,
+                                       int id2) {
+  // length
+  int length = snprintf(nullptr, 0, message, group_id1, id1, group_id2, id2);
+  // allocate
+  char *formatted_msg = new char[length + 1];
+  // format
+  snprintf(formatted_msg, length + 1, message, group_id1, id1, group_id2, id2);
+  // log
+  this->log(level, formatted_msg);
+  // deallocate
+  delete[] formatted_msg;
+}
+
+void Log::add_data(int group_id, int curr_id, double curr_data) {
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  double time_stamp = (double)tv.tv_sec + (double)tv.tv_usec / 100000;
+
+  this->time.push_back(time_stamp);
+  this->data.push_back(curr_data);
+  this->id.push_back(curr_id);
+  this->group_id.push_back(group_id);
+}
+
+void Log::log_group_state(LogLevel level, const char *message, int group_id) {
+  // length
+  int length = snprintf(nullptr, 0, message, group_id);
+  // allocate
+  char *formatted_msg = new char[length + 1];
+  // format
+  snprintf(formatted_msg, length + 1, message, group_id);
+  // log
+  this->log(level, formatted_msg);
+  // deallocate
+  delete[] formatted_msg;
+}
+
+void Log::log_group_value(LogLevel level, const char *message, int group_id,
+                          int value) {
+  // length
+  int length = snprintf(nullptr, 0, message, group_id, value);
+  // allocate
+  char *formatted_msg = new char[length + 1];
+  // format
+  snprintf(formatted_msg, length + 1, message, group_id, value);
+  // log
+  this->log(level, formatted_msg);
+  // deallocate
+  delete[] formatted_msg;
+}
+
+void Log::log_group_neuron_type(LogLevel level, const char *message,
+                                int group_id, int id, const char *type) {
+
+  // length
+  int length = snprintf(nullptr, 0, message, group_id, id, type);
+  // allocate
+  char *formatted_msg = new char[length + 1];
+  // format
+  snprintf(formatted_msg, length + 1, message, group_id, id, type);
+  // log
+  this->log(level, formatted_msg);
+  // deallocate
+  delete[] formatted_msg;
+}
+
+void Log::print(const char *message, bool newline, std::ostream &os) {
+  if (newline)
+    os << message << '\n';
+  else
+    os << message;
 }

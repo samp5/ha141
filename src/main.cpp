@@ -5,12 +5,12 @@
 #include <unistd.h>
 
 #define RAND_SEED time(0)
-// #define RAND_SEED 1
 
 #define NUMBER_NODES 6
 #define NUMBER_EDGES 5
 
 using std::cin;
+using std::cout;
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_barrier_t barrier;
@@ -24,7 +24,7 @@ Log lg;
   3 - INFO,
   4 - DEBUG,
 */
-LogLevel level = DEBUG;
+LogLevel level = INFO;
 
 int main() {
 
