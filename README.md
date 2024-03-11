@@ -25,7 +25,7 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 
 ### In-Progress 🚀
 - [x] ~~Create and integrate Log Class~~
-- [ ] Neuron Group Class ( In progress on `nclass` branch)
+- [ ] Neuron Group Class (basic functionality on `main`, messaging in progress on `nclass`)
 - [ ] Neuron Types for differentiated functionality (input, output)
 - [ ] Possion Process for Neuron Activation
 - [ ] Activate Neuron from file inputs (or other arbitrary input)
