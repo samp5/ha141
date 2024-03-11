@@ -52,6 +52,167 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 - Updated makefile
     - To build without groups use the `build1` target (and `run1` target to run)
     - To build with groups use the `build2` target (and `run2` target to run)
+<details>
+<summary>Example Output 8</summary>
+<br>
+
+- Debug level : `DEBUG2`
+
+``` 
+Running build/ex2
+./build/ex2
+
+Adding Neurons
+----------------
+
+[1710180962:736259] [Debug] Adding Group 1
+[1710180962:736263] [Info] Group 1
+[1710180962:736268] [Info] (1) Neuron 1 added: excitatory
+[1710180962:736271] [Info] (1) Neuron 2 added: inhibitory
+[1710180962:736273] [Info] (1) Neuron 3 added: excitatory
+[1710180962:736275] [Debug] Adding Group 2
+[1710180962:736275] [Info] Group 2
+[1710180962:736277] [Info] (2) Neuron 1 added: excitatory
+[1710180962:736278] [Info] (2) Neuron 2 added: excitatory
+[1710180962:736279] [Info] (2) Neuron 3 added: excitatory
+
+Adding Random Edges
+======================
+
+[1710180962:736284] [Debug2]          (2) Neuron 3 has no outgoing connections
+[1710180962:736285] [Debug2]          (2) Neuron 3 has no incoming connections
+[1710180962:736286] [Debug2]          (1) Neuron 2 has no outgoing connections
+[1710180962:736287] [Debug2]          (1) Neuron 2 has no incoming connections
+[1710180962:736289] [Info] Edge from Neuron 3 to Neuron 2 added.
+[1710180962:736293] [Debug2] Neuron 3 added to the _presynaptic map of Neuron 
+[1710180962:736294] [Debug2]          (1) Neuron 3 has no outgoing connections
+[1710180962:736295] [Debug2]          (1) Neuron 3 has no incoming connections
+[1710180962:736296] [Debug2]          (1) Neuron 2 has no outgoing connections
+[1710180962:736297] [Debug2]       (1) Neuron 2 has connections from:
+[1710180962:736298] [Debug2]         (2) Neuron 3
+[1710180962:736299] [Info] Edge from Neuron 3 to Neuron 2 added.
+[1710180962:736301] [Debug2] Neuron 3 added to the _presynaptic map of Neuron 
+[1710180962:736302] [Debug2]          (2) Neuron 2 has no outgoing connections
+[1710180962:736303] [Debug2]          (2) Neuron 2 has no incoming connections
+[1710180962:736304] [Debug2]          (2) Neuron 1 has no outgoing connections
+[1710180962:736304] [Debug2]          (2) Neuron 1 has no incoming connections
+[1710180962:736305] [Info] Edge from Neuron 2 to Neuron 1 added.
+[1710180962:736307] [Debug2] Neuron 2 added to the _presynaptic map of Neuron 
+[1710180962:736308] [Debug2]          (1) Neuron 2 has no outgoing connections
+[1710180962:736309] [Debug2]       (1) Neuron 2 has connections from:
+[1710180962:736309] [Debug2]         (1) Neuron 3
+[1710180962:736310] [Debug2]         (2) Neuron 3
+[1710180962:736311] [Debug2]          (1) Neuron 1 has no outgoing connections
+[1710180962:736312] [Debug2]          (1) Neuron 1 has no incoming connections
+[1710180962:736313] [Info] Edge from Neuron 2 to Neuron 1 added.
+[1710180962:736314] [Debug2] Neuron 2 added to the _presynaptic map of Neuron 
+[1710180962:736315] [Debug2]          (1) Neuron 1 has no outgoing connections
+[1710180962:736316] [Debug2]       (1) Neuron 1 has connections from:
+[1710180962:736317] [Debug2]         (1) Neuron 2
+[1710180962:736318] [Debug2]       (2) Neuron 3 is connected to:
+[1710180962:736319] [Debug2]          (1) Neuron 2
+[1710180962:736320] [Debug2]          (2) Neuron 3 has no incoming connections
+[1710180962:736321] [Info] Edge from Neuron 1 to Neuron 3 added.
+[1710180962:736322] [Debug2] Neuron 1 added to the _presynaptic map of Neuron 
+
+[1710180962:736324] [Debug] Neuron Group 1 (3 neurons)
+========================================================
+[1710180962:736326] [Debug]    (1) Neuron 1
+[1710180962:736327] [Debug2]       (1) Neuron 1 is connected to:
+[1710180962:736327] [Debug2]          (2) Neuron 3
+[1710180962:736328] [Debug2]       (1) Neuron 1 has connections from:
+[1710180962:736329] [Debug2]         (1) Neuron 2
+[1710180962:736330] [Debug]    (1) Neuron 2
+[1710180962:736330] [Debug2]       (1) Neuron 2 is connected to:
+[1710180962:736331] [Debug2]          (1) Neuron 1
+[1710180962:736332] [Debug2]       (1) Neuron 2 has connections from:
+[1710180962:736333] [Debug2]         (1) Neuron 3
+[1710180962:736334] [Debug2]         (2) Neuron 3
+[1710180962:736334] [Debug]    (1) Neuron 3
+[1710180962:736335] [Debug2]       (1) Neuron 3 is connected to:
+[1710180962:736336] [Debug2]          (1) Neuron 2
+[1710180962:736337] [Debug2]          (1) Neuron 3 has no incoming connections
+
+
+[1710180962:736338] [Debug] Neuron Group 2 (3 neurons)
+========================================================
+[1710180962:736361] [Debug]    (2) Neuron 1
+[1710180962:736362] [Debug2]          (2) Neuron 1 has no outgoing connections
+[1710180962:736363] [Debug2]       (2) Neuron 1 has connections from:
+[1710180962:736364] [Debug2]         (2) Neuron 2
+[1710180962:736364] [Debug]    (2) Neuron 2
+[1710180962:736365] [Debug2]       (2) Neuron 2 is connected to:
+[1710180962:736366] [Debug2]          (2) Neuron 1
+[1710180962:736367] [Debug2]          (2) Neuron 2 has no incoming connections
+[1710180962:736368] [Debug]    (2) Neuron 3
+[1710180962:736368] [Debug2]       (2) Neuron 3 is connected to:
+[1710180962:736369] [Debug2]          (1) Neuron 2
+[1710180962:736370] [Debug2]       (2) Neuron 3 has connections from:
+[1710180962:736371] [Debug2]         (1) Neuron 1
+
+[1710180962:736372] [Debug] Deleteing Group 1 Neuron 1
+[1710180962:736374] [Debug] Deleteing Group 1 Neuron 2
+[1710180962:736375] [Debug] Deleteing Group 1 Neuron 3
+[1710180962:736377] [Debug] Deleteing Group 2 Neuron 1
+[1710180962:736378] [Debug] Deleteing Group 2 Neuron 2
+[1710180962:736379] [Debug] Deleteing Group 2 Neuron 3
+```
+</details>
+
+<details>
+<summary>Example Output 7</summary>
+<br>
+
+``` 
+Running build/ex2
+./build/ex2
+
+Adding Neurons
+----------------
+
+[1710180872:468797] [Debug] Adding Group 1
+[1710180872:468800] [Info] Group 1
+[1710180872:468803] [Info] (1) Neuron 1 added: excitatory
+[1710180872:468805] [Info] (1) Neuron 2 added: excitatory
+[1710180872:468807] [Info] (1) Neuron 3 added: excitatory
+[1710180872:468808] [Debug] Adding Group 2
+[1710180872:468808] [Info] Group 2
+[1710180872:468809] [Info] (2) Neuron 1 added: excitatory
+[1710180872:468810] [Info] (2) Neuron 2 added: inhibitory
+[1710180872:468811] [Info] (2) Neuron 3 added: excitatory
+
+Adding Random Edges
+======================
+
+[1710180872:468815] [Info] Edge from Neuron 3 to Neuron 1 added.
+[1710180872:468821] [Info] Edge from Neuron 1 to Neuron 2 added.
+[1710180872:468823] [Info] Edge from Neuron 2 to Neuron 2 added.
+[1710180872:468827] [Info] Edge from Neuron 1 to Neuron 2 added.
+[1710180872:468830] [Info] Edge from Neuron 2 to Neuron 3 added.
+
+[1710180872:468832] [Debug] Neuron Group 1 (3 neurons)
+========================================================
+[1710180872:468832] [Debug]    (1) Neuron 1
+[1710180872:468833] [Debug]    (1) Neuron 2
+[1710180872:468835] [Debug]    (1) Neuron 3
+
+
+[1710180872:468836] [Debug] Neuron Group 2 (3 neurons)
+========================================================
+[1710180872:468837] [Debug]    (2) Neuron 1
+[1710180872:468839] [Debug]    (2) Neuron 2
+[1710180872:468840] [Debug]    (2) Neuron 3
+
+[1710180872:468841] [Debug] Deleteing Group 1 Neuron 1
+[1710180872:468842] [Debug] Deleteing Group 1 Neuron 2
+[1710180872:468843] [Debug] Deleteing Group 1 Neuron 3
+[1710180872:468844] [Debug] Deleteing Group 2 Neuron 1
+[1710180872:468845] [Debug] Deleteing Group 2 Neuron 2
+[1710180872:468845] [Debug] Deleteing Group 2 Neuron 3
+```
+
+</details>
+
 ### 📌 Update 3-5
 **New addtions:**
 - Fully integrated `Log` class with Debug Level functionality. 
