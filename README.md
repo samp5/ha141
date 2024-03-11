@@ -55,6 +55,54 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 - Updated makefile
     - To build without groups use the `build1` target (and `run1` target to run)
     - To build with groups use the `build2` target (and `run2` target to run)
+
+<details>
+<summary>Neuron Group Class</summary>
+<br>
+
+``` cpp
+class NeuronGroup {
+  // NOT COMPLETE
+private:
+  vector<Neuron *> neurons;
+  int id;
+  pthread_t thread;
+
+  // this variable should be read only from outside the class
+  // Analagous to "value" in previous version
+  int message;
+
+public:
+  NeuronGroup(int _id, int number_neurons);
+  // might move neuron memory responsibilities to this class
+  ~NeuronGroup();
+
+  void *group_run();
+  void start_thread() { pthread_create(&thread, NULL, thread_helper, this); }
+  double get_message() const { return message; }
+  double get_id() const { return id; }
+
+  void set_message(double message);
+  void print_group();
+  int neuron_count();
+  const vector<Neuron *> &get_neruon_vector();
+
+  /*--------------------------------------------------------------*\
+   *                  Thread helper:
+   *    POSIX needs a void* (*)(void*) function signature
+   *    This function allows us to use the run() member funciton
+  \--------------------------------------------------------------*/
+  static void *thread_helper(void *instance) {
+    return ((NeuronGroup *)instance)->group_run();
+  }
+};
+
+
+```
+
+
+</details>
+
 <details>
 <summary>Example Output 8</summary>
 <br>
