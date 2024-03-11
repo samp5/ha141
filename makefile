@@ -4,7 +4,7 @@ CXX = g++
 files = $(wildcard ./src/*.cpp)
 deps = $(wildcard ./src/*.hpp)
 
-build: $(filter-out ./src/main_ng.cpp, $(files)) $(deps)
+build1: $(filter-out ./src/main_ng.cpp, $(files)) $(deps)
 	@echo Target $@
 	@echo New Prerequsites: $? 
 	@echo Compiling...
@@ -20,10 +20,10 @@ build2: $(filter-out ./src/main.cpp, $(files)) $(deps)
 
 run1:
 	@echo Running build/ex1
-	./build/ex
+	./build/ex1
 
 run2:
-	@echo Running build/ex1
+	@echo Running build/ex2
 	./build/ex2
 
 clean:

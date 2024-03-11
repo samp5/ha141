@@ -34,6 +34,7 @@ public:
   double get_id() const { return id; }
 
   void set_message(double message);
+  void print_group();
 
   /*--------------------------------------------------------------*\
    *                  Thread helper:

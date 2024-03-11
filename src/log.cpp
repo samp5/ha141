@@ -262,3 +262,7 @@ void Log::log_group_neuron_type(LogLevel level, const char *message,
   // deallocate
   delete[] formatted_msg;
 }
+
+void Log::print(const char *message, bool newline, std::ostream &os) {
+  os << message << '\n';
+}

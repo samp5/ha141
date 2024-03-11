@@ -50,8 +50,8 @@ public:
   void log_group_neuron_value(LogLevel level, const char *message, int group_id,
                               int id, double value);
 
-  void log_group_neuron_type(LogLevel level, const char *message, int group_id, int id,
-                       const char *type);
+  void log_group_neuron_type(LogLevel level, const char *message, int group_id,
+                             int id, const char *type);
 
   void log_group_neuron_interaction(LogLevel level, const char *message,
                                     int group_id1, int id1, int group_id2,
@@ -63,6 +63,9 @@ public:
 
   // Neuron Group Logs
   void log_group_state(LogLevel level, const char *message, int group_id);
+
+  void print(const char *message, bool newline = true,
+             std::ostream &os = std::cout);
 
 private:
   vector<double> time;

@@ -7,14 +7,12 @@ NeuronGroup::NeuronGroup(int _id, int number_neurons) {
   lg.log_group_state(DEBUG, "Adding Group %d", _id);
 
   this->id = _id;
-  // make space for number of neurons
-  this->neurons.reserve(number_neurons);
 
   // add neurons;
   lg.log_group_state(INFO, "Group %d", this->id);
   for (int i = 0; i < number_neurons; i++) {
     Neuron *neuron = new Neuron(i + 1, get_inhibitory_status());
-    neurons[i] = neuron;
+    this->neurons.push_back(neuron);
   }
 }
 
@@ -37,3 +35,12 @@ void *NeuronGroup::group_run() {
 }
 
 void NeuronGroup::set_message(double message) { this->message = message; }
+
+void NeuronGroup::print_group() {
+  lg.log_group_state(DEBUG, "Neuron Group %d", this->id);
+  lg.print("==============");
+
+  for (Neuron *neuron : this->neurons) {
+    lg.log_neuron_state(DEBUG, "    Neuron %d", neuron->get_id());
+  }
+}

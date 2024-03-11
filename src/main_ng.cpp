@@ -34,9 +34,10 @@ int main() {
 
   vector<NeuronGroup *> neuron_groups(NUMBER_GROUPS);
 
-  int num_neurons = NUMBER_NODES;
   // will potentially leave a remainder
-  int neuron_per_group = NUMBER_NODES / NUMBER_NODES;
+  int neuron_per_group = NUMBER_NODES / NUMBER_GROUPS;
+
+  // reamainder is guearenteed to be less than the number of groups
   int remainder = NUMBER_NODES % NUMBER_GROUPS;
 
   cout << "\nAdding Neurons\n";
@@ -51,10 +52,14 @@ int main() {
       remainder--;
 
     // allocate for this group
-    NeuronGroup *this_group = new NeuronGroup(i, per_group);
+    NeuronGroup *this_group = new NeuronGroup(i + 1, per_group);
 
     // add to vector
-    neuron_groups.push_back(this_group);
+    neuron_groups[i] = this_group;
+  }
+
+  for (auto group : neuron_groups) {
+    group->print_group();
   }
 
   for (auto group : neuron_groups) {
