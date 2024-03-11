@@ -47,6 +47,7 @@ private:
 
 public:
   Neuron(int _id, int inhibitory);
+  Neuron(int _id, int inhibitory, NeuronGroup *group);
   ~Neuron();
   void add_neighbor(Neuron *neighbor, double weight);
   void add_next(Neuron *neighbor, double weight);
@@ -66,6 +67,7 @@ public:
   double get_potential() { return membrane_potential; }
   const weight_map *get_presynaptic() const;
   const weight_map *get_postsynaptic() const;
+  NeuronGroup *get_group();
   bool is_activated() const;
 
   /*--------------------------------------------------------------*\

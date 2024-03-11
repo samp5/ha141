@@ -14,6 +14,7 @@ enum LogLevel {
   WARNING,
   INFO,
   DEBUG,
+  DEBUG2,
 };
 
 extern LogLevel level;
@@ -63,6 +64,9 @@ public:
 
   // Neuron Group Logs
   void log_group_state(LogLevel level, const char *message, int group_id);
+
+  void log_group_value(LogLevel level, const char *message, int group_id,
+                       int value);
 
   void print(const char *message, bool newline = true,
              std::ostream &os = std::cout);

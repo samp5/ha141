@@ -5,6 +5,25 @@
 #include <pthread.h>
 #include <unistd.h>
 
+// Constructor for Neuron class for Neurons in Groups
+//
+// Sets ID, inhibitory status, group pointer
+// and prints out a log message
+//
+// @param1: Neuron ID
+// @param2: excitatory/inhibitory value (1 or -1)
+// @param3: Pointer to the parent group
+Neuron::Neuron(int _id, int inhibitory, NeuronGroup *group) {
+
+  this->id = _id;
+  this->excit_inhib_value = inhibitory;
+  this->group = group;
+
+  const char *inhib = inhibitory == -1 ? "excitatory\0" : "inhibitory\0";
+
+  lg.log_group_neuron_type(INFO, "(%d) Neuron %d added: %s",
+                           this->group->get_id(), _id, inhib);
+}
 // Constructor for Neuron class
 //
 // Sets ID, inhibitory status, and prints out a log message
@@ -62,12 +81,12 @@ void Neuron::add_neighbor(Neuron *neighbor, double weight) {
 void Neuron::add_previous(Neuron *neighbor, double weight) {
   _presynaptic[neighbor] = weight;
   lg.log_neuron_interaction(
-      DEBUG, "Neuron %d added to the _presynaptic map of Neuron ",
+      DEBUG2, "Neuron %d added to the _presynaptic map of Neuron ",
       neighbor->get_id(), this->id);
 }
 
 void Neuron::run_in_group() {
-  
+
   // Check active status
   if (!this->active) {
     lg.log_group_neuron_state(
@@ -332,3 +351,5 @@ const weight_map *Neuron::get_postsynaptic() const {
   return p_postsynaptic;
 }
 bool Neuron::is_activated() const { return this->active; }
+
+NeuronGroup *Neuron::get_group() { return this->group; }

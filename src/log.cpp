@@ -27,6 +27,9 @@ void Log::log(LogLevel level, const char *message,
   case LogLevel::DEBUG:
     _level = "[%d:%d] [Debug] ";
     break;
+  case LogLevel::DEBUG2:
+    _level = "[%d:%d] [Debug2] ";
+    break;
   case LogLevel::ERROR:
     _level = "[%d:%d] [Error] ";
     break;
@@ -248,6 +251,20 @@ void Log::log_group_state(LogLevel level, const char *message, int group_id) {
   delete[] formatted_msg;
 }
 
+void Log::log_group_value(LogLevel level, const char *message, int group_id,
+                          int value) {
+  // length
+  int length = snprintf(nullptr, 0, message, group_id, value);
+  // allocate
+  char *formatted_msg = new char[length + 1];
+  // format
+  snprintf(formatted_msg, length + 1, message, group_id, value);
+  // log
+  this->log(level, formatted_msg);
+  // deallocate
+  delete[] formatted_msg;
+}
+
 void Log::log_group_neuron_type(LogLevel level, const char *message,
                                 int group_id, int id, const char *type) {
 
@@ -264,5 +281,8 @@ void Log::log_group_neuron_type(LogLevel level, const char *message,
 }
 
 void Log::print(const char *message, bool newline, std::ostream &os) {
-  os << message << '\n';
+  if (newline)
+    os << message << '\n';
+  else
+    os << message;
 }

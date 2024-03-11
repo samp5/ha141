@@ -58,6 +58,8 @@ int main() {
     neuron_groups[i] = this_group;
   }
 
+  random_group_neighbors(neuron_groups, NUMBER_EDGES);
+
   for (auto group : neuron_groups) {
     group->print_group();
   }

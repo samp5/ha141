@@ -35,6 +35,8 @@ public:
 
   void set_message(double message);
   void print_group();
+  int neuron_count();
+  const vector<Neuron *> &get_neruon_vector();
 
   /*--------------------------------------------------------------*\
    *                  Thread helper:

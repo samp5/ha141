@@ -11,7 +11,7 @@ NeuronGroup::NeuronGroup(int _id, int number_neurons) {
   // add neurons;
   lg.log_group_state(INFO, "Group %d", this->id);
   for (int i = 0; i < number_neurons; i++) {
-    Neuron *neuron = new Neuron(i + 1, get_inhibitory_status());
+    Neuron *neuron = new Neuron(i + 1, get_inhibitory_status(), this);
     this->neurons.push_back(neuron);
   }
 }
@@ -36,11 +36,22 @@ void *NeuronGroup::group_run() {
 
 void NeuronGroup::set_message(double message) { this->message = message; }
 
+int NeuronGroup::neuron_count() { return (int)this->neurons.size(); }
+
+const vector<Neuron *> &NeuronGroup::get_neruon_vector() {
+  return this->neurons;
+}
+
 void NeuronGroup::print_group() {
-  lg.log_group_state(DEBUG, "Neuron Group %d", this->id);
-  lg.print("==============");
+  lg.print("\n", false);
+  lg.log_group_value(DEBUG, "Neuron Group %d (%d neurons)", this->id,
+                     this->neurons.size());
+  lg.print("========================================================");
 
   for (Neuron *neuron : this->neurons) {
-    lg.log_neuron_state(DEBUG, "    Neuron %d", neuron->get_id());
+    lg.log_group_neuron_state(DEBUG, "   (%d) Neuron %d", this->id,
+                              neuron->get_id());
+    print_group_maps(neuron);
   }
+  lg.print("\n", false);
 }
