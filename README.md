@@ -96,10 +96,7 @@ public:
     return ((NeuronGroup *)instance)->group_run();
   }
 };
-
-
 ```
-
 
 </details>
 
