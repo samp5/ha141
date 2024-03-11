@@ -10,26 +10,25 @@ extern Log lg;
 
 // This class is so that many neurons can run on one thread
 // All neurons will still be allocated on the heap
+
 class NeuronGroup {
+  // NOT COMPLETE
 private:
   vector<Neuron *> neurons;
   int id;
   pthread_t thread;
 
   // this variable should be read only from outside the class
-  // Analagous to "value" in previous development
+  // Analagous to "value" in previous version
   int message;
 
 public:
   NeuronGroup(int _id, int number_neurons);
-
-  // might move memory responsibilities to this class
+  // might move neuron memory responsibilities to this class
   ~NeuronGroup();
 
   void *group_run();
-
   void start_thread() { pthread_create(&thread, NULL, thread_helper, this); }
-
   double get_message() const { return message; }
   double get_id() const { return id; }
 

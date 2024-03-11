@@ -4,11 +4,11 @@ CXX = g++
 files = $(wildcard ./src/*.cpp)
 deps = $(wildcard ./src/*.hpp)
 
-build1: $(filter-out ./src/main_ng.cpp, $(files)) $(deps)
+build1: $(filter-out ./src/main_neuron_groups.cpp, $(files)) $(deps)
 	@echo Target $@
 	@echo New Prerequsites: $? 
 	@echo Compiling...
-	@$(CXX) $(CXXFLAGS) $(filter-out ./src/main_ng.cpp, $(files)) -o ./build/ex1
+	@$(CXX) $(CXXFLAGS) $(filter-out ./src/main_neuron_groups.cpp, $(files)) -o ./build/ex1
 	@echo Done!
 
 build2: $(filter-out ./src/main.cpp, $(files)) $(deps)

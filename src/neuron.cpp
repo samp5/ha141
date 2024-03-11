@@ -18,6 +18,7 @@ Neuron::Neuron(int _id, int inhibitory, NeuronGroup *group) {
   this->id = _id;
   this->excit_inhib_value = inhibitory;
   this->group = group;
+  this->membrane_potential = INITIAL_MEMBRANE_POTENTIAL;
 
   const char *inhib = inhibitory == -1 ? "excitatory\0" : "inhibitory\0";
 
@@ -31,8 +32,9 @@ Neuron::Neuron(int _id, int inhibitory, NeuronGroup *group) {
 // @param1: Neuron ID
 // @param2: excitatory/inhibitory value (1 or -1)
 Neuron::Neuron(int _id, int _excit_inhib_value) {
-  id = _id;
-  excit_inhib_value = _excit_inhib_value;
+  this->id = _id;
+  this->excit_inhib_value = _excit_inhib_value;
+  this->membrane_potential = INITIAL_MEMBRANE_POTENTIAL;
 
   const char *inhib =
       _excit_inhib_value == -1 ? "excitatory\0" : "inhibitory\0";
