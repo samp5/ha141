@@ -27,10 +27,10 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 - [x] ~~Create and integrate Log Class~~
 - [x] ~~Neuron Group Class~~
 - [ ] Decay functionality
-- [ ] Copy functionality for replicating graph layout
-- [ ] Neuron Types for differentiated functionality (input, output)
-- [ ] Possion Process for Neuron Activation
 - [ ] Activate Neuron from file inputs
+- [ ] Neuron Types for differentiated functionality (input, output)
+- [ ] Copy functionality for replicating graph layout
+- [ ] Possion Process for Neuron Activation
 
 | Date  | Key Points 🔑   |  Issues 🐛   |
 |--------------- | --------------- |--------------- |
