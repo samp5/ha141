@@ -17,6 +17,13 @@ enum LogLevel {
   DEBUG2,
 };
 
+typedef struct {
+  int neuron_id;
+  int group_id;
+  double timestamp;
+  double membrane_potentail;
+} LogData;
+
 extern LogLevel level;
 
 class Log {
@@ -72,10 +79,8 @@ public:
              std::ostream &os = std::cout);
 
 private:
-  vector<double> time;
-  vector<double> data;
-  vector<int> id;
-  vector<int> group_id;
+  // make this a struct
+  vector<LogData> log_data;
 };
 
 #endif // !LOG

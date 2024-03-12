@@ -1,5 +1,6 @@
 # ignore notes
 notes.md
+todo.md
 
 # ignore log files
 *.log

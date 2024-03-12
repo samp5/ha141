@@ -124,10 +124,14 @@ void Log::add_data(int curr_id, double curr_data) {
   gettimeofday(&tv, NULL);
   double time_stamp = (double)tv.tv_sec + (double)tv.tv_usec / 100000;
 
-  this->time.push_back(time_stamp);
-  this->data.push_back(curr_data);
-  this->id.push_back(curr_id);
-  this->group_id.push_back(0);
+  LogData this_data;
+
+  this_data.timestamp = time_stamp;
+  this_data.membrane_potentail = curr_data;
+  this_data.group_id = 0;
+  this_data.neuron_id = curr_id;
+
+  this->log_data.push_back(this_data);
 }
 
 void Log::write_data(const char *filename) {
@@ -142,12 +146,6 @@ void Log::write_data(const char *filename) {
   // format
   snprintf(file_name, length + 1, filename, tv.tv_sec);
 
-  if (this->id.size() != this->data.size()) {
-    this->log(ERROR, "write_data: Data size and ID size do not match?");
-    delete[] file_name;
-    return;
-  }
-
   std::ofstream file;
   file.open(file_name);
 
@@ -157,9 +155,9 @@ void Log::write_data(const char *filename) {
     return;
   }
 
-  for (vector<int>::size_type i = 0; i < id.size(); i++) {
-    file << std::fixed << this->time[i] << " " << this->group_id[i] << " "
-         << this->id[i] << " " << this->data[i] << '\n';
+  for (LogData log_data : this->log_data) {
+    file << std::fixed << log_data.group_id << " " << log_data.neuron_id << " "
+         << log_data.timestamp << " " << log_data.membrane_potentail << '\n';
   }
 
   file.close();
@@ -232,10 +230,14 @@ void Log::add_data(int group_id, int curr_id, double curr_data) {
   gettimeofday(&tv, NULL);
   double time_stamp = (double)tv.tv_sec + (double)tv.tv_usec / 100000;
 
-  this->time.push_back(time_stamp);
-  this->data.push_back(curr_data);
-  this->id.push_back(curr_id);
-  this->group_id.push_back(group_id);
+  LogData this_data;
+
+  this_data.timestamp = time_stamp;
+  this_data.membrane_potentail = curr_data;
+  this_data.group_id = group_id;
+  this_data.neuron_id = curr_id;
+
+  this->log_data.push_back(this_data);
 }
 
 void Log::log_group_state(LogLevel level, const char *message, int group_id) {

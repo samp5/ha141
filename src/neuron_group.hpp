@@ -20,7 +20,11 @@ private:
 
   // this variable should be read only from outside the class
   // Analagous to "value" in previous version
+  // Message buffer
+  // Queue data structure
+  // should be a struct
   int message;
+  // separate message buffer for inter group messages
 
 public:
   NeuronGroup(int _id, int number_neurons);
