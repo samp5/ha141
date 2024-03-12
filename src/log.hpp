@@ -25,6 +25,7 @@ typedef struct {
 } LogData;
 
 extern LogLevel level;
+extern ostream &STREAM;
 
 class Log {
 public:
@@ -36,9 +37,11 @@ public:
   void write_data(const char *filesname = "./logs/%ld.log");
 
   void add_data(int group_id, int curr_id, double curr_data);
+  void add_data(int group_id, int curr_id, double curr_data, double time);
 
   // General Log function
-  void log(LogLevel level, const char *message, ostream &os = cout);
+  void log(LogLevel level, const char *message, ostream &os = STREAM);
+  double get_time_stamp();
 
   // Neuron Logs
   void log_neuron_state(LogLevel level, const char *message, int id);
@@ -76,7 +79,10 @@ public:
                        int value);
 
   void print(const char *message, bool newline = true,
-             std::ostream &os = std::cout);
+             std::ostream &os = STREAM);
+
+  void log_message(LogLevel level, const char *message, double timestamp,
+                   int group_id, int id, double value);
 
 private:
   // make this a struct

@@ -87,47 +87,54 @@ void Neuron::add_previous(Neuron *neighbor, double weight) {
       neighbor->get_id(), this->id);
 }
 
-void Neuron::run_in_group() {
-
-  // Check active status
+int Neuron::recieve_in_group() {
+  // Sanity check active status
   if (!this->active) {
     lg.log_group_neuron_state(
-        WARNING, "run_in_group: Neuron %d tried to run when it was not active",
+        WARNING,
+        "run_in_group: Group %d: Neuron %d tried to run when it was not active",
         this->group->get_id(), this->id);
-    return;
+    return 0;
   }
 
   pthread_mutex_lock(&mutex);
 
-  // set membrane potential to either the incoming message or the
-  // INITIAL_MEMBRANE_POTENTIAL
-  this->membrane_potential =
-      this->group->get_message() == INITIAL_MEMBRANE_POTENTIAL
-          ? this->membrane_potential
-          : this->membrane_potential + this->group->get_message();
+  Message *incoming_message = this->get_message();
+  if (incoming_message == NULL) {
+    pthread_mutex_unlock(&mutex);
+    return 0;
+  }
 
-  // reset the group message to INITIAL_MEMBRANE_POTENTIAL
-  this->group->set_message(INITIAL_MEMBRANE_POTENTIAL);
+  this->membrane_potential =
+      this->membrane_potential + incoming_message->message;
 
   lg.log_group_neuron_value(
       INFO, "Neuron %d is activated, accumulated equal to %f",
       this->group->get_id(), this->id, this->membrane_potential);
 
-  lg.add_data(this->group->get_id(), this->id, this->membrane_potential);
+  // use message timestamp not current time
+  // #askpedram
+  lg.add_data(this->group->get_id(), this->id, this->membrane_potential,
+              incoming_message->timestamp);
 
-  recieved = true;
-  pthread_cond_broadcast(&cond);
+  if (!(incoming_message->target_neuron_group == this->get_group())) {
+    recieved = true;
+    pthread_cond_broadcast(&cond);
+  }
 
   pthread_mutex_unlock(&mutex);
 
-  // Check for empty neighbor list
+  delete incoming_message;
+  return 1;
+}
+
+int Neuron::check_run_conditions() {
   if (this->_postsynaptic.empty()) {
     lg.log_group_neuron_state(INFO,
                               "Group %d: Neuron %d does not have any neighbors",
                               this->group->get_id(), this->id);
-    active = false;
-    this->run();
-    return;
+    this->deactivate();
+    return 0;
   }
 
   // Check for activation threshold
@@ -137,13 +144,24 @@ void Neuron::run_in_group() {
                               "Membrane potential for Group %d: Neuron %d is "
                               "below the threshold, not firing",
                               this->group->get_id(), this->id);
-    active = false;
+    this->deactivate();
+    return 0;
+  }
+  return 1;
+}
+
+void Neuron::run_in_group() {
+
+  if (!this->recieve_in_group()) {
+    return;
+  }
+
+  if (!this->check_run_conditions()) {
     return;
   }
 
   // loop through all neighbors
   for (const auto &pair : _postsynaptic) {
-
     lg.log_group_neuron_interaction(
         INFO, "Group %d: Neuron %d is sending a mesage to Group %d: Neuron %d",
         this->group->get_id(), this->id, pair.first->group->get_id(),
@@ -151,51 +169,48 @@ void Neuron::run_in_group() {
 
     pthread_mutex_lock(&mutex);
 
-    // set message
-    double message =
+    // construct message
+    Message *message = new Message;
+    message->target_neuron_group = pair.first->get_group();
+    message->target_neuron = pair.first;
+    message->timestamp = lg.get_time_stamp();
+
+    // calculate message
+    message->message =
         membrane_potential * _postsynaptic[pair.first] * excit_inhib_value;
 
     lg.log_group_neuron_value(
         DEBUG, "Accumulated for Group %d: Neuron %d is %f",
         this->group->get_id(), this->id, this->membrane_potential);
+
     lg.log_group_neuron_interaction(
         DEBUG, "Weight for Group %d: Neuron %d to Group %d: Neuron %d is %f",
         this->group->get_id(), this->id, pair.first->group->get_id(),
         pair.first->id, pair.second);
+
     lg.log_group_neuron_value(DEBUG, "Group %d: Neuron %d modifier is %d",
                               this->group->get_id(), this->id,
                               this->excit_inhib_value);
+
     lg.log_group_neuron_interaction(
         INFO, "Message from Group %d: Neuron %d to Group %d: Neuron %d is %f",
         this->group->get_id(), this->id, pair.first->group->get_id(),
-        pair.first->id, message);
+        pair.first->id, message->message);
 
-    // set recievers group value to message
-    pair.first->group->set_message(message);
-
-    /*
-     * We need to have different logic for if the neuron is in the same group
-     * or different groups
-     *
-     * Same group:
-     *  We can activate it directly
-     *
-     * Different Groups
-     *  Pause this thread until we get a recieved signal
-     */
     // activate neighbor
     pair.first->activate();
 
     if (this->group->get_id() == pair.first->group->get_id()) {
-      // I am a little unsure about this sequencing.
-      // If we activate it directly, and this neuron has neighbor x and the
-      // actiavted neuron has neighbor x
-      //  neuron x would get the message of the neighbor before the message of
-      //  this neuron?
-      pair.first->group->group_run();
+
+      this->get_group()->add_to_intragroup(message);
+
     } else {
+
+      pair.first->get_group()->add_to_intergroup(message);
+
       // get condition
       pthread_cond_t *neighbor_con = pair.first->get_cond();
+
       // signal start
       pthread_cond_signal(neighbor_con);
       pthread_mutex_unlock(&mutex);
@@ -347,7 +362,6 @@ const weight_map *Neuron::get_presynaptic() const {
 //
 // Returns a constant pointer to the _postsynaptic weightmap
 // for the calling instance
-//
 const weight_map *Neuron::get_postsynaptic() const {
   const weight_map *p_postsynaptic = &_postsynaptic;
   return p_postsynaptic;
@@ -355,3 +369,20 @@ const weight_map *Neuron::get_postsynaptic() const {
 bool Neuron::is_activated() const { return this->active; }
 
 NeuronGroup *Neuron::get_group() { return this->group; }
+
+void Neuron::add_message(Message *message) {
+  pthread_mutex_lock(&mutex);
+  this->messages.push_back(message);
+  pthread_mutex_unlock(&mutex);
+}
+
+Message *Neuron::get_message() {
+  if (this->messages.empty()) {
+    lg.log_group_neuron_state(DEBUG, "No messages for (%d) Neuron %d",
+                              this->get_group()->get_id(), this->get_id());
+    return NULL;
+  }
+  Message *most_recent = this->messages.front();
+  this->messages.pop_front();
+  return most_recent;
+}

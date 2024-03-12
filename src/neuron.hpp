@@ -2,8 +2,10 @@
 #define NEURON
 
 #include "log.hpp"
+#include "message.hpp"
 #include "neuron_group.hpp"
 #include <iostream>
+#include <list>
 #include <map>
 #include <pthread.h>
 #include <unistd.h>
@@ -13,6 +15,7 @@
 #define REFRACTORY_MEMBRANE_POTENTIAL -70
 
 using std::cout;
+using std::list;
 extern pthread_mutex_t mutex;
 extern volatile double value;
 extern bool finish;
@@ -45,6 +48,9 @@ private:
   bool active = false;
   bool recieved = false;
 
+  // message list
+  list<Message *> messages;
+
 public:
   Neuron(int _id, int inhibitory);
   Neuron(int _id, int inhibitory, NeuronGroup *group);
@@ -59,6 +65,10 @@ public:
   void activate() { active = true; }
   void deactivate() { active = false; }
   void run_in_group();
+  int recieve_in_group();
+  int check_run_conditions();
+  void add_message(Message *);
+  Message *get_message();
 
   //>>>>>>>>>>>>>> Access to private variables <<<<<<<<<<<
   pthread_t get_thread_id() { return thread; }

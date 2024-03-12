@@ -225,6 +225,18 @@ void Log::log_group_neuron_interaction(LogLevel level, const char *message,
   delete[] formatted_msg;
 }
 
+void Log::add_data(int group_id, int curr_id, double curr_data, double time) {
+
+  LogData this_data;
+
+  this_data.timestamp = time;
+  this_data.membrane_potentail = curr_data;
+  this_data.group_id = group_id;
+  this_data.neuron_id = curr_id;
+
+  this->log_data.push_back(this_data);
+}
+
 void Log::add_data(int group_id, int curr_id, double curr_data) {
   struct timeval tv;
   gettimeofday(&tv, NULL);
@@ -287,4 +299,25 @@ void Log::print(const char *message, bool newline, std::ostream &os) {
     os << message << '\n';
   else
     os << message;
+}
+
+double Log::get_time_stamp() {
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  double time_stamp = (double)tv.tv_sec + (double)tv.tv_usec / 100000;
+  return time_stamp;
+}
+
+void Log::log_message(LogLevel level, const char *message, double timestamp,
+                      int group_id, int id, double value) {
+  // length
+  int length = snprintf(nullptr, 0, message, timestamp, group_id, id, value);
+  // allocate
+  char *formatted_msg = new char[length + 1];
+  // format
+  snprintf(formatted_msg, length + 1, message, timestamp, group_id, id, value);
+  // log
+  this->log(level, formatted_msg);
+  // deallocate
+  delete[] formatted_msg;
 }

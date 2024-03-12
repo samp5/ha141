@@ -1,4 +1,5 @@
 #include "functions.hpp"
+#include "log.hpp"
 #include <cstdlib>
 #include <ostream>
 #include <vector>
@@ -239,4 +240,14 @@ int get_inhibitory_status() {
   }
 
   return ret;
+}
+char *get_active_status_string(bool active) {
+  char *ret;
+  if (active) {
+    ret = "active"; // NOLINT
+    return ret;
+  } else {
+    ret = "inactive"; // NOLINT
+    return ret;
+  }
 }

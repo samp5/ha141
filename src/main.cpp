@@ -12,6 +12,7 @@
 using std::cin;
 using std::cout;
 
+ostream &STREAM = cout;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_barrier_t barrier;
 volatile double value = 0;

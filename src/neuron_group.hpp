@@ -2,11 +2,14 @@
 #define NEURON_GROUP
 
 #include "log.hpp"
+#include "message.hpp"
+#include <list>
 #include <pthread.h>
 
 class Neuron;
 
 extern Log lg;
+using std::list;
 
 // This class is so that many neurons can run on one thread
 // All neurons will still be allocated on the heap
@@ -18,27 +21,35 @@ private:
   int id;
   pthread_t thread;
 
-  // this variable should be read only from outside the class
-  // Analagous to "value" in previous version
-  // Message buffer
-  // Queue data structure
-  // should be a struct
-  int message;
   // separate message buffer for inter group messages
+  list<Message *> intragroup_messages;
+  list<Message *> intergroup_messages;
+  // When a neuron sends a message within its own group:
+  //    Add the message to the queue
+  // process_intragroup_queue should:
+  //    read from the start of the queue
+  //    add the message the right neurons queue
 
 public:
   NeuronGroup(int _id, int number_neurons);
   // might move neuron memory responsibilities to this class
   ~NeuronGroup();
 
+  void process_intragroup_queue();
+  void process_intergroup_queue();
   void *group_run();
-  void start_thread() { pthread_create(&thread, NULL, thread_helper, this); }
-  double get_message() const { return message; }
+  void start_thread() {
+    lg.log_group_state(DEBUG2, "Thread started for group %d", this->get_id());
+    pthread_create(&thread, NULL, thread_helper, this);
+  }
+  void add_to_intragroup(Message *message);
+  void add_to_intergroup(Message *message);
   double get_id() const { return id; }
 
-  void set_message(double message);
+  pthread_t get_thread_id() { return thread; }
   void print_group();
   int neuron_count();
+  double get_message();
   const vector<Neuron *> &get_neruon_vector();
 
   /*--------------------------------------------------------------*\
