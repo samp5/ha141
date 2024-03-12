@@ -30,6 +30,12 @@ void Log::log(LogLevel level, const char *message,
   case LogLevel::DEBUG2:
     _level = "[%d:%d] ❷  ";
     break;
+  case LogLevel::DEBUG3:
+    _level = "[%d:%d] ❸  ";
+    break;
+  case LogLevel::DEBUG4:
+    _level = "[%d:%d] ❹ ";
+    break;
   case LogLevel::ERROR:
     _level = "[%d:%d] |⛔ Error | ";
     break;

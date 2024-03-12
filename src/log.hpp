@@ -15,6 +15,8 @@ enum LogLevel {
   INFO,
   DEBUG,
   DEBUG2,
+  DEBUG3,
+  DEBUG4,
 };
 
 typedef struct {

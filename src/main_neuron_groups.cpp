@@ -65,7 +65,25 @@ int main() {
     group->print_group();
   }
 
+  Message *test_message = new Message;
+  test_message->message = 10;
+  test_message->target_neuron_group = neuron_groups.front();
+  test_message->timestamp = 1000;
+  test_message->target_neuron =
+      neuron_groups.front()->get_neruon_vector().front();
+
+  Message *test_message2 = new Message;
+  test_message2->message = 10;
+  test_message2->target_neuron_group = neuron_groups.front();
+  test_message2->timestamp = 1000;
+  test_message2->target_neuron =
+      neuron_groups.front()->get_neruon_vector().back();
+
+  neuron_groups.front()->add_to_intragroup(test_message);
+  neuron_groups.front()->add_to_intragroup(test_message2);
+
   neuron_groups.front()->get_neruon_vector().front()->activate();
+  neuron_groups.front()->get_neruon_vector().back()->activate();
 
   for (auto group : neuron_groups) {
     group->start_thread();

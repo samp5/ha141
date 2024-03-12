@@ -100,6 +100,7 @@ int Neuron::recieve_in_group() {
   pthread_mutex_lock(&mutex);
 
   Message *incoming_message = this->get_message();
+
   if (incoming_message == NULL) {
     pthread_mutex_unlock(&mutex);
     return 0;
@@ -109,7 +110,7 @@ int Neuron::recieve_in_group() {
       this->membrane_potential + incoming_message->message;
 
   lg.log_group_neuron_value(
-      INFO, "Neuron %d is activated, accumulated equal to %f",
+      INFO, "(%d) Neuron %d is activated, accumulated equal to %f",
       this->group->get_id(), this->id, this->membrane_potential);
 
   // use message timestamp not current time
@@ -382,6 +383,7 @@ Message *Neuron::get_message() {
                               this->get_group()->get_id(), this->get_id());
     return NULL;
   }
+
   Message *most_recent = this->messages.front();
   this->messages.pop_front();
   return most_recent;

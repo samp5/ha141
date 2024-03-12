@@ -33,6 +33,9 @@ void *NeuronGroup::group_run() {
 
   int i = 0;
   while (i < 3) {
+    this->process_intragroup_queue();
+    this->process_intergroup_queue();
+
     for (Neuron *neuron : this->neurons) {
       lg.log_group_neuron_type(
           DEBUG2, "Checking activation:(%d) Neuron %d is %s", this->get_id(),
@@ -43,8 +46,6 @@ void *NeuronGroup::group_run() {
         neuron->run_in_group();
       }
     }
-    this->process_intragroup_queue();
-    this->process_intergroup_queue();
     i++;
   }
   pthread_exit(NULL);
@@ -72,14 +73,17 @@ void NeuronGroup::print_group() {
 
 // each of these proceses should maybe be spawned in their own threads ?
 void NeuronGroup::process_intragroup_queue() {
+
   for (Message *message : this->intragroup_messages) {
     // mutex lock happens in the neuron add_message function
     message->target_neuron->add_message(message);
   }
+  this->intragroup_messages.clear();
 }
 
 void NeuronGroup::process_intergroup_queue() {
   for (Message *message : this->intergroup_messages) {
+
     if (message->target_neuron_group != this) {
       lg.log_group_neuron_state(ERROR,
                                 "process_intergroup_queue: Message meant for "
@@ -89,6 +93,7 @@ void NeuronGroup::process_intergroup_queue() {
     }
     message->target_neuron->add_message(message);
   }
+  this->intergroup_messages.clear();
 }
 void NeuronGroup::add_to_intragroup(Message *message) {
   pthread_mutex_lock(&mutex);

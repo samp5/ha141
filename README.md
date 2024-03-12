@@ -25,19 +25,229 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 
 ### In-Progress 🚀
 - [x] ~~Create and integrate Log Class~~
-- [ ] Neuron Group Class (basic functionality on `main`, messaging in progress on `nclass`)
+- [x] ~~Neuron Group Class~~
+- [ ] Decay functionality
+- [ ] Copy functionality for replicating graph layout
 - [ ] Neuron Types for differentiated functionality (input, output)
 - [ ] Possion Process for Neuron Activation
-- [ ] Activate Neuron from file inputs (or other arbitrary input)
+- [ ] Activate Neuron from file inputs
 
 | Date  | Key Points 🔑   |  Issues 🐛   |
 |--------------- | --------------- |--------------- |
+| [3-12](#-update-3-12)   | Start of messaging functionality between neuron groups. | None |
 | [3-11](#-update-3-11)   | Start of Neruon Group Class| None |
 | [3-5](#-update-3-5)   | New fully integrated Log class. Write neuron ids and potential values to a `<current_time>.log` file. | None |
 | [3-3 pt.2](#-update-3-3-part-2)   | Fixed [Issue 2](#-issue-2)| None |
 | [3-3](#-update-3-3)   | Added time stamps to logging messages. Added function descriptions.| None |
 | [2-29](#-update-2-29)   | Updated Neuron Class with with membrane potentials, refractory phases, Update to edge weights, fixed issue 1, guard clauses on header files.   | "Quit" functionality does not work for the menu [~~Issue 2~~](#-issue-2)|
 | [2-28](#-update-2-28)   | Basic Node class that sends and recieves messages   | `random_neighbors` may repeat edges. [~~Issue 1~~](#-issue-1)|
+
+### 📌 Update 3-12
+**New addtions:**
+- Basic `NeuronGroup` messaging.
+- `NeuronGroup`s run in separate threads
+- Messaging struct
+- Changed Logging struct
+- Changed logging output for readability
+    - ⓘ  for `INFO`
+    - ❶ for `DEBUG`
+    - ❷ for `DEBUG2`
+    - and so on for `DEBUG3` and `DEBUG4`
+
+<details>
+<summary>Logging Struct</summary>
+<br>
+
+```cpp
+typedef struct {
+  int neuron_id;
+  int group_id;
+  double timestamp;
+  double membrane_potentail;
+} LogData;
+```
+
+</details>
+<details>
+<summary>Message Struct</summary>
+<br>
+
+```cpp
+typedef struct {
+  double message;
+  Neuron *target_neuron;
+  NeuronGroup *target_neuron_group;
+  double timestamp;
+} Message;
+```
+
+</details>
+<details>
+<summary>Example Output 9 (summarized)</summary>
+<br>
+
+```
+// adding neurons 
+// random edges
+
+// new output
+
+[1710275464:285432] ❶  Neuron Group 1 (4 neurons)
+========================================================
+[1710275464:285434] ❶     (1) Neuron 1
+[1710275464:285435] ❶     (1) Neuron 2
+[1710275464:285437] ❶     (1) Neuron 3
+[1710275464:285438] ❶     (1) Neuron 4
+[1710275464:285439] ❷        (1) Neuron 4 has connections from:
+[1710275464:285441] ❷          (2) Neuron 2
+
+
+[1710275464:285442] ❶  Neuron Group 2 (4 neurons)
+========================================================
+[1710275464:285443] ❶     (2) Neuron 1
+[1710275464:285444] ❶     (2) Neuron 2
+[1710275464:285446] ❷        (2) Neuron 2 is connected to:
+[1710275464:285447] ❷           (1) Neuron 4
+[1710275464:285448] ❶     (2) Neuron 3
+[1710275464:285449] ❶     (2) Neuron 4
+
+[1710275464:285453] ❷  Thread started for group 1
+[1710275464:285503] ❷  Thread started for group 2
+[1710275464:285653] ⓘ  Group 2 running
+[1710275464:285661] ❷  Checking activation:(2) Neuron 1 is inactive
+[1710275464:285663] ❷  Checking activation:(2) Neuron 2 is inactive
+[1710275464:285664] ❷  Checking activation:(2) Neuron 3 is inactive
+[1710275464:285665] ❷  Checking activation:(2) Neuron 4 is inactive
+[1710275464:285667] ❷  Checking activation:(2) Neuron 1 is inactive
+[1710275464:285668] ❷  Checking activation:(2) Neuron 2 is inactive
+[1710275464:285669] ❷  Checking activation:(2) Neuron 3 is inactive
+[1710275464:285670] ❷  Checking activation:(2) Neuron 4 is inactive
+[1710275464:285672] ❷  Checking activation:(2) Neuron 1 is inactive
+[1710275464:285673] ❷  Checking activation:(2) Neuron 2 is inactive
+[1710275464:285674] ❷  Checking activation:(2) Neuron 3 is inactive
+[1710275464:285675] ❷  Checking activation:(2) Neuron 4 is inactive
+[1710275464:285722] ⓘ  Group 1 running
+[1710275464:285729] ❷  Checking activation:(1) Neuron 1 is active
+[1710275464:285731] ❷  Running (1) Neuron (1)
+[1710275464:285742] ⓘ  (1) Neuron 1 is activated, accumulated equal to -45.000000
+[1710275464:285745] ⓘ  Group 1: Neuron 1 does not have any neighbors
+[1710275464:285747] ❷  Checking activation:(1) Neuron 2 is inactive
+[1710275464:285748] ❷  Checking activation:(1) Neuron 3 is inactive
+[1710275464:285750] ❷  Checking activation:(1) Neuron 4 is active
+[1710275464:285751] ❷  Running (1) Neuron (4)
+[1710275464:285753] ⓘ  (1) Neuron 4 is activated, accumulated equal to -45.000000
+[1710275464:285755] ⓘ  Group 1: Neuron 4 does not have any neighbors
+[1710275464:285757] ❷  Checking activation:(1) Neuron 1 is inactive
+[1710275464:285758] ❷  Checking activation:(1) Neuron 2 is inactive
+[1710275464:285759] ❷  Checking activation:(1) Neuron 3 is inactive
+[1710275464:285760] ❷  Checking activation:(1) Neuron 4 is inactive
+[1710275464:285762] ❷  Checking activation:(1) Neuron 1 is inactive
+[1710275464:285763] ❷  Checking activation:(1) Neuron 2 is inactive
+[1710275464:285764] ❷  Checking activation:(1) Neuron 3 is inactive
+[1710275464:285765] ❷  Checking activation:(1) Neuron 4 is inactive
+
+[1710275464:285986] ❶  Deleteing Group 1 Neuron 1
+[1710275464:285990] ❶  Deleteing Group 1 Neuron 2
+[1710275464:285992] ❶  Deleteing Group 1 Neuron 3
+[1710275464:285994] ❶  Deleteing Group 1 Neuron 4
+[1710275464:285998] ❶  Deleteing Group 2 Neuron 1
+[1710275464:285999] ❶  Deleteing Group 2 Neuron 2
+[1710275464:286001] ❶  Deleteing Group 2 Neuron 3
+[1710275464:286003] ❶  Deleteing Group 2 Neuron 4
+```
+</details>
+
+<details>
+<summary>Example Output 9 (all ouput)</summary>
+<br>
+
+```
+Adding Neurons
+----------------
+
+[1710275464:285392] ❶  Adding Group 1
+[1710275464:285398] ⓘ  Group 1
+[1710275464:285403] ⓘ  (1) Neuron 1 added: excitatory
+[1710275464:285406] ⓘ  (1) Neuron 2 added: excitatory
+[1710275464:285408] ⓘ  (1) Neuron 3 added: excitatory
+[1710275464:285410] ⓘ  (1) Neuron 4 added: excitatory
+[1710275464:285412] ❶  Adding Group 2
+[1710275464:285412] ⓘ  Group 2
+[1710275464:285414] ⓘ  (2) Neuron 1 added: excitatory
+[1710275464:285415] ⓘ  (2) Neuron 2 added: inhibitory
+[1710275464:285417] ⓘ  (2) Neuron 3 added: excitatory
+[1710275464:285418] ⓘ  (2) Neuron 4 added: excitatory
+
+Adding Random Edges
+======================
+
+[1710275464:285425] ⓘ  Edge from Neuron 2 to Neuron 4 added.
+[1710275464:285430] ❷  Neuron 2 added to the _presynaptic map of Neuron 
+
+[1710275464:285432] ❶  Neuron Group 1 (4 neurons)
+========================================================
+[1710275464:285434] ❶     (1) Neuron 1
+[1710275464:285435] ❶     (1) Neuron 2
+[1710275464:285437] ❶     (1) Neuron 3
+[1710275464:285438] ❶     (1) Neuron 4
+[1710275464:285439] ❷        (1) Neuron 4 has connections from:
+[1710275464:285441] ❷          (2) Neuron 2
+
+
+[1710275464:285442] ❶  Neuron Group 2 (4 neurons)
+========================================================
+[1710275464:285443] ❶     (2) Neuron 1
+[1710275464:285444] ❶     (2) Neuron 2
+[1710275464:285446] ❷        (2) Neuron 2 is connected to:
+[1710275464:285447] ❷           (1) Neuron 4
+[1710275464:285448] ❶     (2) Neuron 3
+[1710275464:285449] ❶     (2) Neuron 4
+
+[1710275464:285453] ❷  Thread started for group 1
+[1710275464:285503] ❷  Thread started for group 2
+[1710275464:285653] ⓘ  Group 2 running
+[1710275464:285661] ❷  Checking activation:(2) Neuron 1 is inactive
+[1710275464:285663] ❷  Checking activation:(2) Neuron 2 is inactive
+[1710275464:285664] ❷  Checking activation:(2) Neuron 3 is inactive
+[1710275464:285665] ❷  Checking activation:(2) Neuron 4 is inactive
+[1710275464:285667] ❷  Checking activation:(2) Neuron 1 is inactive
+[1710275464:285668] ❷  Checking activation:(2) Neuron 2 is inactive
+[1710275464:285669] ❷  Checking activation:(2) Neuron 3 is inactive
+[1710275464:285670] ❷  Checking activation:(2) Neuron 4 is inactive
+[1710275464:285672] ❷  Checking activation:(2) Neuron 1 is inactive
+[1710275464:285673] ❷  Checking activation:(2) Neuron 2 is inactive
+[1710275464:285674] ❷  Checking activation:(2) Neuron 3 is inactive
+[1710275464:285675] ❷  Checking activation:(2) Neuron 4 is inactive
+[1710275464:285722] ⓘ  Group 1 running
+[1710275464:285729] ❷  Checking activation:(1) Neuron 1 is active
+[1710275464:285731] ❷  Running (1) Neuron (1)
+[1710275464:285742] ⓘ  (1) Neuron 1 is activated, accumulated equal to -45.000000
+[1710275464:285745] ⓘ  Group 1: Neuron 1 does not have any neighbors
+[1710275464:285747] ❷  Checking activation:(1) Neuron 2 is inactive
+[1710275464:285748] ❷  Checking activation:(1) Neuron 3 is inactive
+[1710275464:285750] ❷  Checking activation:(1) Neuron 4 is active
+[1710275464:285751] ❷  Running (1) Neuron (4)
+[1710275464:285753] ⓘ  (1) Neuron 4 is activated, accumulated equal to -45.000000
+[1710275464:285755] ⓘ  Group 1: Neuron 4 does not have any neighbors
+[1710275464:285757] ❷  Checking activation:(1) Neuron 1 is inactive
+[1710275464:285758] ❷  Checking activation:(1) Neuron 2 is inactive
+[1710275464:285759] ❷  Checking activation:(1) Neuron 3 is inactive
+[1710275464:285760] ❷  Checking activation:(1) Neuron 4 is inactive
+[1710275464:285762] ❷  Checking activation:(1) Neuron 1 is inactive
+[1710275464:285763] ❷  Checking activation:(1) Neuron 2 is inactive
+[1710275464:285764] ❷  Checking activation:(1) Neuron 3 is inactive
+[1710275464:285765] ❷  Checking activation:(1) Neuron 4 is inactive
+
+[1710275464:285986] ❶  Deleteing Group 1 Neuron 1
+[1710275464:285990] ❶  Deleteing Group 1 Neuron 2
+[1710275464:285992] ❶  Deleteing Group 1 Neuron 3
+[1710275464:285994] ❶  Deleteing Group 1 Neuron 4
+[1710275464:285998] ❶  Deleteing Group 2 Neuron 1
+[1710275464:285999] ❶  Deleteing Group 2 Neuron 2
+[1710275464:286001] ❶  Deleteing Group 2 Neuron 3
+[1710275464:286003] ❶  Deleteing Group 2 Neuron 4
+```
+</details>
 
 ### 📌 Update 3-11
 **New addtions:**

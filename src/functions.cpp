@@ -23,7 +23,7 @@ void print_group_maps(Neuron *neuron) {
     }
   } else {
     lg.log_group_neuron_state(
-        DEBUG2, "         (%d) Neuron %d has no outgoing connections",
+        DEBUG3, "         (%d) Neuron %d has no outgoing connections",
         neuron->get_group()->get_id(), neuron->get_id());
   }
 
@@ -41,7 +41,7 @@ void print_group_maps(Neuron *neuron) {
     }
   } else {
     lg.log_group_neuron_state(
-        DEBUG2, "         (%d) Neuron %d has no incoming connections",
+        DEBUG3, "         (%d) Neuron %d has no incoming connections",
         neuron->get_group()->get_id(), neuron->get_id());
   }
 }
