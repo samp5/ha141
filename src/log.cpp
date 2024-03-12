@@ -22,19 +22,19 @@ void Log::log(LogLevel level, const char *message,
 
   switch (level) {
   case LogLevel::INFO:
-    _level = "[%d:%d] [Info] ";
+    _level = "[%d:%d] ⓘ  ";
     break;
   case LogLevel::DEBUG:
-    _level = "[%d:%d] [Debug] ";
+    _level = "[%d:%d] ❶  ";
     break;
   case LogLevel::DEBUG2:
-    _level = "[%d:%d] [Debug2] ";
+    _level = "[%d:%d] ❷  ";
     break;
   case LogLevel::ERROR:
-    _level = "[%d:%d] [Error] ";
+    _level = "[%d:%d] |⛔ Error | ";
     break;
   case LogLevel::WARNING:
-    _level = "[%d:%d] [Warning] ";
+    _level = "[%d:%d] |⚠ Warning| ";
     break;
   case LogLevel::DATA:
     this->log(ERROR, "DATA passed to Log Function?");

@@ -11,7 +11,7 @@
 
 #define NUMBER_NODES 8
 #define NUMBER_EDGES 1
-#define NUMBER_GROUPS 1
+#define NUMBER_GROUPS 2
 
 using std::cout;
 
