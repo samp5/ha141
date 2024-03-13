@@ -65,6 +65,13 @@ int main() {
     group->print_group();
   }
 
+  vector<Message *> messages =
+      construct_message_vector_from_file(neuron_groups, "./input_files/test");
+
+  for (auto message : messages) {
+    print_message(message);
+  }
+
   Message *test_message = new Message;
   test_message->message = 10;
   test_message->target_neuron_group = neuron_groups.front();

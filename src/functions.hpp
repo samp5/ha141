@@ -79,6 +79,17 @@ int get_neuron_count(const vector<NeuronGroup *> &groups);
 //@return pointer to neuron
 Neuron *get_random_neuron(const vector<NeuronGroup *> &group);
 
-char *get_active_status_string(bool active);
+// Get the string form of the active status of a neuron
+//
+//@param1 bool (Neuron::active)
+//@return const char* of "active" or "inactive"
+const char *get_active_status_string(bool active);
+
+void construct_messages_from_file();
+
+Message *construct_message(double value, Neuron *target);
+vector<Message *>
+construct_message_vector_from_file(vector<NeuronGroup *> groups,
+                                   const char *file_name);
 void print_message(Message *message);
 #endif // !FUNCTIONS

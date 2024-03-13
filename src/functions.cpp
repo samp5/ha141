@@ -1,6 +1,7 @@
 #include "functions.hpp"
 #include "log.hpp"
 #include <cstdlib>
+#include <fstream>
 #include <ostream>
 #include <vector>
 
@@ -241,13 +242,62 @@ int get_inhibitory_status() {
 
   return ret;
 }
-char *get_active_status_string(bool active) {
-  char *ret;
+const char *get_active_status_string(bool active) {
   if (active) {
-    ret = "active"; // NOLINT
-    return ret;
+    const char *active = "active"; // NOLINT
+    return active;
   } else {
-    ret = "inactive"; // NOLINT
-    return ret;
+    const char *inactive = "inactive"; // NOLINT
+    return inactive;
   }
+}
+
+vector<Message *>
+construct_message_vector_from_file(vector<NeuronGroup *> groups,
+                                   const char *file_name) {
+  vector<Neuron *> neuron_vec;
+  vector<Message *> message_vector;
+
+  // make a vector of all available neurons
+  for (const auto &group : groups) {
+    for (const auto &neuron : group->get_neruon_vector()) {
+      neuron_vec.push_back(neuron);
+    }
+  }
+
+  std::ifstream file(file_name);
+
+  if (!file.is_open()) {
+    lg.log(ERROR, "construct_message_vector_from_file: Unable to open file");
+    delete[] file_name;
+    return message_vector;
+  }
+
+  int number_neurons = neuron_vec.size();
+  int data_read = 0;
+  double value;
+
+  // should make this a funciton parameter
+  while (!file.eof() && data_read < number_neurons) {
+    file >> value;
+    message_vector.push_back(construct_message(value, neuron_vec[data_read]));
+    data_read++;
+  }
+
+  return message_vector;
+}
+
+Message *construct_message(double value, Neuron *target) {
+  Message *message = new Message;
+  message->message = value;
+  message->timestamp = 0;
+  message->target_neuron = target;
+  message->target_neuron_group = target->get_group();
+
+  return message;
+}
+void print_message(Message *message) {
+  lg.log_message(DEBUG2, "Message: %f %d %d %f", message->timestamp,
+                 message->target_neuron_group->get_id(),
+                 message->target_neuron->get_id(), message->message);
 }
