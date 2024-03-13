@@ -1,8 +1,11 @@
 #include "functions.hpp"
 #include "log.hpp"
+#include "message.hpp"
 #include <cstdlib>
 #include <fstream>
 #include <ostream>
+#include <pthread.h>
+#include <unistd.h>
 #include <vector>
 
 void print_group_maps(Neuron *neuron) {
@@ -239,7 +242,6 @@ int get_inhibitory_status() {
   } else {
     ret = 1;
   }
-
   return ret;
 }
 const char *get_active_status_string(bool active) {
@@ -297,7 +299,37 @@ Message *construct_message(double value, Neuron *target) {
   return message;
 }
 void print_message(Message *message) {
-  lg.log_message(DEBUG2, "Message: %f %d %d %f", message->timestamp,
+  lg.log_message(DEBUG3, "Message: %f %d %d %f", message->timestamp,
                  message->target_neuron_group->get_id(),
                  message->target_neuron->get_id(), message->message);
+}
+
+void *send_message_helper(void *messages) {
+  send_messages((const vector<Message *> *)messages);
+  return NULL;
+}
+
+void send_messages(const vector<Message *> *messages) {
+
+  while (::active) {
+    // sleep 5 milliseconds
+    for (int i = 1; i <= 5; i++) {
+      lg.log_value(DEBUG2, "send_messages waiting: %d", i);
+      usleep(1000);
+    }
+
+    for (auto message : *messages) {
+      lg.log_message(DEBUG2, "Adding Message: %f %d %d %f", message->timestamp,
+                     message->target_neuron_group->get_id(),
+                     message->target_neuron->get_id(), message->message);
+
+      Message *message_copy =
+          construct_message(message->message, message->target_neuron);
+      message_copy->timestamp = lg.get_time_stamp();
+
+      message->target_neuron->add_message(message_copy);
+      message->target_neuron->activate();
+    }
+  }
+  pthread_exit(NULL);
 }

@@ -39,8 +39,7 @@ public:
   void process_intergroup_queue();
   void *group_run();
   void start_thread() {
-    lg.log_group_state(DEBUG2, "Thread started for group %d", this->get_id());
-    pthread_create(&thread, NULL, thread_helper, this);
+    pthread_create(&thread, NULL, NeuronGroup::thread_helper, this);
   }
   void add_to_intragroup(Message *message);
   void add_to_intergroup(Message *message);

@@ -28,6 +28,7 @@ typedef struct {
 
 extern LogLevel level;
 extern ostream &STREAM;
+extern pthread_mutex_t log_mutex;
 
 class Log {
 public:
@@ -85,6 +86,7 @@ public:
 
   void log_message(LogLevel level, const char *message, double timestamp,
                    int group_id, int id, double value);
+  void log_value(LogLevel level, const char *message, int value);
 
 private:
   // make this a struct

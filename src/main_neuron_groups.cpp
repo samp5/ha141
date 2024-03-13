@@ -17,10 +17,13 @@ using std::cout;
 
 ostream &STREAM = cout;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t log_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t message_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_barrier_t barrier;
 volatile double value = 0;
 bool finish = false;
 Log lg;
+bool active = true;
 
 /*
   1 - ERROR,
@@ -72,33 +75,23 @@ int main() {
     print_message(message);
   }
 
-  Message *test_message = new Message;
-  test_message->message = 10;
-  test_message->target_neuron_group = neuron_groups.front();
-  test_message->timestamp = 1000;
-  test_message->target_neuron =
-      neuron_groups.front()->get_neruon_vector().front();
+  // thread id
+  pthread_t messaging_thread;
 
-  Message *test_message2 = new Message;
-  test_message2->message = 10;
-  test_message2->target_neuron_group = neuron_groups.front();
-  test_message2->timestamp = 1000;
-  test_message2->target_neuron =
-      neuron_groups.front()->get_neruon_vector().back();
+  // create messager thread and pass pointer to message array
+  pthread_create(&messaging_thread, NULL, send_message_helper,
+                 (void *)&messages);
 
-  neuron_groups.front()->add_to_intragroup(test_message);
-  neuron_groups.front()->add_to_intragroup(test_message2);
-
-  neuron_groups.front()->get_neruon_vector().front()->activate();
-  neuron_groups.front()->get_neruon_vector().back()->activate();
-
+  // start all group threads
   for (auto group : neuron_groups) {
     group->start_thread();
   }
 
+  // wait for them to finish
   for (auto group : neuron_groups) {
     pthread_join(group->get_thread_id(), NULL);
   }
+  active = false;
 
   for (auto group : neuron_groups) {
     group->print_group();
@@ -108,5 +101,8 @@ int main() {
     delete group;
   }
 
+  pthread_mutex_destroy(&mutex);
+  pthread_mutex_destroy(&log_mutex);
+  pthread_mutex_destroy(&message_mutex);
   return 0;
 }

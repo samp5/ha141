@@ -32,7 +32,16 @@ void *NeuronGroup::group_run() {
   lg.log_group_state(INFO, "Group %d running", this->get_id());
 
   int i = 0;
-  while (i < 3) {
+  while (i < 20) {
+
+    lg.log_group_state(INFO, "Group %d pausing", this->id);
+
+    for (int i = 1; i <= 5; i++) {
+      lg.log_group_value(DEBUG2, "Group %d waiting: %d", this->get_id(), i);
+      usleep(1000);
+    }
+
+    lg.log_group_state(INFO, "Group %d resuming", this->id);
     this->process_intragroup_queue();
     this->process_intergroup_queue();
 
@@ -48,7 +57,7 @@ void *NeuronGroup::group_run() {
     }
     i++;
   }
-  pthread_exit(NULL);
+  return NULL;
 }
 
 int NeuronGroup::neuron_count() { return (int)this->neurons.size(); }

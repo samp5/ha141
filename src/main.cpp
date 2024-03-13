@@ -14,10 +14,12 @@ using std::cout;
 
 ostream &STREAM = cout;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t log_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_barrier_t barrier;
 volatile double value = 0;
 bool finish = false;
 Log lg;
+bool active;
 
 /*
   1 - ERROR,
@@ -25,7 +27,7 @@ Log lg;
   3 - INFO,
   4 - DEBUG,
 */
-LogLevel level = INFO;
+LogLevel level = DEBUG4;
 
 int main() {
 
@@ -95,6 +97,7 @@ int main() {
 
   lg.write_data();
   pthread_mutex_destroy(&mutex);
+  pthread_mutex_destroy(&log_mutex);
   // pthread_barrier_destroy(&barrier);
 
   return 0;

@@ -4,6 +4,7 @@
 #include <ios>
 #include <iostream>
 #include <ostream>
+#include <pthread.h>
 #include <stdio.h>
 #include <sys/time.h>
 
@@ -51,7 +52,9 @@ void Log::log(LogLevel level, const char *message,
   char *message_prefix = new char[length + 1];
 
   snprintf(message_prefix, length + 1, _level, tv.tv_sec, tv.tv_usec);
+  pthread_mutex_lock(&log_mutex);
   os << message_prefix << message << '\n';
+  pthread_mutex_unlock(&log_mutex);
   delete[] message_prefix;
 }
 
@@ -322,6 +325,19 @@ void Log::log_message(LogLevel level, const char *message, double timestamp,
   char *formatted_msg = new char[length + 1];
   // format
   snprintf(formatted_msg, length + 1, message, timestamp, group_id, id, value);
+  // log
+  this->log(level, formatted_msg);
+  // deallocate
+  delete[] formatted_msg;
+}
+
+void Log::log_value(LogLevel level, const char *message, int value) {
+  // length
+  int length = snprintf(nullptr, 0, message, value);
+  // allocate
+  char *formatted_msg = new char[length + 1];
+  // format
+  snprintf(formatted_msg, length + 1, message, value);
   // log
   this->log(level, formatted_msg);
   // deallocate

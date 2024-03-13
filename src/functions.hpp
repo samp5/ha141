@@ -9,6 +9,7 @@
 using std::cout;
 using std::vector;
 extern Log lg;
+extern bool active;
 
 typedef std::map<Neuron *, double> weight_map;
 
@@ -27,7 +28,7 @@ void random_neighbors(vector<Neuron *> nodes, int number_neighbors);
 // Edge weightes are randomly generated and are between [0, 1]
 // @param1: vector of NeuronGroup pointers
 // @param2: desired number of edges in the entire graph
-void random_group_neighbors(vector<NeuronGroup *> groups, int number_neighbors);
+void random_group_neighbors(vector<NeuronGroup *> groups, int numbe_neighbors);
 
 // Print membrane potential of all neurons in vector
 //
@@ -92,4 +93,8 @@ vector<Message *>
 construct_message_vector_from_file(vector<NeuronGroup *> groups,
                                    const char *file_name);
 void print_message(Message *message);
+
+void *send_message_helper(void *messages);
+void send_messages(const vector<Message *> *messages);
+void *send_message_helper(void *messages);
 #endif // !FUNCTIONS

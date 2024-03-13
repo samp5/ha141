@@ -247,8 +247,8 @@ void *Neuron::run() {
     lg.log_neuron_state(INFO, "Neuron %d is waiting", this->id);
     pthread_cond_wait(&cond, &mutex);
   }
-
   pthread_mutex_unlock(&mutex);
+
   if (finish) {
     lg.log_neuron_state(INFO, "Neuron %d is exiting", this->id);
     pthread_exit(NULL);
@@ -326,6 +326,7 @@ void *Neuron::run() {
   active = false;
   this->run();
   pthread_exit(NULL);
+
 }
 
 // Starts the thread for a neuron instance
@@ -372,9 +373,9 @@ bool Neuron::is_activated() const { return this->active; }
 NeuronGroup *Neuron::get_group() { return this->group; }
 
 void Neuron::add_message(Message *message) {
-  pthread_mutex_lock(&mutex);
+  pthread_mutex_lock(&message_mutex);
   this->messages.push_back(message);
-  pthread_mutex_unlock(&mutex);
+  pthread_mutex_unlock(&message_mutex);
 }
 
 Message *Neuron::get_message() {
