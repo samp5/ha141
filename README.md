@@ -30,13 +30,13 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 - [x] ~~Create and integrate Log Class~~
 - [x] ~~Neuron Group Class~~
 - [x] ~~Activate Neuron from file inputs~~
-- [ ] Decay functionality
+- [x] ~~Decay functionality~~
 - [ ] Neuron Types for differentiated functionality (input, output)
 - [ ] Copy functionality for replicating graph layout
 
 | Date  | Key Points 🔑   |  Issues 🐛   |
 |--------------- | --------------- |--------------- |
-| [3-14](#-update-3-14)   | Messaging working between and within groups! Reading from file. | None |
+| [3-14](#-update-3-14)   | Messaging working between and within groups! Reading from file. Decay functionality | None |
 | [3-12](#-update-3-12)   | Start of messaging functionality between neuron groups. | None |
 | [3-11](#-update-3-11)   | Start of Neruon Group Class| None |
 | [3-5](#-update-3-5)   | New fully integrated Log class. Write neuron ids and potential values to a `<current_time>.log` file. | None |
@@ -45,11 +45,68 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 | [2-29](#-update-2-29)   | Updated Neuron Class with with membrane potentials, refractory phases, Update to edge weights, fixed issue 1, guard clauses on header files.   | "Quit" functionality does not work for the menu [~~Issue 2~~](#-issue-2)|
 | [2-28](#-update-2-28)   | Basic Node class that sends and recieves messages   | `random_neighbors` may repeat edges. [~~Issue 1~~](#-issue-1)|
 
-### 📌 Update 3-12
+### 📌 Update 3-14
 **New addtions:**
 - New messaging structure for `NeuronGroups`
 - Additional mutex variables for logging and messaging 
 - Log file for Neuron Groups
+- Neurons decay over time
+
+<details>
+<summary>Neuron potential decay</summary>
+<br>
+
+- Neurons decay based on `DECAY_VALUE` constant
+
+```cpp
+
+void decay_neurons(vector<NeuronGroup *> *groups) {
+  vector<Neuron *> neuron_vec;
+
+  // make a vector of all available neurons
+  for (const auto &group : *groups) {
+    for (const auto &neuron : group->get_neruon_vector()) {
+      neuron_vec.push_back(neuron);
+    }
+  }
+
+  while (::active) {
+
+    for (int i = 1; i <= WAIT_INCREMENT; i++) {
+      lg.log_value(DEBUG3, "decay_neurons waiting: %d", i);
+      usleep(WAIT_TIME);
+    }
+
+    for (auto neuron : neuron_vec) {
+      neuron->decay();
+    }
+  }
+}
+
+```
+
+
+- Neuron Decay member function:
+
+```cpp
+
+double Neuron::decay() {
+  pthread_mutex_lock(&mutex);
+  this->membrane_potential -= DECAY_VALUE;
+
+  lg.add_data(this->get_group()->get_id(), this->get_id(),
+              this->membrane_potential);
+
+  pthread_mutex_unlock(&mutex);
+
+  lg.log_group_neuron_value(
+      DEBUG2, "(%d) Neuron %d decaying. Membrane potential now %f",
+      this->get_group()->get_id(), this->get_id(), this->get_potential());
+  return this->membrane_potential;
+}
+```
+
+</details>
 
 <details>
 <summary>Example Output 10 (this is long) </summary>
