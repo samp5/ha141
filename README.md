@@ -54,6 +54,7 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 <details>
 <summary>Example Output 10 (this is long) </summary>
 <br>
+
 - This output is for a runtime of 60 seconds, with 5 second wait time on both the messager thread and neuron group threads
 - `LogLevel` is `DEBUG3`
 - There are 2 Neuron groups and 4 total neurons
@@ -761,8 +762,8 @@ Adding Random Edges
 <summary>Log file</summary>
 <br>
 
--Example:
-    - Structure is `group_id neuron_id time potential`
+- Example:
+    - Columns are `group_id neuron_id time potential`
 
 ```
 
@@ -831,7 +832,7 @@ Adding Random Edges
     1. Messager thread starts and reads from file
     2. Messager thread sends messages to neurons and then waits `WAIT_TIME` `WAIT_INCREMENT` times
     3. Each `NeuronGroup` thread loops through its neurons and checks their activation status
-        - if activated the neuron activates, exhausts its message queue, and sends messages to any neighbor neurons (by adding to their queue)
+        - if activated the neuron runs, exhausts its message queue, and sends messages to any neighbor neurons (by adding to each respective queue)
     4. After running through all its neurons, the `NeuronGroup` waits `WAIT_TIME` `WAIT_INCREMENT` times.
 - The message queue is implemented as `std::list` because random access is not needed and popping from the front is neccessary.
 
@@ -865,9 +866,10 @@ void send_messages(const vector<Message *> *messages) {
 }
 ```
 
-- Both the message function and the `run_group` function are controlled by the global `bool` `active`
+- Both the message function and the `run_group` function are controlled by the global variable `active`
     - This is deactivated based on the constant `RUN_TIME`;
 ```cpp
+  // main_neuron_groups.cpp
   usleep(RUN_TIME);
   active = false;
 ```
@@ -901,7 +903,6 @@ construct_message_vector_from_file(vector<NeuronGroup *> groups,
   int data_read = 0;
   double value;
 
-  // should make this a funciton parameter
   while (!file.eof() && data_read < number_neurons) {
     file >> value;
     message_vector.push_back(construct_message(value, neuron_vec[data_read]));
