@@ -56,6 +56,8 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 <summary>Neuron potential decay</summary>
 <br>
 
+- Works on a separate thread, using a mutex to protect the neuron `membrane_potential` across threads
+
 - Neurons decay based on `DECAY_VALUE` constant
 
 ```cpp
