@@ -15,8 +15,8 @@
 
 using std::cout;
 
-const int WAIT_INCREMENT = 5;
-const int WAIT_TIME = 1e6;           // in microseconds
+const int WAIT_INCREMENT = 2;
+const int WAIT_TIME = 5e5;           // in microseconds
 const unsigned long RUN_TIME = 20e6; // in microseconds
 const double DECAY_VALUE = 1;
 
