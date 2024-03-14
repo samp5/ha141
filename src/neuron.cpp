@@ -88,6 +88,7 @@ void Neuron::add_previous(Neuron *neighbor, double weight) {
 }
 
 int Neuron::recieve_in_group() {
+
   // Sanity check active status
   if (!this->active) {
     lg.log_group_neuron_state(
@@ -97,15 +98,19 @@ int Neuron::recieve_in_group() {
     return 0;
   }
 
+  // Lock Mutex
   pthread_mutex_lock(&mutex);
 
+  // Get message
   Message *incoming_message = this->get_message();
 
+  // Check message validity
   if (incoming_message == NULL) {
     pthread_mutex_unlock(&mutex);
     return 0;
   }
 
+  // Update membrane_potential
   this->membrane_potential =
       this->membrane_potential + incoming_message->message;
 
@@ -118,18 +123,23 @@ int Neuron::recieve_in_group() {
   lg.add_data(this->group->get_id(), this->id, this->membrane_potential,
               incoming_message->timestamp);
 
-  if (!(incoming_message->target_neuron_group == this->get_group())) {
-    recieved = true;
-    pthread_cond_broadcast(&cond);
-  }
+  // If the message comes from a different group, signal to that group that it
+  // can continue if (!(incoming_message->target_neuron_group ==
+  // this->get_group())) {
+  //   recieved = true;
+  //   pthread_cond_broadcast(&cond);
+  // }
 
   pthread_mutex_unlock(&mutex);
 
+  // Deallocate this message
   delete incoming_message;
   return 1;
 }
 
 int Neuron::check_run_conditions() {
+
+  // Check for neighbors
   if (this->_postsynaptic.empty()) {
     lg.log_group_neuron_state(INFO,
                               "Group %d: Neuron %d does not have any neighbors",
@@ -153,22 +163,24 @@ int Neuron::check_run_conditions() {
 
 void Neuron::run_in_group() {
 
-  if (!this->recieve_in_group()) {
-    return;
+  // Get all the messsages for this neuron
+  while (this->recieve_in_group()) {
   }
 
+  // Check run conditions
   if (!this->check_run_conditions()) {
     return;
   }
 
   // loop through all neighbors
   for (const auto &pair : _postsynaptic) {
+
     lg.log_group_neuron_interaction(
         INFO, "Group %d: Neuron %d is sending a mesage to Group %d: Neuron %d",
         this->group->get_id(), this->id, pair.first->group->get_id(),
         pair.first->id);
 
-    pthread_mutex_lock(&mutex);
+    // pthread_mutex_lock(&mutex);
 
     // construct message
     Message *message = new Message;
@@ -201,26 +213,29 @@ void Neuron::run_in_group() {
     // activate neighbor
     pair.first->activate();
 
+    // Check if it is intragroup
     if (this->group->get_id() == pair.first->group->get_id()) {
 
-      this->get_group()->add_to_intragroup(message);
+      // add message to target
+      message->target_neuron->add_message(message);
 
     } else {
 
-      pair.first->get_group()->add_to_intergroup(message);
+      // add message to neuron
+      message->target_neuron->add_message(message);
 
-      // get condition
-      pthread_cond_t *neighbor_con = pair.first->get_cond();
-
-      // signal start
-      pthread_cond_signal(neighbor_con);
-      pthread_mutex_unlock(&mutex);
-
-      pthread_mutex_lock(&mutex);
-      while (!pair.first->recieved) {
-        pthread_cond_wait(neighbor_con, &mutex);
-      }
-      pthread_mutex_unlock(&mutex);
+      //  // get condition
+      // pthread_cond_t *neighbor_con = pair.first->get_cond();
+      //
+      // // signal start
+      // pthread_cond_signal(neighbor_con);
+      // pthread_mutex_unlock(&mutex);
+      //
+      // pthread_mutex_lock(&mutex);
+      // while (!pair.first->recieved) {
+      //   pthread_cond_wait(neighbor_con, &mutex);
+      // }
+      // pthread_mutex_unlock(&mutex);
     }
   }
 
@@ -326,7 +341,6 @@ void *Neuron::run() {
   active = false;
   this->run();
   pthread_exit(NULL);
-
 }
 
 // Starts the thread for a neuron instance
@@ -379,13 +393,20 @@ void Neuron::add_message(Message *message) {
 }
 
 Message *Neuron::get_message() {
+
+  // Return if messages is empty
   if (this->messages.empty()) {
-    lg.log_group_neuron_state(DEBUG, "No messages for (%d) Neuron %d",
+    lg.log_group_neuron_state(DEBUG,
+                              "No additional messages for (%d) Neuron %d",
                               this->get_group()->get_id(), this->get_id());
     return NULL;
   }
 
-  Message *most_recent = this->messages.front();
+  // Get least recent message
+  Message *last = this->messages.front();
+
+  // Remove it from the queue
   this->messages.pop_front();
-  return most_recent;
+
+  return last;
 }

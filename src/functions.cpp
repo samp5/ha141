@@ -313,9 +313,9 @@ void send_messages(const vector<Message *> *messages) {
 
   while (::active) {
     // sleep 5 milliseconds
-    for (int i = 1; i <= 5; i++) {
-      lg.log_value(DEBUG2, "send_messages waiting: %d", i);
-      usleep(1000);
+    for (int i = 1; i <= WAIT_INCREMENT; i++) {
+      lg.log_value(DEBUG3, "send_messages waiting: %d", i);
+      usleep(WAIT_TIME);
     }
 
     for (auto message : *messages) {

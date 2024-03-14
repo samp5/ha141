@@ -10,6 +10,8 @@ using std::cout;
 using std::vector;
 extern Log lg;
 extern bool active;
+extern const int WAIT_TIME;
+extern const int WAIT_INCREMENT;
 
 typedef std::map<Neuron *, double> weight_map;
 

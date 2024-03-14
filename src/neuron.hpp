@@ -64,7 +64,7 @@ public:
   void join_thread();
   void refractory();
   void activate() { this->active = true; }
-  void deactivate() { active = false; }
+  void deactivate() { this->active = false; }
   void run_in_group();
   int recieve_in_group();
   int check_run_conditions();

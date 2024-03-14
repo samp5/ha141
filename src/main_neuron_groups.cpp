@@ -9,11 +9,15 @@
 // #define RAND_SEED time(0)
 #define RAND_SEED 1
 
-#define NUMBER_NODES 8
-#define NUMBER_EDGES 1
+#define NUMBER_NODES 4
+#define NUMBER_EDGES 3
 #define NUMBER_GROUPS 2
 
 using std::cout;
+
+const int WAIT_INCREMENT = 5;
+const int WAIT_TIME = 1e6;           // in microseconds
+const unsigned long RUN_TIME = 60e6; // in microseconds
 
 ostream &STREAM = cout;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -31,7 +35,7 @@ bool active = true;
   3 - INFO,
   4 - DEBUG,
 */
-LogLevel level = DEBUG2;
+LogLevel level = DEBUG3;
 
 int main() {
   srand(RAND_SEED);
@@ -87,11 +91,19 @@ int main() {
     group->start_thread();
   }
 
-  // wait for them to finish
-  for (auto group : neuron_groups) {
-    pthread_join(group->get_thread_id(), NULL);
-  }
+  // int choice;
+  // do {
+  //   lg.log(INFO, "Stop Execution? (1 for yes, 0 for no) ");
+  //   std::cin >> choice;
+  //
+  // } while (!choice);
+  //
+
+  usleep(RUN_TIME);
   active = false;
+
+  lg.log(INFO, "Writing data to file...");
+  lg.write_data();
 
   for (auto group : neuron_groups) {
     group->print_group();

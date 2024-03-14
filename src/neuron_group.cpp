@@ -29,21 +29,11 @@ NeuronGroup::~NeuronGroup() {
 }
 
 void *NeuronGroup::group_run() {
+  // Log running status
   lg.log_group_state(INFO, "Group %d running", this->get_id());
 
-  int i = 0;
-  while (i < 20) {
-
-    lg.log_group_state(INFO, "Group %d pausing", this->id);
-
-    for (int i = 1; i <= 5; i++) {
-      lg.log_group_value(DEBUG2, "Group %d waiting: %d", this->get_id(), i);
-      usleep(1000);
-    }
-
-    lg.log_group_state(INFO, "Group %d resuming", this->id);
-    this->process_intragroup_queue();
-    this->process_intergroup_queue();
+  // While the network is running...
+  while (::active) {
 
     for (Neuron *neuron : this->neurons) {
       lg.log_group_neuron_type(
@@ -55,7 +45,15 @@ void *NeuronGroup::group_run() {
         neuron->run_in_group();
       }
     }
-    i++;
+
+    lg.log_group_state(DEBUG, "Group %d pausing", this->id);
+
+    for (int i = 1; i <= WAIT_INCREMENT; i++) {
+      lg.log_group_value(DEBUG3, "Group %d waiting: %d", this->get_id(), i);
+      usleep(WAIT_TIME);
+    }
+
+    lg.log_group_state(DEBUG, "Group %d resuming", this->id);
   }
   return NULL;
 }

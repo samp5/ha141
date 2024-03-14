@@ -9,6 +9,9 @@
 class Neuron;
 
 extern Log lg;
+extern const int WAIT_TIME;
+extern const int WAIT_INCREMENT;
+extern bool active;
 using std::list;
 
 // This class is so that many neurons can run on one thread
