@@ -762,6 +762,7 @@ Adding Random Edges
 <summary>Log file</summary>
 <br>
 
+- This log is for a runtime of 60 seconds, with 5 second wait time on both the messager thread and neuron group threads
 - Example:
     - Columns are `group_id neuron_id time potential`
 
