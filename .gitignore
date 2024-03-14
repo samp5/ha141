@@ -8,8 +8,6 @@ todo.md
 # exclude all build executables
 build/*
 
-#ignore .png
-*.png
 
 #ingore venv
 plotting/venv/*
