@@ -36,7 +36,7 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 
 | Date  | Key Points 🔑   |  Issues 🐛   |
 |--------------- | --------------- |--------------- |
-| [3-14](#-update-3-14)   | Messaging working between and within groups! Reading from file. Decay functionality | None |
+| [3-14](#-update-3-14)   | Messaging working between and within groups! Reading from file. Decay functionality. Basic plotting with Python | None |
 | [3-12](#-update-3-12)   | Start of messaging functionality between neuron groups. | None |
 | [3-11](#-update-3-11)   | Start of Neruon Group Class| None |
 | [3-5](#-update-3-5)   | New fully integrated Log class. Write neuron ids and potential values to a `<current_time>.log` file. | None |
@@ -51,7 +51,16 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 - Additional mutex variables for logging and messaging 
 - Log file for Neuron Groups
 - Neurons decay over time
+- Plotting with matplotlib
 
+<details>
+<summary>Plotting</summary>
+<br>
+- Basic plotting with `matplotlib` 
+- `.pngs` are in `(<group_id>)<neuron_id>.png` format
+- Images are located in `plotting/`
+
+</details>
 <details>
 <summary>Neuron potential decay</summary>
 <br>
