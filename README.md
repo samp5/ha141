@@ -55,8 +55,8 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 <summary>Example Output 10 (this is long) </summary>
 <br>
 - This output is for a runtime of 60 seconds, with 5 second wait time on both the messager thread and neuron group threads
-- `LogLevel` is 'DEBUG3'
-- There are 2 `NeuronGroup`s and 4 total `Neuron`s
+- `LogLevel` is `DEBUG3`
+- There are 2 Neuron groups and 4 total neurons
 
 ```
 Running build/ex2
