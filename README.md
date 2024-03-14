@@ -877,6 +877,7 @@ void send_messages(const vector<Message *> *messages) {
 
 - Constructing messages from a file input
     - Constructs a vector of dynamically allocated Messages (deallocated in `deallocate_message_vector`)
+    - The message value corresponds directly the the value in the file but this could be changed easily.
     - In the future, the construct message from file could take a vector of `INPUT` neurons only.
 ```cpp
 
