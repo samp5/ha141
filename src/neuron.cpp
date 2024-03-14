@@ -98,21 +98,22 @@ int Neuron::recieve_in_group() {
     return 0;
   }
 
-  // Lock Mutex
-  pthread_mutex_lock(&mutex);
-
   // Get message
   Message *incoming_message = this->get_message();
 
   // Check message validity
   if (incoming_message == NULL) {
-    pthread_mutex_unlock(&mutex);
     return 0;
   }
+
+  // Lock Mutex
+  pthread_mutex_lock(&mutex);
 
   // Update membrane_potential
   this->membrane_potential =
       this->membrane_potential + incoming_message->message;
+
+  pthread_mutex_unlock(&mutex);
 
   lg.log_group_neuron_value(
       INFO, "(%d) Neuron %d is activated, accumulated equal to %f",
@@ -122,15 +123,6 @@ int Neuron::recieve_in_group() {
   // #askpedram
   lg.add_data(this->group->get_id(), this->id, this->membrane_potential,
               incoming_message->timestamp);
-
-  // If the message comes from a different group, signal to that group that it
-  // can continue if (!(incoming_message->target_neuron_group ==
-  // this->get_group())) {
-  //   recieved = true;
-  //   pthread_cond_broadcast(&cond);
-  // }
-
-  pthread_mutex_unlock(&mutex);
 
   // Deallocate this message
   delete incoming_message;
@@ -180,8 +172,6 @@ void Neuron::run_in_group() {
         this->group->get_id(), this->id, pair.first->group->get_id(),
         pair.first->id);
 
-    // pthread_mutex_lock(&mutex);
-
     // construct message
     Message *message = new Message;
     message->target_neuron_group = pair.first->get_group();
@@ -223,19 +213,6 @@ void Neuron::run_in_group() {
 
       // add message to neuron
       message->target_neuron->add_message(message);
-
-      //  // get condition
-      // pthread_cond_t *neighbor_con = pair.first->get_cond();
-      //
-      // // signal start
-      // pthread_cond_signal(neighbor_con);
-      // pthread_mutex_unlock(&mutex);
-      //
-      // pthread_mutex_lock(&mutex);
-      // while (!pair.first->recieved) {
-      //   pthread_cond_wait(neighbor_con, &mutex);
-      // }
-      // pthread_mutex_unlock(&mutex);
     }
   }
 
@@ -409,4 +386,19 @@ Message *Neuron::get_message() {
   this->messages.pop_front();
 
   return last;
+}
+
+double Neuron::decay() {
+  pthread_mutex_lock(&mutex);
+  this->membrane_potential -= DECAY_VALUE;
+
+  lg.add_data(this->get_group()->get_id(), this->get_id(),
+              this->membrane_potential);
+
+  pthread_mutex_unlock(&mutex);
+
+  lg.log_group_neuron_value(
+      DEBUG2, "(%d) Neuron %d decaying. Membrane potential now %f",
+      this->get_group()->get_id(), this->get_id(), this->get_potential());
+  return this->membrane_potential;
 }

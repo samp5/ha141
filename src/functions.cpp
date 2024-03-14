@@ -6,7 +6,6 @@
 #include <ostream>
 #include <pthread.h>
 #include <unistd.h>
-#include <vector>
 
 void print_group_maps(Neuron *neuron) {
   const weight_map *p_postsyntapic = neuron->get_postsynaptic();
@@ -244,6 +243,7 @@ int get_inhibitory_status() {
   }
   return ret;
 }
+
 const char *get_active_status_string(bool active) {
   if (active) {
     const char *active = "active"; // NOLINT
@@ -251,6 +251,34 @@ const char *get_active_status_string(bool active) {
   } else {
     const char *inactive = "inactive"; // NOLINT
     return inactive;
+  }
+}
+
+void *decay_helper(void *groups) {
+  decay_neurons((vector<NeuronGroup *> *)groups);
+  return NULL;
+}
+
+void decay_neurons(vector<NeuronGroup *> *groups) {
+  vector<Neuron *> neuron_vec;
+
+  // make a vector of all available neurons
+  for (const auto &group : *groups) {
+    for (const auto &neuron : group->get_neruon_vector()) {
+      neuron_vec.push_back(neuron);
+    }
+  }
+
+  while (::active) {
+
+    for (int i = 1; i <= WAIT_INCREMENT; i++) {
+      lg.log_value(DEBUG3, "decay_neurons waiting: %d", i);
+      usleep(WAIT_TIME);
+    }
+
+    for (auto neuron : neuron_vec) {
+      neuron->decay();
+    }
   }
 }
 
@@ -332,6 +360,7 @@ void send_messages(const vector<Message *> *messages) {
   }
   pthread_exit(NULL);
 }
+
 void deallocate_message_vector(const vector<Message *> *messages) {
   for (auto message : *messages) {
     delete message;

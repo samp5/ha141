@@ -22,6 +22,7 @@ extern volatile double value;
 extern bool finish;
 extern pthread_barrier_t barrier;
 extern Log lg;
+extern const double DECAY_VALUE;
 
 class NeuronGroup;
 
@@ -66,6 +67,7 @@ public:
   void activate() { this->active = true; }
   void deactivate() { this->active = false; }
   void run_in_group();
+  double decay();
   int recieve_in_group();
   int check_run_conditions();
   void add_message(Message *);

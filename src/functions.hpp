@@ -12,6 +12,7 @@ extern Log lg;
 extern bool active;
 extern const int WAIT_TIME;
 extern const int WAIT_INCREMENT;
+extern const double DECAY_VALUE;
 
 typedef std::map<Neuron *, double> weight_map;
 
@@ -100,4 +101,6 @@ void *send_message_helper(void *messages);
 void send_messages(const vector<Message *> *messages);
 void *send_message_helper(void *messages);
 void deallocate_message_vector(const vector<Message *> *messages);
+void *decay_helper(void *groups);
+void decay_neurons(vector<NeuronGroup *> *groups);
 #endif // !FUNCTIONS

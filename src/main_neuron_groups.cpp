@@ -17,7 +17,8 @@ using std::cout;
 
 const int WAIT_INCREMENT = 5;
 const int WAIT_TIME = 1e6;           // in microseconds
-const unsigned long RUN_TIME = 60e6; // in microseconds
+const unsigned long RUN_TIME = 20e6; // in microseconds
+const double DECAY_VALUE = 1;
 
 ostream &STREAM = cout;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -49,7 +50,7 @@ int main() {
   int remainder = NUMBER_NODES % NUMBER_GROUPS;
 
   cout << "\nAdding Neurons\n";
-  cout << "----------------\n\n";
+  cout << "=================";
 
   for (int i = 0; i < NUMBER_GROUPS; i++) {
 
@@ -81,10 +82,12 @@ int main() {
 
   // thread id
   pthread_t messaging_thread;
+  pthread_t decay_thread;
 
   // create messager thread and pass pointer to message array
   pthread_create(&messaging_thread, NULL, send_message_helper,
                  (void *)&messages);
+  pthread_create(&decay_thread, NULL, decay_helper, (void *)&neuron_groups);
 
   // start all group threads
   for (auto group : neuron_groups) {
