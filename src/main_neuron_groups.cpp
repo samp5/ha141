@@ -91,19 +91,13 @@ int main() {
     group->start_thread();
   }
 
-  // int choice;
-  // do {
-  //   lg.log(INFO, "Stop Execution? (1 for yes, 0 for no) ");
-  //   std::cin >> choice;
-  //
-  // } while (!choice);
-  //
-
   usleep(RUN_TIME);
   active = false;
 
   lg.log(INFO, "Writing data to file...");
   lg.write_data();
+
+  deallocate_message_vector(&messages);
 
   for (auto group : neuron_groups) {
     group->print_group();

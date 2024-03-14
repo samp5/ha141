@@ -271,7 +271,6 @@ construct_message_vector_from_file(vector<NeuronGroup *> groups,
 
   if (!file.is_open()) {
     lg.log(ERROR, "construct_message_vector_from_file: Unable to open file");
-    delete[] file_name;
     return message_vector;
   }
 
@@ -312,13 +311,13 @@ void *send_message_helper(void *messages) {
 void send_messages(const vector<Message *> *messages) {
 
   while (::active) {
-    // sleep 5 milliseconds
     for (int i = 1; i <= WAIT_INCREMENT; i++) {
       lg.log_value(DEBUG3, "send_messages waiting: %d", i);
       usleep(WAIT_TIME);
     }
 
     for (auto message : *messages) {
+
       lg.log_message(DEBUG2, "Adding Message: %f %d %d %f", message->timestamp,
                      message->target_neuron_group->get_id(),
                      message->target_neuron->get_id(), message->message);
@@ -332,4 +331,9 @@ void send_messages(const vector<Message *> *messages) {
     }
   }
   pthread_exit(NULL);
+}
+void deallocate_message_vector(const vector<Message *> *messages) {
+  for (auto message : *messages) {
+    delete message;
+  }
 }

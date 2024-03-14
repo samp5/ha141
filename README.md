@@ -5,14 +5,17 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 
 ```
 ├── src
-│   ├── main.cpp
-│   ├── main_neuron_groups.cpp
 │   ├── functions.hpp
 │   ├── functions.cpp
-│   ├── neuron_group.hpp
-│   ├── neuron_group.cpp
+│   ├── log.hpp
+│   ├── log.cpp
+│   ├── main.cpp
+│   ├── main_neuron_groups.cpp
+│   ├── message.hpp
 │   ├── neuron.hpp
-│   └── neuron.cpp
+│   ├── neuron.cpp
+│   ├── neuron_group.hpp
+│   └── neuron_group.cpp
 ├── pthred_ex //practice pthread examples
 │   └── ...
 ├── logs 
@@ -26,14 +29,14 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 ### In-Progress 🚀
 - [x] ~~Create and integrate Log Class~~
 - [x] ~~Neuron Group Class~~
+- [x] ~~Activate Neuron from file inputs~~
 - [ ] Decay functionality
-- [ ] Activate Neuron from file inputs
 - [ ] Neuron Types for differentiated functionality (input, output)
 - [ ] Copy functionality for replicating graph layout
-- [ ] Possion Process for Neuron Activation
 
 | Date  | Key Points 🔑   |  Issues 🐛   |
 |--------------- | --------------- |--------------- |
+| [3-14](#-update-3-14)   | Messaging working between and within groups! Reading from file. | None |
 | [3-12](#-update-3-12)   | Start of messaging functionality between neuron groups. | None |
 | [3-11](#-update-3-11)   | Start of Neruon Group Class| None |
 | [3-5](#-update-3-5)   | New fully integrated Log class. Write neuron ids and potential values to a `<current_time>.log` file. | None |
@@ -41,6 +44,875 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 | [3-3](#-update-3-3)   | Added time stamps to logging messages. Added function descriptions.| None |
 | [2-29](#-update-2-29)   | Updated Neuron Class with with membrane potentials, refractory phases, Update to edge weights, fixed issue 1, guard clauses on header files.   | "Quit" functionality does not work for the menu [~~Issue 2~~](#-issue-2)|
 | [2-28](#-update-2-28)   | Basic Node class that sends and recieves messages   | `random_neighbors` may repeat edges. [~~Issue 1~~](#-issue-1)|
+
+### 📌 Update 3-12
+**New addtions:**
+- New messaging structure for `NeuronGroups`
+- Additional mutex variables for logging and messaging 
+- Log file for Neuron Groups
+
+<details>
+<summary>Example Output 10 (this is long) </summary>
+<br>
+- This output is for a runtime of 60 seconds, with 5 second wait time on both the messager thread and neuron group threads
+- `LogLevel` is 'DEBUG3'
+- There are 2 `NeuronGroup`s and 4 total `Neuron`s
+
+```
+Running build/ex2
+./build/ex2
+
+Adding Neurons
+----------------
+
+[1710434170:856328] ❶  Adding Group 1
+[1710434170:856332] ⓘ  Group 1
+[1710434170:856336] ⓘ  (1) Neuron 1 added: excitatory
+[1710434170:856339] ⓘ  (1) Neuron 2 added: excitatory
+[1710434170:856341] ❶  Adding Group 2
+[1710434170:856342] ⓘ  Group 2
+[1710434170:856343] ⓘ  (2) Neuron 1 added: excitatory
+[1710434170:856344] ⓘ  (2) Neuron 2 added: excitatory
+
+Adding Random Edges
+======================
+
+[1710434170:856348] ❸           (2) Neuron 2 has no outgoing connections
+[1710434170:856349] ❸           (2) Neuron 2 has no incoming connections
+[1710434170:856349] ❸           (1) Neuron 1 has no outgoing connections
+[1710434170:856350] ❸           (1) Neuron 1 has no incoming connections
+[1710434170:856352] ⓘ  Edge from Neuron 2 to Neuron 1 added.
+[1710434170:856355] ❷  Neuron 2 added to the _presynaptic map of Neuron 
+[1710434170:856357] ❷        (2) Neuron 2 is connected to:
+[1710434170:856358] ❷           (1) Neuron 1
+[1710434170:856358] ❸           (2) Neuron 2 has no incoming connections
+[1710434170:856359] ❸           (1) Neuron 1 has no outgoing connections
+[1710434170:856360] ❷        (1) Neuron 1 has connections from:
+[1710434170:856361] ❷          (2) Neuron 2
+[1710434170:856362] ❶  has_neighbor: Neuron 2 is already connected to Neuron 1
+[1710434170:856363] ❸           (1) Neuron 1 has no outgoing connections
+[1710434170:856363] ❷        (1) Neuron 1 has connections from:
+[1710434170:856364] ❷          (2) Neuron 2
+[1710434170:856365] ❸           (1) Neuron 2 has no outgoing connections
+[1710434170:856365] ❸           (1) Neuron 2 has no incoming connections
+[1710434170:856366] ⓘ  Edge from Neuron 1 to Neuron 2 added.
+[1710434170:856368] ❷  Neuron 1 added to the _presynaptic map of Neuron 
+[1710434170:856368] ❷        (2) Neuron 2 is connected to:
+[1710434170:856369] ❷           (1) Neuron 1
+[1710434170:856370] ❸           (2) Neuron 2 has no incoming connections
+[1710434170:856371] ❷        (1) Neuron 1 is connected to:
+[1710434170:856371] ❷           (1) Neuron 2
+[1710434170:856372] ❷        (1) Neuron 1 has connections from:
+[1710434170:856373] ❷          (2) Neuron 2
+[1710434170:856373] ❶  has_neighbor: Neuron 2 is already connected to Neuron 1
+[1710434170:856374] ❸           (1) Neuron 2 has no outgoing connections
+[1710434170:856375] ❷        (1) Neuron 2 has connections from:
+[1710434170:856375] ❷          (1) Neuron 1
+[1710434170:856376] ❷        (2) Neuron 2 is connected to:
+[1710434170:856377] ❷           (1) Neuron 1
+[1710434170:856377] ❸           (2) Neuron 2 has no incoming connections
+[1710434170:856378] ⓘ  Edge from Neuron 2 to Neuron 2 added.
+[1710434170:856379] ❷  Neuron 2 added to the _presynaptic map of Neuron 
+
+[1710434170:856381] ❶  Neuron Group 1 (2 neurons)
+========================================================
+[1710434170:856382] ❶     (1) Neuron 1
+[1710434170:856383] ❷        (1) Neuron 1 is connected to:
+[1710434170:856383] ❷           (1) Neuron 2
+[1710434170:856384] ❷        (1) Neuron 1 has connections from:
+[1710434170:856385] ❷          (2) Neuron 2
+[1710434170:856385] ❶     (1) Neuron 2
+[1710434170:856386] ❷        (1) Neuron 2 is connected to:
+[1710434170:856387] ❷           (2) Neuron 2
+[1710434170:856387] ❷        (1) Neuron 2 has connections from:
+[1710434170:856388] ❷          (1) Neuron 1
+
+
+[1710434170:856389] ❶  Neuron Group 2 (2 neurons)
+========================================================
+[1710434170:856390] ❶     (2) Neuron 1
+[1710434170:856390] ❸           (2) Neuron 1 has no outgoing connections
+[1710434170:856391] ❸           (2) Neuron 1 has no incoming connections
+[1710434170:856392] ❶     (2) Neuron 2
+[1710434170:856392] ❷        (2) Neuron 2 is connected to:
+[1710434170:856393] ❷           (1) Neuron 1
+[1710434170:856394] ❷        (2) Neuron 2 has connections from:
+[1710434170:856394] ❷          (1) Neuron 2
+
+[1710434170:856437] ❸  Message: 0.000000 1 1 1.000000
+[1710434170:856439] ❸  Message: 0.000000 1 2 2.000000
+[1710434170:856461] ❸  Message: 0.000000 2 1 1.000000
+[1710434170:856463] ❸  Message: 0.000000 2 2 2.000000
+[1710434170:856576] ❸  send_messages waiting: 1
+[1710434170:856724] ⓘ  Group 2 running
+[1710434170:856731] ❷  Checking activation:(2) Neuron 1 is inactive
+[1710434170:856731] ⓘ  Group 1 running
+[1710434170:856733] ❷  Checking activation:(2) Neuron 2 is inactive
+[1710434170:856737] ❶  Group 2 pausing
+[1710434170:856737] ❷  Checking activation:(1) Neuron 1 is inactive
+[1710434170:856738] ❸  Group 2 waiting: 1
+[1710434170:856740] ❷  Checking activation:(1) Neuron 2 is inactive
+[1710434170:856741] ❶  Group 1 pausing
+[1710434170:856743] ❸  Group 1 waiting: 1
+[1710434171:856779] ❸  send_messages waiting: 2
+[1710434171:856877] ❸  Group 2 waiting: 2
+[1710434171:856877] ❸  Group 1 waiting: 2
+[1710434172:856992] ❸  send_messages waiting: 3
+[1710434172:857038] ❸  Group 1 waiting: 3
+[1710434172:857038] ❸  Group 2 waiting: 3
+[1710434173:857168] ❸  send_messages waiting: 4
+[1710434173:857220] ❸  Group 1 waiting: 4
+[1710434173:857220] ❸  Group 2 waiting: 4
+[1710434174:857337] ❸  send_messages waiting: 5
+[1710434174:857393] ❸  Group 1 waiting: 5
+[1710434174:857399] ❸  Group 2 waiting: 5
+[1710434175:857532] ❷  Adding Message: 0.000000 1 1 1.000000
+[1710434175:857553] ❷  Adding Message: 0.000000 1 2 2.000000
+[1710434175:857558] ❷  Adding Message: 0.000000 2 1 1.000000
+[1710434175:857563] ❷  Adding Message: 0.000000 2 2 2.000000
+[1710434175:857566] ❸  send_messages waiting: 1
+[1710434175:857602] ❶  Group 2 resuming
+[1710434175:857632] ❷  Checking activation:(2) Neuron 1 is active
+[1710434175:857635] ❷  Running (2) Neuron (1)
+[1710434175:857602] ❶  Group 1 resuming
+[1710434175:857648] ❷  Checking activation:(1) Neuron 1 is active
+[1710434175:857652] ❷  Running (1) Neuron (1)
+[1710434175:857652] ⓘ  (2) Neuron 1 is activated, accumulated equal to -54.000000
+[1710434175:857664] ❶  No additional messages for (2) Neuron 1
+[1710434175:857667] ⓘ  Group 2: Neuron 1 does not have any neighbors
+[1710434175:857671] ❷  Checking activation:(2) Neuron 2 is active
+[1710434175:857673] ❷  Running (2) Neuron (2)
+[1710434175:857683] ⓘ  (1) Neuron 1 is activated, accumulated equal to -54.000000
+[1710434175:857695] ❶  No additional messages for (1) Neuron 1
+[1710434175:857702] ⓘ  Group 1: Neuron 1 is sending a mesage to Group 1: Neuron 2
+[1710434175:857710] ❶  Accumulated for Group 1: Neuron 1 is -54.000000
+[1710434175:857714] ⓘ  (2) Neuron 2 is activated, accumulated equal to -53.000000
+[1710434175:857716] ❶  Weight for Group 1: Neuron 1 to Group 1: Neuron 2 is 0.242887
+[1710434175:857721] ❶  No additional messages for (2) Neuron 2
+[1710434175:857722] ❶  Group 1: Neuron 1 modifier is -
+[1710434175:857728] ⓘ  Group 2: Neuron 2 is sending a mesage to Group 1: Neuron 1
+[1710434175:857732] ⓘ  Message from Group 1: Neuron 1 to Group 1: Neuron 2 is 13.115886
+[1710434175:857735] ❶  Accumulated for Group 2: Neuron 2 is -53.000000
+[1710434175:857737] ⓘ  Neuron 1 fired, entering refractory phase
+[1710434175:857743] ❶  Weight for Group 2: Neuron 2 to Group 1: Neuron 1 is 0.277775
+[1710434175:857748] ❶  Group 2: Neuron 2 modifier is -
+[1710434175:857754] ⓘ  Message from Group 2: Neuron 2 to Group 1: Neuron 1 is 14.722060
+[1710434175:857759] ⓘ  Neuron 2 fired, entering refractory phase
+[1710434175:857771] ⓘ  Neuron 1 portential set to -70.0000
+[1710434175:857774] ⓘ  Neuron 2 portential set to -70.0000
+[1710434175:859910] ⓘ  Neuron 1 completed refractory phase, running
+[1710434175:859937] ❷  Checking activation:(1) Neuron 2 is active
+[1710434175:859910] ⓘ  Neuron 2 completed refractory phase, running
+[1710434175:859955] ❶  Group 2 pausing
+[1710434175:859958] ❸  Group 2 waiting: 1
+[1710434175:859940] ❷  Running (1) Neuron (2)
+[1710434175:859982] ⓘ  (1) Neuron 2 is activated, accumulated equal to -53.000000
+[1710434175:859989] ⓘ  (1) Neuron 2 is activated, accumulated equal to -39.884114
+[1710434175:859997] ❶  No additional messages for (1) Neuron 2
+[1710434175:860119] ⓘ  Group 1: Neuron 2 is sending a mesage to Group 2: Neuron 2
+[1710434175:860127] ❶  Accumulated for Group 1: Neuron 2 is -39.884114
+[1710434175:860133] ❶  Weight for Group 1: Neuron 2 to Group 2: Neuron 2 is 0.512932
+[1710434175:860137] ❶  Group 1: Neuron 2 modifier is -
+[1710434175:860142] ⓘ  Message from Group 1: Neuron 2 to Group 2: Neuron 2 is 20.457854
+[1710434175:860146] ⓘ  Neuron 1 fired, entering refractory phase
+[1710434175:860154] ⓘ  Neuron 2 portential set to -70.0000
+[1710434175:862348] ⓘ  Neuron 1 completed refractory phase, running
+[1710434175:862362] ❶  Group 1 pausing
+[1710434175:862365] ❸  Group 1 waiting: 1
+[1710434176:857708] ❸  send_messages waiting: 2
+[1710434176:860234] ❸  Group 2 waiting: 2
+[1710434176:862616] ❸  Group 1 waiting: 2
+[1710434177:857965] ❸  send_messages waiting: 3
+[1710434177:860476] ❸  Group 2 waiting: 3
+[1710434177:862902] ❸  Group 1 waiting: 3
+[1710434178:858145] ❸  send_messages waiting: 4
+[1710434178:860751] ❸  Group 2 waiting: 4
+[1710434178:863141] ❸  Group 1 waiting: 4
+[1710434179:858383] ❸  send_messages waiting: 5
+[1710434179:860999] ❸  Group 2 waiting: 5
+[1710434179:863328] ❸  Group 1 waiting: 5
+[1710434180:858634] ❷  Adding Message: 0.000000 1 1 1.000000
+[1710434180:858652] ❷  Adding Message: 0.000000 1 2 2.000000
+[1710434180:858656] ❷  Adding Message: 0.000000 2 1 1.000000
+[1710434180:858659] ❷  Adding Message: 0.000000 2 2 2.000000
+[1710434180:858661] ❸  send_messages waiting: 1
+[1710434180:861218] ❶  Group 2 resuming
+[1710434180:861235] ❷  Checking activation:(2) Neuron 1 is active
+[1710434180:861237] ❷  Running (2) Neuron (1)
+[1710434180:861250] ⓘ  (2) Neuron 1 is activated, accumulated equal to -53.000000
+[1710434180:861253] ❶  No additional messages for (2) Neuron 1
+[1710434180:861255] ⓘ  Group 2: Neuron 1 does not have any neighbors
+[1710434180:861258] ❷  Checking activation:(2) Neuron 2 is active
+[1710434180:861260] ❷  Running (2) Neuron (2)
+[1710434180:861264] ⓘ  (2) Neuron 2 is activated, accumulated equal to -49.542146
+[1710434180:861267] ⓘ  (2) Neuron 2 is activated, accumulated equal to -47.542146
+[1710434180:861269] ❶  No additional messages for (2) Neuron 2
+[1710434180:861273] ⓘ  Group 2: Neuron 2 is sending a mesage to Group 1: Neuron 1
+[1710434180:861278] ❶  Accumulated for Group 2: Neuron 2 is -47.542146
+[1710434180:861282] ❶  Weight for Group 2: Neuron 2 to Group 1: Neuron 1 is 0.277775
+[1710434180:861285] ❶  Group 2: Neuron 2 modifier is -
+[1710434180:861289] ⓘ  Message from Group 2: Neuron 2 to Group 1: Neuron 1 is 13.206006
+[1710434180:861293] ⓘ  Neuron 2 fired, entering refractory phase
+[1710434180:861300] ⓘ  Neuron 2 portential set to -70.0000
+[1710434180:863488] ⓘ  Neuron 2 completed refractory phase, running
+[1710434180:863505] ❶  Group 2 pausing
+[1710434180:863507] ❸  Group 2 waiting: 1
+[1710434180:863488] ❶  Group 1 resuming
+[1710434180:863516] ❷  Checking activation:(1) Neuron 1 is active
+[1710434180:863519] ❷  Running (1) Neuron (1)
+[1710434180:863531] ⓘ  (1) Neuron 1 is activated, accumulated equal to -55.277940
+[1710434180:863538] ⓘ  (1) Neuron 1 is activated, accumulated equal to -54.277940
+[1710434180:863542] ⓘ  (1) Neuron 1 is activated, accumulated equal to -41.071935
+[1710434180:863543] ❶  No additional messages for (1) Neuron 1
+[1710434180:863547] ⓘ  Group 1: Neuron 1 is sending a mesage to Group 1: Neuron 2
+[1710434180:863552] ❶  Accumulated for Group 1: Neuron 1 is -41.071935
+[1710434180:863555] ❶  Weight for Group 1: Neuron 1 to Group 1: Neuron 2 is 0.242887
+[1710434180:863558] ❶  Group 1: Neuron 1 modifier is -
+[1710434180:863561] ⓘ  Message from Group 1: Neuron 1 to Group 1: Neuron 2 is 9.975830
+[1710434180:863563] ⓘ  Neuron 1 fired, entering refractory phase
+[1710434180:863569] ⓘ  Neuron 1 portential set to -70.0000
+[1710434180:865786] ⓘ  Neuron 1 completed refractory phase, running
+[1710434180:865806] ❷  Checking activation:(1) Neuron 2 is active
+[1710434180:865809] ❷  Running (1) Neuron (2)
+[1710434180:865928] ⓘ  (1) Neuron 2 is activated, accumulated equal to -68.000000
+[1710434180:865934] ⓘ  (1) Neuron 2 is activated, accumulated equal to -58.024170
+[1710434180:865936] ❶  No additional messages for (1) Neuron 2
+[1710434180:865941] ⓘ  Membrane potential for Group 1: Neuron 2 is below the threshold, not firing
+[1710434180:865944] ❶  Group 1 pausing
+[1710434180:865946] ❸  Group 1 waiting: 1
+[1710434181:858876] ❸  send_messages waiting: 2
+[1710434181:863689] ❸  Group 2 waiting: 2
+[1710434181:866209] ❸  Group 1 waiting: 2
+[1710434182:859051] ❸  send_messages waiting: 3
+[1710434182:863907] ❸  Group 2 waiting: 3
+[1710434182:866485] ❸  Group 1 waiting: 3
+[1710434183:859325] ❸  send_messages waiting: 4
+[1710434183:864209] ❸  Group 2 waiting: 4
+[1710434183:866660] ❸  Group 1 waiting: 4
+[1710434184:859489] ❸  send_messages waiting: 5
+[1710434184:864433] ❸  Group 2 waiting: 5
+[1710434184:866867] ❸  Group 1 waiting: 5
+[1710434185:859666] ❷  Adding Message: 0.000000 1 1 1.000000
+[1710434185:859687] ❷  Adding Message: 0.000000 1 2 2.000000
+[1710434185:859692] ❷  Adding Message: 0.000000 2 1 1.000000
+[1710434185:859696] ❷  Adding Message: 0.000000 2 2 2.000000
+[1710434185:859699] ❸  send_messages waiting: 1
+[1710434185:864718] ❶  Group 2 resuming
+[1710434185:864739] ❷  Checking activation:(2) Neuron 1 is active
+[1710434185:864742] ❷  Running (2) Neuron (1)
+[1710434185:864758] ⓘ  (2) Neuron 1 is activated, accumulated equal to -52.000000
+[1710434185:864763] ❶  No additional messages for (2) Neuron 1
+[1710434185:864766] ⓘ  Group 2: Neuron 1 does not have any neighbors
+[1710434185:864769] ❷  Checking activation:(2) Neuron 2 is active
+[1710434185:864771] ❷  Running (2) Neuron (2)
+[1710434185:864776] ⓘ  (2) Neuron 2 is activated, accumulated equal to -68.000000
+[1710434185:864778] ❶  No additional messages for (2) Neuron 2
+[1710434185:864784] ⓘ  Membrane potential for Group 2: Neuron 2 is below the threshold, not firing
+[1710434185:864786] ❶  Group 2 pausing
+[1710434185:864788] ❸  Group 2 waiting: 1
+[1710434185:867064] ❶  Group 1 resuming
+[1710434185:867085] ❷  Checking activation:(1) Neuron 1 is active
+[1710434185:867088] ❷  Running (1) Neuron (1)
+[1710434185:867103] ⓘ  (1) Neuron 1 is activated, accumulated equal to -69.000000
+[1710434185:867107] ❶  No additional messages for (1) Neuron 1
+[1710434185:867111] ⓘ  Membrane potential for Group 1: Neuron 1 is below the threshold, not firing
+[1710434185:867115] ❷  Checking activation:(1) Neuron 2 is active
+[1710434185:867117] ❷  Running (1) Neuron (2)
+[1710434185:867122] ⓘ  (1) Neuron 2 is activated, accumulated equal to -56.024170
+[1710434185:867168] ❶  No additional messages for (1) Neuron 2
+[1710434185:867171] ⓘ  Membrane potential for Group 1: Neuron 2 is below the threshold, not firing
+[1710434185:867173] ❶  Group 1 pausing
+[1710434185:867175] ❸  Group 1 waiting: 1
+[1710434186:859959] ❸  send_messages waiting: 2
+[1710434186:865016] ❸  Group 2 waiting: 2
+[1710434186:867440] ❸  Group 1 waiting: 2
+[1710434187:860164] ❸  send_messages waiting: 3
+[1710434187:865283] ❸  Group 2 waiting: 3
+[1710434187:867638] ❸  Group 1 waiting: 3
+[1710434188:860324] ❸  send_messages waiting: 4
+[1710434188:865484] ❸  Group 2 waiting: 4
+[1710434188:867894] ❸  Group 1 waiting: 4
+[1710434189:860581] ❸  send_messages waiting: 5
+[1710434189:865713] ❸  Group 2 waiting: 5
+[1710434189:868112] ❸  Group 1 waiting: 5
+[1710434190:860865] ❷  Adding Message: 0.000000 1 1 1.000000
+[1710434190:860878] ❷  Adding Message: 0.000000 1 2 2.000000
+[1710434190:860881] ❷  Adding Message: 0.000000 2 1 1.000000
+[1710434190:860884] ❷  Adding Message: 0.000000 2 2 2.000000
+[1710434190:860885] ❸  send_messages waiting: 1
+[1710434190:865927] ❶  Group 2 resuming
+[1710434190:865943] ❷  Checking activation:(2) Neuron 1 is active
+[1710434190:865945] ❷  Running (2) Neuron (1)
+[1710434190:865957] ⓘ  (2) Neuron 1 is activated, accumulated equal to -51.000000
+[1710434190:866042] ❶  No additional messages for (2) Neuron 1
+[1710434190:866045] ⓘ  Group 2: Neuron 1 does not have any neighbors
+[1710434190:866047] ❷  Checking activation:(2) Neuron 2 is active
+[1710434190:866049] ❷  Running (2) Neuron (2)
+[1710434190:866053] ⓘ  (2) Neuron 2 is activated, accumulated equal to -66.000000
+[1710434190:866055] ❶  No additional messages for (2) Neuron 2
+[1710434190:866057] ⓘ  Membrane potential for Group 2: Neuron 2 is below the threshold, not firing
+[1710434190:866059] ❶  Group 2 pausing
+[1710434190:866061] ❸  Group 2 waiting: 1
+[1710434190:868314] ❶  Group 1 resuming
+[1710434190:868329] ❷  Checking activation:(1) Neuron 1 is active
+[1710434190:868331] ❷  Running (1) Neuron (1)
+[1710434190:868343] ⓘ  (1) Neuron 1 is activated, accumulated equal to -68.000000
+[1710434190:868346] ❶  No additional messages for (1) Neuron 1
+[1710434190:868349] ⓘ  Membrane potential for Group 1: Neuron 1 is below the threshold, not firing
+[1710434190:868352] ❷  Checking activation:(1) Neuron 2 is active
+[1710434190:868353] ❷  Running (1) Neuron (2)
+[1710434190:868357] ⓘ  (1) Neuron 2 is activated, accumulated equal to -54.024170
+[1710434190:868359] ❶  No additional messages for (1) Neuron 2
+[1710434190:868363] ⓘ  Group 1: Neuron 2 is sending a mesage to Group 2: Neuron 2
+[1710434190:868367] ❶  Accumulated for Group 1: Neuron 2 is -54.024170
+[1710434190:868371] ❶  Weight for Group 1: Neuron 2 to Group 2: Neuron 2 is 0.512932
+[1710434190:868373] ❶  Group 1: Neuron 2 modifier is -
+[1710434190:868377] ⓘ  Message from Group 1: Neuron 2 to Group 2: Neuron 2 is 27.710747
+[1710434190:868380] ⓘ  Neuron 1 fired, entering refractory phase
+[1710434190:868387] ⓘ  Neuron 2 portential set to -70.0000
+[1710434190:870595] ⓘ  Neuron 1 completed refractory phase, running
+[1710434190:870610] ❶  Group 1 pausing
+[1710434190:870612] ❸  Group 1 waiting: 1
+[1710434191:861120] ❸  send_messages waiting: 2
+[1710434191:866315] ❸  Group 2 waiting: 2
+[1710434191:870795] ❸  Group 1 waiting: 2
+[1710434192:861415] ❸  send_messages waiting: 3
+[1710434192:866552] ❸  Group 2 waiting: 3
+[1710434192:871086] ❸  Group 1 waiting: 3
+[1710434193:861603] ❸  send_messages waiting: 4
+[1710434193:866779] ❸  Group 2 waiting: 4
+[1710434193:871389] ❸  Group 1 waiting: 4
+[1710434194:861852] ❸  send_messages waiting: 5
+[1710434194:867006] ❸  Group 2 waiting: 5
+[1710434194:871662] ❸  Group 1 waiting: 5
+[1710434195:862014] ❷  Adding Message: 0.000000 1 1 1.000000
+[1710434195:862027] ❷  Adding Message: 0.000000 1 2 2.000000
+[1710434195:862030] ❷  Adding Message: 0.000000 2 1 1.000000
+[1710434195:862033] ❷  Adding Message: 0.000000 2 2 2.000000
+[1710434195:862035] ❸  send_messages waiting: 1
+[1710434195:867271] ❶  Group 2 resuming
+[1710434195:867286] ❷  Checking activation:(2) Neuron 1 is active
+[1710434195:867289] ❷  Running (2) Neuron (1)
+[1710434195:867300] ⓘ  (2) Neuron 1 is activated, accumulated equal to -50.000000
+[1710434195:867303] ❶  No additional messages for (2) Neuron 1
+[1710434195:867306] ⓘ  Group 2: Neuron 1 does not have any neighbors
+[1710434195:867308] ❷  Checking activation:(2) Neuron 2 is active
+[1710434195:867309] ❷  Running (2) Neuron (2)
+[1710434195:867313] ⓘ  (2) Neuron 2 is activated, accumulated equal to -38.289253
+[1710434195:867317] ⓘ  (2) Neuron 2 is activated, accumulated equal to -36.289253
+[1710434195:867318] ❶  No additional messages for (2) Neuron 2
+[1710434195:867322] ⓘ  Group 2: Neuron 2 is sending a mesage to Group 1: Neuron 1
+[1710434195:867326] ❶  Accumulated for Group 2: Neuron 2 is -36.289253
+[1710434195:867330] ❶  Weight for Group 2: Neuron 2 to Group 1: Neuron 1 is 0.277775
+[1710434195:867333] ❶  Group 2: Neuron 2 modifier is -
+[1710434195:867337] ⓘ  Message from Group 2: Neuron 2 to Group 1: Neuron 1 is 10.080237
+[1710434195:867340] ⓘ  Neuron 2 fired, entering refractory phase
+[1710434195:867346] ⓘ  Neuron 2 portential set to -70.0000
+[1710434195:869543] ⓘ  Neuron 2 completed refractory phase, running
+[1710434195:869646] ❶  Group 2 pausing
+[1710434195:869649] ❸  Group 2 waiting: 1
+[1710434195:871955] ❶  Group 1 resuming
+[1710434195:871975] ❷  Checking activation:(1) Neuron 1 is active
+[1710434195:871978] ❷  Running (1) Neuron (1)
+[1710434195:871994] ⓘ  (1) Neuron 1 is activated, accumulated equal to -67.000000
+[1710434195:872001] ⓘ  (1) Neuron 1 is activated, accumulated equal to -56.919763
+[1710434195:872003] ❶  No additional messages for (1) Neuron 1
+[1710434195:872007] ⓘ  Membrane potential for Group 1: Neuron 1 is below the threshold, not firing
+[1710434195:872010] ❷  Checking activation:(1) Neuron 2 is active
+[1710434195:872012] ❷  Running (1) Neuron (2)
+[1710434195:872017] ⓘ  (1) Neuron 2 is activated, accumulated equal to -68.000000
+[1710434195:872019] ❶  No additional messages for (1) Neuron 2
+[1710434195:872021] ⓘ  Membrane potential for Group 1: Neuron 2 is below the threshold, not firing
+[1710434195:872023] ❶  Group 1 pausing
+[1710434195:872026] ❸  Group 1 waiting: 1
+[1710434196:862217] ❸  send_messages waiting: 2
+[1710434196:869823] ❸  Group 2 waiting: 2
+[1710434196:872208] ❸  Group 1 waiting: 2
+[1710434197:862475] ❸  send_messages waiting: 3
+[1710434197:870022] ❸  Group 2 waiting: 3
+[1710434197:872406] ❸  Group 1 waiting: 3
+[1710434198:862749] ❸  send_messages waiting: 4
+[1710434198:870257] ❸  Group 2 waiting: 4
+[1710434198:872694] ❸  Group 1 waiting: 4
+[1710434199:863002] ❸  send_messages waiting: 5
+[1710434199:870471] ❸  Group 2 waiting: 5
+[1710434199:873000] ❸  Group 1 waiting: 5
+[1710434200:863252] ❷  Adding Message: 0.000000 1 1 1.000000
+[1710434200:863267] ❷  Adding Message: 0.000000 1 2 2.000000
+[1710434200:863271] ❷  Adding Message: 0.000000 2 1 1.000000
+[1710434200:863274] ❷  Adding Message: 0.000000 2 2 2.000000
+[1710434200:863276] ❸  send_messages waiting: 1
+[1710434200:870669] ❶  Group 2 resuming
+[1710434200:870684] ❷  Checking activation:(2) Neuron 1 is active
+[1710434200:870686] ❷  Running (2) Neuron (1)
+[1710434200:870698] ⓘ  (2) Neuron 1 is activated, accumulated equal to -49.000000
+[1710434200:870701] ❶  No additional messages for (2) Neuron 1
+[1710434200:870703] ⓘ  Group 2: Neuron 1 does not have any neighbors
+[1710434200:870705] ❷  Checking activation:(2) Neuron 2 is active
+[1710434200:870707] ❷  Running (2) Neuron (2)
+[1710434200:870710] ⓘ  (2) Neuron 2 is activated, accumulated equal to -68.000000
+[1710434200:870712] ❶  No additional messages for (2) Neuron 2
+[1710434200:870715] ⓘ  Membrane potential for Group 2: Neuron 2 is below the threshold, not firing
+[1710434200:870716] ❶  Group 2 pausing
+[1710434200:870718] ❸  Group 2 waiting: 1
+[1710434200:873224] ❶  Group 1 resuming
+[1710434200:873241] ❷  Checking activation:(1) Neuron 1 is active
+[1710434200:873243] ❷  Running (1) Neuron (1)
+[1710434200:873256] ⓘ  (1) Neuron 1 is activated, accumulated equal to -55.919763
+[1710434200:873259] ❶  No additional messages for (1) Neuron 1
+[1710434200:873262] ⓘ  Membrane potential for Group 1: Neuron 1 is below the threshold, not firing
+[1710434200:873264] ❷  Checking activation:(1) Neuron 2 is active
+[1710434200:873266] ❷  Running (1) Neuron (2)
+[1710434200:873270] ⓘ  (1) Neuron 2 is activated, accumulated equal to -66.000000
+[1710434200:873271] ❶  No additional messages for (1) Neuron 2
+[1710434200:873273] ⓘ  Membrane potential for Group 1: Neuron 2 is below the threshold, not firing
+[1710434200:873275] ❶  Group 1 pausing
+[1710434200:873277] ❸  Group 1 waiting: 1
+[1710434201:863423] ❸  send_messages waiting: 2
+[1710434201:870937] ❸  Group 2 waiting: 2
+[1710434201:873517] ❸  Group 1 waiting: 2
+[1710434202:863586] ❸  send_messages waiting: 3
+[1710434202:871135] ❸  Group 2 waiting: 3
+[1710434202:873726] ❸  Group 1 waiting: 3
+[1710434203:863738] ❸  send_messages waiting: 4
+[1710434203:871302] ❸  Group 2 waiting: 4
+[1710434203:873958] ❸  Group 1 waiting: 4
+[1710434204:863976] ❸  send_messages waiting: 5
+[1710434204:871565] ❸  Group 2 waiting: 5
+[1710434204:874244] ❸  Group 1 waiting: 5
+[1710434205:864218] ❷  Adding Message: 0.000000 1 1 1.000000
+[1710434205:864233] ❷  Adding Message: 0.000000 1 2 2.000000
+[1710434205:864237] ❷  Adding Message: 0.000000 2 1 1.000000
+[1710434205:864239] ❷  Adding Message: 0.000000 2 2 2.000000
+[1710434205:864241] ❸  send_messages waiting: 1
+[1710434205:871853] ❶  Group 2 resuming
+[1710434205:871870] ❷  Checking activation:(2) Neuron 1 is active
+[1710434205:871872] ❷  Running (2) Neuron (1)
+[1710434205:871885] ⓘ  (2) Neuron 1 is activated, accumulated equal to -48.000000
+[1710434205:871888] ❶  No additional messages for (2) Neuron 1
+[1710434205:871891] ⓘ  Group 2: Neuron 1 does not have any neighbors
+[1710434205:871893] ❷  Checking activation:(2) Neuron 2 is active
+[1710434205:871895] ❷  Running (2) Neuron (2)
+[1710434205:871898] ⓘ  (2) Neuron 2 is activated, accumulated equal to -66.000000
+[1710434205:871933] ❶  No additional messages for (2) Neuron 2
+[1710434205:871936] ⓘ  Membrane potential for Group 2: Neuron 2 is below the threshold, not firing
+[1710434205:871938] ❶  Group 2 pausing
+[1710434205:871940] ❸  Group 2 waiting: 1
+[1710434205:874589] ❶  Group 1 resuming
+[1710434205:874606] ❷  Checking activation:(1) Neuron 1 is active
+[1710434205:874608] ❷  Running (1) Neuron (1)
+[1710434205:874621] ⓘ  (1) Neuron 1 is activated, accumulated equal to -54.919763
+[1710434205:874624] ❶  No additional messages for (1) Neuron 1
+[1710434205:874629] ⓘ  Group 1: Neuron 1 is sending a mesage to Group 1: Neuron 2
+[1710434205:874634] ❶  Accumulated for Group 1: Neuron 1 is -54.919763
+[1710434205:874639] ❶  Weight for Group 1: Neuron 1 to Group 1: Neuron 2 is 0.242887
+[1710434205:874641] ❶  Group 1: Neuron 1 modifier is -
+[1710434205:874645] ⓘ  Message from Group 1: Neuron 1 to Group 1: Neuron 2 is 13.339284
+[1710434205:874649] ⓘ  Neuron 1 fired, entering refractory phase
+[1710434205:874656] ⓘ  Neuron 1 portential set to -70.0000
+[1710434205:876832] ⓘ  Neuron 1 completed refractory phase, running
+[1710434205:876852] ❷  Checking activation:(1) Neuron 2 is active
+[1710434205:876855] ❷  Running (1) Neuron (2)
+[1710434205:876870] ⓘ  (1) Neuron 2 is activated, accumulated equal to -64.000000
+[1710434205:876877] ⓘ  (1) Neuron 2 is activated, accumulated equal to -50.660716
+[1710434205:876879] ❶  No additional messages for (1) Neuron 2
+[1710434205:876885] ⓘ  Group 1: Neuron 2 is sending a mesage to Group 2: Neuron 2
+[1710434205:876891] ❶  Accumulated for Group 1: Neuron 2 is -50.660716
+[1710434205:876895] ❶  Weight for Group 1: Neuron 2 to Group 2: Neuron 2 is 0.512932
+[1710434205:876899] ❶  Group 1: Neuron 2 modifier is -
+[1710434205:876903] ⓘ  Message from Group 1: Neuron 2 to Group 2: Neuron 2 is 25.985522
+[1710434205:876907] ⓘ  Neuron 1 fired, entering refractory phase
+[1710434205:876915] ⓘ  Neuron 2 portential set to -70.0000
+[1710434205:879194] ⓘ  Neuron 1 completed refractory phase, running
+[1710434205:879215] ❶  Group 1 pausing
+[1710434205:879219] ❸  Group 1 waiting: 1
+[1710434206:864459] ❸  send_messages waiting: 2
+[1710434206:872104] ❸  Group 2 waiting: 2
+[1710434206:879443] ❸  Group 1 waiting: 2
+[1710434207:864648] ❸  send_messages waiting: 3
+[1710434207:872282] ❸  Group 2 waiting: 3
+[1710434207:879720] ❸  Group 1 waiting: 3
+[1710434208:864730] ❸  send_messages waiting: 4
+[1710434208:872440] ❸  Group 2 waiting: 4
+[1710434208:879907] ❸  Group 1 waiting: 4
+[1710434209:864909] ❸  send_messages waiting: 5
+[1710434209:872702] ❸  Group 2 waiting: 5
+[1710434209:880110] ❸  Group 1 waiting: 5
+[1710434210:865204] ❷  Adding Message: 0.000000 1 1 1.000000
+[1710434210:865230] ❷  Adding Message: 0.000000 1 2 2.000000
+[1710434210:865237] ❷  Adding Message: 0.000000 2 1 1.000000
+[1710434210:865243] ❷  Adding Message: 0.000000 2 2 2.000000
+[1710434210:865247] ❸  send_messages waiting: 1
+[1710434210:872923] ❶  Group 2 resuming
+[1710434210:872946] ❷  Checking activation:(2) Neuron 1 is active
+[1710434210:872949] ❷  Running (2) Neuron (1)
+[1710434210:873087] ⓘ  (2) Neuron 1 is activated, accumulated equal to -47.000000
+[1710434210:873092] ❶  No additional messages for (2) Neuron 1
+[1710434210:873096] ⓘ  Group 2: Neuron 1 does not have any neighbors
+[1710434210:873100] ❷  Checking activation:(2) Neuron 2 is active
+[1710434210:873102] ❷  Running (2) Neuron (2)
+[1710434210:873109] ⓘ  (2) Neuron 2 is activated, accumulated equal to -40.014478
+[1710434210:873114] ⓘ  (2) Neuron 2 is activated, accumulated equal to -38.014478
+[1710434210:873116] ❶  No additional messages for (2) Neuron 2
+[1710434210:873122] ⓘ  Group 2: Neuron 2 is sending a mesage to Group 1: Neuron 1
+[1710434210:873129] ❶  Accumulated for Group 2: Neuron 2 is -38.014478
+[1710434210:873135] ❶  Weight for Group 2: Neuron 2 to Group 1: Neuron 1 is 0.277775
+[1710434210:873140] ❶  Group 2: Neuron 2 modifier is -
+[1710434210:873146] ⓘ  Message from Group 2: Neuron 2 to Group 1: Neuron 1 is 10.559461
+[1710434210:873151] ⓘ  Neuron 2 fired, entering refractory phase
+[1710434210:873161] ⓘ  Neuron 2 portential set to -70.0000
+[1710434210:875358] ⓘ  Neuron 2 completed refractory phase, running
+[1710434210:875378] ❶  Group 2 pausing
+[1710434210:875381] ❸  Group 2 waiting: 1
+[1710434210:880429] ❶  Group 1 resuming
+[1710434210:880450] ❷  Checking activation:(1) Neuron 1 is active
+[1710434210:880454] ❷  Running (1) Neuron (1)
+[1710434210:880472] ⓘ  (1) Neuron 1 is activated, accumulated equal to -69.000000
+[1710434210:880481] ⓘ  (1) Neuron 1 is activated, accumulated equal to -58.440539
+[1710434210:880485] ❶  No additional messages for (1) Neuron 1
+[1710434210:880489] ⓘ  Membrane potential for Group 1: Neuron 1 is below the threshold, not firing
+[1710434210:880492] ❷  Checking activation:(1) Neuron 2 is active
+[1710434210:880495] ❷  Running (1) Neuron (2)
+[1710434210:880501] ⓘ  (1) Neuron 2 is activated, accumulated equal to -68.000000
+[1710434210:880503] ❶  No additional messages for (1) Neuron 2
+[1710434210:880506] ⓘ  Membrane potential for Group 1: Neuron 2 is below the threshold, not firing
+[1710434210:880509] ❶  Group 1 pausing
+[1710434210:880512] ❸  Group 1 waiting: 1
+[1710434211:865361] ❸  send_messages waiting: 2
+[1710434211:875500] ❸  Group 2 waiting: 2
+[1710434211:880673] ❸  Group 1 waiting: 2
+[1710434212:865522] ❸  send_messages waiting: 3
+[1710434212:875698] ❸  Group 2 waiting: 3
+[1710434212:880865] ❸  Group 1 waiting: 3
+[1710434213:865695] ❸  send_messages waiting: 4
+[1710434213:875899] ❸  Group 2 waiting: 4
+[1710434213:881012] ❸  Group 1 waiting: 4
+[1710434214:865835] ❸  send_messages waiting: 5
+[1710434214:876022] ❸  Group 2 waiting: 5
+[1710434214:881242] ❸  Group 1 waiting: 5
+[1710434215:866066] ❷  Adding Message: 0.000000 1 1 1.000000
+[1710434215:866087] ❷  Adding Message: 0.000000 1 2 2.000000
+[1710434215:866092] ❷  Adding Message: 0.000000 2 1 1.000000
+[1710434215:866096] ❷  Adding Message: 0.000000 2 2 2.000000
+[1710434215:866099] ❸  send_messages waiting: 1
+[1710434215:876134] ❶  Group 2 resuming
+[1710434215:876152] ❷  Checking activation:(2) Neuron 1 is active
+[1710434215:876155] ❷  Running (2) Neuron (1)
+[1710434215:876169] ⓘ  (2) Neuron 1 is activated, accumulated equal to -46.000000
+[1710434215:876173] ❶  No additional messages for (2) Neuron 1
+[1710434215:876175] ⓘ  Group 2: Neuron 1 does not have any neighbors
+[1710434215:876178] ❷  Checking activation:(2) Neuron 2 is active
+[1710434215:876180] ❷  Running (2) Neuron (2)
+[1710434215:876184] ⓘ  (2) Neuron 2 is activated, accumulated equal to -68.000000
+[1710434215:876186] ❶  No additional messages for (2) Neuron 2
+[1710434215:876188] ⓘ  Membrane potential for Group 2: Neuron 2 is below the threshold, not firing
+[1710434215:876190] ❶  Group 2 pausing
+[1710434215:876192] ❸  Group 2 waiting: 1
+[1710434215:881519] ❶  Group 1 resuming
+[1710434215:881544] ❷  Checking activation:(1) Neuron 1 is active
+[1710434215:881548] ❷  Running (1) Neuron (1)
+[1710434215:881568] ⓘ  (1) Neuron 1 is activated, accumulated equal to -57.440539
+[1710434215:881693] ❶  No additional messages for (1) Neuron 1
+[1710434215:881699] ⓘ  Membrane potential for Group 1: Neuron 1 is below the threshold, not firing
+[1710434215:881703] ❷  Checking activation:(1) Neuron 2 is active
+[1710434215:881706] ❷  Running (1) Neuron (2)
+[1710434215:881714] ⓘ  (1) Neuron 2 is activated, accumulated equal to -66.000000
+[1710434215:881717] ❶  No additional messages for (1) Neuron 2
+[1710434215:881720] ⓘ  Membrane potential for Group 1: Neuron 2 is below the threshold, not firing
+[1710434215:881723] ❶  Group 1 pausing
+[1710434215:881726] ❸  Group 1 waiting: 1
+[1710434216:866213] ❸  send_messages waiting: 2
+[1710434216:876458] ❸  Group 2 waiting: 2
+[1710434216:881980] ❸  Group 1 waiting: 2
+[1710434217:866475] ❸  send_messages waiting: 3
+[1710434217:876648] ❸  Group 2 waiting: 3
+[1710434217:882162] ❸  Group 1 waiting: 3
+[1710434218:866616] ❸  send_messages waiting: 4
+[1710434218:876855] ❸  Group 2 waiting: 4
+[1710434218:882410] ❸  Group 1 waiting: 4
+[1710434219:866819] ❸  send_messages waiting: 5
+[1710434219:877076] ❸  Group 2 waiting: 5
+[1710434219:882623] ❸  Group 1 waiting: 5
+[1710434220:867011] ❷  Adding Message: 0.000000 1 1 1.000000
+[1710434220:867030] ❷  Adding Message: 0.000000 1 2 2.000000
+[1710434220:867035] ❷  Adding Message: 0.000000 2 1 1.000000
+[1710434220:867038] ❷  Adding Message: 0.000000 2 2 2.000000
+[1710434220:867041] ❸  send_messages waiting: 1
+[1710434220:877354] ❶  Group 2 resuming
+[1710434220:877372] ❷  Checking activation:(2) Neuron 1 is active
+[1710434220:877375] ❷  Running (2) Neuron (1)
+[1710434220:877389] ⓘ  (2) Neuron 1 is activated, accumulated equal to -45.000000
+[1710434220:877393] ❶  No additional messages for (2) Neuron 1
+[1710434220:877396] ⓘ  Group 2: Neuron 1 does not have any neighbors
+[1710434220:877399] ❷  Checking activation:(2) Neuron 2 is active
+[1710434220:877400] ❷  Running (2) Neuron (2)
+[1710434220:877404] ⓘ  (2) Neuron 2 is activated, accumulated equal to -66.000000
+[1710434220:877406] ❶  No additional messages for (2) Neuron 2
+[1710434220:877410] ⓘ  Membrane potential for Group 2: Neuron 2 is below the threshold, not firing
+[1710434220:877412] ❶  Group 2 pausing
+[1710434220:877414] ❸  Group 2 waiting: 1
+[1710434220:882900] ❶  Group 1 resuming
+[1710434220:882916] ❷  Checking activation:(1) Neuron 1 is active
+[1710434220:882918] ❷  Running (1) Neuron (1)
+[1710434220:882932] ⓘ  (1) Neuron 1 is activated, accumulated equal to -56.440539
+[1710434220:882935] ❶  No additional messages for (1) Neuron 1
+[1710434220:882938] ⓘ  Membrane potential for Group 1: Neuron 1 is below the threshold, not firing
+[1710434220:882941] ❷  Checking activation:(1) Neuron 2 is active
+[1710434220:882942] ❷  Running (1) Neuron (2)
+[1710434220:882946] ⓘ  (1) Neuron 2 is activated, accumulated equal to -64.000000
+[1710434220:882948] ❶  No additional messages for (1) Neuron 2
+[1710434220:882950] ⓘ  Membrane potential for Group 1: Neuron 2 is below the threshold, not firing
+[1710434220:882952] ❶  Group 1 pausing
+[1710434220:882953] ❸  Group 1 waiting: 1
+[1710434221:867264] ❸  send_messages waiting: 2
+[1710434221:877621] ❸  Group 2 waiting: 2
+[1710434221:883180] ❸  Group 1 waiting: 2
+[1710434222:867440] ❸  send_messages waiting: 3
+[1710434222:877887] ❸  Group 2 waiting: 3
+[1710434222:883455] ❸  Group 1 waiting: 3
+[1710434223:867603] ❸  send_messages waiting: 4
+[1710434223:878158] ❸  Group 2 waiting: 4
+[1710434223:883756] ❸  Group 1 waiting: 4
+[1710434224:867788] ❸  send_messages waiting: 5
+[1710434224:878420] ❸  Group 2 waiting: 5
+[1710434224:883916] ❸  Group 1 waiting: 5
+[1710434225:867973] ❷  Adding Message: 0.000000 1 1 1.000000
+[1710434225:867994] ❷  Adding Message: 0.000000 1 2 2.000000
+[1710434225:867999] ❷  Adding Message: 0.000000 2 1 1.000000
+[1710434225:868003] ❷  Adding Message: 0.000000 2 2 2.000000
+[1710434225:868005] ❸  send_messages waiting: 1
+[1710434225:878729] ❶  Group 2 resuming
+[1710434225:878747] ❷  Checking activation:(2) Neuron 1 is active
+[1710434225:878853] ❷  Running (2) Neuron (1)
+[1710434225:878868] ⓘ  (2) Neuron 1 is activated, accumulated equal to -44.000000
+[1710434225:878871] ❶  No additional messages for (2) Neuron 1
+[1710434225:878874] ⓘ  Group 2: Neuron 1 does not have any neighbors
+[1710434225:878877] ❷  Checking activation:(2) Neuron 2 is active
+[1710434225:878879] ❷  Running (2) Neuron (2)
+[1710434225:878883] ⓘ  (2) Neuron 2 is activated, accumulated equal to -64.000000
+[1710434225:878885] ❶  No additional messages for (2) Neuron 2
+[1710434225:878888] ⓘ  Membrane potential for Group 2: Neuron 2 is below the threshold, not firing
+[1710434225:878890] ❶  Group 2 pausing
+[1710434225:878892] ❸  Group 2 waiting: 1
+[1710434225:884156] ❶  Group 1 resuming
+[1710434225:884172] ❷  Checking activation:(1) Neuron 1 is active
+[1710434225:884174] ❷  Running (1) Neuron (1)
+[1710434225:884188] ⓘ  (1) Neuron 1 is activated, accumulated equal to -55.440539
+[1710434225:884191] ❶  No additional messages for (1) Neuron 1
+[1710434225:884194] ⓘ  Membrane potential for Group 1: Neuron 1 is below the threshold, not firing
+[1710434225:884197] ❷  Checking activation:(1) Neuron 2 is active
+[1710434225:884199] ❷  Running (1) Neuron (2)
+[1710434225:884203] ⓘ  (1) Neuron 2 is activated, accumulated equal to -62.000000
+[1710434225:884205] ❶  No additional messages for (1) Neuron 2
+[1710434225:884207] ⓘ  Membrane potential for Group 1: Neuron 2 is below the threshold, not firing
+[1710434225:884208] ❶  Group 1 pausing
+[1710434225:884210] ❸  Group 1 waiting: 1
+[1710434226:868182] ❸  send_messages waiting: 2
+[1710434226:879136] ❸  Group 2 waiting: 2
+[1710434226:884455] ❸  Group 1 waiting: 2
+[1710434227:868400] ❸  send_messages waiting: 3
+[1710434227:879352] ❸  Group 2 waiting: 3
+[1710434227:884718] ❸  Group 1 waiting: 3
+[1710434228:868580] ❸  send_messages waiting: 4
+[1710434228:879655] ❸  Group 2 waiting: 4
+[1710434228:884904] ❸  Group 1 waiting: 4
+[1710434229:868797] ❸  send_messages waiting: 5
+[1710434229:879855] ❸  Group 2 waiting: 5
+[1710434229:885211] ❸  Group 1 waiting: 5
+[1710434230:856652] ⓘ  Writing data to file...
+
+[1710434230:857030] ❶  Neuron Group 1 (2 neurons)
+========================================================
+[1710434230:857033] ❶     (1) Neuron 1
+[1710434230:857036] ❷        (1) Neuron 1 is connected to:
+[1710434230:857038] ❷           (1) Neuron 2
+[1710434230:857040] ❷        (1) Neuron 1 has connections from:
+[1710434230:857042] ❷          (2) Neuron 2
+[1710434230:857043] ❶     (1) Neuron 2
+[1710434230:857045] ❷        (1) Neuron 2 is connected to:
+[1710434230:857046] ❷           (2) Neuron 2
+[1710434230:857047] ❷        (1) Neuron 2 has connections from:
+[1710434230:857048] ❷          (1) Neuron 1
+
+
+[1710434230:857050] ❶  Neuron Group 2 (2 neurons)
+========================================================
+[1710434230:857052] ❶     (2) Neuron 1
+[1710434230:857053] ❸           (2) Neuron 1 has no outgoing connections
+[1710434230:857054] ❸           (2) Neuron 1 has no incoming connections
+[1710434230:857056] ❶     (2) Neuron 2
+[1710434230:857057] ❷        (2) Neuron 2 is connected to:
+[1710434230:857058] ❷           (1) Neuron 1
+[1710434230:857059] ❷        (2) Neuron 2 has connections from:
+[1710434230:857060] ❷          (1) Neuron 2
+
+[1710434230:857063] ❶  Deleteing Group 1 Neuron 1
+[1710434230:857067] ❶  Deleteing Group 1 Neuron 2
+[1710434230:857069] ❶  Deleteing Group 2 Neuron 1
+[1710434230:857070] ❶  Deleteing Group 2 Neuron 2
+```
+
+
+
+
+</details>
+
+<details>
+<summary>Log file</summary>
+<br>
+
+-Example:
+    - Structure is `group_id neuron_id time potential`
+
+```
+
+2 1 1710432472.534000 -54.000000
+1 1 1710432472.533860 -54.000000
+2 2 1710432472.534050 -53.000000
+1 2 1710432472.533950 -53.000000
+1 2 1710432472.535760 -39.884114
+2 1 1710432477.544780 -53.000000
+2 2 1710432472.560560 -49.542146
+2 2 1710432477.544840 -47.542146
+1 1 1710432472.536580 -55.277940
+1 1 1710432477.544610 -54.277940
+1 1 1710432477.571260 -41.071935
+1 2 1710432477.544720 -68.000000
+1 2 1710432477.595780 -58.024170
+2 1 1710432482.556490 -52.000000
+2 2 1710432482.556560 -68.000000
+1 1 1710432482.556310 -69.000000
+1 2 1710432482.556430 -56.024170
+2 1 1710432487.568480 -51.000000
+2 2 1710432487.568560 -66.000000
+1 1 1710432487.568280 -68.000000
+1 2 1710432487.568410 -54.024170
+2 1 1710432492.580400 -50.000000
+2 2 1710432487.643090 -38.289253
+2 2 1710432492.580610 -36.289253
+1 1 1710432492.579830 -67.000000
+1 1 1710432492.631490 -56.919763
+1 2 1710432492.580100 -68.000000
+2 1 1710432497.592390 -49.000000
+2 2 1710432497.592500 -68.000000
+1 1 1710432497.591940 -55.919763
+1 2 1710432497.592240 -66.000000
+2 1 1710432502.606400 -48.000000
+2 2 1710432502.606490 -66.000000
+1 1 1710432502.606110 -54.919763
+1 2 1710432502.606280 -64.000000
+1 2 1710432502.704360 -50.660716
+2 1 1710432507.618390 -47.000000
+2 2 1710432502.727340 -40.014478
+2 2 1710432507.618450 -38.014478
+1 1 1710432507.618230 -69.000000
+1 1 1710432507.699600 -58.440539
+1 2 1710432507.618330 -68.000000
+2 1 1710432512.630750 -46.000000
+2 2 1710432512.630790 -68.000000
+1 1 1710432512.630600 -57.440539
+1 2 1710432512.630690 -66.000000
+2 1 1710432517.642160 -45.000000
+2 2 1710432517.642210 -66.000000
+1 1 1710432517.641950 -56.440539
+1 2 1710432517.642080 -64.000000
+2 1 1710432522.653550 -44.000000
+2 2 1710432522.653590 -64.000000
+1 1 1710432522.653410 -55.440539
+1 2 1710432522.653500 -62.000000
+```
+
+</details>
+<details>
+<summary>Messaging Structure</summary>
+<br>
+
+- The messaging structure works as follows:
+    1. Messager thread starts and reads from file
+    2. Messager thread sends messages to neurons and then waits `WAIT_TIME` `WAIT_INCREMENT` times
+    3. Each `NeuronGroup` thread loops through its neurons and checks their activation status
+        - if activated the neuron activates, exhausts its message queue, and sends messages to any neighbor neurons (by adding to their queue)
+    4. After running through all its neurons, the `NeuronGroup` waits `WAIT_TIME` `WAIT_INCREMENT` times.
+- The message queue is implemented as `std::list` because random access is not needed and popping from the front is neccessary.
+
+
+- Main message function
+```cpp
+
+void send_messages(const vector<Message *> *messages) {
+
+  while (::active) {
+    for (int i = 1; i <= WAIT_INCREMENT; i++) {
+      lg.log_value(DEBUG3, "send_messages waiting: %d", i);
+      usleep(WAIT_TIME);
+    }
+
+    for (auto message : *messages) {
+
+      lg.log_message(DEBUG2, "Adding Message: %f %d %d %f", message->timestamp,
+                     message->target_neuron_group->get_id(),
+                     message->target_neuron->get_id(), message->message);
+
+      Message *message_copy =
+          construct_message(message->message, message->target_neuron);
+      message_copy->timestamp = lg.get_time_stamp();
+
+      message->target_neuron->add_message(message_copy);
+      message->target_neuron->activate();
+    }
+  }
+  pthread_exit(NULL);
+}
+```
+
+- Both the message function and the `run_group` function are controlled by the global `bool` `active`
+    - This is deactivated based on the constant `RUN_TIME`;
+```cpp
+  usleep(RUN_TIME);
+  active = false;
+```
+
+- Constructing messages from a file input
+    - Constructs a vector of dynamically allocated Messages (deallocated in `deallocate_message_vector`)
+    - In the future, the construct message from file could take a vector of `INPUT` neurons only.
+```cpp
+
+vector<Message *>
+construct_message_vector_from_file(vector<NeuronGroup *> groups,
+                                   const char *file_name) {
+  vector<Neuron *> neuron_vec;
+  vector<Message *> message_vector;
+
+  // make a vector of all available neurons
+  for (const auto &group : groups) {
+    for (const auto &neuron : group->get_neruon_vector()) {
+      neuron_vec.push_back(neuron);
+    }
+  }
+
+  std::ifstream file(file_name);
+
+  if (!file.is_open()) {
+    lg.log(ERROR, "construct_message_vector_from_file: Unable to open file");
+    return message_vector;
+  }
+
+  int number_neurons = neuron_vec.size();
+  int data_read = 0;
+  double value;
+
+  // should make this a funciton parameter
+  while (!file.eof() && data_read < number_neurons) {
+    file >> value;
+    message_vector.push_back(construct_message(value, neuron_vec[data_read]));
+    data_read++;
+  }
+
+  return message_vector;
+}
+```
+
+</details>
 
 ### 📌 Update 3-12
 **New addtions:**
@@ -58,7 +930,7 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 <summary>Logging Struct</summary>
 <br>
 
-```cpp
+```cpp 
 typedef struct {
   int neuron_id;
   int group_id;

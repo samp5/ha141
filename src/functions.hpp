@@ -99,4 +99,5 @@ void print_message(Message *message);
 void *send_message_helper(void *messages);
 void send_messages(const vector<Message *> *messages);
 void *send_message_helper(void *messages);
+void deallocate_message_vector(const vector<Message *> *messages);
 #endif // !FUNCTIONS
