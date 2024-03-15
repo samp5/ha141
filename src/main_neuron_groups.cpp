@@ -9,8 +9,8 @@
 // #define RAND_SEED time(0)
 #define RAND_SEED 1
 
-#define NUMBER_NODES 4
-#define NUMBER_EDGES 3
+#define NUMBER_NODES 6
+#define NUMBER_EDGES 5
 #define NUMBER_GROUPS 2
 
 using std::cout;

@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 data = []
-with open('../logs/1710458559.log', 'r') as file:
+with open('../logs/1710507065.log', 'r') as file:
     for line in file:
         parts = line.split()
         group_id = int(parts[0])
@@ -26,5 +26,5 @@ for group_id, neuron_id in unique_ids:
     plt.title(f'Group ID: {group_id}, Neuron ID: {neuron_id}')
     plt.legend()
     plt.grid(True)
-    plt.savefig(f"({group_id}){neuron_id}.png")
+    plt.savefig(f"group_{group_id}neuron_{neuron_id}.png")
 
