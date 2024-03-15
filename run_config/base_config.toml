@@ -1,13 +1,13 @@
 [neuron]
 
 # number of neurons
-neuron_count = 6
+neuron_count = 12
 
 # number of groups
-group_count = 2
+group_count = 3
 
 # number of connections
-edge_count = 4
+edge_count = 10
 
 # in milliseconds
 wait_time = 100
@@ -31,11 +31,11 @@ refractory_membrane_potential = -70.0
 # DEBUG2
 # DEBUG3
 # DEBUG4
-level = "INFO"
+level = "DEBUG3"
 
 [decay]
 # Value that each neuron decays every wait_time * wait_loops
-value = 1.0
+value = 0.5
 
 [random]
 # options are 'time' for using the current time, or an integer (as a string e.g. "1")
@@ -43,4 +43,7 @@ seed = "time"
 
 [runtime_vars]
 # in seconds
-runtime = 20
+runtime = 10
+
+# file to read input from
+input_file = "./input_files/test"

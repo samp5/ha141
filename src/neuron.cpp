@@ -108,11 +108,9 @@ int Neuron::recieve_in_group() {
 
   // Lock Mutex
   pthread_mutex_lock(&mutex);
-
   // Update membrane_potential
   this->membrane_potential =
       this->membrane_potential + incoming_message->message;
-
   pthread_mutex_unlock(&mutex);
 
   lg.log_group_neuron_value(
@@ -179,8 +177,10 @@ void Neuron::run_in_group() {
     message->timestamp = lg.get_time_stamp();
 
     // calculate message
+    pthread_mutex_lock(&mutex);
     message->message =
         membrane_potential * _postsynaptic[pair.first] * excit_inhib_value;
+    pthread_mutex_unlock(&mutex);
 
     lg.log_group_neuron_value(
         DEBUG, "Accumulated for Group %d: Neuron %d is %f",
@@ -216,12 +216,13 @@ void Neuron::run_in_group() {
     }
   }
 
-  lg.log_group_neuron_state(INFO, "Neuron %d fired, entering refractory phase",
+  lg.log_group_neuron_state(INFO,
+                            "(%d) Neuron %d fired, entering refractory phase",
                             this->group->get_id(), this->id);
   this->refractory();
-  lg.log_group_neuron_state(INFO,
-                            "Neuron %d completed refractory phase, running",
-                            this->group->get_id(), this->id);
+  lg.log_group_neuron_state(
+      INFO, "(%d) Neuron %d completed refractory phase, running",
+      this->group->get_id(), this->id);
   this->deactivate();
 }
 
@@ -371,19 +372,26 @@ void Neuron::add_message(Message *message) {
 
 Message *Neuron::get_message() {
 
+  pthread_mutex_lock(&message_mutex);
   // Return if messages is empty
   if (this->messages.empty()) {
+    pthread_mutex_unlock(&message_mutex);
     lg.log_group_neuron_state(DEBUG,
                               "No additional messages for (%d) Neuron %d",
                               this->get_group()->get_id(), this->get_id());
     return NULL;
   }
+  pthread_mutex_unlock(&message_mutex);
 
   // Get least recent message
+  pthread_mutex_lock(&message_mutex);
   Message *last = this->messages.front();
+  pthread_mutex_unlock(&message_mutex);
 
   // Remove it from the queue
+  pthread_mutex_lock(&message_mutex);
   this->messages.pop_front();
+  pthread_mutex_unlock(&message_mutex);
 
   return last;
 }

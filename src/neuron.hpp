@@ -14,6 +14,7 @@ using std::cout;
 using std::list;
 extern pthread_mutex_t mutex;
 extern pthread_mutex_t message_mutex;
+extern pthread_mutex_t activation_mutex;
 extern volatile double value;
 extern bool finish;
 extern pthread_barrier_t barrier;
@@ -63,8 +64,16 @@ public:
   void start_thread();
   void join_thread();
   void refractory();
-  void activate() { this->active = true; }
-  void deactivate() { this->active = false; }
+  void activate() {
+    pthread_mutex_lock(&activation_mutex);
+    this->active = true;
+    pthread_mutex_unlock(&activation_mutex);
+  }
+  void deactivate() {
+    pthread_mutex_lock(&activation_mutex);
+    this->active = false;
+    pthread_mutex_unlock(&activation_mutex);
+  }
   void run_in_group();
   double decay();
   int recieve_in_group();

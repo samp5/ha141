@@ -28,6 +28,7 @@ extern ostream &STREAM;
 extern int INITIAL_MEMBRANE_POTENTIAL;
 extern int ACTIVATION_THRESHOLD;
 extern int REFRACTORY_MEMBRANE_POTENTIAL;
+extern std::string INPUT_FILE;
 
 typedef std::map<Neuron *, double> weight_map;
 
@@ -109,7 +110,7 @@ void construct_messages_from_file();
 Message *construct_message(double value, Neuron *target);
 vector<Message *>
 construct_message_vector_from_file(vector<NeuronGroup *> groups,
-                                   const char *file_name);
+                                   std::string file_name);
 void print_message(Message *message);
 
 void *send_message_helper(void *messages);

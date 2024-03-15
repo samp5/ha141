@@ -29,6 +29,7 @@ NeuronGroup::~NeuronGroup() {
 }
 
 void *NeuronGroup::group_run() {
+
   // Log running status
   lg.log_group_state(INFO, "Group %d running", this->get_id());
 

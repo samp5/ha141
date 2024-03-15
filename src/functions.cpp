@@ -279,7 +279,7 @@ void decay_neurons(vector<NeuronGroup *> *groups) {
 
 vector<Message *>
 construct_message_vector_from_file(vector<NeuronGroup *> groups,
-                                   const char *file_name) {
+                                   std::string file_name) {
   vector<Neuron *> neuron_vec;
   vector<Message *> message_vector;
 
@@ -520,6 +520,13 @@ int set_options(const char *file_name) {
     DECAY_VALUE = tbl["decay"]["value"].as_floating_point()->get();
   } else {
     lg.log_string(ERROR, "Failed to parse: %s", "decay value");
+  }
+
+  if (tbl["runtime_vars"]["input_file"].as_string()) {
+    std::string file = tbl["runtime_vars"]["input_file"].as_string()->get();
+    INPUT_FILE = file;
+  } else {
+    lg.log_string(ERROR, "Failed to parse: %s", "input_file");
   }
 
   if (tbl["debug"]["level"].as_string()) {
