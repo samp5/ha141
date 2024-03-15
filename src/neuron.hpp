@@ -10,10 +10,6 @@
 #include <pthread.h>
 #include <unistd.h>
 
-#define INITIAL_MEMBRANE_POTENTIAL -55
-#define ACTIVATION_THRESHOLD -55
-#define REFRACTORY_MEMBRANE_POTENTIAL -70
-
 using std::cout;
 using std::list;
 extern pthread_mutex_t mutex;
@@ -22,7 +18,10 @@ extern volatile double value;
 extern bool finish;
 extern pthread_barrier_t barrier;
 extern Log lg;
-extern const double DECAY_VALUE;
+extern double DECAY_VALUE;
+extern int INITIAL_MEMBRANE_POTENTIAL;
+extern int ACTIVATION_THRESHOLD;
+extern int REFRACTORY_MEMBRANE_POTENTIAL;
 
 class NeuronGroup;
 

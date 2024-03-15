@@ -11,7 +11,7 @@
 void Log::log(LogLevel level, const char *message,
               std::ostream &os) { // default output stream is standard output
 
-  if (level > ::level) {
+  if (level > ::DEBUG_LEVEL) {
     return;
   }
 
@@ -338,6 +338,19 @@ void Log::log_value(LogLevel level, const char *message, int value) {
   char *formatted_msg = new char[length + 1];
   // format
   snprintf(formatted_msg, length + 1, message, value);
+  // log
+  this->log(level, formatted_msg);
+  // deallocate
+  delete[] formatted_msg;
+}
+
+void Log::log_string(LogLevel level, const char *message, const char *string) {
+  // length
+  int length = snprintf(nullptr, 0, message, string);
+  // allocate
+  char *formatted_msg = new char[length + 1];
+  // format
+  snprintf(formatted_msg, length + 1, message, string);
   // log
   this->log(level, formatted_msg);
   // deallocate

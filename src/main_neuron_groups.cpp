@@ -6,19 +6,19 @@
 #include <pthread.h>
 #include <unistd.h>
 
-// #define RAND_SEED time(0)
-#define RAND_SEED 1
-
-#define NUMBER_NODES 6
-#define NUMBER_EDGES 5
-#define NUMBER_GROUPS 2
-
 using std::cout;
 
-const int WAIT_INCREMENT = 2;
-const int WAIT_TIME = 5e5;           // in microseconds
-const unsigned long RUN_TIME = 20e6; // in microseconds
-const double DECAY_VALUE = 1;
+int INITIAL_MEMBRANE_POTENTIAL;
+int ACTIVATION_THRESHOLD;
+int REFRACTORY_MEMBRANE_POTENTIAL;
+int RAND_SEED;
+int NUMBER_EDGES;
+int NUMBER_GROUPS;
+int NUMBER_NODES;
+int WAIT_LOOPS;
+int WAIT_TIME;          // in microseconds
+unsigned long RUN_TIME; // in microseconds
+double DECAY_VALUE;
 
 ostream &STREAM = cout;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -29,16 +29,27 @@ volatile double value = 0;
 bool finish = false;
 Log lg;
 bool active = true;
+LogLevel DEBUG_LEVEL;
 
 /*
   1 - ERROR,
   2 - WARNING,
   3 - INFO,
   4 - DEBUG,
+  5 - DEBUG2,
+  6 - DEBUG3,
+  7 - DEBUG4,
 */
-LogLevel level = DEBUG3;
 
-int main() {
+int main(int argc, char **argv) {
+
+  if (!parse_command_line_args(argv, argc)) {
+    pthread_mutex_destroy(&mutex);
+    pthread_mutex_destroy(&log_mutex);
+    pthread_mutex_destroy(&message_mutex);
+    return 0;
+  }
+
   srand(RAND_SEED);
 
   vector<NeuronGroup *> neuron_groups(NUMBER_GROUPS);

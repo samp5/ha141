@@ -26,7 +26,7 @@ typedef struct {
   double membrane_potentail;
 } LogData;
 
-extern LogLevel level;
+extern LogLevel DEBUG_LEVEL;
 extern ostream &STREAM;
 extern pthread_mutex_t log_mutex;
 
@@ -80,6 +80,8 @@ public:
 
   void log_group_value(LogLevel level, const char *message, int group_id,
                        int value);
+
+  void log_string(LogLevel level, const char *message, const char *string);
 
   void print(const char *message, bool newline = true,
              std::ostream &os = STREAM);

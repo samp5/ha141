@@ -1,18 +1,33 @@
 #ifndef FUNCTIONS
 #define FUNCTIONS
 
+#include "../run_config/toml.hpp"
 #include "log.hpp"
 #include "neuron.hpp"
 #include <iostream>
+#include <ostream>
+#include <pthread.h>
+#include <string>
+#include <unistd.h>
 #include <vector>
 
 using std::cout;
 using std::vector;
 extern Log lg;
 extern bool active;
-extern const int WAIT_TIME;
-extern const int WAIT_INCREMENT;
-extern const double DECAY_VALUE;
+extern int WAIT_TIME;
+extern int WAIT_LOOPS;
+extern double DECAY_VALUE;
+extern int RAND_SEED;
+extern int NUMBER_NODES;
+extern int NUMBER_EDGES;
+extern int NUMBER_GROUPS;
+extern unsigned long RUN_TIME;
+extern double DECAY_VALUE;
+extern ostream &STREAM;
+extern int INITIAL_MEMBRANE_POTENTIAL;
+extern int ACTIVATION_THRESHOLD;
+extern int REFRACTORY_MEMBRANE_POTENTIAL;
 
 typedef std::map<Neuron *, double> weight_map;
 
@@ -103,4 +118,10 @@ void *send_message_helper(void *messages);
 void deallocate_message_vector(const vector<Message *> *messages);
 void *decay_helper(void *groups);
 void decay_neurons(vector<NeuronGroup *> *groups);
+int parse_command_line_args(char **argv, int argc);
+void use_base_toml();
+void create_base_toml();
+int set_options(const char *file_name);
+bool file_exists(const char *file_name);
+LogLevel get_level_from_string(std::string level);
 #endif // !FUNCTIONS

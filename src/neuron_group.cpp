@@ -48,7 +48,7 @@ void *NeuronGroup::group_run() {
 
     lg.log_group_state(DEBUG, "Group %d pausing", this->id);
 
-    for (int i = 1; i <= WAIT_INCREMENT; i++) {
+    for (int i = 1; i <= WAIT_LOOPS; i++) {
       lg.log_group_value(DEBUG3, "Group %d waiting: %d", this->get_id(), i);
       usleep(WAIT_TIME);
     }
