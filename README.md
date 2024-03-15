@@ -18,8 +18,16 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 │   └── neuron_group.cpp
 ├── pthred_ex //practice pthread examples
 │   └── ...
+├── plotting 
+│   ├── venv //virtual environment for python packages
+│   └── main.py
+├── run_config 
+│   ├── base_config.toml // base config
+│   └── toml.hpp // header for toml++
 ├── logs 
 │   └── // all .log files ignored 
+├── input_files 
+│   └── ... // input files for neuron activation
 ├── .gitignore
 ├── README.md
 └── makefile
@@ -31,11 +39,13 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 - [x] ~~Neuron Group Class~~
 - [x] ~~Activate Neuron from file inputs~~
 - [x] ~~Decay functionality~~
+- [x] ~~TOML configuration for run-time options~~
 - [ ] Neuron Types for differentiated functionality (input, output)
 - [ ] Copy functionality for replicating graph layout
 
 | Date  | Key Points 🔑   |  Issues 🐛   |
 |--------------- | --------------- |--------------- |
+| [3-15](#-update-3-15)   | .toml configuration for run-time options! | None |
 | [3-14](#-update-3-14)   | Messaging working between and within groups! Reading from file. Decay functionality. Basic plotting with Python | None |
 | [3-12](#-update-3-12)   | Start of messaging functionality between neuron groups. | None |
 | [3-11](#-update-3-11)   | Start of Neruon Group Class| None |
@@ -44,6 +54,76 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 | [3-3](#-update-3-3)   | Added time stamps to logging messages. Added function descriptions.| None |
 | [2-29](#-update-2-29)   | Updated Neuron Class with with membrane potentials, refractory phases, Update to edge weights, fixed issue 1, guard clauses on header files.   | "Quit" functionality does not work for the menu [~~Issue 2~~](#-issue-2)|
 | [2-28](#-update-2-28)   | Basic Node class that sends and recieves messages   | `random_neighbors` may repeat edges. [~~Issue 1~~](#-issue-1)|
+### 📌 Update 3-15
+**New addtions:**
+- .toml file for configuring multiple run-time options
+- Specify other .toml files as command line arguement
+
+``` 
+build/ex2 <filename> 
+```
+
+<details>
+<summary>.toml_file</summary>
+<br>
+
+- Base_config is regenerated if it isn't found in the directory
+- Able to change run parameters without re-compiling.
+- Easy to implement more run-time options
+- Uses the [toml++](https://github.com/marzer/tomlplusplus) library for file parsing
+
+
+```toml
+[neuron]
+
+# number of neurons
+neuron_count = 6
+
+# number of groups
+group_count = 2
+
+# number of connections
+edge_count = 4
+
+# in milliseconds
+wait_time = 100
+
+# integer
+wait_loops = 5
+
+# value each neuron is initialized with
+initial_membrane_potential = -55.0
+
+# minimum potential at which a neuron will fire
+activation_threshold = -55.0
+
+# value that each neuron is set to after firing
+refractory_membrane_potential = -70.0
+
+[debug]
+# Options are
+# INFO
+# DEBUG
+# DEBUG2
+# DEBUG3
+# DEBUG4
+level = "INFO"
+
+[decay]
+# Value that each neuron decays every wait_time * wait_loops
+value = 1.0
+
+[random]
+# options are 'time' for using the current time, or an integer (as a string e.g. "1")
+seed = "time"
+
+[runtime_vars]
+# in seconds
+runtime = 20
+```
+
+
+</details>
 
 ### 📌 Update 3-14
 **New addtions:**
