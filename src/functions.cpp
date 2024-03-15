@@ -301,7 +301,6 @@ construct_message_vector_from_file(vector<NeuronGroup *> groups,
   int data_read = 0;
   double value;
 
-  // should make this a funciton parameter
   while (!file.eof() && data_read < number_neurons) {
     file >> value;
     message_vector.push_back(construct_message(value, neuron_vec[data_read]));
@@ -320,9 +319,12 @@ Message *construct_message(double value, Neuron *target) {
 
   return message;
 }
+
 void print_message(Message *message) {
-  lg.log_message(DEBUG3, "Message: %f %d %d %f", message->timestamp,
-                 message->target_neuron_group->get_id(),
+  lg.log_message(DEBUG3,
+                 "Message: \n\tdummy_time:\t%f \n\ttarget neuron:\t%d "
+                 "\n\ttarget_group:\t%d \n\tvalue:\t%f",
+                 message->timestamp, message->target_neuron_group->get_id(),
                  message->target_neuron->get_id(), message->message);
 }
 
@@ -341,8 +343,9 @@ void send_messages(const vector<Message *> *messages) {
 
     for (auto message : *messages) {
 
-      lg.log_message(DEBUG2, "Adding Message: %f %d %d %f", message->timestamp,
-                     message->target_neuron_group->get_id(),
+      lg.log_message(DEBUG2,
+                     "Adding Message! time: %f group: %d neuron: %d value: %f",
+                     message->timestamp, message->target_neuron_group->get_id(),
                      message->target_neuron->get_id(), message->message);
 
       Message *message_copy =
@@ -608,4 +611,27 @@ LogLevel get_level_from_string(std::string level) {
   lg.log(WARNING, "\"level\" does not match any available options: setting "
                   "LogLevel to INFO");
   return INFO;
+}
+
+void assign_groups(vector<NeuronGroup *> &neuron_groups) {
+
+  int neuron_per_group = NUMBER_NODES / NUMBER_GROUPS;
+
+  // reamainder is guearenteed to be less than the number of groups
+  int remainder = NUMBER_NODES % NUMBER_GROUPS;
+
+  for (int i = 0; i < NUMBER_GROUPS; i++) {
+
+    // check for remainder and the neurons in the current group accordingly
+    int per_group = remainder ? neuron_per_group + 1 : neuron_per_group;
+
+    if (remainder)
+      remainder--;
+
+    // allocate for this group
+    NeuronGroup *this_group = new NeuronGroup(i + 1, per_group);
+
+    // add to vector
+    neuron_groups.at(i) = this_group;
+  }
 }

@@ -105,24 +105,103 @@ Neuron *get_random_neuron(const vector<NeuronGroup *> &group);
 //@return const char* of "active" or "inactive"
 const char *get_active_status_string(bool active);
 
-void construct_messages_from_file();
-
+// Construct a message
+//
+//@param1: value for message
+//@param2: target neuron
+//@returns: pointer to dynamically allocated Message
 Message *construct_message(double value, Neuron *target);
+
+// Construct a message vector from an input file
+//
+// Builds a vector of messages from an input_file
+//
+// @param1: vector of neuron groups
+// @param2: filename
+// @returns vector of `Message` pointers
 vector<Message *>
 construct_message_vector_from_file(vector<NeuronGroup *> groups,
                                    std::string file_name);
+
+// Prints out a message via the Log class
+//
+//@param1: pointer to message
 void print_message(Message *message);
 
+// Thread helper to run message thread
+//
+// Correct function signature so that
+// `send_messages` can be run in a thread
+//
+// @param1 MUST BE `void*` to a `vector<Message*>`
 void *send_message_helper(void *messages);
+
+// Send messages on loop every WAIT_TIME * WAIT_LOOPS
+// to every neuron
+//
+// While ::active, sends the repective message to every
+// neuron every WAIT_TIME * WAIT_LOOPS
+// activates the recieving neuron
+//
+// @param1: pointer to the message vector
 void send_messages(const vector<Message *> *messages);
-void *send_message_helper(void *messages);
+
+// Deallocates the memory held in the message vector
+//
+// @param1: pointer to the message vector
 void deallocate_message_vector(const vector<Message *> *messages);
+
+// Thread helper to run decay thread
+//
+// Correct function signature so that
+// `decay_neurons` can be run in a thread
+//
+// @param1 MUST BE `void*` to a `vector<NeuronGroup*>`
 void *decay_helper(void *groups);
+
+// Decays every neuron on timer
+//
+// While ::active, decays every neruon every
+// `WAIT_LOOPS` * `WAIT_TIME` by `DECAY_VALUE`
+//
+// @param1 pointer to the neuron group vector
 void decay_neurons(vector<NeuronGroup *> *groups);
+
+// Parse command line arguements
+//
+// Looks for config.toml file or help command
+// If the toml is found, tries to use it; otherwise,
+// uses the default
 int parse_command_line_args(char **argv, int argc);
+
+// Creates base_toml if needed and sets settings
+//
 void use_base_toml();
+
+// Creates base_toml
 void create_base_toml();
+
+// Sets all global variables based on
+// keys in toml file
+//
+// @param1 file_name
 int set_options(const char *file_name);
+
+// Checks to see if a file file_exists
+//
+// @param1 file_name
 bool file_exists(const char *file_name);
+
+// Get enum member from LogLevel from string
+//
+// @param1 string version of enum members
 LogLevel get_level_from_string(std::string level);
+
+// Assign neurons to groups based on global variable counts
+//
+// Accounts for non-devisible neuron amounts and creates
+// the most evenly distruted groups possible
+//
+// @param1 reference to neuron groups vector
+void assign_groups(vector<NeuronGroup *> &neuron_groups);
 #endif // !FUNCTIONS
