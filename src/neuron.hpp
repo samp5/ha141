@@ -12,7 +12,7 @@
 
 using std::cout;
 using std::list;
-extern pthread_mutex_t mutex;
+extern pthread_mutex_t potential_mutex;
 extern pthread_mutex_t message_mutex;
 extern pthread_mutex_t activation_mutex;
 extern volatile double value;
@@ -57,29 +57,29 @@ public:
   Neuron(int _id, int inhibitory);
   Neuron(int _id, int inhibitory, NeuronGroup *group);
   ~Neuron();
+
   void add_neighbor(Neuron *neighbor, double weight);
+
   void add_next(Neuron *neighbor, double weight);
   void add_previous(Neuron *neighbor, double weight);
+
+  // Running and messaging
   void *run();
-  void start_thread();
-  void join_thread();
-  void refractory();
-  void activate() {
-    pthread_mutex_lock(&activation_mutex);
-    this->active = true;
-    pthread_mutex_unlock(&activation_mutex);
-  }
-  void deactivate() {
-    pthread_mutex_lock(&activation_mutex);
-    this->active = false;
-    pthread_mutex_unlock(&activation_mutex);
-  }
   void run_in_group();
-  double decay();
   int recieve_in_group();
   int check_run_conditions();
   void add_message(Message *);
   Message *get_message();
+
+  // State operations
+  void refractory();
+  void activate();
+  void deactivate();
+  double decay();
+
+  // Thread operations
+  void start_thread();
+  void join_thread();
 
   //>>>>>>>>>>>>>> Access to private variables <<<<<<<<<<<
   pthread_t get_thread_id() { return thread; }
