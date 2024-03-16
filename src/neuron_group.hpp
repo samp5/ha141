@@ -38,14 +38,17 @@ public:
   // might move neuron memory responsibilities to this class
   ~NeuronGroup();
 
+  // these four are not used right now
   void process_intragroup_queue();
   void process_intergroup_queue();
+  void add_to_intragroup(Message *message);
+  void add_to_intergroup(Message *message);
+
   void *group_run();
+
   void start_thread() {
     pthread_create(&thread, NULL, NeuronGroup::thread_helper, this);
   }
-  void add_to_intragroup(Message *message);
-  void add_to_intergroup(Message *message);
   double get_id() const { return id; }
 
   pthread_t get_thread_id() { return thread; }

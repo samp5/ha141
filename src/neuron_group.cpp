@@ -4,8 +4,8 @@
 #include <pthread.h>
 #include <unistd.h>
 
+// Constructor
 NeuronGroup::NeuronGroup(int _id, int number_neurons) {
-
   lg.log_group_state(DEBUG, "Adding Group %d", _id);
 
   this->id = _id;
@@ -18,6 +18,7 @@ NeuronGroup::NeuronGroup(int _id, int number_neurons) {
   }
 }
 
+// Destructor
 NeuronGroup::~NeuronGroup() {
   for (auto neuron : this->neurons) {
 
@@ -28,6 +29,11 @@ NeuronGroup::~NeuronGroup() {
   }
 }
 
+// Run group
+//
+// runs through all neurons and checks their activation status
+// every `WAIT_LOOPS` * `WAIT_TIME`
+//
 void *NeuronGroup::group_run() {
 
   // Log running status
@@ -37,24 +43,29 @@ void *NeuronGroup::group_run() {
   while (::active) {
 
     for (Neuron *neuron : this->neurons) {
+
       lg.log_group_neuron_type(
           DEBUG2, "Checking activation:(%d) Neuron %d is %s", this->get_id(),
           neuron->get_id(), get_active_status_string(neuron->is_activated()));
+
       if (neuron->is_activated()) {
+
         lg.log_group_neuron_state(DEBUG2, "Running (%d) Neuron (%d)",
                                   this->get_id(), neuron->get_id());
+
+        // Run neuron
         neuron->run_in_group();
       }
     }
 
-    lg.log_group_state(DEBUG, "Group %d pausing", this->id);
+    lg.log_group_state(DEBUG2, "Group %d pausing", this->id);
 
     for (int i = 1; i <= WAIT_LOOPS; i++) {
       lg.log_group_value(DEBUG3, "Group %d waiting: %d", this->get_id(), i);
       usleep(WAIT_TIME);
     }
 
-    lg.log_group_state(DEBUG, "Group %d resuming", this->id);
+    lg.log_group_state(DEBUG2, "Group %d resuming", this->id);
   }
   return NULL;
 }
@@ -104,12 +115,12 @@ void NeuronGroup::process_intergroup_queue() {
   this->intergroup_messages.clear();
 }
 void NeuronGroup::add_to_intragroup(Message *message) {
-  pthread_mutex_lock(&mutex);
+  pthread_mutex_lock(&potential_mutex);
   this->intragroup_messages.push_back(message);
-  pthread_mutex_unlock(&mutex);
+  pthread_mutex_unlock(&potential_mutex);
 }
 void NeuronGroup::add_to_intergroup(Message *message) {
-  pthread_mutex_lock(&mutex);
+  pthread_mutex_lock(&potential_mutex);
   this->intergroup_messages.push_back(message);
-  pthread_mutex_unlock(&mutex);
+  pthread_mutex_unlock(&potential_mutex);
 }
