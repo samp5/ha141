@@ -31,7 +31,7 @@ refractory_membrane_potential = -70.0
 # DEBUG2
 # DEBUG3
 # DEBUG4
-level = "DEBUG3"
+level = "DEBUG4"
 
 [decay]
 # Value that each neuron decays every wait_time * wait_loops

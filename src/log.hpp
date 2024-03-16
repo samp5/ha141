@@ -40,6 +40,7 @@ public:
   void write_data(const char *filesname = "./logs/%ld.log");
 
   void add_data(int group_id, int curr_id, double curr_data);
+
   void add_data(int group_id, int curr_id, double curr_data, double time);
 
   // General Log function
@@ -91,7 +92,6 @@ public:
   void log_value(LogLevel level, const char *message, int value);
 
 private:
-  // make this a struct
   vector<LogData> log_data;
 };
 
