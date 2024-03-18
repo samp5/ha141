@@ -38,7 +38,7 @@ public:
   // DATA Functions
   void add_data(int id, double data);
 
-  void write_data(const char *filesname = "./logs/%ld.log");
+  void write_data(const char *filesname = "./logs/%ld/%ld.log");
 
   void add_data(int group_id, int curr_id, double curr_data);
 
@@ -46,6 +46,8 @@ public:
 
   void add_data(int group_id, int curr_id, double curr_data, double time,
                 int type);
+
+  void log_runtime_config();
 
   // General Log function
   void log(LogLevel level, const char *message, ostream &os = STREAM);

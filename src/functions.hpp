@@ -5,6 +5,7 @@
 #include "log.hpp"
 #include "neuron.hpp"
 #include <algorithm>
+#include <filesystem>
 #include <iostream>
 #include <ostream>
 #include <pthread.h>
@@ -34,6 +35,7 @@ extern int ACTIVATION_THRESHOLD;
 extern int REFRACTORY_MEMBRANE_POTENTIAL;
 extern int NUMBER_INPUT_NEURONS;
 extern std::string INPUT_FILE;
+extern std::string CONFIG_FILE;
 
 typedef std::map<Neuron *, double> weight_map;
 

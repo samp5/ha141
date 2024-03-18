@@ -1,12 +1,14 @@
 #include "log.hpp"
 #include "functions.hpp"
 #include <bits/types/struct_timeval.h>
+#include <filesystem>
 #include <fstream>
 #include <ios>
 #include <iostream>
 #include <ostream>
 #include <pthread.h>
 #include <stdio.h>
+#include <string>
 #include <sys/time.h>
 
 void Log::log(LogLevel level, const char *message,
@@ -158,15 +160,20 @@ void Log::add_data(int group_id, int curr_id, double curr_data, double time,
 }
 void Log::write_data(const char *filename) {
 
+  namespace fs = std::filesystem;
+
   struct timeval tv;
   gettimeofday(&tv, NULL);
 
+  fs::path parent = "./logs/" + std::to_string(tv.tv_sec);
+  fs::create_directory(parent);
+
   // length
-  int length = snprintf(nullptr, 0, filename, tv.tv_sec);
+  int length = snprintf(nullptr, 0, filename, tv.tv_sec, tv.tv_sec);
   // allocate
   char *file_name = new char[length + 1];
   // format
-  snprintf(file_name, length + 1, filename, tv.tv_sec);
+  snprintf(file_name, length + 1, filename, tv.tv_sec, tv.tv_sec);
 
   std::ofstream file;
   file.open(file_name);
@@ -184,8 +191,10 @@ void Log::write_data(const char *filename) {
   }
 
   file.close();
+
   // deallocate
   delete[] file_name;
+  this->log_runtime_config();
 }
 
 void Log::log_group_neuron_state(LogLevel level, const char *message,
@@ -382,4 +391,22 @@ void Log::log_string(LogLevel level, const char *message, const char *string) {
   this->log(level, formatted_msg);
   // deallocate
   delete[] formatted_msg;
+}
+
+void Log::log_runtime_config() {
+
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+
+  std::string time = std::to_string(tv.tv_sec);
+
+  namespace fs = std::filesystem;
+  fs::path config_source = CONFIG_FILE;
+  fs::path input_source = INPUT_FILE;
+
+  fs::path config_target = "./logs/" + time + "/" + time + ".toml";
+  fs::path input_target = "./logs/" + time + "/" + time + ".txt";
+
+  fs::copy_file(config_source, config_target);
+  fs::copy_file(input_source, input_target);
 }

@@ -1,4 +1,5 @@
 #include "functions.hpp"
+
 #include "log.hpp"
 #include "message.hpp"
 #include "neuron.hpp"
@@ -562,6 +563,7 @@ int parse_command_line_args(char **argv, int argc) {
 
 int set_options(const char *file_name) {
 
+  CONFIG_FILE = file_name;
   toml::table tbl;
 
   try {

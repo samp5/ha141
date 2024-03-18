@@ -24,6 +24,7 @@ unsigned long RUN_TIME; // in microseconds
 double DECAY_VALUE;
 LogLevel DEBUG_LEVEL;
 std::string INPUT_FILE;
+std::string CONFIG_FILE;
 ostream &STREAM = cout;
 
 Log lg;
