@@ -16,7 +16,8 @@ int REFRACTORY_MEMBRANE_POTENTIAL;
 int RAND_SEED;
 int NUMBER_EDGES;
 int NUMBER_GROUPS;
-int NUMBER_NODES;
+int NUMBER_NEURONS;
+int NUMBER_INPUT_NEURONS;
 int WAIT_LOOPS;
 int WAIT_TIME;          // in microseconds
 unsigned long RUN_TIME; // in microseconds
@@ -59,6 +60,17 @@ int main(int argc, char **argv) {
     return 0;
   }
 
+  // If the number of input neurons exceeds the number of neurons quite
+  if (NUMBER_INPUT_NEURONS >= NUMBER_NEURONS) {
+    lg.log(ERROR, "NUMBER_INPUT_NEURONS greater than or equal to "
+                  "NUMBER_NEURONS... quitting");
+    pthread_mutex_destroy(&potential_mutex);
+    pthread_mutex_destroy(&log_mutex);
+    pthread_mutex_destroy(&message_mutex);
+    pthread_mutex_destroy(&activation_mutex);
+    return 0;
+  }
+
   // Set seed
   srand(RAND_SEED);
 
@@ -70,6 +82,10 @@ int main(int argc, char **argv) {
 
   // Assign neurons to groups
   assign_groups(neuron_groups);
+
+  // assign neurons types
+  // this just assigns input neurons for now
+  assign_neuron_types(neuron_groups);
 
   // Add random edges between neurons
   random_group_neighbors(neuron_groups, NUMBER_EDGES);
