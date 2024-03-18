@@ -4,6 +4,7 @@
 #include "../run_config/toml.hpp"
 #include "log.hpp"
 #include "neuron.hpp"
+#include <algorithm>
 #include <iostream>
 #include <ostream>
 #include <pthread.h>
@@ -11,15 +12,18 @@
 #include <unistd.h>
 #include <vector>
 
+using std::copy_if;
 using std::cout;
+using std::distance;
 using std::vector;
+
 extern Log lg;
 extern bool active;
 extern int WAIT_TIME;
 extern int WAIT_LOOPS;
 extern double DECAY_VALUE;
 extern int RAND_SEED;
-extern int NUMBER_NODES;
+extern int NUMBER_NEURONS;
 extern int NUMBER_EDGES;
 extern int NUMBER_GROUPS;
 extern unsigned long RUN_TIME;
@@ -28,6 +32,7 @@ extern ostream &STREAM;
 extern int INITIAL_MEMBRANE_POTENTIAL;
 extern int ACTIVATION_THRESHOLD;
 extern int REFRACTORY_MEMBRANE_POTENTIAL;
+extern int NUMBER_INPUT_NEURONS;
 extern std::string INPUT_FILE;
 
 typedef std::map<Neuron *, double> weight_map;
@@ -97,7 +102,8 @@ int get_neuron_count(const vector<NeuronGroup *> &groups);
 //
 //@param1 const reference to the NeuronGroup vector
 //@return pointer to neuron
-Neuron *get_random_neuron(const vector<NeuronGroup *> &group);
+Neuron *get_random_neuron(const vector<NeuronGroup *> &group,
+                          bool input_type_allowed = true);
 
 // Get the string form of the active status of a neuron
 //
@@ -204,4 +210,8 @@ LogLevel get_level_from_string(std::string level);
 //
 // @param1 reference to neuron groups vector
 void assign_groups(vector<NeuronGroup *> &neuron_groups);
+
+void assign_neuron_types(vector<NeuronGroup *> &groups);
+
+std::string io_type_to_string(Neuron_t type);
 #endif // !FUNCTIONS

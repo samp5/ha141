@@ -1,6 +1,8 @@
 #include "functions.hpp"
 #include "log.hpp"
 #include "message.hpp"
+#include "neuron.hpp"
+#include <cstdlib>
 
 void print_group_maps(Neuron *neuron) {
   const weight_map *p_postsyntapic = neuron->get_postsynaptic();
@@ -188,7 +190,7 @@ void random_group_neighbors(vector<NeuronGroup *> groups,
 
     // Get random neurons
     Neuron *from = get_random_neuron(groups);
-    Neuron *to = get_random_neuron(groups);
+    Neuron *to = get_random_neuron(groups, false);
 
     // check for self connections
     if (from == to) {
@@ -211,10 +213,72 @@ int get_neuron_count(const vector<NeuronGroup *> &groups) {
   return size;
 }
 
-Neuron *get_random_neuron(const vector<NeuronGroup *> &groups) {
-  int group_number = rand() % groups.size();
-  int neuron_number = rand() % groups[group_number]->neuron_count();
-  return groups[group_number]->get_neruon_vector()[neuron_number];
+Neuron *get_random_neuron(const vector<NeuronGroup *> &groups,
+                          bool input_type_allowed) {
+
+  typedef vector<Neuron *>::size_type vec_sz_t;
+
+  vec_sz_t group_number = rand() % groups.size();
+
+  if (input_type_allowed) {
+
+    // If input type is allowed, normal thing
+    int neuron_number = rand() % groups.at(group_number)->neuron_count();
+
+    return groups.at(group_number)->get_neruon_vector().at(neuron_number);
+
+  } else {
+
+    lg.log(DEBUG4, "Finding non-input neuron...");
+
+    bool try_again;
+    unsigned long tries = 0;
+    Neuron *ret_neuron;
+
+    do {
+      // make a vector to hold all the candiate neurons (non input)
+      vector<Neuron *> group_neurons(
+          groups[group_number]->get_neruon_vector().size());
+
+      // copy all non-input neurons to new vector
+      // fancy lamda function
+      auto end = copy_if(groups.at(group_number)->get_neruon_vector().begin(),
+                         groups.at(group_number)->get_neruon_vector().end(),
+                         group_neurons.begin(), [](Neuron *neuron) {
+                           return neuron->get_type() != Input;
+                         });
+
+      // shrink to fit
+      group_neurons.resize(distance(group_neurons.begin(), end));
+
+      lg.log_value(DEBUG4, "Group %d has %d non-input neuron(s)",
+                   groups.at(group_number)->get_id(), group_neurons.size());
+
+      // If there are no input neurons
+      if (group_neurons.empty()) {
+        lg.log_group_state(
+            WARNING,
+            "There are no non-input neurons in Group %d: trying a "
+            "different group...",
+            groups[group_number]->get_id());
+
+        group_number = group_number == groups.size() ? 0 : group_number + 1;
+        try_again = true;
+        tries++;
+
+      } else {
+        try_again = false;
+        ret_neuron = group_neurons.at(rand() % group_neurons.size());
+      }
+    } while (try_again && tries < groups.size());
+
+    if (tries == groups.size()) {
+      lg.log(ERROR, "Unable to find non-input neuron, exitting");
+      exit(1);
+    }
+
+    return ret_neuron;
+  }
 }
 
 void print_node_values(vector<Neuron *> nodes) {
@@ -286,7 +350,9 @@ construct_message_vector_from_file(vector<NeuronGroup *> groups,
   // make a vector of all available neurons
   for (const auto &group : groups) {
     for (const auto &neuron : group->get_neruon_vector()) {
-      neuron_vec.push_back(neuron);
+      if (neuron->get_type() == Input) {
+        neuron_vec.push_back(neuron);
+      }
     }
   }
 
@@ -297,11 +363,11 @@ construct_message_vector_from_file(vector<NeuronGroup *> groups,
     return message_vector;
   }
 
-  int number_neurons = neuron_vec.size();
+  int number_input_neurons = neuron_vec.size();
   int data_read = 0;
   double value;
 
-  while (!file.eof() && data_read < number_neurons) {
+  while (!file.eof() && data_read < number_input_neurons) {
     file >> value;
     message_vector.push_back(construct_message(value, neuron_vec[data_read]));
     data_read++;
@@ -383,6 +449,9 @@ void create_base_toml() {
   file << '\n';
   file << "# number of neurons" << '\n';
   file << "neuron_count = 6" << '\n';
+  file << '\n';
+  file << "# number of input type neurons" << '\n';
+  file << "input_neuron_count = 3" << '\n';
   file << '\n';
   file << "# number of groups" << '\n';
   file << "group_count = 2" << '\n';
@@ -502,6 +571,13 @@ int set_options(const char *file_name) {
     return 0;
   }
 
+  if (tbl["neuron"]["input_neuron_count"].as_integer()) {
+    NUMBER_INPUT_NEURONS =
+        tbl["neuron"]["input_neuron_count"].as_integer()->get();
+  } else {
+    lg.log_string(ERROR, "Failed to parse: %s", "input_neuron_count");
+  }
+
   if (tbl["runtime_vars"]["runtime"].as_integer()) {
     RUN_TIME = 1e6 * tbl["runtime_vars"]["runtime"].as_integer()->get();
   } else {
@@ -589,7 +665,7 @@ int set_options(const char *file_name) {
   }
 
   if (tbl["neuron"]["neuron_count"].as_integer()) {
-    NUMBER_NODES = tbl["neuron"]["neuron_count"].as_integer()->get();
+    NUMBER_NEURONS = tbl["neuron"]["neuron_count"].as_integer()->get();
   } else {
     lg.log_string(ERROR, "Failed to parse: %s", "neuron_count");
   }
@@ -615,10 +691,10 @@ LogLevel get_level_from_string(std::string level) {
 
 void assign_groups(vector<NeuronGroup *> &neuron_groups) {
 
-  int neuron_per_group = NUMBER_NODES / NUMBER_GROUPS;
+  int neuron_per_group = NUMBER_NEURONS / NUMBER_GROUPS;
 
   // reamainder is guearenteed to be less than the number of groups
-  int remainder = NUMBER_NODES % NUMBER_GROUPS;
+  int remainder = NUMBER_NEURONS % NUMBER_GROUPS;
 
   for (int i = 0; i < NUMBER_GROUPS; i++) {
 
@@ -634,4 +710,55 @@ void assign_groups(vector<NeuronGroup *> &neuron_groups) {
     // add to vector
     neuron_groups.at(i) = this_group;
   }
+}
+
+void assign_neuron_types(vector<NeuronGroup *> &groups) {
+  typedef vector<Neuron *>::size_type vec_sz_t;
+  vector<Neuron *> neuron_vec;
+
+  lg.log(INFO, "Assiging Input neurons");
+
+  // make a vector of all available neurons
+  for (const auto &group : groups) {
+    for (const auto &neuron : group->get_neruon_vector()) {
+      neuron_vec.push_back(neuron);
+    }
+  }
+
+  vec_sz_t vecsize = neuron_vec.size();
+
+  int input_count = NUMBER_INPUT_NEURONS;
+
+  while (input_count) {
+
+    vec_sz_t rand_index = rand() % vecsize;
+
+    if (neuron_vec.at(rand_index)->get_type() == None) {
+
+      neuron_vec.at(rand_index)->set_type(Input);
+      lg.log_group_neuron_type(DEBUG, "(%d) Neuron %d is a %s type",
+                               neuron_vec.at(rand_index)->get_group()->get_id(),
+                               neuron_vec.at(rand_index)->get_id(), "Input");
+
+      input_count--;
+    }
+  }
+}
+std::string io_type_to_string(Neuron_t type) {
+  std::string ret;
+  switch (type) {
+  case None:
+    ret = "None";
+    break;
+  case Input:
+    ret = "Input";
+    break;
+  case Hidden:
+    ret = "Hidden";
+    break;
+  case Output:
+    ret = "Output";
+    break;
+  }
+  return ret;
 }
