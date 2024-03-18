@@ -3,6 +3,9 @@
 # number of neurons
 neuron_count = 12
 
+# number of input type neurons
+input_neuron_count = 6
+
 # number of groups
 group_count = 3
 
