@@ -4,6 +4,7 @@ todo.md
 
 # ignore log files
 *.log
+logs/*
 
 # exclude all build executables
 build/*
