@@ -1,4 +1,5 @@
 #include "log.hpp"
+#include "functions.hpp"
 #include <bits/types/struct_timeval.h>
 #include <fstream>
 #include <ios>
@@ -143,6 +144,18 @@ void Log::add_data(int curr_id, double curr_data) {
   this->log_data.push_back(this_data);
 }
 
+void Log::add_data(int group_id, int curr_id, double curr_data, double time,
+                   int type) {
+  LogData this_data;
+
+  this_data.timestamp = time;
+  this_data.membrane_potentail = curr_data;
+  this_data.group_id = group_id;
+  this_data.neuron_id = curr_id;
+  this_data.type = type;
+
+  this->log_data.push_back(this_data);
+}
 void Log::write_data(const char *filename) {
 
   struct timeval tv;
@@ -166,6 +179,7 @@ void Log::write_data(const char *filename) {
 
   for (LogData log_data : this->log_data) {
     file << std::fixed << log_data.group_id << " " << log_data.neuron_id << " "
+         << io_type_to_string((Neuron_t)log_data.type) << " "
          << log_data.timestamp << " " << log_data.membrane_potentail << '\n';
   }
 
@@ -331,6 +345,19 @@ void Log::log_message(LogLevel level, const char *message, double timestamp,
   delete[] formatted_msg;
 }
 
+void Log::log_value(LogLevel level, const char *message, int value,
+                    int value2) {
+  // length
+  int length = snprintf(nullptr, 0, message, value, value2);
+  // allocate
+  char *formatted_msg = new char[length + 1];
+  // format
+  snprintf(formatted_msg, length + 1, message, value, value2);
+  // log
+  this->log(level, formatted_msg);
+  // deallocate
+  delete[] formatted_msg;
+}
 void Log::log_value(LogLevel level, const char *message, int value) {
   // length
   int length = snprintf(nullptr, 0, message, value);

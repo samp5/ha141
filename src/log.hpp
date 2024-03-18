@@ -19,11 +19,12 @@ enum LogLevel {
   DEBUG4,
 };
 
-typedef struct {
+typedef struct LogData {
   int neuron_id;
   int group_id;
   double timestamp;
   double membrane_potentail;
+  int type = 0;
 } LogData;
 
 extern LogLevel DEBUG_LEVEL;
@@ -42,6 +43,9 @@ public:
   void add_data(int group_id, int curr_id, double curr_data);
 
   void add_data(int group_id, int curr_id, double curr_data, double time);
+
+  void add_data(int group_id, int curr_id, double curr_data, double time,
+                int type);
 
   // General Log function
   void log(LogLevel level, const char *message, ostream &os = STREAM);
@@ -90,6 +94,7 @@ public:
   void log_message(LogLevel level, const char *message, double timestamp,
                    int group_id, int id, double value);
   void log_value(LogLevel level, const char *message, int value);
+  void log_value(LogLevel level, const char *message, int value, int value2);
 
 private:
   vector<LogData> log_data;
