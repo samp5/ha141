@@ -40,11 +40,12 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 - [x] ~~Activate Neuron from file inputs~~
 - [x] ~~Decay functionality~~
 - [x] ~~TOML configuration for run-time options~~
-- [ ] Neuron Types for differentiated functionality (input, output)
+- [x] ~~Neuron Types for differentiated functionality (input, output)~~
 - [ ] Copy functionality for replicating graph layout
 
 | Date  | Key Points 🔑   |  Issues 🐛   |
 |--------------- | --------------- |--------------- |
+| [3-18](#-update-3-18)   | Neuron input type | None |
 | [3-15](#-update-3-15)   | .toml configuration for run-time options! | None |
 | [3-14](#-update-3-14)   | Messaging working between and within groups! Reading from file. Decay functionality. Basic plotting with Python | None |
 | [3-12](#-update-3-12)   | Start of messaging functionality between neuron groups. | None |
@@ -54,6 +55,32 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 | [3-3](#-update-3-3)   | Added time stamps to logging messages. Added function descriptions.| None |
 | [2-29](#-update-2-29)   | Updated Neuron Class with with membrane potentials, refractory phases, Update to edge weights, fixed issue 1, guard clauses on header files.   | "Quit" functionality does not work for the menu [~~Issue 2~~](#-issue-2)|
 | [2-28](#-update-2-28)   | Basic Node class that sends and recieves messages   | `random_neighbors` may repeat edges. [~~Issue 1~~](#-issue-1)|
+
+
+### 📌 Update 3-18
+**New addtions:**
+- Neuron types 
+    - `Input` type fully functional, Output not
+    - Restrictions on `add_random_neighbors` function for `Input` neurons to add outgoing connections only
+- Run-time configuration setting for number of input neurons
+- Shows Neuron type on plot 
+- Log neuron type
+
+- Example output with `DEBUG4`
+
+    - [Example Output 11](./logs/example_output_11)
+
+    - [Corresponding Log](./logs/1710775791.log)
+
+<details>
+<summary>Plot example</summary>
+<br>
+
+[Example Plot](./plotting/group_1neuron_2.png)
+
+</details>
+
+
 ### 📌 Update 3-15
 **New addtions:**
 - .toml file for configuring multiple run-time options
@@ -136,9 +163,10 @@ runtime = 20
 <details>
 <summary>Plotting</summary>
 <br>
+
 - Basic plotting with `matplotlib` 
-- `.pngs` are in `(<group_id>)<neuron_id>.png` format
-- Images are located in `plotting/`
+- `.pngs` are in `group_id_neuron_id.png` format
+- Images are generated in `plotting/`
 
 </details>
 <details>
