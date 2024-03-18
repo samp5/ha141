@@ -12,13 +12,16 @@
 
 using std::cout;
 using std::list;
+
 extern pthread_mutex_t potential_mutex;
 extern pthread_mutex_t message_mutex;
 extern pthread_mutex_t activation_mutex;
+
 extern volatile double value;
 extern bool finish;
 extern pthread_barrier_t barrier;
 extern Log lg;
+
 extern double DECAY_VALUE;
 extern int INITIAL_MEMBRANE_POTENTIAL;
 extern int ACTIVATION_THRESHOLD;
@@ -26,7 +29,7 @@ extern int REFRACTORY_MEMBRANE_POTENTIAL;
 
 class NeuronGroup;
 
-enum Neuron_t { Input, Hidden };
+enum Neuron_t { None = 0, Input = 1, Hidden = 2, Output = 3 };
 
 class Neuron {
 private:
@@ -55,6 +58,7 @@ private:
 
 public:
   Neuron(int _id, int inhibitory);
+  Neuron(int _id, int inhibitory, NeuronGroup *group, Neuron_t type);
   Neuron(int _id, int inhibitory, NeuronGroup *group);
   ~Neuron();
 
@@ -73,6 +77,7 @@ public:
 
   // State operations
   void refractory();
+  void set_type(Neuron_t type);
   void activate();
   void deactivate();
   double decay();
@@ -84,6 +89,9 @@ public:
   //>>>>>>>>>>>>>> Access to private variables <<<<<<<<<<<
   pthread_t get_thread_id() { return thread; }
   pthread_cond_t *get_cond() { return &cond; }
+
+  // returns the IO type of the neuron
+  Neuron_t get_type() { return this->type; }
   int get_id() { return id; }
   double get_potential() { return membrane_potential; }
   const weight_map *get_presynaptic() const;

@@ -12,6 +12,7 @@ NeuronGroup::NeuronGroup(int _id, int number_neurons) {
 
   // add neurons;
   lg.log_group_state(INFO, "Group %d", this->id);
+
   for (int i = 0; i < number_neurons; i++) {
     Neuron *neuron = new Neuron(i + 1, get_inhibitory_status(), this);
     this->neurons.push_back(neuron);

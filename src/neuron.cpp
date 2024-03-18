@@ -13,8 +13,32 @@
 // @param1: Neuron ID
 // @param2: excitatory/inhibitory value (1 or -1)
 // @param3: Pointer to the parent group
+Neuron::Neuron(int _id, int inhibitory, NeuronGroup *group, Neuron_t type) {
+
+  this->type = None;
+  this->id = _id;
+  this->excit_inhib_value = inhibitory;
+  this->group = group;
+  this->membrane_potential = INITIAL_MEMBRANE_POTENTIAL;
+  this->type = type;
+
+  const char *inhib = inhibitory == -1 ? "excitatory\0" : "inhibitory\0";
+
+  lg.log_group_neuron_type(INFO, "(%d) Neuron %d added: %s",
+                           this->group->get_id(), _id, inhib);
+}
+
+// Constructor for Neuron class for Neurons in Groups
+//
+// Sets ID, inhibitory status, group pointer
+// and prints out a log message
+//
+// @param1: Neuron ID
+// @param2: excitatory/inhibitory value (1 or -1)
+// @param3: Pointer to the parent group
 Neuron::Neuron(int _id, int inhibitory, NeuronGroup *group) {
 
+  this->type = None;
   this->id = _id;
   this->excit_inhib_value = inhibitory;
   this->group = group;
@@ -33,6 +57,7 @@ Neuron::Neuron(int _id, int inhibitory, NeuronGroup *group) {
 // @param1: Neuron ID
 // @param2: excitatory/inhibitory value (1 or -1)
 Neuron::Neuron(int _id, int _excit_inhib_value) {
+  this->type = None;
   this->id = _id;
   this->excit_inhib_value = _excit_inhib_value;
   this->membrane_potential = INITIAL_MEMBRANE_POTENTIAL;
@@ -61,8 +86,20 @@ Neuron::~Neuron() { pthread_cond_destroy(&cond); }
 // @param2: Weight for that edge
 void Neuron::add_neighbor(Neuron *neighbor, double weight) {
 
-  lg.log_neuron_interaction(INFO, "Edge from Neuron %d to Neuron %d added.", id,
-                            neighbor->get_id());
+  if (neighbor->get_type() == Input) {
+    lg.log(ERROR, "Connection to Input type Neuron... quitting");
+    exit(1);
+  }
+
+  if (!neighbor->get_group()) {
+    lg.log_neuron_interaction(INFO, "Edge from Neuron %d to Neuron %d added.",
+                              id, neighbor->get_id());
+  } else {
+    lg.log_group_neuron_interaction(
+        INFO, "Edge from (%d) Neuron %d to (%d) Neuron %d added",
+        this->get_group()->get_id(), this->get_id(),
+        neighbor->get_group()->get_id(), neighbor->get_id());
+  }
 
   _postsynaptic[neighbor] = weight;
 
@@ -130,7 +167,7 @@ int Neuron::recieve_in_group() {
   // use message timestamp not current time
   // #askpedram
   lg.add_data(this->group->get_id(), this->id, this->membrane_potential,
-              incoming_message->timestamp);
+              incoming_message->timestamp, this->get_type());
 
   // Deallocate this message
   delete incoming_message;
@@ -449,3 +486,8 @@ void Neuron::deactivate() {
   this->active = false;
   pthread_mutex_unlock(&activation_mutex);
 }
+
+// Set type of neuron
+//
+// @param1: Neuron_t
+void Neuron::set_type(Neuron_t type) { this->type = type; }
