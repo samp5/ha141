@@ -381,7 +381,7 @@ Message *construct_message(double value, Neuron *target) {
   Message *message = new Message;
   message->message = value;
   message->timestamp = 0;
-  message->target_neuron = target;
+  message->post_synaptic_neuron = target;
   message->target_neuron_group = target->get_group();
 
   return message;
@@ -392,7 +392,7 @@ void print_message(Message *message) {
                  "Message: \n\tdummy_time:\t%f \n\ttarget neuron:\t%d "
                  "\n\ttarget_group:\t%d \n\tvalue:\t%f",
                  message->timestamp, message->target_neuron_group->get_id(),
-                 message->target_neuron->get_id(), message->message);
+                 message->post_synaptic_neuron->get_id(), message->message);
 }
 
 void *send_message_helper(void *messages) {
@@ -403,6 +403,7 @@ void *send_message_helper(void *messages) {
 void send_messages(const vector<Message *> *messages) {
 
   while (::active) {
+
     for (int i = 1; i <= WAIT_LOOPS; i++) {
       lg.log_value(DEBUG3, "send_messages waiting: %d", i);
       usleep(WAIT_TIME);
@@ -413,14 +414,14 @@ void send_messages(const vector<Message *> *messages) {
       lg.log_message(DEBUG2,
                      "Adding Message! time: %f group: %d neuron: %d value: %f",
                      message->timestamp, message->target_neuron_group->get_id(),
-                     message->target_neuron->get_id(), message->message);
+                     message->post_synaptic_neuron->get_id(), message->message);
 
       Message *message_copy =
-          construct_message(message->message, message->target_neuron);
+          construct_message(message->message, message->post_synaptic_neuron);
       message_copy->timestamp = lg.get_time_stamp();
 
-      message->target_neuron->add_message(message_copy);
-      message->target_neuron->activate();
+      message->post_synaptic_neuron->add_message(message_copy);
+      message->post_synaptic_neuron->activate();
     }
   }
   pthread_exit(NULL);
@@ -474,6 +475,9 @@ void create_base_toml() {
   file << '\n';
   file << "# value that each neuron is set to after firing" << '\n';
   file << "refractory_membrane_potential = -70.0" << '\n';
+  file << '\n';
+  file << "#  tau for the linearlization of the decay function";
+  file << "tau = 1.0";
   file << '\n';
   file << "[debug]" << '\n';
   file << "# Options are" << '\n';
@@ -571,6 +575,12 @@ int set_options(const char *file_name) {
   } catch (const toml::parse_error &err) {
     lg.log_string(ERROR, "Parsing failed:", err.what());
     return 0;
+  }
+
+  if (tbl["neuron"]["tau"].as_floating_point()) {
+    TAU = tbl["neuron"]["tau"].as_floating_point()->get();
+  } else {
+    lg.log_string(ERROR, "Failed to parse: %s", "tau");
   }
 
   if (tbl["neuron"]["input_neuron_count"].as_integer()) {
