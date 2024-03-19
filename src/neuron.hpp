@@ -23,9 +23,11 @@ extern pthread_barrier_t barrier;
 extern Log lg;
 
 extern double DECAY_VALUE;
+extern double TAU;
 extern int INITIAL_MEMBRANE_POTENTIAL;
 extern int ACTIVATION_THRESHOLD;
 extern int REFRACTORY_MEMBRANE_POTENTIAL;
+extern double REFRACTORY_DURATION;
 
 class NeuronGroup;
 
@@ -39,6 +41,11 @@ private:
   int id;
   Neuron_t type;
   NeuronGroup *group;
+
+  // timestamp data
+  double last_modified;
+  double refractory_start = 0.0;
+  double last_decay;
 
   // Edge values
   typedef std::map<Neuron *, double> weight_map;
@@ -74,13 +81,15 @@ public:
   int check_run_conditions();
   void add_message(Message *);
   Message *get_message();
+  void send_messages_in_group();
 
   // State operations
   void refractory();
   void set_type(Neuron_t type);
   void activate();
   void deactivate();
-  double decay();
+  double decay(double tau = TAU, double v_rest = REFRACTORY_MEMBRANE_POTENTIAL);
+  void update_potential(double value);
 
   // Thread operations
   void start_thread();

@@ -11,6 +11,8 @@
 #include <string>
 #include <sys/time.h>
 
+pthread_mutex_t data_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 void Log::log(LogLevel level, const char *message,
               std::ostream &os) { // default output stream is standard output
 
@@ -259,6 +261,7 @@ void Log::log_group_neuron_interaction(LogLevel level, const char *message,
 
 void Log::add_data(int group_id, int curr_id, double curr_data, double time) {
 
+  pthread_mutex_lock(&data_mutex);
   LogData this_data;
 
   this_data.timestamp = time;
@@ -267,6 +270,7 @@ void Log::add_data(int group_id, int curr_id, double curr_data, double time) {
   this_data.neuron_id = curr_id;
 
   this->log_data.push_back(this_data);
+  pthread_mutex_unlock(&data_mutex);
 }
 
 void Log::add_data(int group_id, int curr_id, double curr_data) {

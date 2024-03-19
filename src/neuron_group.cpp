@@ -96,7 +96,7 @@ void NeuronGroup::process_intragroup_queue() {
 
   for (Message *message : this->intragroup_messages) {
     // mutex lock happens in the neuron add_message function
-    message->target_neuron->add_message(message);
+    message->post_synaptic_neuron->add_message(message);
   }
   this->intragroup_messages.clear();
 }
@@ -111,7 +111,7 @@ void NeuronGroup::process_intergroup_queue() {
                                 this->get_id(),
                                 message->target_neuron_group->get_id());
     }
-    message->target_neuron->add_message(message);
+    message->post_synaptic_neuron->add_message(message);
   }
   this->intergroup_messages.clear();
 }

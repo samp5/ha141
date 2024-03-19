@@ -34,7 +34,8 @@ extern int INITIAL_MEMBRANE_POTENTIAL;
 extern int ACTIVATION_THRESHOLD;
 extern int REFRACTORY_MEMBRANE_POTENTIAL;
 extern int NUMBER_INPUT_NEURONS;
-extern int TAU;
+extern double TAU;
+extern double REFRACTORY_DURATION;
 extern std::string INPUT_FILE;
 extern std::string CONFIG_FILE;
 

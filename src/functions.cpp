@@ -577,6 +577,15 @@ int set_options(const char *file_name) {
     return 0;
   }
 
+  if (tbl["neuron"]["refractory_duration"].as_floating_point()) {
+    // convert to seconds
+    REFRACTORY_DURATION =
+        tbl["neuron"]["refractory_duration"].as_floating_point()->get() /
+        1000.0f;
+  } else {
+    lg.log_string(ERROR, "Failed to parse: %s", "refractory_duration");
+  }
+
   if (tbl["neuron"]["tau"].as_floating_point()) {
     TAU = tbl["neuron"]["tau"].as_floating_point()->get();
   } else {

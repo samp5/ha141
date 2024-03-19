@@ -19,8 +19,10 @@ int NUMBER_GROUPS;
 int NUMBER_NEURONS;
 int NUMBER_INPUT_NEURONS;
 int WAIT_LOOPS;
-int WAIT_TIME;          // in microseconds
+int WAIT_TIME; // in microseconds
+double TAU;
 unsigned long RUN_TIME; // in microseconds
+double REFRACTORY_DURATION;
 double DECAY_VALUE;
 LogLevel DEBUG_LEVEL;
 std::string INPUT_FILE;

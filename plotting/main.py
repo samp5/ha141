@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 data = []
-with open('../logs/1710773400.log', 'r') as file:
+with open('../logs/1710861766/1710861766.log', 'r') as file:
     for line in file:
         parts = line.split()
         group_id = int(parts[0])
@@ -19,8 +19,10 @@ for group_id, neuron_id in unique_ids:
 
     neuron_type = filtered_data[0][2]
     sorted_data = sorted(filtered_data, key=lambda x: x[0])
+
+    min_time = sorted_data[0][0]
     
-    x_values = [entry[0] for entry in sorted_data]
+    x_values = [entry[0] - min_time for entry in sorted_data]
     y_values = [entry[1] for entry in sorted_data]
     
     

@@ -15,12 +15,12 @@
 // @param3: Pointer to the parent group
 Neuron::Neuron(int _id, int inhibitory, NeuronGroup *group, Neuron_t type) {
 
-  this->type = None;
+  this->type = type;
   this->id = _id;
   this->excit_inhib_value = inhibitory;
   this->group = group;
   this->membrane_potential = INITIAL_MEMBRANE_POTENTIAL;
-  this->type = type;
+  this->excit_inhib_value = inhibitory;
 
   const char *inhib = inhibitory == -1 ? "excitatory\0" : "inhibitory\0";
 
@@ -153,19 +153,26 @@ int Neuron::recieve_in_group() {
     return 0;
   }
 
-  // Lock Mutex
-  pthread_mutex_lock(&potential_mutex);
-  // Update membrane_potential
-  this->membrane_potential =
-      this->membrane_potential + incoming_message->message;
-  pthread_mutex_unlock(&potential_mutex);
+  if (incoming_message->timestamp <
+      this->refractory_start + REFRACTORY_DURATION) {
+
+    lg.add_data(this->group->get_id(), this->id, this->membrane_potential,
+                incoming_message->timestamp, this->get_type());
+
+    delete incoming_message;
+    lg.log_group_neuron_state(
+        INFO, "(%d) Neuron %d is still in refractory period, ignoring message",
+        this->get_group()->get_id(), this->get_id());
+    return 1;
+  }
+
+  this->update_potential(incoming_message->message);
 
   lg.log_group_neuron_value(
-      INFO, "(%d) Neuron %d is activated, accumulated equal to %f",
+      INFO, "(%d) Neuron %d recieved message, accumulated equal to %f",
       this->group->get_id(), this->id, this->membrane_potential);
 
   // use message timestamp not current time
-  // #askpedram
   lg.add_data(this->group->get_id(), this->id, this->membrane_potential,
               incoming_message->timestamp, this->get_type());
 
@@ -174,50 +181,10 @@ int Neuron::recieve_in_group() {
   return 1;
 }
 
-// Checks if a neuron is able to run after recieving
-// all its messages
-//
-// checks neighbors and activation threshold
-//
-// @returns: 1 if okay to run, 0 if not
-int Neuron::check_run_conditions() {
-
-  // Check for neighbors
-  if (this->_postsynaptic.empty()) {
-    lg.log_group_neuron_state(INFO,
-                              "Group %d: Neuron %d does not have any neighbors",
-                              this->group->get_id(), this->id);
-    this->deactivate();
-    return 0;
-  }
-
-  // Check for activation threshold
-  if (membrane_potential < ACTIVATION_THRESHOLD) {
-
-    lg.log_group_neuron_state(INFO,
-                              "Membrane potential for Group %d: Neuron %d is "
-                              "below the threshold, not firing",
-                              this->group->get_id(), this->id);
-    this->deactivate();
-    return 0;
-  }
-  return 1;
-}
-
-// Run cycle for a neuron in a group
-void Neuron::run_in_group() {
-
-  // Get all the messsages for this neuron
-  while (this->recieve_in_group()) {
-  }
-
-  // Check run conditions
-  if (!this->check_run_conditions()) {
-    return;
-  }
+void Neuron::send_messages_in_group() {
 
   // loop through all neighbors
-  for (const auto &pair : _postsynaptic) {
+  for (const auto &pair : this->_postsynaptic) {
 
     lg.log_group_neuron_interaction(
         INFO, "Group %d: Neuron %d is sending a mesage to Group %d: Neuron %d",
@@ -227,58 +194,57 @@ void Neuron::run_in_group() {
     // construct message
     Message *message = new Message;
     message->target_neuron_group = pair.first->get_group();
-    message->target_neuron = pair.first;
+    message->post_synaptic_neuron = pair.first;
     message->timestamp = lg.get_time_stamp();
 
     // calculate message
     pthread_mutex_lock(&potential_mutex);
-    message->message =
-        membrane_potential * _postsynaptic[pair.first] * excit_inhib_value;
+    message->message = this->membrane_potential *
+                       this->_postsynaptic[pair.first] *
+                       this->excit_inhib_value;
     pthread_mutex_unlock(&potential_mutex);
 
     lg.log_group_neuron_value(
-        DEBUG, "Accumulated for Group %d: Neuron %d is %f",
+        DEBUG2, "Accumulated for Group %d: Neuron %d is %f",
         this->group->get_id(), this->id, this->membrane_potential);
 
     lg.log_group_neuron_interaction(
-        DEBUG, "Weight for Group %d: Neuron %d to Group %d: Neuron %d is %f",
+        DEBUG2, "Weight for Group %d: Neuron %d to Group %d: Neuron %d is %f",
         this->group->get_id(), this->id, pair.first->group->get_id(),
         pair.first->id, pair.second);
 
-    lg.log_group_neuron_value(DEBUG, "Group %d: Neuron %d modifier is %d",
+    lg.log_group_neuron_value(DEBUG2, "Group %d: Neuron %d modifier is %d",
                               this->group->get_id(), this->id,
                               this->excit_inhib_value);
 
     lg.log_group_neuron_interaction(
-        INFO, "Message from Group %d: Neuron %d to Group %d: Neuron %d is %f",
+        INFO, "Message from  (%d) Neuron %d to (%d) Neuron %d is %f",
         this->group->get_id(), this->id, pair.first->group->get_id(),
         pair.first->id, message->message);
 
     // activate neighbor
     pair.first->activate();
 
-    // Check if it is intragroup
-    if (this->group->get_id() == pair.first->group->get_id()) {
-
-      // add message to target
-      message->target_neuron->add_message(message);
-
-    } else {
-
-      // add message to neuron
-      message->target_neuron->add_message(message);
-    }
+    // add message to target
+    message->post_synaptic_neuron->add_message(message);
   }
 
-  lg.log_group_neuron_state(INFO,
-                            "(%d) Neuron %d fired, entering refractory phase",
-                            this->group->get_id(), this->id);
+  lg.log_group_neuron_state(
+      INFO,
+      "(%d) Neuron %d reached activation threshold, entering refractory phase",
+      this->group->get_id(), this->id);
 
   this->refractory();
+}
 
-  lg.log_group_neuron_state(
-      INFO, "(%d) Neuron %d completed refractory phase, running",
-      this->group->get_id(), this->id);
+// Run cycle for a neuron in a group
+void Neuron::run_in_group() {
+
+  while (this->recieve_in_group()) {
+    if (this->membrane_potential >= ACTIVATION_THRESHOLD) {
+      this->send_messages_in_group();
+    }
+  }
 
   this->deactivate();
 }
@@ -393,10 +359,19 @@ void Neuron::join_thread() { pthread_join(thread, NULL); }
 // Neuron sleeps for 2 milliseconds and potential is reset to
 // value set by preprocessor directive REFRACTORY_MEMBRANE_POTENTIAL
 void Neuron::refractory() {
-  membrane_potential = REFRACTORY_MEMBRANE_POTENTIAL;
-  lg.log_neuron_value(INFO, "Neuron %d portential set to %f", this->id,
-                      this->membrane_potential);
-  usleep(2000);
+
+  this->refractory_start = lg.get_time_stamp();
+
+  pthread_mutex_lock(&potential_mutex);
+  this->membrane_potential = REFRACTORY_MEMBRANE_POTENTIAL;
+  pthread_mutex_unlock(&potential_mutex);
+
+  lg.log_neuron_value(INFO,
+                      "Neuron %d in refractory state: potential set to %f",
+                      this->id, this->membrane_potential);
+  lg.add_data(this->get_group()->get_id(), this->get_id(),
+              this->membrane_potential, this->refractory_start,
+              this->get_type());
 }
 
 // Return presynaptic edges for a neuron
@@ -458,18 +433,24 @@ Message *Neuron::get_message() {
 // Logs the updated membrane_potential
 //
 // @returns new membrane_potential
-double Neuron::decay() {
-  pthread_mutex_lock(&potential_mutex);
-  this->membrane_potential -= DECAY_VALUE;
+double Neuron::decay(double tau, double v_rest) {
+
+  // for a membrane potential of  -55, tau = 10, decay value is 1.5
+  double decay_value = (this->membrane_potential - v_rest) / tau;
+
+  this->update_potential(-decay_value);
 
   lg.add_data(this->get_group()->get_id(), this->get_id(),
               this->membrane_potential);
 
-  pthread_mutex_unlock(&potential_mutex);
+  lg.log_group_neuron_value(
+      DEBUG2, "(%d) Neuron %d is decaying. Decay value is %f i",
+      this->get_group()->get_id(), this->get_id(), decay_value);
 
   lg.log_group_neuron_value(
-      DEBUG2, "(%d) Neuron %d decaying. Membrane potential now %f",
+      DEBUG2, "(%d) Neuron %d decayed. Membrane potential now %f",
       this->get_group()->get_id(), this->get_id(), this->get_potential());
+
   return this->membrane_potential;
 }
 
@@ -491,3 +472,9 @@ void Neuron::deactivate() {
 //
 // @param1: Neuron_t
 void Neuron::set_type(Neuron_t type) { this->type = type; }
+
+void Neuron::update_potential(double value) {
+  pthread_mutex_lock(&potential_mutex);
+  this->membrane_potential += value;
+  pthread_mutex_unlock(&potential_mutex);
+}

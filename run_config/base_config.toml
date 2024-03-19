@@ -1,7 +1,7 @@
 [neuron]
 
 # number of neurons
-neuron_count = 12
+neuron_count = 15
 
 # number of input type neurons
 input_neuron_count = 6
@@ -10,10 +10,10 @@ input_neuron_count = 6
 group_count = 3
 
 # number of connections
-edge_count = 10
+edge_count = 13
 
 # in milliseconds
-wait_time = 100
+wait_time = 200
 
 # integer
 wait_loops = 5
@@ -26,6 +26,12 @@ activation_threshold = -55.0
 
 # value that each neuron is set to after firing
 refractory_membrane_potential = -70.0
+
+# duration in milliseconds
+refractory_duration = 2.0
+
+# tau for the linearlization of the decay function
+tau = 10.0
 
 [debug]
 # Options are
@@ -40,13 +46,14 @@ level = "DEBUG4"
 # Value that each neuron decays every wait_time * wait_loops
 value = 0.5
 
+
 [random]
 # options are 'time' for using the current time, or an integer (as a string e.g. "1")
-seed = "time"
+seed = "1"
 
 [runtime_vars]
 # in seconds
-runtime = 5
+runtime = 20
 
 # file to read input from
 input_file = "./input_files/test"

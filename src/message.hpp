@@ -6,7 +6,8 @@ class Neuron;
 
 typedef struct {
   double message;
-  Neuron *target_neuron;
+  Neuron *presynaptic_neuron;
+  Neuron *post_synaptic_neuron;
   NeuronGroup *target_neuron_group;
   double timestamp;
 } Message;
