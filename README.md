@@ -67,9 +67,14 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 - Added `data_mutex` to ensure all data points are added with the correct information to the `log_data` vector
 
 - Graphs now show activation, refractory periods, and decay
-    - [Graph1](./plotting/group_1neuron_1)
-    - [Graph2](./plotting/group_2neuron_2.png)
-    - [Decay Example](./plotting/group_2neuron_4.png) (This neuron had no incoming connections)
+    - See images in `./plotting/` for examples
+
+[Graph1](./plotting/group_1neuron_1.png)
+
+[Graph2](./plotting/group_2neuron_2.png)
+
+[Decay Example](./plotting/group_2neuron_4.png) (This neuron had no incoming connections)
+
 
 
 ### 📌 Update 3-18
