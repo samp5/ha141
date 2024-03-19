@@ -41,10 +41,13 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 - [x] ~~Decay functionality~~
 - [x] ~~TOML configuration for run-time options~~
 - [x] ~~Neuron Types for differentiated functionality (input, output)~~
+- [ ] Message list sorting
+- [ ] Data structure for tracking presynaptic propagation 
 - [ ] Copy functionality for replicating graph layout
 
 | Date  | Key Points 🔑   |  Issues 🐛   |
 |--------------- | --------------- |--------------- |
+| [3-19](#-update-3-19)   | Changed decay funciton, firing logic, and x-axis for graphing| None |
 | [3-18](#-update-3-18)   | Neuron input type | None |
 | [3-15](#-update-3-15)   | .toml configuration for run-time options! | None |
 | [3-14](#-update-3-14)   | Messaging working between and within groups! Reading from file. Decay functionality. Basic plotting with Python | None |
@@ -55,6 +58,18 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 | [3-3](#-update-3-3)   | Added time stamps to logging messages. Added function descriptions.| None |
 | [2-29](#-update-2-29)   | Updated Neuron Class with with membrane potentials, refractory phases, Update to edge weights, fixed issue 1, guard clauses on header files.   | "Quit" functionality does not work for the menu [~~Issue 2~~](#-issue-2)|
 | [2-28](#-update-2-28)   | Basic Node class that sends and recieves messages   | `random_neighbors` may repeat edges. [~~Issue 1~~](#-issue-1)|
+
+### 📌 Update 3-19
+**New addtions:**
+- Decay logic now includes $\tau$ and $V_{rest}$
+- Refractory period does not use `usleep` but instead is stored in data member `refractory_start` and any messages with the timestamp `refractory_start + REFRACTORY_DURATION` are ignored. 
+- Neurons enter refractory period even if they have no neighbors
+- Added `data_mutex` to ensure all data points are added with the correct information to the `log_data` vector
+
+- Graphs now show activation, refractory periods, and decay
+    - [Graph1](./plotting/group_1neuron_1)
+    - [Graph2](./plotting/group_2neuron_2.png)
+    - [Decay Example](./plotting/group_2neuron_4.png) (This neuron had no incoming connections)
 
 
 ### 📌 Update 3-18
