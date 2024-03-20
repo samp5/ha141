@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 data = []
-with open('../logs/1710877494/1710877494.log', 'r') as file:
+with open('../logs/1710962602/1710962602.log', 'r') as file:
     for line in file:
         parts = line.split()
         group_id = int(parts[0])
@@ -17,7 +17,7 @@ for group_id, neuron_id in unique_ids:
 
     filtered_data = [(entry[3], entry[4], entry[2]) for entry in data if entry[0] == group_id and entry[1] == neuron_id]
 
-    neuron_type = filtered_data[0][2]
+    neuron_type = filtered_data[1][2]
     sorted_data = sorted(filtered_data, key=lambda x: x[0])
 
     min_time = sorted_data[0][0]
@@ -34,3 +34,5 @@ for group_id, neuron_id in unique_ids:
     plt.legend()
     plt.grid(True)
     plt.savefig(f"group_{group_id}neuron_{neuron_id}.png")
+    plt.close()
+

@@ -160,7 +160,15 @@ int Neuron::recieve_in_group() {
     lg.add_data(this->group->get_id(), this->id, this->membrane_potential,
                 incoming_message->timestamp, this->get_type());
 
+    if (!incoming_message) {
+      lg.log_group_neuron_state(
+          ERROR, "Tried to dealocate incoming message when message was NULL",
+          this->get_group()->get_id(), this->get_id());
+    }
+
     delete incoming_message;
+    incoming_message = nullptr;
+
     lg.log_group_neuron_state(
         INFO, "(%d) Neuron %d is still in refractory period, ignoring message",
         this->get_group()->get_id(), this->get_id());
@@ -178,7 +186,14 @@ int Neuron::recieve_in_group() {
               incoming_message->timestamp, this->get_type());
 
   // Deallocate this message
+  if (!incoming_message) {
+    lg.log_group_neuron_state(
+        ERROR, "Tried to dealocate incoming message when message was NULL",
+        this->get_group()->get_id(), this->get_id());
+  }
+
   delete incoming_message;
+  incoming_message = nullptr;
   return 1;
 }
 

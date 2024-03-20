@@ -138,6 +138,7 @@ void Log::add_data(int curr_id, double curr_data) {
   gettimeofday(&tv, NULL);
   double time_stamp = (double)tv.tv_sec + (double)tv.tv_usec / 100000;
 
+  pthread_mutex_lock(&data_mutex);
   LogData this_data;
 
   this_data.timestamp = time_stamp;
@@ -146,10 +147,12 @@ void Log::add_data(int curr_id, double curr_data) {
   this_data.neuron_id = curr_id;
 
   this->log_data.push_back(this_data);
+  pthread_mutex_unlock(&data_mutex);
 }
 
 void Log::add_data(int group_id, int curr_id, double curr_data, double time,
                    int type) {
+  pthread_mutex_lock(&data_mutex);
   LogData this_data;
 
   this_data.timestamp = time;
@@ -159,6 +162,7 @@ void Log::add_data(int group_id, int curr_id, double curr_data, double time,
   this_data.type = type;
 
   this->log_data.push_back(this_data);
+  pthread_mutex_unlock(&data_mutex);
 }
 void Log::write_data(const char *filename) {
 
@@ -278,6 +282,7 @@ void Log::add_data(int group_id, int curr_id, double curr_data) {
   gettimeofday(&tv, NULL);
   double time_stamp = (double)tv.tv_sec + (double)tv.tv_usec / 100000;
 
+  pthread_mutex_lock(&data_mutex);
   LogData this_data;
 
   this_data.timestamp = time_stamp;
@@ -286,6 +291,7 @@ void Log::add_data(int group_id, int curr_id, double curr_data) {
   this_data.neuron_id = curr_id;
 
   this->log_data.push_back(this_data);
+  pthread_mutex_unlock(&data_mutex);
 }
 
 void Log::log_group_state(LogLevel level, const char *message, int group_id) {
