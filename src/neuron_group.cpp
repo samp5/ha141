@@ -54,6 +54,28 @@ void *NeuronGroup::group_run() {
         lg.log_group_neuron_state(DEBUG2, "Running (%d) Neuron (%d)",
                                   this->get_id(), neuron->get_id());
 
+        if (DEBUG_LEVEL >= DEBUG4) {
+          bool sorted = true;
+          auto messages = neuron->get_message_vector();
+          double timestamp;
+          if (!messages.empty()) {
+            timestamp = messages.front()->timestamp;
+          }
+          for (auto message : messages) {
+            if (timestamp > message->timestamp) {
+              lg.log(ERROR, "Message list not sorted");
+              sorted = false;
+            }
+            print_message(message);
+            timestamp = message->timestamp;
+          }
+          if (sorted) {
+            lg.log_group_neuron_state(
+                DEBUG4, "Message list for (%d) Neruon %d is sorteded",
+                neuron->get_group()->get_id(), neuron->get_id());
+          }
+        }
+
         // Run neuron
         neuron->run_in_group();
       }

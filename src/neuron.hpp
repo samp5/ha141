@@ -103,6 +103,7 @@ public:
   Neuron_t get_type() { return this->type; }
   int get_id() { return id; }
   double get_potential() { return membrane_potential; }
+  const list<Message *> &get_message_vector();
   const weight_map *get_presynaptic() const;
   const weight_map *get_postsynaptic() const;
   NeuronGroup *get_group();

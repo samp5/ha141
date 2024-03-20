@@ -2,6 +2,7 @@
 #include "functions.hpp"
 #include "log.hpp"
 
+#include <iterator>
 #include <pthread.h>
 #include <unistd.h>
 
@@ -397,9 +398,23 @@ bool Neuron::is_activated() const { return this->active; }
 NeuronGroup *Neuron::get_group() { return this->group; }
 
 void Neuron::add_message(Message *message) {
-  pthread_mutex_lock(&message_mutex);
-  this->messages.push_back(message);
-  pthread_mutex_unlock(&message_mutex);
+  if (this->messages.empty()) {
+    pthread_mutex_lock(&message_mutex);
+    this->messages.push_back(message);
+    pthread_mutex_unlock(&message_mutex);
+  } else {
+
+    list<Message *>::const_iterator it = this->messages.begin();
+
+    while (it != this->messages.end() &&
+           message->timestamp > (*it)->timestamp) {
+      it++;
+    }
+
+    pthread_mutex_lock(&message_mutex);
+    this->messages.insert(it, message);
+    pthread_mutex_unlock(&message_mutex);
+  }
 }
 
 Message *Neuron::get_message() {
@@ -478,3 +493,4 @@ void Neuron::update_potential(double value) {
   this->membrane_potential += value;
   pthread_mutex_unlock(&potential_mutex);
 }
+const list<Message *> &Neuron::get_message_vector() { return this->messages; }
