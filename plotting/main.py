@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 data = []
-with open('../logs/1710962602/1710962602.log', 'r') as file:
+with open('../logs/1711396161/1711396161.log', 'r') as file:
     for line in file:
         parts = line.split()
         group_id = int(parts[0])
@@ -27,7 +27,7 @@ for group_id, neuron_id in unique_ids:
     
     
     plt.figure()
-    plt.plot(x_values, y_values, marker='o' , label=f'Group ID: {group_id}, Item ID: {neuron_id}')
+    plt.scatter(x_values, y_values, marker='.' , label=f'Group ID: {group_id}, Item ID: {neuron_id}')
     plt.xlabel('Time')
     plt.ylabel('Membrane Potential')
     plt.title(f'Group ID: {group_id}, Neuron ID: {neuron_id}, Type: {neuron_type}')

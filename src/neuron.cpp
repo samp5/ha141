@@ -385,6 +385,7 @@ void Neuron::refractory() {
   lg.log_neuron_value(INFO,
                       "Neuron %d in refractory state: potential set to %f",
                       this->id, this->membrane_potential);
+
   lg.add_data(this->get_group()->get_id(), this->get_id(),
               this->membrane_potential, this->refractory_start,
               this->get_type());

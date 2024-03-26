@@ -145,6 +145,7 @@ void random_neighbors(vector<Neuron *> nodes, int number_neighbors) {
 
   lg.print("\nAdding Random Edges");
   lg.print("======================\n\n");
+
   int size = nodes.size();
   int i = 0;
   if (number_neighbors > size) {
@@ -404,13 +405,17 @@ void send_messages(const vector<Message *> *messages) {
 
   while (::active) {
 
-    for (int i = 1; i <= WAIT_LOOPS; i++) {
-      lg.log_value(DEBUG3, "send_messages waiting: %d", i);
-      usleep(WAIT_TIME);
-    }
+    // for (int i = 1; i <= WAIT_LOOPS; i++) {
+    //   lg.log_value(DEBUG3, "send_messages waiting: %d", i);
+    // }
+    
+
+    // random numbers for the time_stamp
+    //
+    //
+
 
     for (auto message : *messages) {
-
       lg.log_message(DEBUG2,
                      "Adding Message! time: %f group: %d neuron: %d value: %f",
                      message->timestamp, message->target_neuron_group->get_id(),

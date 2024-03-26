@@ -1,19 +1,19 @@
 [neuron]
 
 # number of neurons
-neuron_count = 30
+neuron_count = 12
 
 # number of input type neurons
-input_neuron_count = 20
+input_neuron_count = 5
 
 # number of groups
-group_count = 3
+group_count = 4
 
 # number of connections
-edge_count = 30
+edge_count = 12
 
 # in milliseconds
-wait_time = 100
+wait_time = 5
 
 # integer
 wait_loops = 3
@@ -40,7 +40,7 @@ tau = 10.0
 # DEBUG2
 # DEBUG3
 # DEBUG4
-level = "INFO"
+level = "DEBUG4"
 
 [decay]
 # Value that each neuron decays every wait_time * wait_loops
@@ -49,7 +49,7 @@ value = 0.5
 
 [random]
 # options are 'time' for using the current time, or an integer (as a string e.g. "1")
-seed = "1"
+seed = "time"
 
 [runtime_vars]
 # in seconds

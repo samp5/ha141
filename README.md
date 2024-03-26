@@ -73,7 +73,7 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 
 [Graph2](./plotting/group_2neuron_2.png)
 
-[Decay Example](./plotting/group_2neuron_4.png) (This neuron had no incoming connections)
+[Decay Example](./plotting/group_2neuron_4.png)
 
 
 
