@@ -1,9 +1,5 @@
 #include "functions.hpp"
-
-#include "log.hpp"
-#include "message.hpp"
-#include "neuron.hpp"
-#include <cstdlib>
+#include "input_neuron.hpp"
 
 void print_group_maps(Neuron *neuron) {
   const weight_map *p_postsyntapic = neuron->get_postsynaptic();
@@ -179,15 +175,7 @@ void random_group_neighbors(vector<NeuronGroup *> groups,
   lg.print("\nAdding Random Edges");
   lg.print("======================\n");
 
-  int neuron_count = get_neuron_count(groups);
   int i = 0;
-
-  if (number_neighbors > neuron_count) {
-    number_neighbors = neuron_count;
-    lg.log(WARNING, "random_neighbors: Number of neighbors exceeds size, "
-                    "setting number of neighbors to size");
-  }
-
   while (i < number_neighbors) {
 
     // Get random neurons
@@ -332,14 +320,45 @@ void decay_neurons(vector<NeuronGroup *> *groups) {
 
   while (::active) {
 
-    for (int i = 1; i <= WAIT_LOOPS; i++) {
-      lg.log_value(DEBUG3, "decay_neurons waiting: %d", i);
-      usleep(WAIT_TIME);
-    }
+    usleep(WAIT_TIME);
 
     for (auto neuron : neuron_vec) {
       neuron->decay();
     }
+  }
+}
+
+void set_message_values_for_input_neurons(vector<NeuronGroup *> groups,
+                                          std::string file_name) {
+  vector<Neuron *> neuron_vec;
+
+  for (const auto &group : groups) {
+    for (const auto &neuron : group->get_neruon_vector()) {
+      if (neuron->get_type() == Input) {
+        neuron_vec.push_back(neuron);
+      }
+    }
+  }
+
+  std::ifstream file(file_name);
+
+  if (!file.is_open()) {
+    lg.log(ERROR, "set_message_values_for_input_neurons: Unable to open file");
+    return;
+  }
+
+  int number_input_neurons = neuron_vec.size();
+  int data_read = 0;
+  double value;
+
+  while (!file.eof() && data_read < number_input_neurons) {
+    file >> value;
+
+    InputNeuron *input_neuron =
+        dynamic_cast<InputNeuron *>(neuron_vec.at(data_read));
+
+    input_neuron->set_input_value(value);
+    data_read++;
   }
 }
 
@@ -405,15 +424,13 @@ void send_messages(const vector<Message *> *messages) {
 
   while (::active) {
 
-    // for (int i = 1; i <= WAIT_LOOPS; i++) {
-    //   lg.log_value(DEBUG3, "send_messages waiting: %d", i);
-    // }
-    
+    for (int i = 1; i <= WAIT_LOOPS; i++) {
+      lg.log_value(DEBUG3, "send_messages waiting: %d", i);
+    }
 
     // random numbers for the time_stamp
     //
     //
-
 
     for (auto message : *messages) {
       lg.log_message(DEBUG2,
@@ -700,6 +717,8 @@ int set_options(const char *file_name) {
 }
 
 LogLevel get_level_from_string(std::string level) {
+  if (level == "NONE")
+    return NONE;
   if (level == "INFO")
     return INFO;
   if (level == "DEBUG")
@@ -718,20 +737,13 @@ LogLevel get_level_from_string(std::string level) {
 void assign_groups(vector<NeuronGroup *> &neuron_groups) {
 
   int neuron_per_group = NUMBER_NEURONS / NUMBER_GROUPS;
-
-  // reamainder is guearenteed to be less than the number of groups
-  int remainder = NUMBER_NEURONS % NUMBER_GROUPS;
+  int input_neurons_per_group = NUMBER_INPUT_NEURONS / NUMBER_GROUPS;
 
   for (int i = 0; i < NUMBER_GROUPS; i++) {
 
-    // check for remainder and the neurons in the current group accordingly
-    int per_group = remainder ? neuron_per_group + 1 : neuron_per_group;
-
-    if (remainder)
-      remainder--;
-
     // allocate for this group
-    NeuronGroup *this_group = new NeuronGroup(i + 1, per_group);
+    NeuronGroup *this_group =
+        new NeuronGroup(i + 1, neuron_per_group, input_neurons_per_group);
 
     // add to vector
     neuron_groups.at(i) = this_group;
@@ -770,6 +782,25 @@ void assign_neuron_types(vector<NeuronGroup *> &groups) {
     }
   }
 }
+
+std::string message_type_to_string(Message_t type) {
+  std::string ret;
+  switch (type) {
+  case Stimulus:
+    ret = "S";
+    break;
+  case Refractory:
+    ret = "R";
+    break;
+  case From_Neighbor:
+    ret = "N";
+    break;
+  case Decay:
+    ret = "D";
+    break;
+  }
+  return ret;
+}
 std::string io_type_to_string(Neuron_t type) {
   std::string ret;
   switch (type) {
@@ -787,4 +818,60 @@ std::string io_type_to_string(Neuron_t type) {
     break;
   }
   return ret;
+}
+void check_start_conditions() {
+  bool error = false;
+  if (NUMBER_INPUT_NEURONS >= NUMBER_NEURONS) {
+    lg.log(ERROR, "NUMBER_INPUT_NEURONS greater than or equal to "
+                  "NUMBER_NEURONS... quitting");
+    error = true;
+  } else if (NUMBER_NEURONS % NUMBER_GROUPS != 0) {
+    lg.log(ERROR, "NUMBER_NEURONS not divisible by NUMBER_GROUPS... quitting");
+    error = true;
+  } else if (NUMBER_INPUT_NEURONS % NUMBER_GROUPS != 0) {
+    lg.log(ERROR,
+           "NUMBER_INPUT_NEURONS not divisible by NUMBER_GROUPS... quitting");
+    error = true;
+  } else if (NUMBER_EDGES > maximum_edges()) {
+    lg.log(ERROR, "Maximum number of possible edges exceeded .. quitting");
+    error = true;
+  }
+  if (error) {
+    destroy_mutexes();
+    exit(0);
+  } else {
+    return;
+  }
+}
+
+void destroy_mutexes() {
+  pthread_mutex_destroy(&potential_mutex);
+  pthread_mutex_destroy(&log_mutex);
+  pthread_mutex_destroy(&message_mutex);
+  pthread_mutex_destroy(&activation_mutex);
+}
+
+int maximum_edges() {
+  // for an undirected graph there are n(n-1) / 2 edges
+  //
+  // Since our connections are only allowed to go one way, the network is
+  // essentially an undirected graph.
+  //
+  // input neurons can only have outgoing edges is
+  // the parameter NUMBER_NEURONS represents the total number of neurons
+  // then n_t = NUMBER_NEURONS, n_r = NUMBER_NEURONS - NUMBER_INPUT_NEURONS
+  // n_i = NUMBER_INPUT_NEURONS
+  //
+  // the max edges are the total number of maximum edges minus the number of
+  // edges that would be possible in a undirected graph of only the input
+  // neurons maximum_edges = n_t(n_t) / 2 - n_i(n_i-1) / 2
+
+  int n_i = NUMBER_INPUT_NEURONS;
+  int n_t = NUMBER_NEURONS;
+
+  // always even so division is fine
+  int edges_lost_to_input = n_i * (n_i - 1) / 2;
+  int max_edges = (n_t * (n_t - 1) / 2) - edges_lost_to_input;
+
+  return max_edges;
 }

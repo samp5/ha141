@@ -1,8 +1,8 @@
 #include "neuron.hpp"
 #include "functions.hpp"
 #include "log.hpp"
+#include "message.hpp"
 
-#include <iterator>
 #include <pthread.h>
 #include <unistd.h>
 
@@ -158,7 +158,8 @@ int Neuron::recieve_in_group() {
       this->refractory_start + REFRACTORY_DURATION) {
 
     lg.add_data(this->group->get_id(), this->id, this->membrane_potential,
-                incoming_message->timestamp, this->get_type());
+                incoming_message->timestamp, this->get_type(),
+                incoming_message->message_type);
 
     if (!incoming_message) {
       lg.log_group_neuron_state(
@@ -172,6 +173,7 @@ int Neuron::recieve_in_group() {
     lg.log_group_neuron_state(
         INFO, "(%d) Neuron %d is still in refractory period, ignoring message",
         this->get_group()->get_id(), this->get_id());
+
     return 1;
   }
 
@@ -183,7 +185,8 @@ int Neuron::recieve_in_group() {
 
   // use message timestamp not current time
   lg.add_data(this->group->get_id(), this->id, this->membrane_potential,
-              incoming_message->timestamp, this->get_type());
+              incoming_message->timestamp, this->get_type(),
+              incoming_message->message_type);
 
   // Deallocate this message
   if (!incoming_message) {
@@ -212,6 +215,7 @@ void Neuron::send_messages_in_group() {
     message->target_neuron_group = pair.first->get_group();
     message->post_synaptic_neuron = pair.first;
     message->timestamp = lg.get_time_stamp();
+    message->message_type = From_Neighbor;
 
     // calculate message
     pthread_mutex_lock(&potential_mutex);
@@ -295,7 +299,7 @@ void *Neuron::run() {
 
   lg.log_neuron_value(INFO, "Neuron %d is activated, accumulated equal to %f",
                       this->id, this->membrane_potential);
-  lg.add_data(this->id, this->membrane_potential);
+  // lg.add_data(this->id, this->membrane_potential);
   recieved = true;
 
   pthread_cond_broadcast(&cond);
@@ -376,6 +380,8 @@ void Neuron::join_thread() { pthread_join(thread, NULL); }
 // value set by preprocessor directive REFRACTORY_MEMBRANE_POTENTIAL
 void Neuron::refractory() {
 
+  Message_t refractory_type = Refractory;
+
   this->refractory_start = lg.get_time_stamp();
 
   pthread_mutex_lock(&potential_mutex);
@@ -388,7 +394,7 @@ void Neuron::refractory() {
 
   lg.add_data(this->get_group()->get_id(), this->get_id(),
               this->membrane_potential, this->refractory_start,
-              this->get_type());
+              this->get_type(), refractory_type);
 }
 
 // Return presynaptic edges for a neuron
@@ -469,10 +475,18 @@ double Neuron::decay(double tau, double v_rest) {
   // for a membrane potential of  -55, tau = 10, decay value is 1.5
   double decay_value = (this->membrane_potential - v_rest) / tau;
 
+  if (!decay_value) {
+    return this->membrane_potential;
+  }
+
+  Message_t decay_type = Decay;
+  double time_rn = lg.get_time_stamp();
+
   this->update_potential(-decay_value);
 
-  lg.add_data(this->get_group()->get_id(), this->get_id(),
-              this->membrane_potential);
+  double potential = this->membrane_potential;
+  lg.add_data(this->get_group()->get_id(), this->get_id(), potential, time_rn,
+              this->get_type(), decay_type);
 
   lg.log_group_neuron_value(
       DEBUG2, "(%d) Neuron %d is decaying. Decay value is %f i",
@@ -480,9 +494,9 @@ double Neuron::decay(double tau, double v_rest) {
 
   lg.log_group_neuron_value(
       DEBUG2, "(%d) Neuron %d decayed. Membrane potential now %f",
-      this->get_group()->get_id(), this->get_id(), this->get_potential());
+      this->get_group()->get_id(), this->get_id(), potential);
 
-  return this->membrane_potential;
+  return potential;
 }
 
 // Activates neuron

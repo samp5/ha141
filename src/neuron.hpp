@@ -34,7 +34,7 @@ class NeuronGroup;
 enum Neuron_t { None = 0, Input = 1, Hidden = 2, Output = 3 };
 
 class Neuron {
-private:
+protected:
   // Neuron vaules
   double membrane_potential = INITIAL_MEMBRANE_POTENTIAL;
   int excit_inhib_value;
@@ -67,7 +67,7 @@ public:
   Neuron(int _id, int inhibitory);
   Neuron(int _id, int inhibitory, NeuronGroup *group, Neuron_t type);
   Neuron(int _id, int inhibitory, NeuronGroup *group);
-  ~Neuron();
+  virtual ~Neuron();
 
   void add_neighbor(Neuron *neighbor, double weight);
 
@@ -76,12 +76,12 @@ public:
 
   // Running and messaging
   void *run();
-  void run_in_group();
+  virtual void run_in_group();
   int recieve_in_group();
   int check_run_conditions();
   void add_message(Message *);
   Message *get_message();
-  void send_messages_in_group();
+  virtual void send_messages_in_group();
 
   // State operations
   void refractory();

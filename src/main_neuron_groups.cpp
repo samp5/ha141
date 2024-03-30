@@ -56,23 +56,12 @@ int main(int argc, char **argv) {
 
   // If we are unable to parse, just quit
   if (!parse_command_line_args(argv, argc)) {
-    pthread_mutex_destroy(&potential_mutex);
-    pthread_mutex_destroy(&log_mutex);
-    pthread_mutex_destroy(&message_mutex);
-    pthread_mutex_destroy(&activation_mutex);
+    destroy_mutexes();
     return 0;
   }
 
-  // If the number of input neurons exceeds the number of neurons quite
-  if (NUMBER_INPUT_NEURONS >= NUMBER_NEURONS) {
-    lg.log(ERROR, "NUMBER_INPUT_NEURONS greater than or equal to "
-                  "NUMBER_NEURONS... quitting");
-    pthread_mutex_destroy(&potential_mutex);
-    pthread_mutex_destroy(&log_mutex);
-    pthread_mutex_destroy(&message_mutex);
-    pthread_mutex_destroy(&activation_mutex);
-    return 0;
-  }
+  // Check the start conditions
+  check_start_conditions();
 
   // Set seed
   srand(RAND_SEED);
@@ -88,14 +77,15 @@ int main(int argc, char **argv) {
 
   // assign neurons types
   // this just assigns input neurons for now
-  assign_neuron_types(neuron_groups);
+  // assign_neuron_types(neuron_groups);
 
   // Add random edges between neurons
   random_group_neighbors(neuron_groups, NUMBER_EDGES);
 
   // Get message vector from file
-  vector<Message *> messages =
-      construct_message_vector_from_file(neuron_groups, INPUT_FILE);
+  // vector<Message *> messages =
+  //     construct_message_vector_from_file(neuron_groups, INPUT_FILE);
+  set_message_values_for_input_neurons(neuron_groups, INPUT_FILE);
 
   // Print out groups
   for (auto group : neuron_groups) {
@@ -103,17 +93,17 @@ int main(int argc, char **argv) {
   }
 
   // Print out messages
-  for (auto message : messages) {
-    print_message(message);
-  }
+  // for (auto message : messages) {
+  //   print_message(message);
+  // }
 
   // thread ids
-  pthread_t messaging_thread;
+  // pthread_t messaging_thread;
   pthread_t decay_thread;
 
   // create messager thread and pass pointer to message array
-  pthread_create(&messaging_thread, NULL, send_message_helper,
-                 (void *)&messages);
+  // pthread_create(&messaging_thread, NULL, send_message_helper,
+  //                (void *)&messages);
 
   // create decay thread and pass pointer to neuron groups
   pthread_create(&decay_thread, NULL, decay_helper, (void *)&neuron_groups);
@@ -129,8 +119,6 @@ int main(int argc, char **argv) {
 
   lg.log(INFO, "Writing data to file...");
   lg.write_data();
-
-  deallocate_message_vector(&messages);
 
   // Deallocate groups
   for (auto group : neuron_groups) {

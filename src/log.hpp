@@ -1,6 +1,7 @@
 #ifndef LOG
 #define LOG
 
+#include "message.hpp"
 #include <iostream>
 #include <vector>
 
@@ -9,6 +10,7 @@ using std::ostream;
 using std::vector;
 
 enum LogLevel {
+  NONE,
   DATA,
   ERROR,
   WARNING,
@@ -24,7 +26,8 @@ typedef struct LogData {
   int group_id;
   double timestamp;
   double membrane_potentail;
-  int type = 0;
+  int neuron_type = 0;
+  Message_t message_type;
 } LogData;
 
 extern LogLevel DEBUG_LEVEL;
@@ -36,7 +39,6 @@ public:
   // constructor
 
   // DATA Functions
-  void add_data(int id, double data);
 
   void write_data(const char *filesname = "./logs/%ld/%ld.log");
 
@@ -45,7 +47,7 @@ public:
   void add_data(int group_id, int curr_id, double curr_data, double time);
 
   void add_data(int group_id, int curr_id, double curr_data, double time,
-                int type);
+                int type, Message_t message_type);
 
   void log_runtime_config();
 

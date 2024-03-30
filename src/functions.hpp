@@ -41,6 +41,11 @@ extern std::string CONFIG_FILE;
 
 typedef std::map<Neuron *, double> weight_map;
 
+int maximum_edges();
+
+void check_start_conditions();
+
+void destroy_mutexes();
 // Assign random neighbors to all nodes in vector
 //
 // Reflexive edges and duplicate edges are not allowed.
@@ -218,4 +223,7 @@ void assign_groups(vector<NeuronGroup *> &neuron_groups);
 void assign_neuron_types(vector<NeuronGroup *> &groups);
 
 std::string io_type_to_string(Neuron_t type);
+std::string message_type_to_string(Message_t type);
+void set_message_values_for_input_neurons(vector<NeuronGroup *> groups,
+                                          std::string file_name);
 #endif // !FUNCTIONS

@@ -1,8 +1,46 @@
 #include "functions.hpp"
+#include "input_neuron.hpp"
 #include "log.hpp"
 #include "neuron.hpp"
+#include <cstdlib>
 #include <pthread.h>
 #include <unistd.h>
+
+// Constructor
+NeuronGroup::NeuronGroup(int _id, int number_neurons,
+                         int number_input_neurons) {
+  lg.log_group_state(DEBUG, "Adding Group %d", _id);
+
+  this->id = _id;
+
+  lg.log_group_state(INFO, "Group %d", this->id);
+
+  // we only need this many of "regular neurons"
+  number_neurons -= number_input_neurons;
+
+  int id = 1;
+
+  while (number_neurons || number_input_neurons) {
+
+    // 1 is regular, 0 is input
+    int roll = rand() % 2;
+
+    if (roll && number_neurons) {
+
+      Neuron *neuron = new Neuron(id, get_inhibitory_status(), this);
+      this->neurons.push_back(neuron);
+      number_neurons--;
+      id++;
+
+    } else if (!roll && number_input_neurons) {
+
+      InputNeuron *neuron = new InputNeuron(id, this);
+      this->neurons.push_back(neuron);
+      number_input_neurons--;
+      id++;
+    }
+  }
+}
 
 // Constructor
 NeuronGroup::NeuronGroup(int _id, int number_neurons) {
@@ -54,28 +92,9 @@ void *NeuronGroup::group_run() {
         lg.log_group_neuron_state(DEBUG2, "Running (%d) Neuron (%d)",
                                   this->get_id(), neuron->get_id());
 
-        if (DEBUG_LEVEL >= DEBUG4) {
-          bool sorted = true;
-          auto messages = neuron->get_message_vector();
-          double timestamp;
-          if (!messages.empty()) {
-            timestamp = messages.front()->timestamp;
-          }
-          for (auto message : messages) {
-            if (timestamp > message->timestamp) {
-              lg.log(ERROR, "Message list not sorted");
-              sorted = false;
-            }
-            print_message(message);
-            timestamp = message->timestamp;
-          }
-          if (sorted) {
-            lg.log_group_neuron_state(
-                DEBUG4, "Message list for (%d) Neruon %d is sorteded",
-                neuron->get_group()->get_id(), neuron->get_id());
-          }
+        if (neuron->get_type() == Input) {
+          InputNeuron *neuron = dynamic_cast<InputNeuron *>(neuron);
         }
-
         // Run neuron
         neuron->run_in_group();
       }

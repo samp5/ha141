@@ -34,8 +34,8 @@ private:
   //    add the message the right neurons queue
 
 public:
+  NeuronGroup(int _id, int number_neurons, int number_input_neurons);
   NeuronGroup(int _id, int number_neurons);
-  // might move neuron memory responsibilities to this class
   ~NeuronGroup();
 
   // these four are not used right now

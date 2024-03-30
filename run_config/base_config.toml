@@ -1,16 +1,16 @@
 [neuron]
 
 # number of neurons
-neuron_count = 12
+neuron_count = 30
 
 # number of input type neurons
-input_neuron_count = 5
+input_neuron_count = 15
 
 # number of groups
-group_count = 4
+group_count = 5
 
 # number of connections
-edge_count = 12
+edge_count = 40
 
 # in milliseconds
 wait_time = 5
