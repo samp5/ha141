@@ -12,19 +12,24 @@ void InputNeuron::run_in_group() {
 
   if (!this->check_refractory_period()) {
     lg.log_group_neuron_state(
-        INFO, "(%d) Neuron %d is still in refractory period, ignoring input",
+        INFO,
+        "INPUT: (%d) Neuron %d is still in refractory period, ignoring input",
         this->get_group()->get_id(), this->get_id());
     return;
   }
 
+  if (this->membrane_potential >= ACTIVATION_THRESHOLD) {
+    this->send_messages_in_group();
+  }
+
   if (poisson_result()) {
 
-    double time = lg.get_time_stamp();
+    double time_rn = lg.get_time_stamp();
 
     this->update_potential(this->input_value);
 
     lg.add_data(this->get_group()->get_id(), this->get_id(),
-                this->membrane_potential, time, this->get_type(), Stimulus);
+                this->membrane_potential, time_rn, this->get_type(), Stimulus);
 
     lg.log_group_neuron_value(
         INFO,
@@ -57,11 +62,11 @@ bool InputNeuron::check_refractory_period() {
 
   // first check refractory status
   if (timestamp < this->refractory_start + REFRACTORY_DURATION) {
-    lg.add_data(this->group->get_id(), this->id, this->membrane_potential,
-                timestamp, this->get_type(), Stimulus);
+
     lg.log_group_neuron_state(
         INFO, "(%d) Neuron %d is still in refractory period, ignoring message",
         this->get_group()->get_id(), this->get_id());
+
     return false;
   }
 

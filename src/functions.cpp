@@ -323,7 +323,8 @@ void decay_neurons(vector<NeuronGroup *> *groups) {
     usleep(WAIT_TIME);
 
     for (auto neuron : neuron_vec) {
-      neuron->decay();
+      double time_rn = lg.get_time_stamp();
+      neuron->decay(time_rn);
     }
   }
 }
@@ -501,6 +502,9 @@ void create_base_toml() {
   file << "#  tau for the linearlization of the decay function";
   file << "tau = 1.0";
   file << '\n';
+  file << "#  poisson_prob_of_success";
+  file << "poisson_prob_of_success = 0.7";
+  file << '\n';
   file << "[debug]" << '\n';
   file << "# Options are" << '\n';
   file << "# INFO" << '\n';
@@ -597,6 +601,13 @@ int set_options(const char *file_name) {
   } catch (const toml::parse_error &err) {
     lg.log_string(ERROR, "Parsing failed:", err.what());
     return 0;
+  }
+
+  if (tbl["neuron"]["poisson_prob_of_success"].as_floating_point()) {
+    INPUT_PROB_SUCCESS =
+        tbl["neuron"]["poisson_prob_of_success"].as_floating_point()->get();
+  } else {
+    lg.log_string(ERROR, "Failed to parse: %s", "poisson_prob_of_success");
   }
 
   if (tbl["neuron"]["refractory_duration"].as_floating_point()) {

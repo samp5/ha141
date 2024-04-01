@@ -100,14 +100,14 @@ void *NeuronGroup::group_run() {
       }
     }
 
-    lg.log_group_state(DEBUG2, "Group %d pausing", this->id);
+    // lg.log_group_state(DEBUG3, "Group %d pausing", this->id);
+    //
+    // for (int i = 1; i <= WAIT_LOOPS; i++) {
+    //   lg.log_group_value(DEBUG3, "Group %d waiting: %d", this->get_id(), i);
+    //   usleep(WAIT_TIME);
+    // }
 
-    for (int i = 1; i <= WAIT_LOOPS; i++) {
-      lg.log_group_value(DEBUG3, "Group %d waiting: %d", this->get_id(), i);
-      usleep(WAIT_TIME);
-    }
-
-    lg.log_group_state(DEBUG2, "Group %d resuming", this->id);
+    // lg.log_group_state(DEBUG2, "Group %d resuming", this->id);
   }
   return NULL;
 }

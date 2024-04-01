@@ -4,12 +4,15 @@
 #include "neuron.hpp"
 #include "neuron_group.hpp"
 
+extern double INPUT_PROB_SUCCESS;
+
 class InputNeuron : public Neuron {
 private:
   double input_value;
-  double probalility_of_success = 0.8;
+  double probalility_of_success = INPUT_PROB_SUCCESS;
 
 public:
+
   InputNeuron(int _id, NeuronGroup *group);
   void run_in_group();
   bool poisson_result();

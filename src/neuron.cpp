@@ -3,6 +3,7 @@
 #include "log.hpp"
 #include "message.hpp"
 
+#include <cstdlib>
 #include <pthread.h>
 #include <unistd.h>
 
@@ -156,10 +157,6 @@ int Neuron::recieve_in_group() {
 
   if (incoming_message->timestamp <
       this->refractory_start + REFRACTORY_DURATION) {
-
-    lg.add_data(this->group->get_id(), this->id, this->membrane_potential,
-                incoming_message->timestamp, this->get_type(),
-                incoming_message->message_type);
 
     if (!incoming_message) {
       lg.log_group_neuron_state(
@@ -393,7 +390,7 @@ void Neuron::refractory() {
                       this->id, this->membrane_potential);
 
   lg.add_data(this->get_group()->get_id(), this->get_id(),
-              this->membrane_potential, this->refractory_start,
+              REFRACTORY_MEMBRANE_POTENTIAL, this->refractory_start,
               this->get_type(), refractory_type);
 }
 
@@ -421,9 +418,11 @@ NeuronGroup *Neuron::get_group() { return this->group; }
 
 void Neuron::add_message(Message *message) {
   if (this->messages.empty()) {
+
     pthread_mutex_lock(&message_mutex);
     this->messages.push_back(message);
     pthread_mutex_unlock(&message_mutex);
+
   } else {
 
     list<Message *>::const_iterator it = this->messages.begin();
@@ -470,22 +469,23 @@ Message *Neuron::get_message() {
 // Logs the updated membrane_potential
 //
 // @returns new membrane_potential
-double Neuron::decay(double tau, double v_rest) {
+double Neuron::decay(double timestamp, double tau, double v_rest) {
 
   // for a membrane potential of  -55, tau = 10, decay value is 1.5
   double decay_value = (this->membrane_potential - v_rest) / tau;
 
-  if (!decay_value) {
-    return this->membrane_potential;
+  // if we sitting at -70 no need to decay
+  if (abs(decay_value) < 0.01) {
+    return 0;
   }
 
   Message_t decay_type = Decay;
-  double time_rn = lg.get_time_stamp();
 
   this->update_potential(-decay_value);
 
   double potential = this->membrane_potential;
-  lg.add_data(this->get_group()->get_id(), this->get_id(), potential, time_rn,
+
+  lg.add_data(this->get_group()->get_id(), this->get_id(), potential, timestamp,
               this->get_type(), decay_type);
 
   lg.log_group_neuron_value(

@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 data = []
-with open('../logs/1711756941/1711756941.log', 'r') as file:
+with open('../logs/1711992931/1711992931.log', 'r') as file:
     for line in file:
         parts = line.split()
         group_id = int(parts[0])
@@ -39,15 +39,15 @@ for group_id, neuron_id in unique_ids:
 
     min_time = sorted_data[0][0]
 
-    x_values = [entry[0] - min_time for entry in sorted_data]
+    x_values = [(entry[0] - min_time) for entry in sorted_data]
     y_values = [entry[1] for entry in sorted_data]
-    plt.plot(x_values, y_values, linewidth = 1, linestyle = '--')
+    # plt.plot(x_values, y_values, linewidth = 1, linestyle = '--')
 
-    neuron_type = filtered_data[1][2]
+    neuron_type = filtered_data[0][2]
 
     for message_type in message_types:
 
-        filtered_data2 = [filtered_data[i] for i in range(len(filtered_data)) if filtered_data[i][3] == message_type]
+        filtered_data2 = [data for data in filtered_data if data[3] == message_type]
 
         sorted_data = sorted(filtered_data2, key=lambda x: x[0])
 
@@ -56,7 +56,7 @@ for group_id, neuron_id in unique_ids:
 
         min_time = sorted_data[0][0]
 
-        x_values = [entry[0] - min_time for entry in sorted_data]
+        x_values = [(entry[0] - min_time) for entry in sorted_data]
         y_values = [entry[1] for entry in sorted_data]
 
         plt.scatter(x_values, y_values, c=markers[message_type][COLOR], marker= markers[message_type][MARKER], label = message_type);

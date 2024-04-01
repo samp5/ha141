@@ -24,6 +24,7 @@ double TAU;
 unsigned long RUN_TIME; // in microseconds
 double REFRACTORY_DURATION;
 double DECAY_VALUE;
+double INPUT_PROB_SUCCESS;
 LogLevel DEBUG_LEVEL;
 std::string INPUT_FILE;
 std::string CONFIG_FILE;

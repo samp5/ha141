@@ -88,7 +88,8 @@ public:
   void set_type(Neuron_t type);
   void activate();
   void deactivate();
-  double decay(double tau = TAU, double v_rest = REFRACTORY_MEMBRANE_POTENTIAL);
+  double decay(double timestamp, double tau = TAU,
+               double v_rest = REFRACTORY_MEMBRANE_POTENTIAL);
   void update_potential(double value);
 
   // Thread operations
