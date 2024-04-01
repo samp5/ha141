@@ -4,7 +4,7 @@
 neuron_count = 30
 
 # number of input type neurons
-input_neuron_count = 15
+input_neuron_count = 5
 
 # number of groups
 group_count = 5
@@ -34,7 +34,7 @@ refractory_duration = 3.0
 tau = 10.0
 
 # input neuron probability of success
-poisson_prob_of_success = 0.01
+poisson_prob_of_success = 0.5
 
 [debug]
 # Options are

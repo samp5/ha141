@@ -4,34 +4,36 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 ### 📁 Folder Structure
 
 ```
-├── src
-│   ├── functions.hpp
-│   ├── functions.cpp
-│   ├── log.hpp
-│   ├── log.cpp
-│   ├── main.cpp
-│   ├── main_neuron_groups.cpp
-│   ├── message.hpp
-│   ├── neuron.hpp
-│   ├── neuron.cpp
-│   ├── neuron_group.hpp
-│   └── neuron_group.cpp
-├── pthred_ex //practice pthread examples
-│   └── ...
-├── plotting 
-│   ├── venv //virtual environment for python packages
-│   └── main.py
-├── run_config 
-│   ├── base_config.toml // base config
-│   └── toml.hpp // header for toml++
-├── logs 
-│   └── // all .log files ignored 
-├── input_files 
-│   └── ... // input files for neuron activation
-├── .gitignore
-├── README.md
-└── makefile
-
+  build
+  input_files
+  └  test
+  images
+  logs
+  plotting
+    venv
+  └  main.py
+  pthread_ex
+  run_config
+  │  base_config.toml
+  └  toml.hpp
+  src
+  │  functions.cpp
+  │  functions.hpp
+  │  input_neuron.cpp
+  │  input_neuron.hpp
+  │  log.cpp
+  │  log.hpp
+  │  main.cpp
+  │  main_neuron_groups.cpp
+  │  message.hpp
+  │  neuron.cpp
+  │  neuron.hpp
+  │  neuron_group.cpp
+  └  neuron_group.hpp
+   .clangd
+   .gitignore
+   makefile
+   README.md
 ```
 
 ### In-Progress 🚀
@@ -41,12 +43,13 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 - [x] ~~Decay functionality~~
 - [x] ~~TOML configuration for run-time options~~
 - [x] ~~Neuron Types for differentiated functionality (input, output)~~
-- [ ] Message list sorting
+- [x] Message list sorting
 - [ ] Data structure for tracking presynaptic propagation 
 - [ ] Copy functionality for replicating graph layout
 
 | Date  | Key Points 🔑   |  Issues 🐛   |
 |--------------- | --------------- |--------------- |
+| [4-1](#-update-4-1)   | Graph updates (markers for different events) some logic changes for neuron activation/firing/etc. Input Neurons! | Not entirely sure the neuron implementation is correct, but the graphs are looking more promising |
 | [3-19](#-update-3-19)   | Changed decay funciton, firing logic, and x-axis for graphing| None |
 | [3-18](#-update-3-18)   | Neuron input type | None |
 | [3-15](#-update-3-15)   | .toml configuration for run-time options! | None |
@@ -59,6 +62,95 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 | [2-29](#-update-2-29)   | Updated Neuron Class with with membrane potentials, refractory phases, Update to edge weights, fixed issue 1, guard clauses on header files.   | "Quit" functionality does not work for the menu [~~Issue 2~~](#-issue-2)|
 | [2-28](#-update-2-28)   | Basic Node class that sends and recieves messages   | `random_neighbors` may repeat edges. [~~Issue 1~~](#-issue-1)|
 
+### 📌 Update 4-1
+**New addtions:**
+
+- Graphs not have legends for (S)timulus (N)eighborActivation (D)ecay (R)efractory
+
+    - [Input Neuron Group 1 Neuron 4 Run 1711992931](./images/group_1neuron_4.png)
+    - [Input Neuron Group 1 Neuron 3 Run 1711992931](./images/group_1neuron_3.png)
+    - [Input Neuron Group 3 Neuron 5 Run 1711994996](./images/group_3neuron_5.png) ( has not incoming connections)
+    - [Input Neuron Group 3 Neuron 3 Run 1711994996](./images/group_3neuron_3.png) ( seems like the decay function doens't run as often as it should? )
+
+
+
+- Input neuron subclass with (`run_in_group` and `send_messages_in_group` are `virtual` in base class)
+
+```cpp
+extern double INPUT_PROB_SUCCESS;
+
+class InputNeuron : public Neuron {
+private:
+  double input_value;
+  double probalility_of_success = INPUT_PROB_SUCCESS;
+
+public:
+
+  InputNeuron(int _id, NeuronGroup *group);
+  void run_in_group();
+  bool poisson_result();
+  void set_input_value(double value);
+  bool check_refractory_period();
+  void send_messages_in_group();
+};
+```
+
+- Input neurons are mixed in with all other neurons
+- `dynamic_cast` is used to access derived class methods during group run
+
+```cpp
+
+//... in NeuronGroup::group_run()
+if (neuron->is_activated()) {
+
+lg.log_group_neuron_state(DEBUG2, "Running (%d) Neuron (%d)",
+                          this->get_id(), neuron->get_id());
+
+if (neuron->get_type() == Input) {
+  InputNeuron *neuron = dynamic_cast<InputNeuron *>(neuron);
+}
+// Run neuron
+neuron->run_in_group();
+}
+```
+
+- Poisson Procces for input neuron
+    - Input Neuron run process is
+        1. Check refractory status (ignore any input if still in refractory period)
+        2. Recieve input if poisson success
+            - Determined by `INPUT_PROB_SUCCESS` set by `["neuron"]["poisson_prop_of_success"]` in toml configuration file
+        3. Check activaiton threshold and fire if above.
+
+- Maximum edges function to ensure runtime configuration is possible
+
+```cpp
+int maximum_edges() {
+  // for an undirected graph there are n(n-1) / 2 edges
+  //
+  // Since our connections are only allowed to go one way and self loops are forbidden 
+  // the network is essentially an undirected graph.
+  //
+  // input neurons can only have outgoing edges 
+  // the parameter NUMBER_NEURONS represents the total number of neurons
+  // then n_t = NUMBER_NEURONS
+  // n_i = NUMBER_INPUT_NEURONS
+  //
+  // the max edges are the total number of maximum edges minus the number of
+  // edges that would be possible in a undirected graph of only the input
+  // neurons maximum_edges = n_t(n_t) / 2 - n_i(n_i-1) / 2
+
+  int n_i = NUMBER_INPUT_NEURONS;
+  int n_t = NUMBER_NEURONS;
+
+  // always even so division is fine
+  int edges_lost_to_input = n_i * (n_i - 1) / 2;
+  int max_edges = (n_t * (n_t - 1) / 2) - edges_lost_to_input;
+
+  return max_edges;
+
+```
+
+
 ### 📌 Update 3-19
 **New addtions:**
 - Decay logic now includes $\tau$ and $V_{rest}$
@@ -67,14 +159,6 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 - Added `data_mutex` to ensure all data points are added with the correct information to the `log_data` vector
 
 - Graphs now show activation, refractory periods, and decay
-    - See images in `./plotting/` for examples
-
-[Graph1](./plotting/group_1neuron_1.png)
-
-[Graph2](./plotting/group_2neuron_2.png)
-
-[Decay Example](./plotting/group_2neuron_4.png)
-
 
 
 ### 📌 Update 3-18

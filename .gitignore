@@ -12,6 +12,4 @@ build/*
 
 #ingore venv
 plotting/venv/*
-
-#ignore .pngs
-*.png
+plotting/*.png

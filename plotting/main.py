@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 data = []
-with open('../logs/1711992931/1711992931.log', 'r') as file:
+with open('../logs/1711995342/1711995342.log', 'r') as file:
     for line in file:
         parts = line.split()
         group_id = int(parts[0])
