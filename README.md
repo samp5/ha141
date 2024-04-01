@@ -72,8 +72,6 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
     - [Input Neuron Group 3 Neuron 5 Run 1711994996](./images/group_3neuron_5.png) ( has not incoming connections)
     - [Input Neuron Group 3 Neuron 3 Run 1711994996](./images/group_3neuron_3.png) ( seems like the decay function doens't run as often as it should? )
 
-
-
 - Input neuron subclass with (`run_in_group` and `send_messages_in_group` are `virtual` in base class)
 
 ```cpp
