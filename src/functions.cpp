@@ -882,6 +882,8 @@ int maximum_edges() {
 
   // always even so division is fine
   int edges_lost_to_input = n_i * (n_i - 1) / 2;
+
+  // maximum possible edges
   int max_edges = (n_t * (n_t - 1) / 2) - edges_lost_to_input;
 
   return max_edges;
