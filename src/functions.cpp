@@ -809,6 +809,9 @@ std::string message_type_to_string(Message_t type) {
   case Decay:
     ret = "D";
     break;
+  case Checked:
+    ret = "C";
+    break;
   }
   return ret;
 }

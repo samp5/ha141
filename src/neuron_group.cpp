@@ -95,7 +95,6 @@ void *NeuronGroup::group_run() {
         if (neuron->get_type() == Input) {
           InputNeuron *neuron = dynamic_cast<InputNeuron *>(neuron);
         }
-        // Run neuron
         neuron->run_in_group();
       }
     }

@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 data = []
-with open('../logs/1711995342/1711995342.log', 'r') as file:
+with open('../logs/1712247340/1712247340.log', 'r') as file:
     for line in file:
         parts = line.split()
         group_id = int(parts[0])
@@ -12,8 +12,8 @@ with open('../logs/1711995342/1711995342.log', 'r') as file:
         message_type = parts[5]
         data.append((group_id, neuron_id, neuron_type, timestamp, value, message_type))
 
-message_types = ["S", "R", "N", "D"]
-markers = {"S":("+", "gold"), "R":("_", "green"), "N":('.', "gold"), "D": ('|', "red")}
+message_types = ["S", "R", "N", "D", "C"]
+markers = {"S":("+", "gold"), "R":("_", "green"), "N":('2', "gold"), "D": ('|', "red"), "C": ('.', 'gray')}
 
 unique_ids = {(entry[0], entry[1]) for entry in data}
 
@@ -30,7 +30,7 @@ length = 0
 
 for group_id, neuron_id in unique_ids:
 
-    plt.figure()
+    plt.figure(dpi=300)
 
     # this is unique neuron id data
     filtered_data = [(entry[TIMESTAMP], entry[POTENTIAL], entry[NEURONTYPE], entry[MESSAGETYPE]) for entry in data if entry[GROUPID] == group_id and entry[NEURONID] == neuron_id]
@@ -59,7 +59,7 @@ for group_id, neuron_id in unique_ids:
         x_values = [(entry[0] - min_time) for entry in sorted_data]
         y_values = [entry[1] for entry in sorted_data]
 
-        plt.scatter(x_values, y_values, c=markers[message_type][COLOR], marker= markers[message_type][MARKER], label = message_type);
+        plt.scatter(x_values, y_values, c=markers[message_type][COLOR], marker= markers[message_type][MARKER], label = message_type, linewidths=0.35);
 
 
     

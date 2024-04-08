@@ -70,7 +70,6 @@ public:
   virtual ~Neuron();
 
   void add_neighbor(Neuron *neighbor, double weight);
-
   void add_next(Neuron *neighbor, double weight);
   void add_previous(Neuron *neighbor, double weight);
 

@@ -4,7 +4,7 @@
 class NeuronGroup;
 class Neuron;
 
-enum Message_t { Decay, Stimulus, From_Neighbor, Refractory };
+enum Message_t { Decay, Stimulus, From_Neighbor, Refractory, Checked };
 
 typedef struct {
   double message;
