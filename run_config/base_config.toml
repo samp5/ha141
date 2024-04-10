@@ -1,16 +1,16 @@
 [neuron]
 
 # number of neurons
-neuron_count = 30
+neuron_count = 10
 
 # number of input type neurons
-input_neuron_count = 5
+input_neuron_count = 3
 
 # number of groups
-group_count = 5
+group_count = 1
 
 # number of connections
-edge_count = 40
+edge_count = 10
 
 # in milliseconds
 wait_time = 2
@@ -31,10 +31,10 @@ refractory_membrane_potential = -70.0
 refractory_duration = 3.0
 
 # tau for the linearlization of the decay function
-tau = 10.0
+tau = 100.0
 
 # input neuron probability of success
-poisson_prob_of_success = 0.5
+poisson_prob_of_success = 0.01
 
 [debug]
 # Options are
@@ -43,11 +43,11 @@ poisson_prob_of_success = 0.5
 # DEBUG2
 # DEBUG3
 # DEBUG4
-level = "DEBUG4"
+level = "DEBUG2"
 
 [decay]
 # Value that each neuron decays every wait_time * wait_loops
-value = 0.5
+value = 1
 
 
 [random]

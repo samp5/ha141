@@ -12,7 +12,6 @@ private:
   double probalility_of_success = INPUT_PROB_SUCCESS;
 
 public:
-
   InputNeuron(int _id, NeuronGroup *group);
   void run_in_group();
   bool poisson_result();

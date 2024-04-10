@@ -100,14 +100,12 @@ int main(int argc, char **argv) {
 
   // thread ids
   // pthread_t messaging_thread;
-  pthread_t decay_thread;
 
   // create messager thread and pass pointer to message array
   // pthread_create(&messaging_thread, NULL, send_message_helper,
   //                (void *)&messages);
 
   // create decay thread and pass pointer to neuron groups
-  pthread_create(&decay_thread, NULL, decay_helper, (void *)&neuron_groups);
 
   // start all group threads
   for (auto group : neuron_groups) {
@@ -118,13 +116,18 @@ int main(int argc, char **argv) {
   usleep(RUN_TIME);
   active = false;
 
+  for (auto group : neuron_groups) {
+    pthread_join(group->get_thread_id(), NULL);
+  }
+
+  for (auto group : neuron_groups) {
+    delete group;
+  }
+
   lg.log(INFO, "Writing data to file...");
   lg.write_data();
 
   // Deallocate groups
-  for (auto group : neuron_groups) {
-    delete group;
-  }
 
   // Destroy mutexes
   pthread_mutex_destroy(&potential_mutex);

@@ -3,6 +3,7 @@
 #include "log.hpp"
 #include "message.hpp"
 
+#include <cmath>
 #include <cstdlib>
 #include <pthread.h>
 #include <unistd.h>
@@ -23,6 +24,7 @@ Neuron::Neuron(int _id, int inhibitory, NeuronGroup *group, Neuron_t type) {
   this->group = group;
   this->membrane_potential = INITIAL_MEMBRANE_POTENTIAL;
   this->excit_inhib_value = inhibitory;
+  this->last_decay = lg.get_time_stamp();
 
   const char *inhib = inhibitory == -1 ? "excitatory\0" : "inhibitory\0";
 
@@ -45,6 +47,7 @@ Neuron::Neuron(int _id, int inhibitory, NeuronGroup *group) {
   this->excit_inhib_value = inhibitory;
   this->group = group;
   this->membrane_potential = INITIAL_MEMBRANE_POTENTIAL;
+  this->last_decay = lg.get_time_stamp();
 
   const char *inhib = inhibitory == -1 ? "excitatory\0" : "inhibitory\0";
 
@@ -63,6 +66,7 @@ Neuron::Neuron(int _id, int _excit_inhib_value) {
   this->id = _id;
   this->excit_inhib_value = _excit_inhib_value;
   this->membrane_potential = INITIAL_MEMBRANE_POTENTIAL;
+  this->last_decay = lg.get_time_stamp();
 
   const char *inhib =
       _excit_inhib_value == -1 ? "excitatory\0" : "inhibitory\0";
@@ -75,6 +79,13 @@ Neuron::Neuron(int _id, int _excit_inhib_value) {
 // Destroys pthread conditional
 //
 Neuron::~Neuron() { pthread_cond_destroy(&cond); }
+
+void Neuron::transfer_data() {
+  for (auto data : this->log_data) {
+    lg.add_data(*data);
+    delete data;
+  }
+}
 
 // Adds neuron to the _postsynaptic map with weight
 //
@@ -150,17 +161,23 @@ int Neuron::recieve_in_group() {
   // Get message
   Message *incoming_message = this->get_message();
 
-  // Check message validity
   if (incoming_message == NULL) {
+
+    double time = lg.get_time_stamp();
+    this->retroactive_decay(this->last_decay, time);
     return 0;
   }
+
+  this->retroactive_decay(this->last_decay, incoming_message->timestamp);
+
+  // Check message validity
 
   if (incoming_message->timestamp <
       this->refractory_start + REFRACTORY_DURATION) {
 
     if (!incoming_message) {
       lg.log_group_neuron_state(
-          ERROR, "Tried to dealocate incoming message when message was NULL",
+          ERROR, "Tried to deallocate incoming message when message was NULL",
           this->get_group()->get_id(), this->get_id());
     }
 
@@ -183,7 +200,7 @@ int Neuron::recieve_in_group() {
   // use message timestamp not current time
   lg.add_data(this->group->get_id(), this->id, this->membrane_potential,
               incoming_message->timestamp, this->get_type(),
-              incoming_message->message_type);
+              incoming_message->message_type, this);
 
   // Deallocate this message
   if (!incoming_message) {
@@ -390,7 +407,7 @@ void Neuron::refractory() {
 
   lg.add_data(this->get_group()->get_id(), this->get_id(),
               REFRACTORY_MEMBRANE_POTENTIAL, this->refractory_start,
-              this->get_type(), refractory_type);
+              this->get_type(), refractory_type, this);
 }
 
 // Return presynaptic edges for a neuron
@@ -450,17 +467,51 @@ Message *Neuron::get_message() {
   }
   pthread_mutex_unlock(&message_mutex);
 
-  // Get least recent message
+  // Get least recent message and remove it from the queue
   pthread_mutex_lock(&message_mutex);
   Message *last = this->messages.front();
-  pthread_mutex_unlock(&message_mutex);
-
-  // Remove it from the queue
-  pthread_mutex_lock(&message_mutex);
   this->messages.pop_front();
   pthread_mutex_unlock(&message_mutex);
 
   return last;
+}
+
+// Decays a neuron based on DECAY_VALUE retroactively
+//
+// Adds data points at even intervals from `from` to `to`
+//
+// Logs the updated membrane_potential
+//
+// @returns new membrane_potential
+void Neuron::retroactive_decay(double from, double to, double tau,
+                               double v_rest) {
+
+  double decay_time_step = 2e-3;
+
+  Message_t message_decay_type = Decay;
+
+  double first_decay = from;
+
+  for (double i = first_decay; i < to; i += decay_time_step) {
+
+    // #askpedram Decay happens regardles of refractory period
+    if (i < this->refractory_start + REFRACTORY_DURATION) {
+      continue;
+    }
+
+    double decay_value = (this->membrane_potential - v_rest) / tau;
+
+    if (decay_value < 0 || decay_value < 0.001) {
+      continue;
+    }
+
+    this->update_potential(-decay_value);
+
+    lg.add_data(this->get_group()->get_id(), this->get_id(),
+                this->membrane_potential, i, this->get_type(),
+                message_decay_type, this);
+    this->last_decay = i;
+  }
 }
 
 // Decays a neuron based on DECAY_VALUE
@@ -474,7 +525,7 @@ double Neuron::decay(double timestamp, double tau, double v_rest) {
   double decay_value = (this->membrane_potential - v_rest) / tau;
 
   // if we sitting at -70 no need to decay
-  if (abs(decay_value) < 0.01) {
+  if (abs(decay_value) < 0.01 || decay_value < 0) {
     return 0;
   }
 
@@ -485,10 +536,10 @@ double Neuron::decay(double timestamp, double tau, double v_rest) {
   double potential = this->membrane_potential;
 
   lg.add_data(this->get_group()->get_id(), this->get_id(), potential, timestamp,
-              this->get_type(), decay_type);
+              this->get_type(), decay_type, this);
 
   lg.log_group_neuron_value(
-      DEBUG2, "(%d) Neuron %d is decaying. Decay value is %f i",
+      DEBUG2, "(%d) Neuron %d is decaying. Decay value is %f",
       this->get_group()->get_id(), this->get_id(), decay_value);
 
   lg.log_group_neuron_value(

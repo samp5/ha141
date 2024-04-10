@@ -280,12 +280,12 @@ void print_node_values(vector<Neuron *> nodes) {
   }
 }
 
-double weight_function() { return (double)rand() / RAND_MAX; }
+double weight_function() { return (double)rand() / RAND_MAX * 0.1; }
 
 int get_inhibitory_status() {
   int ret;
   double x = (double)rand() / RAND_MAX;
-  if (x >= 0.2) {
+  if (x >= 0.1) {
     ret = -1;
   } else {
     ret = 1;

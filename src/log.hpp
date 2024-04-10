@@ -49,6 +49,11 @@ public:
   void add_data(int group_id, int curr_id, double curr_data, double time,
                 int type, Message_t message_type);
 
+  void add_data(int group_id, int curr_id, double curr_data, double time,
+                int type, Message_t message_type, Neuron *origin);
+
+  void add_data(LogData data);
+
   void log_runtime_config();
 
   // General Log function

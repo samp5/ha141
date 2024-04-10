@@ -18,6 +18,9 @@ void InputNeuron::run_in_group() {
     return;
   }
 
+  double time = lg.get_time_stamp();
+  this->retroactive_decay(this->last_decay, time);
+
   if (this->membrane_potential >= ACTIVATION_THRESHOLD) {
     this->send_messages_in_group();
   }
@@ -29,7 +32,8 @@ void InputNeuron::run_in_group() {
     this->update_potential(this->input_value);
 
     lg.add_data(this->get_group()->get_id(), this->get_id(),
-                this->membrane_potential, time_rn, this->get_type(), Stimulus);
+                this->membrane_potential, time_rn, this->get_type(), Stimulus,
+                this);
 
     lg.log_group_neuron_value(
         INFO,

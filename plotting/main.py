@@ -1,7 +1,34 @@
 import matplotlib.pyplot as plt
+import sys
+import os
+
+def get_most_recent_log():
+    log_dir = ""
+    for root, dirs, files in os.walk("../logs/"):
+        if root == "../logs/":
+            log_dir = dirs;
+            break;
+    max = log_dir[0];
+    for log in log_dir:
+        if log > max:
+            max = log
+    
+    return max
+
+if len(sys.argv) == 1:
+    file_name ='../logs/1712692411/1712692411.log' 
+else:
+    if sys.argv[1] == "-r":
+        most_recent = get_most_recent_log()
+        file_name = f"../logs/{most_recent}/{most_recent}.log"
+    else:
+        print("Invalid argument")
+        quit()
+
+
 
 data = []
-with open('../logs/1712247340/1712247340.log', 'r') as file:
+with open(file_name, 'r') as file:
     for line in file:
         parts = line.split()
         group_id = int(parts[0])
@@ -15,7 +42,7 @@ with open('../logs/1712247340/1712247340.log', 'r') as file:
 message_types = ["S", "R", "N", "D", "C"]
 markers = {"S":("+", "gold"), "R":("_", "green"), "N":('2', "gold"), "D": ('|', "red"), "C": ('.', 'gray')}
 
-unique_ids = {(entry[0], entry[1]) for entry in data}
+unique_ids = {(entry[0], entry[1], entry[2]) for entry in data}
 
 MARKER = 0
 COLOR = 1
@@ -28,41 +55,47 @@ MESSAGETYPE = 5
 
 length = 0 
 
-for group_id, neuron_id in unique_ids:
+for group_id, neuron_id, neuron_type in unique_ids:
 
+    # create figure
     plt.figure(dpi=300)
 
-    # this is unique neuron id data
-    filtered_data = [(entry[TIMESTAMP], entry[POTENTIAL], entry[NEURONTYPE], entry[MESSAGETYPE]) for entry in data if entry[GROUPID] == group_id and entry[NEURONID] == neuron_id]
+       # grab data for current neuron
+    filtered_data = [(entry[3], entry[4], entry[5]) for entry in data if entry[0] == group_id and entry[1] == neuron_id]
     
+    # sort data
     sorted_data = sorted(filtered_data, key=lambda x: x[0])
 
+    # find min time
     min_time = sorted_data[0][0]
 
-    x_values = [(entry[0] - min_time) for entry in sorted_data]
-    y_values = [entry[1] for entry in sorted_data]
-    # plt.plot(x_values, y_values, linewidth = 1, linestyle = '--')
+    # subtract out min time
+    sorted_data = [(entry[0] - min_time, entry[1], entry[2]) for entry in sorted_data]
 
-    neuron_type = filtered_data[0][2]
+    # get x and y values
+    x_values = [entry[0] for entry in sorted_data]
+    y_values = [entry[1] for entry in sorted_data]
+
+    # plot all data for current neuron
+    plt.plot(x_values, y_values, linewidth = 0.1 , linestyle = '--')
 
     for message_type in message_types:
 
-        filtered_data2 = [data for data in filtered_data if data[3] == message_type]
+        # filter for message type
+        filtered_data2 = [entry for entry in sorted_data if entry[2] == message_type]
 
-        sorted_data = sorted(filtered_data2, key=lambda x: x[0])
-
-        if (not sorted_data):
+        # if its empty continue
+        if (not filtered_data2):
             continue
 
-        min_time = sorted_data[0][0]
 
-        x_values = [(entry[0] - min_time) for entry in sorted_data]
-        y_values = [entry[1] for entry in sorted_data]
+        # get x and y values
+        x_values = [entry[0] for entry in filtered_data2]
+        y_values = [entry[1] for entry in filtered_data2]
 
+        #scatter plot
         plt.scatter(x_values, y_values, c=markers[message_type][COLOR], marker= markers[message_type][MARKER], label = message_type, linewidths=0.35);
 
-
-    
     plt.xlabel('Time')
     plt.ylabel('Membrane Potential')
     plt.title(f'Group ID: {group_id}, Neuron ID: {neuron_id}, Type: {neuron_type}')

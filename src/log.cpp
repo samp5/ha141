@@ -152,6 +152,24 @@ void Log::add_data(int group_id, int curr_id, double curr_data, double time,
   this->log_data.push_back(this_data);
   pthread_mutex_unlock(&data_mutex);
 }
+
+void Log::add_data(int group_id, int curr_id, double curr_data, double time,
+                   int type, Message_t message_type, Neuron *origin) {
+  LogData *this_data = new LogData;
+  this_data->timestamp = time;
+  this_data->membrane_potentail = curr_data;
+  this_data->group_id = group_id;
+  this_data->neuron_id = curr_id;
+  this_data->neuron_type = type;
+  this_data->message_type = message_type;
+  origin->push_back_data(this_data);
+}
+
+void Log::add_data(LogData data) {
+  pthread_mutex_lock(&data_mutex);
+  this->log_data.push_back(data);
+  pthread_mutex_unlock(&data_mutex);
+}
 void Log::write_data(const char *filename) {
 
   namespace fs = std::filesystem;
@@ -189,7 +207,6 @@ void Log::write_data(const char *filename) {
 
   // deallocate
   delete[] file_name;
-  this->log_runtime_config();
 }
 
 void Log::log_group_neuron_state(LogLevel level, const char *message,

@@ -35,6 +35,8 @@ enum Neuron_t { None = 0, Input = 1, Hidden = 2, Output = 3 };
 
 class Neuron {
 protected:
+  vector<LogData *> log_data;
+
   // Neuron vaules
   double membrane_potential = INITIAL_MEMBRANE_POTENTIAL;
   int excit_inhib_value;
@@ -43,9 +45,8 @@ protected:
   NeuronGroup *group;
 
   // timestamp data
-  double last_modified;
-  double refractory_start = 0.0;
   double last_decay;
+  double refractory_start = 0.0;
 
   // Edge values
   typedef std::map<Neuron *, double> weight_map;
@@ -89,6 +90,8 @@ public:
   void deactivate();
   double decay(double timestamp, double tau = TAU,
                double v_rest = REFRACTORY_MEMBRANE_POTENTIAL);
+  void retroactive_decay(double from, double to, double tau = TAU,
+                         double v_rest = REFRACTORY_MEMBRANE_POTENTIAL);
   void update_potential(double value);
 
   // Thread operations
@@ -98,6 +101,7 @@ public:
   //>>>>>>>>>>>>>> Access to private variables <<<<<<<<<<<
   pthread_t get_thread_id() { return thread; }
   pthread_cond_t *get_cond() { return &cond; }
+  double get_last_decay() { return this->last_decay; }
 
   // returns the IO type of the neuron
   Neuron_t get_type() { return this->type; }
@@ -108,6 +112,10 @@ public:
   const weight_map *get_postsynaptic() const;
   NeuronGroup *get_group();
   bool is_activated() const;
+
+  // log operations
+  void push_back_data(LogData *data) { this->log_data.push_back(data); }
+  void transfer_data();
 
   /*--------------------------------------------------------------*\
    *                  Thread helper:

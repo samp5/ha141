@@ -71,8 +71,6 @@ NeuronGroup::~NeuronGroup() {
 // Run group
 //
 // runs through all neurons and checks their activation status
-// every `WAIT_LOOPS` * `WAIT_TIME`
-//
 void *NeuronGroup::group_run() {
 
   // Log running status
@@ -84,7 +82,7 @@ void *NeuronGroup::group_run() {
     for (Neuron *neuron : this->neurons) {
 
       lg.log_group_neuron_type(
-          DEBUG2, "Checking activation:(%d) Neuron %d is %s", this->get_id(),
+          DEBUG4, "Checking activation:(%d) Neuron %d is %s", this->get_id(),
           neuron->get_id(), get_active_status_string(neuron->is_activated()));
 
       if (neuron->is_activated()) {
@@ -96,6 +94,9 @@ void *NeuronGroup::group_run() {
           InputNeuron *neuron = dynamic_cast<InputNeuron *>(neuron);
         }
         neuron->run_in_group();
+      } else {
+        double time = lg.get_time_stamp();
+        neuron->retroactive_decay(neuron->get_last_decay(), time);
       }
     }
 
@@ -108,6 +109,11 @@ void *NeuronGroup::group_run() {
 
     // lg.log_group_state(DEBUG2, "Group %d resuming", this->id);
   }
+
+  for (auto neuron : this->neurons) {
+    neuron->transfer_data();
+  }
+
   return NULL;
 }
 

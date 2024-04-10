@@ -1,9 +1,9 @@
 # ignore notes
 notes.md
 todo.md
+testoutput
 
 # ignore log files
-*.log
 logs/*
 
 # exclude all build executables
