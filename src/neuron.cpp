@@ -162,7 +162,6 @@ int Neuron::recieve_in_group() {
   Message *incoming_message = this->get_message();
 
   if (incoming_message == NULL) {
-
     double time = lg.get_time_stamp();
     this->retroactive_decay(this->last_decay, time);
     return 0;
@@ -171,7 +170,6 @@ int Neuron::recieve_in_group() {
   this->retroactive_decay(this->last_decay, incoming_message->timestamp);
 
   // Check message validity
-
   if (incoming_message->timestamp <
       this->refractory_start + REFRACTORY_DURATION) {
 
@@ -441,6 +439,7 @@ void Neuron::add_message(Message *message) {
 
   } else {
 
+    pthread_mutex_lock(&message_mutex);
     list<Message *>::const_iterator it = this->messages.begin();
 
     while (it != this->messages.end() &&
@@ -448,7 +447,6 @@ void Neuron::add_message(Message *message) {
       it++;
     }
 
-    pthread_mutex_lock(&message_mutex);
     this->messages.insert(it, message);
     pthread_mutex_unlock(&message_mutex);
   }
