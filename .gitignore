@@ -10,7 +10,8 @@ logs/*
 # exclude all build executables
 build/*
 
-# run config changes
+# core dumps
+core*
 
 
 #ingore venv
