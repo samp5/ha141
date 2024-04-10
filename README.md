@@ -49,7 +49,7 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 
 | Date  | Key Points 🔑   |  Issues 🐛   |
 |--------------- | --------------- |--------------- |
-| [4-10](#-update-4-10)   | | |
+| [4-10](#-update-4-10)   | Graphing looks much much better. New decay functionality, fixed a sneaky SEGV |  None |
 | [4-1](#-update-4-1)   | Graph updates (markers for different events) some logic changes for neuron activation/firing/etc. Input Neurons! | Not entirely sure the neuron implementation is correct, but the graphs are looking more promising |
 | [3-19](#-update-3-19)   | Changed decay funciton, firing logic, and x-axis for graphing| None |
 | [3-18](#-update-3-18)   | Neuron input type | None |
@@ -65,6 +65,48 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 
 ### 📌 Update 4-10
 **New addtions:**
+
+- Graphing seems like its working exactly as it should!
+    - [Group 1 Neuron 2](./images/4101.png)
+    - [Group 1 Neuron 6](./images/4102.png)
+    - [Group 3 Neuron 4](./images/4103.png) 
+    - [Group 4 Neuron 4](./images/4104.png) 
+
+**New Decay Function**
+
+- Retroactive decay approach rather than decay helper thread
+
+```cpp
+void Neuron::retroactive_decay(double from, double to, double tau,
+                               double v_rest) {
+
+  // Catches the first decay for this neuron (initialized to -1)
+  if (from < 0) {
+    this->last_decay = to;
+    return;
+  }
+
+  double decay_time_step = 2e-3;
+  Message_t message_decay_type = Decay;
+  double first_decay = from;
+  double i;
+
+  for (i = first_decay; i < to; i += decay_time_step) {
+    double decay_value = (this->membrane_potential - v_rest) / tau;
+    // catch decays that are negative or really small and ignore them
+    if (decay_value < 0 || decay_value < 0.0001) {
+      continue;
+    }
+    this->update_potential(-decay_value);
+    lg.add_data(this->get_group()->get_id(), this->get_id(),
+                this->membrane_potential, i, this->get_type(),
+                message_decay_type, this);
+  }
+  // reset the last decay
+  this->last_decay = i;
+}
+```
+
 
 
 ### 📌 Update 4-1
@@ -83,18 +125,7 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 extern double INPUT_PROB_SUCCESS;
 
 class InputNeuron : public Neuron {
-private:
-  double input_value;
-  double probalility_of_success = INPUT_PROB_SUCCESS;
 
-public:
-
-  InputNeuron(int _id, NeuronGroup *group);
-  void run_in_group();
-  bool poisson_result();
-  void set_input_value(double value);
-  bool check_refractory_period();
-  void send_messages_in_group();
 };
 ```
 
