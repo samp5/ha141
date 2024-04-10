@@ -13,7 +13,6 @@ build/*
 # core dumps
 core*
 
-
 #ingore venv
 plotting/venv/*
 plotting/*.png
