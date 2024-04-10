@@ -2,6 +2,7 @@
 notes.md
 todo.md
 testoutput
+run_config/base_config.toml
 
 # ignore log files
 logs/*
