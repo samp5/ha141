@@ -24,7 +24,7 @@ Neuron::Neuron(int _id, int inhibitory, NeuronGroup *group, Neuron_t type) {
   this->group = group;
   this->membrane_potential = INITIAL_MEMBRANE_POTENTIAL;
   this->excit_inhib_value = inhibitory;
-  this->last_decay = lg.get_time_stamp();
+  this->last_decay = -1;
 
   const char *inhib = inhibitory == -1 ? "excitatory\0" : "inhibitory\0";
 
@@ -152,7 +152,7 @@ int Neuron::recieve_in_group() {
   // Sanity check active status
   if (!this->active) {
     lg.log_group_neuron_state(
-        WARNING,
+        ERROR,
         "run_in_group: Group %d: Neuron %d tried to run when it was not active",
         this->group->get_id(), this->id);
     return 0;
@@ -486,22 +486,28 @@ Message *Neuron::get_message() {
 void Neuron::retroactive_decay(double from, double to, double tau,
                                double v_rest) {
 
+  if (from < 0) {
+    this->last_decay = to;
+    return;
+  }
+
   double decay_time_step = 2e-3;
 
   Message_t message_decay_type = Decay;
 
   double first_decay = from;
+  double i;
 
-  for (double i = first_decay; i < to; i += decay_time_step) {
+  for (i = first_decay; i < to; i += decay_time_step) {
 
     // #askpedram Decay happens regardles of refractory period
-    if (i < this->refractory_start + REFRACTORY_DURATION) {
-      continue;
-    }
+    // if (i < this->refractory_start + REFRACTORY_DURATION) {
+    //   continue;
+    // }
 
     double decay_value = (this->membrane_potential - v_rest) / tau;
 
-    if (decay_value < 0 || decay_value < 0.001) {
+    if (decay_value < 0 || decay_value < 0.0001) {
       continue;
     }
 
@@ -510,8 +516,8 @@ void Neuron::retroactive_decay(double from, double to, double tau,
     lg.add_data(this->get_group()->get_id(), this->get_id(),
                 this->membrane_potential, i, this->get_type(),
                 message_decay_type, this);
-    this->last_decay = i;
   }
+  this->last_decay = i;
 }
 
 // Decays a neuron based on DECAY_VALUE

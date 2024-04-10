@@ -2,13 +2,16 @@
 notes.md
 todo.md
 testoutput
-run_config/base_config.toml
+
 
 # ignore log files
 logs/*
 
 # exclude all build executables
 build/*
+
+# run config changes
+run_config/*.toml
 
 
 #ingore venv

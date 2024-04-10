@@ -40,7 +40,7 @@ with open(file_name, 'r') as file:
         data.append((group_id, neuron_id, neuron_type, timestamp, value, message_type))
 
 message_types = ["S", "R", "N", "D", "C"]
-markers = {"S":("+", "gold"), "R":("_", "green"), "N":('2', "gold"), "D": ('|', "red"), "C": ('.', 'gray')}
+markers = {"S":("+", "gold"), "R":("_", "green"), "N":('2', "gold"), "D": (3, "red"), "C": ('.', 'gray')}
 
 unique_ids = {(entry[0], entry[1], entry[2]) for entry in data}
 

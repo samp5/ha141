@@ -56,7 +56,7 @@ seed = "1"
 
 [runtime_vars]
 # in seconds
-runtime = 3
+runtime = 10
 
 # file to read input from
 input_file = "./input_files/test"
