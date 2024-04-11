@@ -1,6 +1,7 @@
 #include "functions.hpp"
 #include "input_neuron.hpp"
 #include <algorithm>
+#include <string>
 
 void print_group_maps(Neuron *neuron) {
   const weight_map *p_postsyntapic = neuron->get_postsynaptic();
@@ -899,7 +900,9 @@ void check_start_conditions() {
            "NUMBER_INPUT_NEURONS not divisible by NUMBER_GROUPS... quitting");
     error = true;
   } else if (NUMBER_EDGES > maximum_edges()) {
-    lg.log(ERROR, "Maximum number of possible edges exceeded .. quitting");
+    lg.log_string(ERROR,
+                  "Maximum number of possible edges (%s) exceeded .. quitting",
+                  std::to_string(maximum_edges()).c_str());
     error = true;
   }
   if (error) {

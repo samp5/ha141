@@ -47,11 +47,9 @@ pthread_mutex_t message_mutex = PTHREAD_MUTEX_INITIALIZER;
 // This is only for non-group runs
 volatile double value = 0;
 
-// This is only for non-group runs
-bool finish = false;
-
 // This is for group runs
 bool active = true;
+bool finish = false;
 
 int main(int argc, char **argv) {
 
@@ -68,8 +66,7 @@ int main(int argc, char **argv) {
   srand(RAND_SEED);
 
   // Reserve the vector memory
-  vector<NeuronGroup *> neuron_groups;
-  neuron_groups.reserve(NUMBER_GROUPS);
+  vector<NeuronGroup *> neuron_groups(NUMBER_GROUPS);
 
   // Assign neurons to groups
   assign_groups(neuron_groups);
@@ -86,20 +83,6 @@ int main(int argc, char **argv) {
   for (auto group : neuron_groups) {
     group->print_group();
   }
-
-  // Print out messages
-  // for (auto message : messages) {
-  //   print_message(message);
-  // }
-
-  // thread ids
-  // pthread_t messaging_thread;
-
-  // create messager thread and pass pointer to message array
-  // pthread_create(&messaging_thread, NULL, send_message_helper,
-  //                (void *)&messages);
-
-  // create decay thread and pass pointer to neuron groups
 
   // start all group threads
   for (auto group : neuron_groups) {

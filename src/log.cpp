@@ -207,6 +207,7 @@ void Log::write_data(const char *filename) {
 
   // deallocate
   delete[] file_name;
+  this->log_runtime_config();
 }
 
 void Log::log_group_neuron_state(LogLevel level, const char *message,

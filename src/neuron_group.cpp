@@ -89,25 +89,13 @@ void *NeuronGroup::group_run() {
 
         lg.log_group_neuron_state(DEBUG2, "Running (%d) Neuron (%d)",
                                   this->get_id(), neuron->get_id());
-
-        if (neuron->get_type() == Input) {
-          InputNeuron *neuron = dynamic_cast<InputNeuron *>(neuron);
-        }
+        neuron = neuron->get_type() == Input ? dynamic_cast<InputNeuron * >(neuron) : neuron;
         neuron->run_in_group();
       } else {
         double time = lg.get_time_stamp();
         neuron->retroactive_decay(neuron->get_last_decay(), time);
       }
     }
-
-    // lg.log_group_state(DEBUG3, "Group %d pausing", this->id);
-    //
-    // for (int i = 1; i <= WAIT_LOOPS; i++) {
-    //   lg.log_group_value(DEBUG3, "Group %d waiting: %d", this->get_id(), i);
-    //   usleep(WAIT_TIME);
-    // }
-
-    // lg.log_group_state(DEBUG2, "Group %d resuming", this->id);
   }
 
   for (auto neuron : this->neurons) {
