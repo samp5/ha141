@@ -49,6 +49,7 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 
 | Date  | Key Points 🔑   |  Issues 🐛   |
 |--------------- | --------------- |--------------- |
+| [4-11](#-update-4-11)   | New synapse class |  None |
 | [4-10](#-update-4-10)   | Graphing looks much much better. New decay functionality, fixed a sneaky SEGV |  None |
 | [4-1](#-update-4-1)   | Graph updates (markers for different events) some logic changes for neuron activation/firing/etc. Input Neurons! | Not entirely sure the neuron implementation is correct, but the graphs are looking more promising |
 | [3-19](#-update-3-19)   | Changed decay funciton, firing logic, and x-axis for graphing| None |
@@ -62,6 +63,110 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 | [3-3](#-update-3-3)   | Added time stamps to logging messages. Added function descriptions.| None |
 | [2-29](#-update-2-29)   | Updated Neuron Class with with membrane potentials, refractory phases, Update to edge weights, fixed issue 1, guard clauses on header files.   | "Quit" functionality does not work for the menu [~~Issue 2~~](#-issue-2)|
 | [2-28](#-update-2-28)   | Basic Node class that sends and recieves messages   | `random_neighbors` may repeat edges. [~~Issue 1~~](#-issue-1)|
+
+### 📌 Update 4-11
+**New addtions:**
+- `Synapse` Class to replace maps in `Neuron` Class
+- Hopefully will make backpropagation easier
+    - Keep track of `last_weight` in `Synapse`
+- Command-line arguments for `main.py`
+    - use `-r` to automatically use the most recent log file in the `logs` folder
+
+```cpp
+class Synapse {
+public:
+  Synapse(Neuron *from, Neuron *to, double w)
+      : _origin(from), _destination(to), _weight(w){};
+  Neuron *getPostSynaptic() { return this->_destination; }
+  Neuron *getPreSynaptic() { return this->_origin; }
+  void propagate();
+  void alterWeight(double weight);
+  double getWeight() { return this->_weight; }
+
+private:
+  Neuron *_origin = nullptr;
+  Neuron *_destination = nullptr;
+  double _weight = 0.0;
+  double _last_weight = -1.0;
+};
+```
+
+- Greatly simplifies sending messages
+```cpp
+
+void Neuron::send_messages_in_group() {
+
+  for (const auto synapse : getPostSynaptic()) {
+    synapse->propagate();
+  }
+
+  lg.log_group_neuron_state(
+      INFO,
+      "(%d) Neuron %d reached activation threshold, entering refractory phase",
+      this->group->get_id(), this->id);
+
+  this->refractory();
+}
+
+```
+
+- Rewrote helper functions like `add_random_neighbors` and `has_neighbor` to be `random_synapses` and `has_synaptic_connection` to accommodate the new data structure
+
+```cpp
+// signatures
+bool has_synaptic_connection(Neuron *from_neuron, Neuron *to_neuron);
+void random_synapses(vector<NeuronGroup *> groups, int number_neighbors);
+```
+
+<details>
+<summary>Definitions here </summary>
+<br>
+
+```cpp
+void random_synapses(vector<NeuronGroup *> groups, int number_neighbors) {
+  int i = 0;
+  while (i < number_neighbors) {
+
+    // Get random neurons
+    Neuron *from = get_random_neuron(groups);
+    Neuron *to = get_random_neuron(groups, false);
+
+    // check for self connections
+    if (from == to) {
+      continue;
+    }
+    if (has_synaptic_connection(from, to)) {
+      continue;
+    }
+
+    from->add_neighbor(to, weight_function());
+    i++;
+  }
+}
+
+bool has_synaptic_connection(Neuron *from_neuron, Neuron *to_neuron) {
+  auto pPostsynaptic = from_neuron->getPostSynaptic();
+  auto pPresynaptic = from_neuron->getPresynaptic();
+
+  if (find_if(pPostsynaptic.begin(), pPostsynaptic.end(),
+              [to_neuron](Synapse *syn) {
+                return syn->getPostSynaptic() == to_neuron;
+              }) == pPostsynaptic.end()) {
+
+    return false;
+  } else if (find_if(pPresynaptic.begin(), pPresynaptic.end(),
+                     [to_neuron](Synapse *syn) {
+                       return syn->getPreSynaptic() == to_neuron;
+                     }) == pPresynaptic.end()) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+```
+
+</details>
 
 ### 📌 Update 4-10
 **New addtions:**
