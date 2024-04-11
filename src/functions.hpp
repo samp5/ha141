@@ -55,6 +55,14 @@ void destroy_mutexes();
 // @param2: desired number of edges in the entire graph
 void random_neighbors(vector<Neuron *> nodes, int number_neighbors);
 
+// Assign random neighbors to all nodes in vector
+//
+// Reflexive edges and duplicate edges are not allowed.
+// Edge weightes are randomly generated and are between [0, 1]
+// @param1: vector of Neuron pointers
+// @param2: desired number of edges in the entire graph
+void random_synapses(vector<NeuronGroup *> groups, int number_neighbors);
+
 // Assign random neighbors to all nodes in each group in group
 // vector
 //
@@ -127,6 +135,14 @@ const char *get_active_status_string(bool active);
 //@param2: target neuron
 //@returns: pointer to dynamically allocated Message
 Message *construct_message(double value, Neuron *target);
+
+// Construct a message
+//
+//@param1: value for message
+//@param2: target neuron
+//@param3: Message_t
+//@returns: pointer to dynamically allocated Message
+Message *construct_message(double value, Neuron *target, Message_t type);
 
 // Construct a message vector from an input file
 //

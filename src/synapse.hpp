@@ -10,8 +10,9 @@ public:
       : _origin(from), _destination(to), _weight(w){};
   Neuron *getPostSynaptic() { return this->_destination; }
   Neuron *getPreSynaptic() { return this->_origin; }
-  void propagate(Message *message);
+  void propagate();
   void alterWeight(double weight);
+  double getWeight() { return this->_weight; }
 
 private:
   Neuron *_origin = nullptr;

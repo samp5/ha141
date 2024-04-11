@@ -104,6 +104,12 @@ void Neuron::add_neighbor(Neuron *neighbor, double weight) {
     exit(1);
   }
 
+  Synapse *new_connection = new Synapse(this, neighbor, weight);
+  Synapse *return_record = new Synapse(neighbor, this, weight);
+
+  this->addPostSynapticConnection(new_connection);
+  this->addPreSynapticConnnection(return_record);
+
   if (!neighbor->get_group()) {
     lg.log_neuron_interaction(INFO, "Edge from Neuron %d to Neuron %d added.",
                               id, neighbor->get_id());
@@ -116,11 +122,8 @@ void Neuron::add_neighbor(Neuron *neighbor, double weight) {
 
   _postsynaptic[neighbor] = weight;
 
-  // get pointer to this instance
-  Neuron *this_neuron = this;
-
   // add to neighbor _presynaptic
-  neighbor->add_previous(this_neuron, weight);
+  neighbor->add_previous(this, weight);
 }
 
 // Adds a neuron to the _presynaptic map with weight
@@ -149,15 +152,6 @@ void Neuron::add_previous(Neuron *neighbor, double weight) {
 // @returns 0 if all messages recieved, 1 otherwise
 int Neuron::recieve_in_group() {
 
-  // Sanity check active status
-  if (!this->active) {
-    lg.log_group_neuron_state(
-        ERROR,
-        "run_in_group: Group %d: Neuron %d tried to run when it was not active",
-        this->group->get_id(), this->id);
-    return 0;
-  }
-
   // Get message
   Message *incoming_message = this->get_message();
 
@@ -169,15 +163,8 @@ int Neuron::recieve_in_group() {
 
   this->retroactive_decay(this->last_decay, incoming_message->timestamp);
 
-  // Check message validity
   if (incoming_message->timestamp <
       this->refractory_start + REFRACTORY_DURATION) {
-
-    if (!incoming_message) {
-      lg.log_group_neuron_state(
-          ERROR, "Tried to deallocate incoming message when message was NULL",
-          this->get_group()->get_id(), this->get_id());
-    }
 
     delete incoming_message;
     incoming_message = nullptr;
@@ -201,12 +188,6 @@ int Neuron::recieve_in_group() {
               incoming_message->message_type, this);
 
   // Deallocate this message
-  if (!incoming_message) {
-    lg.log_group_neuron_state(
-        ERROR, "Tried to dealocate incoming message when message was NULL",
-        this->get_group()->get_id(), this->get_id());
-  }
-
   delete incoming_message;
   incoming_message = nullptr;
   return 1;
@@ -214,51 +195,8 @@ int Neuron::recieve_in_group() {
 
 void Neuron::send_messages_in_group() {
 
-  // loop through all neighbors
-  for (const auto &pair : this->_postsynaptic) {
-
-    lg.log_group_neuron_interaction(
-        INFO, "Group %d: Neuron %d is sending a mesage to Group %d: Neuron %d",
-        this->group->get_id(), this->id, pair.first->group->get_id(),
-        pair.first->id);
-
-    // construct message
-    Message *message = new Message;
-    message->target_neuron_group = pair.first->get_group();
-    message->post_synaptic_neuron = pair.first;
-    message->timestamp = lg.get_time_stamp();
-    message->message_type = From_Neighbor;
-
-    // calculate message
-    pthread_mutex_lock(&potential_mutex);
-    message->message = this->membrane_potential *
-                       this->_postsynaptic[pair.first] *
-                       this->excit_inhib_value;
-    pthread_mutex_unlock(&potential_mutex);
-
-    lg.log_group_neuron_value(
-        DEBUG2, "Accumulated for Group %d: Neuron %d is %f",
-        this->group->get_id(), this->id, this->membrane_potential);
-
-    lg.log_group_neuron_interaction(
-        DEBUG2, "Weight for Group %d: Neuron %d to Group %d: Neuron %d is %f",
-        this->group->get_id(), this->id, pair.first->group->get_id(),
-        pair.first->id, pair.second);
-
-    lg.log_group_neuron_value(DEBUG2, "Group %d: Neuron %d modifier is %d",
-                              this->group->get_id(), this->id,
-                              this->excit_inhib_value);
-
-    lg.log_group_neuron_interaction(
-        INFO, "Message from  (%d) Neuron %d to (%d) Neuron %d is %f",
-        this->group->get_id(), this->id, pair.first->group->get_id(),
-        pair.first->id, message->message);
-
-    // activate neighbor
-    pair.first->activate();
-
-    // add message to target
-    message->post_synaptic_neuron->add_message(message);
+  for (const auto synapse : getPostSynaptic()) {
+    synapse->propagate();
   }
 
   lg.log_group_neuron_state(
@@ -276,7 +214,6 @@ void Neuron::run_in_group() {
       this->send_messages_in_group();
     }
   }
-
   this->deactivate();
 }
 
@@ -431,8 +368,8 @@ bool Neuron::is_activated() const { return this->active; }
 NeuronGroup *Neuron::get_group() { return this->group; }
 
 void Neuron::add_message(Message *message) {
-  if (this->messages.empty()) {
 
+  if (this->messages.empty()) {
     pthread_mutex_lock(&message_mutex);
     this->messages.push_back(message);
     pthread_mutex_unlock(&message_mutex);
@@ -578,3 +515,17 @@ void Neuron::update_potential(double value) {
   pthread_mutex_unlock(&potential_mutex);
 }
 const list<Message *> &Neuron::get_message_vector() { return this->messages; }
+
+double Neuron::get_potential() {
+  pthread_mutex_lock(&potential_mutex);
+  double potential = membrane_potential;
+  pthread_mutex_unlock(&potential_mutex);
+
+  return potential;
+}
+void Neuron::addPostSynapticConnection(Synapse *synapse) {
+  this->PostSynapticConnnections.push_back(synapse);
+}
+void Neuron::addPreSynapticConnnection(Synapse *synapse) {
+  this->PreSynapticConnections.push_back(synapse);
+}

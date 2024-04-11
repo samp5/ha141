@@ -1,5 +1,6 @@
 #include "functions.hpp"
 #include "input_neuron.hpp"
+#include <algorithm>
 
 void print_group_maps(Neuron *neuron) {
   const weight_map *p_postsyntapic = neuron->get_postsynaptic();
@@ -104,14 +105,34 @@ bool has_neighbor(Neuron *from_neuron, Neuron *to_neuron) {
   return ret;
 }
 
+bool has_synaptic_connection(Neuron *from_neuron, Neuron *to_neuron) {
+  auto pPostsynaptic = from_neuron->getPostSynaptic();
+  auto pPresynaptic = from_neuron->getPresynaptic();
+
+  if (find_if(pPostsynaptic.begin(), pPostsynaptic.end(),
+              [to_neuron](Synapse *syn) {
+                return syn->getPostSynaptic() == to_neuron;
+              }) == pPostsynaptic.end()) {
+
+    return false;
+  } else if (find_if(pPresynaptic.begin(), pPresynaptic.end(),
+                     [to_neuron](Synapse *syn) {
+                       return syn->getPreSynaptic() == to_neuron;
+                     }) == pPresynaptic.end()) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
 bool has_neighbor_group(Neuron *from_neuron, Neuron *to_neuron) {
   bool ret;
   const weight_map *p_postsyntapic = from_neuron->get_postsynaptic();
   const weight_map *p_presyntapic = from_neuron->get_presynaptic();
 
   // print maps as debugging measure
-  print_group_maps(from_neuron);
-  print_group_maps(to_neuron);
+  // print_group_maps(from_neuron);
+  // print_group_maps(to_neuron);
 
   // check for connection FROM from_neuron TO to_neuron
   if (p_postsyntapic->find(to_neuron) != p_postsyntapic->end()) {
@@ -168,6 +189,27 @@ void random_neighbors(vector<Neuron *> nodes, int number_neighbors) {
     i++;
   }
   cout << '\n';
+}
+
+void random_synapses(vector<NeuronGroup *> groups, int number_neighbors) {
+  int i = 0;
+  while (i < number_neighbors) {
+
+    // Get random neurons
+    Neuron *from = get_random_neuron(groups);
+    Neuron *to = get_random_neuron(groups, false);
+
+    // check for self connections
+    if (from == to) {
+      continue;
+    }
+    if (has_synaptic_connection(from, to)) {
+      continue;
+    }
+
+    from->add_neighbor(to, weight_function());
+    i++;
+  }
 }
 
 void random_group_neighbors(vector<NeuronGroup *> groups,
@@ -405,6 +447,16 @@ Message *construct_message(double value, Neuron *target) {
   message->post_synaptic_neuron = target;
   message->target_neuron_group = target->get_group();
 
+  return message;
+}
+
+Message *construct_message(double value, Neuron *target, Message_t type) {
+  Message *message = new Message;
+  message->message = value;
+  message->timestamp = lg.get_time_stamp();
+  message->post_synaptic_neuron = target;
+  message->target_neuron_group = target->get_group();
+  message->message_type = type;
   return message;
 }
 

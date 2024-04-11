@@ -68,20 +68,14 @@ int main(int argc, char **argv) {
   srand(RAND_SEED);
 
   // Reserve the vector memory
-  vector<NeuronGroup *> neuron_groups(NUMBER_GROUPS);
-
-  lg.print("\nAdding Neurons\n");
-  lg.print("==================");
+  vector<NeuronGroup *> neuron_groups;
+  neuron_groups.reserve(NUMBER_GROUPS);
 
   // Assign neurons to groups
   assign_groups(neuron_groups);
 
-  // assign neurons types
-  // this just assigns input neurons for now
-  // assign_neuron_types(neuron_groups);
-
   // Add random edges between neurons
-  random_group_neighbors(neuron_groups, NUMBER_EDGES);
+  random_synapses(neuron_groups, NUMBER_EDGES);
 
   // Get message vector from file
   // vector<Message *> messages =
