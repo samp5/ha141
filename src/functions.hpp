@@ -63,30 +63,10 @@ void random_neighbors(vector<Neuron *> nodes, int number_neighbors);
 // @param2: desired number of edges in the entire graph
 void random_synapses(vector<NeuronGroup *> groups, int number_neighbors);
 
-// Assign random neighbors to all nodes in each group in group
-// vector
-//
-// Reflexive edges and duplicate edges are not allowed.
-// Edge weightes are randomly generated and are between [0, 1]
-// @param1: vector of NeuronGroup pointers
-// @param2: desired number of edges in the entire graph
-void random_group_neighbors(vector<NeuronGroup *> groups, int numbe_neighbors);
-
 // Print membrane potential of all neurons in vector
 //
 // @param1: vector of Neuron pointers
 void print_node_values(vector<Neuron *> nodes);
-
-// Print out presynaptic and postsynapic connections of a neuron
-//
-// @param1: Neuron pointer
-void print_maps(Neuron *neuron);
-
-// Print out presynaptic and postsynapic connections of a neuron
-// with group data
-//
-// @param1: Neuron pointer
-void print_group_maps(Neuron *neuron);
 
 // Prints out the current time with microsecond granularity
 //

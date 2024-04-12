@@ -3,109 +3,6 @@
 #include <algorithm>
 #include <string>
 
-void print_group_maps(Neuron *neuron) {
-  const weight_map *p_postsyntapic = neuron->get_postsynaptic();
-  const weight_map *p_presyntapic = neuron->get_presynaptic();
-
-  if (!p_postsyntapic->empty()) {
-    // print post synaptic
-    weight_map::const_iterator post_it = p_postsyntapic->begin();
-
-    lg.log_group_neuron_state(DEBUG2, "      (%d) Neuron %d is connected to:",
-                              neuron->get_group()->get_id(), neuron->get_id());
-
-    while (post_it != p_postsyntapic->end()) {
-      lg.log_group_neuron_state(DEBUG2, "         (%d) Neuron %d",
-                                post_it->first->get_group()->get_id(),
-                                post_it->first->get_id());
-      ++post_it;
-    }
-  } else {
-    lg.log_group_neuron_state(
-        DEBUG3, "         (%d) Neuron %d has no outgoing connections",
-        neuron->get_group()->get_id(), neuron->get_id());
-  }
-
-  if (!p_presyntapic->empty()) {
-    // print pre synaptic
-    weight_map::const_iterator pre_it = p_presyntapic->begin();
-    lg.log_group_neuron_state(DEBUG2,
-                              "      (%d) Neuron %d has connections from:",
-                              neuron->get_group()->get_id(), neuron->get_id());
-    while (pre_it != p_presyntapic->end()) {
-      lg.log_group_neuron_state(DEBUG2, "        (%d) Neuron %d",
-                                pre_it->first->get_group()->get_id(),
-                                pre_it->first->get_id());
-      ++pre_it;
-    }
-  } else {
-    lg.log_group_neuron_state(
-        DEBUG3, "         (%d) Neuron %d has no incoming connections",
-        neuron->get_group()->get_id(), neuron->get_id());
-  }
-}
-
-void print_maps(Neuron *neuron) {
-  const weight_map *p_postsyntapic = neuron->get_postsynaptic();
-  const weight_map *p_presyntapic = neuron->get_presynaptic();
-
-  if (!p_postsyntapic->empty()) {
-    // print post synaptic
-    weight_map::const_iterator post_it = p_postsyntapic->begin();
-
-    lg.log_neuron_state(DEBUG, "Neuron %d is connected to:", neuron->get_id());
-
-    while (post_it != p_postsyntapic->end()) {
-      lg.log_neuron_state(DEBUG, "    - Neuron %d", post_it->first->get_id());
-      ++post_it;
-    }
-  }
-
-  if (!p_presyntapic->empty()) {
-    // print pre synaptic
-    weight_map::const_iterator pre_it = p_presyntapic->begin();
-    lg.log_neuron_state(DEBUG,
-                        "Neuron %d has connections from:", neuron->get_id());
-    while (pre_it != p_presyntapic->end()) {
-      lg.log_neuron_state(DEBUG, "    - Neuron %d", pre_it->first->get_id());
-      ++pre_it;
-    }
-  }
-}
-
-bool has_neighbor(Neuron *from_neuron, Neuron *to_neuron) {
-  bool ret;
-  const weight_map *p_postsyntapic = from_neuron->get_postsynaptic();
-  const weight_map *p_presyntapic = from_neuron->get_presynaptic();
-
-  // print maps as debugging measure
-  print_maps(from_neuron);
-  print_maps(to_neuron);
-
-  // check for connection FROM from_neuron TO to_neuron
-  if (p_postsyntapic->find(to_neuron) != p_postsyntapic->end()) {
-
-    lg.log_neuron_interaction(
-        DEBUG, "has_neighbor: Neuron %d is already connected to Neuron %d",
-        from_neuron->get_id(), to_neuron->get_id());
-
-    // if the to neuron is not already in the postsynaptic map
-    ret = true;
-  }
-  // check for connections FROM to_neuron TO from_neuron
-  else if (p_presyntapic->find(to_neuron) != p_presyntapic->end()) {
-    lg.log_neuron_interaction(
-        DEBUG, "has_neighbor: Neuron %d already has connection from Neuron %d",
-        to_neuron->get_id(), from_neuron->get_id());
-
-    // if the to_neuron is in the presynaptic list
-    ret = true;
-  } else {
-    ret = false;
-  }
-  return ret;
-}
-
 bool has_synaptic_connection(Neuron *from_neuron, Neuron *to_neuron) {
   auto pPostsynaptic = from_neuron->getPostSynaptic();
   auto pPresynaptic = from_neuron->getPresynaptic();
@@ -159,39 +56,6 @@ bool has_neighbor_group(Neuron *from_neuron, Neuron *to_neuron) {
   return ret;
 }
 
-void random_neighbors(vector<Neuron *> nodes, int number_neighbors) {
-
-  lg.print("\nAdding Random Edges");
-  lg.print("======================\n\n");
-
-  int size = nodes.size();
-  int i = 0;
-  if (number_neighbors > size) {
-    number_neighbors = size;
-    lg.log(WARNING, "random_neighbors: Number of neighbors exceeds size, "
-                    "setting number of neighbors to size");
-  }
-
-  while (i < number_neighbors) {
-
-    // Get random neurons
-    int from = rand() % size;
-    int to = rand() % size;
-
-    // check for self connections
-    if (from == to) {
-      continue;
-    }
-    if (has_neighbor(nodes[from], nodes[to])) {
-      continue;
-    }
-
-    nodes[from]->add_neighbor(nodes[to], weight_function());
-    i++;
-  }
-  cout << '\n';
-}
-
 void random_synapses(vector<NeuronGroup *> groups, int number_neighbors) {
   int i = 0;
   while (i < number_neighbors) {
@@ -205,31 +69,6 @@ void random_synapses(vector<NeuronGroup *> groups, int number_neighbors) {
       continue;
     }
     if (has_synaptic_connection(from, to)) {
-      continue;
-    }
-
-    from->add_neighbor(to, weight_function());
-    i++;
-  }
-}
-
-void random_group_neighbors(vector<NeuronGroup *> groups,
-                            int number_neighbors) {
-  lg.print("\nAdding Random Edges");
-  lg.print("======================\n");
-
-  int i = 0;
-  while (i < number_neighbors) {
-
-    // Get random neurons
-    Neuron *from = get_random_neuron(groups);
-    Neuron *to = get_random_neuron(groups, false);
-
-    // check for self connections
-    if (from == to) {
-      continue;
-    }
-    if (has_neighbor_group(from, to)) {
       continue;
     }
 
