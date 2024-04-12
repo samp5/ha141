@@ -251,35 +251,6 @@ void *send_message_helper(void *messages) {
   return NULL;
 }
 
-void send_messages(const vector<Message *> *messages) {
-
-  while (::active) {
-
-    for (int i = 1; i <= WAIT_LOOPS; i++) {
-      lg.log_value(DEBUG3, "send_messages waiting: %d", i);
-    }
-
-    // random numbers for the time_stamp
-    //
-    //
-
-    for (auto message : *messages) {
-      lg.log_message(DEBUG2,
-                     "Adding Message! time: %f group: %d neuron: %d value: %f",
-                     message->timestamp, message->target_neuron_group->get_id(),
-                     message->post_synaptic_neuron->get_id(), message->message);
-
-      Message *message_copy =
-          construct_message(message->message, message->post_synaptic_neuron);
-      message_copy->timestamp = lg.get_time_stamp();
-
-      message->post_synaptic_neuron->add_message(message_copy);
-      message->post_synaptic_neuron->activate();
-    }
-  }
-  pthread_exit(NULL);
-}
-
 void deallocate_message_vector(const vector<Message *> *messages) {
   for (auto message : *messages) {
     delete message;
