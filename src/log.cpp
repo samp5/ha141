@@ -28,6 +28,9 @@ void Log::log(LogLevel level, const char *message,
   const char *_level;
 
   switch (level) {
+  case LogLevel::ESSENTIAL:
+    _level = "!  ";
+    break;
   case LogLevel::INFO:
     _level = "[%d:%d] ⓘ  ";
     break;
