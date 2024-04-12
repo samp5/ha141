@@ -246,11 +246,6 @@ void print_message(Message *message) {
                  message->post_synaptic_neuron->get_id(), message->message);
 }
 
-void *send_message_helper(void *messages) {
-  send_messages((const vector<Message *> *)messages);
-  return NULL;
-}
-
 void deallocate_message_vector(const vector<Message *> *messages) {
   for (auto message : *messages) {
     delete message;
