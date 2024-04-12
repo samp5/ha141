@@ -342,18 +342,18 @@ void use_base_toml() {
 
 int parse_command_line_args(char **argv, int argc) {
   if (argc == 1) {
-    lg.log(INFO,
+    lg.log(ESSENTIAL,
            "No command line arguements detected: Using base_config.toml:");
-    lg.log(INFO,
+    lg.log(ESSENTIAL,
            "Usage: build/ex2 <filename> run build/ex2 --help for file format");
     use_base_toml();
     return 1;
 
   } else if (argc > 2) {
     lg.log(
-        INFO,
+        ESSENTIAL,
         "Too many command line arguements detected: Using base_config.toml:");
-    lg.log(INFO,
+    lg.log(ESSENTIAL,
            "Usage: build/ex2 <filename> run build/ex2 --help for more info");
 
     use_base_toml();
