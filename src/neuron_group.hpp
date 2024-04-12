@@ -24,25 +24,10 @@ private:
   int id;
   pthread_t thread;
 
-  // separate message buffer for inter group messages
-  list<Message *> intragroup_messages;
-  list<Message *> intergroup_messages;
-  // When a neuron sends a message within its own group:
-  //    Add the message to the queue
-  // process_intragroup_queue should:
-  //    read from the start of the queue
-  //    add the message the right neurons queue
-
 public:
   NeuronGroup(int _id, int number_neurons, int number_input_neurons);
   NeuronGroup(int _id, int number_neurons);
   ~NeuronGroup();
-
-  // these four are not used right now
-  void process_intragroup_queue();
-  void process_intergroup_queue();
-  void add_to_intragroup(Message *message);
-  void add_to_intergroup(Message *message);
 
   void *group_run();
 
@@ -52,6 +37,7 @@ public:
   double get_id() const { return id; }
 
   pthread_t get_thread_id() { return thread; }
+  // not implemented
   void print_group();
   int neuron_count();
   double get_message();

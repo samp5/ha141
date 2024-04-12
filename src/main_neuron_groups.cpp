@@ -79,11 +79,6 @@ int main(int argc, char **argv) {
   //     construct_message_vector_from_file(neuron_groups, INPUT_FILE);
   set_message_values_for_input_neurons(neuron_groups, INPUT_FILE);
 
-  // Print out groups
-  for (auto group : neuron_groups) {
-    group->print_group();
-  }
-
   // start all group threads
   for (auto group : neuron_groups) {
     group->start_thread();

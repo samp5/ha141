@@ -89,7 +89,9 @@ void *NeuronGroup::group_run() {
 
         lg.log_group_neuron_state(DEBUG2, "Running (%d) Neuron (%d)",
                                   this->get_id(), neuron->get_id());
-        neuron = neuron->get_type() == Input ? dynamic_cast<InputNeuron * >(neuron) : neuron;
+        neuron = neuron->get_type() == Input
+                     ? dynamic_cast<InputNeuron *>(neuron)
+                     : neuron;
         neuron->run_in_group();
       } else {
         double time = lg.get_time_stamp();
@@ -112,50 +114,6 @@ const vector<Neuron *> &NeuronGroup::get_neruon_vector() {
 }
 
 void NeuronGroup::print_group() {
-  lg.print("\n", false);
-  lg.log_group_value(DEBUG, "Neuron Group %d (%d neurons)", this->id,
-                     this->neurons.size());
-  lg.print("========================================================");
-
-  for (Neuron *neuron : this->neurons) {
-    lg.log_group_neuron_state(DEBUG, "   (%d) Neuron %d", this->id,
-                              neuron->get_id());
-    print_group_maps(neuron);
-  }
-  lg.print("\n", false);
+  cout << "NeuronGroup::print_group() not implemented\n";
 }
 
-// each of these proceses should maybe be spawned in their own threads ?
-void NeuronGroup::process_intragroup_queue() {
-
-  for (Message *message : this->intragroup_messages) {
-    // mutex lock happens in the neuron add_message function
-    message->post_synaptic_neuron->add_message(message);
-  }
-  this->intragroup_messages.clear();
-}
-
-void NeuronGroup::process_intergroup_queue() {
-  for (Message *message : this->intergroup_messages) {
-
-    if (message->target_neuron_group != this) {
-      lg.log_group_neuron_state(ERROR,
-                                "process_intergroup_queue: Message meant for "
-                                "Group %d in Group %d intergroup_messages",
-                                this->get_id(),
-                                message->target_neuron_group->get_id());
-    }
-    message->post_synaptic_neuron->add_message(message);
-  }
-  this->intergroup_messages.clear();
-}
-void NeuronGroup::add_to_intragroup(Message *message) {
-  pthread_mutex_lock(&potential_mutex);
-  this->intragroup_messages.push_back(message);
-  pthread_mutex_unlock(&potential_mutex);
-}
-void NeuronGroup::add_to_intergroup(Message *message) {
-  pthread_mutex_lock(&potential_mutex);
-  this->intergroup_messages.push_back(message);
-  pthread_mutex_unlock(&potential_mutex);
-}
