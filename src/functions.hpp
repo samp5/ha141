@@ -63,6 +63,7 @@ void random_neighbors(vector<Neuron *> nodes, int number_neighbors);
 // @param2: desired number of edges in the entire graph
 void random_synapses(vector<NeuronGroup *> groups, int number_neighbors);
 
+
 // Print membrane potential of all neurons in vector
 //
 // @param1: vector of Neuron pointers
@@ -123,17 +124,6 @@ Message *construct_message(double value, Neuron *target);
 //@param3: Message_t
 //@returns: pointer to dynamically allocated Message
 Message *construct_message(double value, Neuron *target, Message_t type);
-
-// Construct a message vector from an input file
-//
-// Builds a vector of messages from an input_file
-//
-// @param1: vector of neuron groups
-// @param2: filename
-// @returns vector of `Message` pointers
-vector<Message *>
-construct_message_vector_from_file(vector<NeuronGroup *> groups,
-                                   std::string file_name);
 
 // Prints out a message via the Log class
 //
