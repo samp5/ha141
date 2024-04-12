@@ -3,6 +3,7 @@
 #include "log.hpp"
 #include "message.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <pthread.h>
@@ -78,7 +79,15 @@ Neuron::Neuron(int _id, int _excit_inhib_value) {
 //
 // Destroys pthread conditional
 //
-Neuron::~Neuron() { pthread_cond_destroy(&cond); }
+Neuron::~Neuron() {
+  pthread_cond_destroy(&cond);
+  std::for_each(this->PostSynapticConnnections.begin(),
+                this->PostSynapticConnnections.end(),
+                [](Synapse *syn) { delete syn; });
+  std::for_each(this->PreSynapticConnections.begin(),
+                this->PreSynapticConnections.end(),
+                [](Synapse *syn) { delete syn; });
+}
 
 void Neuron::transfer_data() {
   for (auto data : this->log_data) {
