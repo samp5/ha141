@@ -185,42 +185,15 @@ const char *get_active_status_string(bool active) {
   }
 }
 
-void *decay_helper(void *groups) {
-  decay_neurons((vector<NeuronGroup *> *)groups);
-  return NULL;
-}
-
-void decay_neurons(vector<NeuronGroup *> *groups) {
-  vector<Neuron *> neuron_vec;
-
-  // make a vector of all available neurons
-  for (const auto &group : *groups) {
-    for (const auto &neuron : group->get_neruon_vector()) {
-      neuron_vec.push_back(neuron);
-    }
-  }
-
-  while (::active) {
-
-    usleep(WAIT_TIME);
-
-    for (auto neuron : neuron_vec) {
-      double time_rn = lg.get_time_stamp();
-      neuron->decay(time_rn);
-    }
-  }
-}
-
 void set_message_values_for_input_neurons(vector<NeuronGroup *> groups,
                                           std::string file_name) {
   vector<Neuron *> neuron_vec;
 
   for (const auto &group : groups) {
-    for (const auto &neuron : group->get_neruon_vector()) {
-      if (neuron->get_type() == Input) {
-        neuron_vec.push_back(neuron);
-      }
-    }
+    copy_if(group->get_neruon_vector().begin(),
+            group->get_neruon_vector().end(),
+            std::back_insert_iterator(neuron_vec),
+            [](Neuron *neuron) { return (neuron->get_type() == Input); });
   }
 
   std::ifstream file(file_name);
