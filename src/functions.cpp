@@ -251,10 +251,12 @@ void deallocate_message_vector(const vector<Message *> *messages) {
     delete message;
   }
 }
+
 bool file_exists(const char *file_name) {
   std::ifstream f(file_name);
   return f.good();
 }
+
 void create_base_toml() {
   const char *file_name = "./run_config/base_config.toml";
 
