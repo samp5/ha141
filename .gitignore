@@ -6,6 +6,7 @@ testoutput
 
 # ignore log files
 logs/*
+input_files/*.txt
 
 # exclude all build executables
 build/*

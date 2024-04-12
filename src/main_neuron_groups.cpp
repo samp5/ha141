@@ -76,7 +76,6 @@ int main(int argc, char **argv) {
 
   // Get message vector from file
   // vector<Message *> messages =
-  //     construct_message_vector_from_file(neuron_groups, INPUT_FILE);
   set_message_values_for_input_neurons(neuron_groups, INPUT_FILE);
 
   // start all group threads

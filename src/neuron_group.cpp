@@ -116,4 +116,3 @@ const vector<Neuron *> &NeuronGroup::get_neruon_vector() {
 void NeuronGroup::print_group() {
   cout << "NeuronGroup::print_group() not implemented\n";
 }
-

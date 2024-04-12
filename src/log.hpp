@@ -10,6 +10,7 @@ using std::ostream;
 using std::vector;
 
 enum LogLevel {
+  ESSENTIAL,
   NONE,
   DATA,
   ERROR,
