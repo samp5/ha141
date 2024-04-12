@@ -218,41 +218,6 @@ void set_message_values_for_input_neurons(vector<NeuronGroup *> groups,
   }
 }
 
-vector<Message *>
-construct_message_vector_from_file(vector<NeuronGroup *> groups,
-                                   std::string file_name) {
-  vector<Neuron *> neuron_vec;
-  vector<Message *> message_vector;
-
-  // make a vector of all available neurons
-  for (const auto &group : groups) {
-    for (const auto &neuron : group->get_neruon_vector()) {
-      if (neuron->get_type() == Input) {
-        neuron_vec.push_back(neuron);
-      }
-    }
-  }
-
-  std::ifstream file(file_name);
-
-  if (!file.is_open()) {
-    lg.log(ERROR, "construct_message_vector_from_file: Unable to open file");
-    return message_vector;
-  }
-
-  int number_input_neurons = neuron_vec.size();
-  int data_read = 0;
-  double value;
-
-  while (!file.eof() && data_read < number_input_neurons) {
-    file >> value;
-    message_vector.push_back(construct_message(value, neuron_vec[data_read]));
-    data_read++;
-  }
-
-  return message_vector;
-}
-
 Message *construct_message(double value, Neuron *target) {
   Message *message = new Message;
   message->message = value;
