@@ -347,9 +347,6 @@ void Log::log_group_neuron_type(LogLevel level, const char *message,
 }
 
 void Log::print(const char *message, bool newline, std::ostream &os) {
-  if (DEBUG_LEVEL == NONE) {
-    return;
-  }
   if (newline)
     os << message << '\n';
   else
