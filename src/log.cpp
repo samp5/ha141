@@ -2,6 +2,7 @@
 #include "functions.hpp"
 #include "message.hpp"
 #include <bits/types/struct_timeval.h>
+#include <chrono>
 #include <filesystem>
 #include <fstream>
 #include <ios>
@@ -22,8 +23,6 @@ void Log::log(LogLevel level, const char *message,
   }
 
   // get time for log message
-  struct timeval tv;
-  gettimeofday(&tv, NULL);
 
   const char *_level;
 
@@ -32,25 +31,25 @@ void Log::log(LogLevel level, const char *message,
     _level = "!  ";
     break;
   case LogLevel::INFO:
-    _level = "[%d:%d] ⓘ  ";
+    _level = "[%f] ⓘ  ";
     break;
   case LogLevel::DEBUG:
-    _level = "[%d:%d] ❶  ";
+    _level = "[%f] ❶  ";
     break;
   case LogLevel::DEBUG2:
-    _level = "[%d:%d] ❷  ";
+    _level = "[%f] ❷  ";
     break;
   case LogLevel::DEBUG3:
-    _level = "[%d:%d] ❸  ";
+    _level = "[%f] ❸  ";
     break;
   case LogLevel::DEBUG4:
-    _level = "[%d:%d] ❹ ";
+    _level = "[%f] ❹ ";
     break;
   case LogLevel::ERROR:
-    _level = "[%d:%d] |⛔ Error | ";
+    _level = "[%f] |⛔ Error | ";
     break;
   case LogLevel::WARNING:
-    _level = "[%d:%d] |⚠ Warning| ";
+    _level = "[%f] |⚠ Warning| ";
     break;
   case LogLevel::DATA:
     this->log(ERROR, "DATA passed to Log Function?");
@@ -60,10 +59,11 @@ void Log::log(LogLevel level, const char *message,
     return;
   }
 
-  int length = snprintf(nullptr, 0, _level, tv.tv_sec, tv.tv_usec);
+  double time_rn = lg.get_time_stamp();
+  int length = snprintf(nullptr, 0, _level, time_rn);
   char *message_prefix = new char[length + 1];
 
-  snprintf(message_prefix, length + 1, _level, tv.tv_sec, tv.tv_usec);
+  snprintf(message_prefix, length + 1, _level, time_rn);
   // pthread_mutex_lock(&log_mutex);
   os << message_prefix << message << '\n';
   // pthread_mutex_unlock(&log_mutex);
@@ -179,16 +179,17 @@ void Log::write_data(const char *filename) {
 
   struct timeval tv;
   gettimeofday(&tv, NULL);
+  int name = tv.tv_sec - 1'710'000'000;
 
-  fs::path parent = "./logs/" + std::to_string(tv.tv_sec);
+  fs::path parent = "./logs/" + std::to_string(name);
   fs::create_directory(parent);
 
   // length
-  int length = snprintf(nullptr, 0, filename, tv.tv_sec, tv.tv_sec);
+  int length = snprintf(nullptr, 0, filename, name, name);
   // allocate
   char *file_name = new char[length + 1];
   // format
-  snprintf(file_name, length + 1, filename, tv.tv_sec, tv.tv_sec);
+  snprintf(file_name, length + 1, filename, name, name);
 
   std::ofstream file;
   file.open(file_name);
@@ -210,7 +211,7 @@ void Log::write_data(const char *filename) {
 
   // deallocate
   delete[] file_name;
-  this->log_runtime_config();
+  this->log_runtime_config(std::to_string(name));
 }
 
 void Log::log_group_neuron_state(LogLevel level, const char *message,
@@ -353,11 +354,14 @@ void Log::print(const char *message, bool newline, std::ostream &os) {
     os << message;
 }
 
+void Log::set_offset(double value) { this->off_set += value; }
+
 double Log::get_time_stamp() {
-  struct timeval tv;
-  gettimeofday(&tv, NULL);
-  double time_stamp = (double)tv.tv_sec + (double)tv.tv_usec / 100000;
-  return time_stamp;
+
+  hr_clock::time_point now = hr_clock::now();
+
+  duration time_span = std::chrono::duration_cast<duration>(now - this->start);
+  return time_span.count() - this->off_set;
 }
 
 void Log::log_message(LogLevel level, const char *message, double timestamp,
@@ -413,19 +417,14 @@ void Log::log_string(LogLevel level, const char *message, const char *string) {
   delete[] formatted_msg;
 }
 
-void Log::log_runtime_config() {
-
-  struct timeval tv;
-  gettimeofday(&tv, NULL);
-
-  std::string time = std::to_string(tv.tv_sec);
+void Log::log_runtime_config(const std::string &name) {
 
   namespace fs = std::filesystem;
   fs::path config_source = CONFIG_FILE;
   fs::path input_source = INPUT_FILE;
 
-  fs::path config_target = "./logs/" + time + "/" + time + ".toml";
-  fs::path input_target = "./logs/" + time + "/" + time + ".txt";
+  fs::path config_target = "./logs/" + name + "/" + name + ".toml";
+  fs::path input_target = "./logs/" + name + "/" + name + ".txt";
 
   fs::copy_file(config_source, config_target);
   fs::copy_file(input_source, input_target);

@@ -2,6 +2,7 @@
 #define LOG
 
 #include "message.hpp"
+#include <chrono>
 #include <iostream>
 #include <vector>
 
@@ -35,10 +36,18 @@ extern LogLevel DEBUG_LEVEL;
 extern ostream &STREAM;
 extern pthread_mutex_t log_mutex;
 
+using hr_clock = std::chrono::high_resolution_clock;
+using duration = std::chrono::duration<double>;
+
 class Log {
+
+private:
+  hr_clock::time_point start;
+  double off_set;
+
 public:
   // constructor
-
+  Log() : start(hr_clock::now()), off_set(0.0f) {}
   // DATA Functions
 
   void write_data(const char *filesname = "./logs/%ld/%ld.log");
@@ -55,11 +64,12 @@ public:
 
   void add_data(LogData data);
 
-  void log_runtime_config();
+  void log_runtime_config(const std::string &name);
 
   // General Log function
   void log(LogLevel level, const char *message, ostream &os = STREAM);
   double get_time_stamp();
+  void set_offset(double value);
 
   // Neuron Logs
   void log_neuron_state(LogLevel level, const char *message, int id);
