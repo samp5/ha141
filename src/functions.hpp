@@ -2,6 +2,7 @@
 #define FUNCTIONS
 
 #include "../run_config/toml.hpp"
+#include "input_neuron.hpp"
 #include "log.hpp"
 #include "neuron.hpp"
 #include <algorithm>
@@ -62,7 +63,6 @@ void random_neighbors(vector<Neuron *> nodes, int number_neighbors);
 // @param1: vector of Neuron pointers
 // @param2: desired number of edges in the entire graph
 void random_synapses(vector<NeuronGroup *> groups, int number_neighbors);
-
 
 // Print membrane potential of all neurons in vector
 //
@@ -213,4 +213,8 @@ std::string io_type_to_string(Neuron_t type);
 std::string message_type_to_string(Message_t type);
 void set_message_values_for_input_neurons(vector<NeuronGroup *> groups,
                                           std::string file_name);
+void construct_input_neuron_vector(const vector<NeuronGroup *> &groups,
+                                   vector<InputNeuron *> &input_neurons);
+void get_next_line(std::string &line);
+void set_next_line(const vector<InputNeuron *> &input_neurons);
 #endif // !FUNCTIONS

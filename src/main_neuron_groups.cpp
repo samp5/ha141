@@ -75,8 +75,10 @@ int main(int argc, char **argv) {
   random_synapses(neuron_groups, NUMBER_EDGES);
 
   // Get message vector from file
-  // vector<Message *> messages =
-  set_message_values_for_input_neurons(neuron_groups, INPUT_FILE);
+
+  vector<InputNeuron *> input_neurons;
+  construct_input_neuron_vector(neuron_groups, input_neurons);
+  set_next_line(input_neurons);
 
   // start all group threads
   for (auto group : neuron_groups) {

@@ -189,8 +189,8 @@ const char *get_active_status_string(bool active) {
   }
 }
 
-void get_input_neuron_vector(const vector<NeuronGroup *> groups,
-                             vector<InputNeuron *> &input_neurons) {
+void construct_input_neuron_vector(const vector<NeuronGroup *> &groups,
+                                   vector<InputNeuron *> &input_neurons) {
   if (!input_neurons.empty()) {
     lg.log(ERROR, "get_input_neuron_vector: this constructs a new vector! "
                   "emptying vector that was passed. If Neurons in this vector "
@@ -223,7 +223,7 @@ void get_next_line(std::string &line) {
 
 void set_next_line(const vector<InputNeuron *> &input_neurons) {
   if (input_neurons.empty()) {
-    lg.log(ERROR, "set_next_line: passed empty input neuron vector?");
+    lg.log(ESSENTIAL, "set_next_line: passed empty input neuron vector?");
     return;
   }
 
