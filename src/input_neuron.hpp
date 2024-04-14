@@ -11,7 +11,7 @@ extern pthread_cond_t stimulus_switch_cond;
 extern bool switching_stimulus;
 
 class InputNeuron : public Neuron {
-private:
+protected:
   double input_value;
   double probalility_of_success = INPUT_PROB_SUCCESS;
 
