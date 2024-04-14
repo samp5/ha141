@@ -77,7 +77,6 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 
 
 - Graphs showing multiple stimulus switches during a run
-
     - [Input Neuron Example](./images/41401.png)
     - [Regular Neuron Example](./images/41402.png)
 
