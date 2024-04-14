@@ -82,56 +82,6 @@ void InputNeuron::send_messages_in_group() {
   for (const auto synapse : getSynapses()) {
     synapse->propagate();
   }
-  // loop through all neighbors
-  // for (const auto &pair : this->_postsynaptic) {
-  //
-  //   lg.log_group_neuron_interaction(INFO,
-  //                                   "(Input) Group %d: Neuron %d is sending a
-  //                                   " "mesage to Group %d: Neuron %d",
-  //                                   this->group->get_id(), this->id,
-  //                                   pair.first->get_group()->get_id(),
-  //                                   pair.first->get_id());
-  //
-  //   // construct message
-  //   Message *message = new Message;
-  //   message->target_neuron_group = pair.first->get_group();
-  //   message->post_synaptic_neuron = pair.first;
-  //   message->timestamp = lg.get_time_stamp();
-  //   message->message_type = From_Neighbor;
-  //
-  //   // calculate message
-  //   pthread_mutex_lock(&potential_mutex);
-  //   message->message = this->membrane_potential *
-  //                      this->_postsynaptic[pair.first] *
-  //                      this->excit_inhib_value;
-  //   pthread_mutex_unlock(&potential_mutex);
-  //
-  //   lg.log_group_neuron_value(
-  //       DEBUG2, "Accumulated for (Input) Group %d: Neuron %d is %f",
-  //       this->group->get_id(), this->id, this->membrane_potential);
-  //
-  //   lg.log_group_neuron_interaction(
-  //       DEBUG2,
-  //       "Weight for (Input) Group %d: Neuron %d to Group %d: Neuron %d is
-  //       %f", this->get_group()->get_id(), this->get_id(),
-  //       pair.first->get_group()->get_id(), pair.first->get_id(),
-  //       pair.second);
-  //
-  //   lg.log_group_neuron_value(DEBUG2, "Group %d: Neuron %d modifier is %d",
-  //                             this->group->get_id(), this->get_id(),
-  //                             this->excit_inhib_value);
-  //
-  //   lg.log_group_neuron_interaction(
-  //       INFO, "Message from  (Input) (%d) Neuron %d to (%d) Neuron %d is %f",
-  //       this->group->get_id(), this->id, pair.first->get_group()->get_id(),
-  //       pair.first->get_id(), message->message);
-  //
-  //   // activate neighbor
-  //   pair.first->activate();
-  //
-  //   // add message to target
-  //   message->post_synaptic_neuron->add_message(message);
-  // }
 
   lg.log_group_neuron_state(
       INFO,
