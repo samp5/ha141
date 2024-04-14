@@ -66,7 +66,7 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 | [2-28](#-update-2-28)   | Basic Node class that sends and recieves messages   | `random_neighbors` may repeat edges. [~~Issue 1~~](#-issue-1)|
 
 
-### 📌 Update 4-11
+### 📌 Update 4-14
 **New addtions:**
 - Changed timing system to `std::chrono::high_resolution_clock`
 - Changed the way that input is read and fed to `InputNeuron`s
