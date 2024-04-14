@@ -74,16 +74,9 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
     - Specifics:
         - Successive stimuli **must** be on separate lines, but mnist data is already in this format so it works
         - For $n$ input neurons, only $n$ values are read from a given line. The rest are thrown away
-
-- Graphing seems like its working exactly as it should!
-    - [Group 1 Neuron 2](./images/4101.png)
-    - [Group 1 Neuron 6](./images/4102.png)
-    - [Group 3 Neuron 4](./images/4103.png) 
-    - [Group 4 Neuron 4](./images/4104.png) 
-
 - Graphs showing multiple stimulus switches during a run
-    - [Input Neuron Example](./images/41401.png)
-    - [Regular Neuron Example](./images/41402.png)
+    - [Input Neuron Example](images/41401.png)
+    - [Regular Neuron Example](images/41402.png)
 
 #### New control path for `InputNeuron`s
 - The stimulus values for an `InputNeuron` are updated via a `pthread_cond_signal` 
