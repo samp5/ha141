@@ -49,6 +49,7 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 
 | Date  | Key Points 🔑   |  Issues 🐛   |
 |--------------- | --------------- |--------------- |
+| [4-14](#-update-4-14)   | Multiple stimuli same run |  None |
 | [4-11](#-update-4-11)   | New synapse class |  None |
 | [4-10](#-update-4-10)   | Graphing looks much much better. New decay functionality, fixed a sneaky SEGV |  None |
 | [4-1](#-update-4-1)   | Graph updates (markers for different events) some logic changes for neuron activation/firing/etc. Input Neurons! | Not entirely sure the neuron implementation is correct, but the graphs are looking more promising |
@@ -63,6 +64,99 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 | [3-3](#-update-3-3)   | Added time stamps to logging messages. Added function descriptions.| None |
 | [2-29](#-update-2-29)   | Updated Neuron Class with with membrane potentials, refractory phases, Update to edge weights, fixed issue 1, guard clauses on header files.   | "Quit" functionality does not work for the menu [~~Issue 2~~](#-issue-2)|
 | [2-28](#-update-2-28)   | Basic Node class that sends and recieves messages   | `random_neighbors` may repeat edges. [~~Issue 1~~](#-issue-1)|
+
+
+### 📌 Update 4-11
+**New addtions:**
+- Changed timing system to `std::chrono::high_resolution_clock`
+- Changed the way that input is read and fed to `InputNeuron`s
+- Uses `std::getline` with an `ifstream` to keep track of where we are in the file and read successive lines after a given amount of time
+    - Specifics:
+        - Successive stimuli **must** be on separate lines, but mnist data is already in this format so it works
+        - For $$n$$ input neurons, only $$n$$ values are read from a given line. The rest are thrown away
+
+
+- Graphs showing multiple stimulus switches during a run
+
+    - [Input Neuron Example](./images/41401.png)
+    - [Regular Neuron Example](./images/41402.png)
+
+#### New control path for `InputNeuron`s
+- The stimulus values for an `InputNeuron` are updated via a `pthread_cond_signal` 
+    - Anytime the `InputNeuron` is run, a global bool is checked, `switching_stimulus`
+
+```cpp
+if (::switching_stimulus) {
+// wait for all input neurons to switch to the new stimulus
+pthread_mutex_lock(&::stimulus_switch_mutex);
+while (::switching_stimulus) {
+  pthread_cond_wait(&::stimulus_switch_cond, &::stimulus_switch_mutex);
+}
+pthread_mutex_unlock(&::stimulus_switch_mutex);
+}
+
+```
+
+- The input neuron then waits, effectivley haulting its parent group's thread, until all values for all `InputNeuron`s have been updated. 
+- To account for the time taken for this process, an offset is introduced to the `Log` member function `get_time_stamp`
+
+```cpp
+
+// main_neuron_groups.cpp ... 
+
+auto start = std::chrono::high_resolution_clock::now();
+switching_stimulus = true;
+
+// update the stimulus values for each input_neuron
+set_next_line(input_neurons);
+
+auto end = std::chrono::high_resolution_clock::now();
+
+auto duration =
+    std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
+
+// adjust the offset
+lg.set_offset(duration.count());
+
+pthread_mutex_lock(&stimulus_switch_mutex);
+switching_stimulus = false;
+pthread_cond_broadcast(&stimulus_switch_cond);
+pthread_mutex_unlock(&stimulus_switch_mutex);
+```
+
+<details>
+<summary>Specifics of helper functions</summary>
+<br>
+
+```cpp
+// to set values of each input neuron 
+void set_next_line(const vector<InputNeuron *> &input_neurons) {
+  std::string line;
+  get_next_line(line);
+
+  std::stringstream s(line);
+  double value;
+
+  for (InputNeuron *input_neuron : input_neurons) {
+    s >> value;
+    input_neuron->set_input_value(value);
+  }
+}
+
+//updated get_time_stamp
+
+double Log::get_time_stamp() {
+
+  hr_clock::time_point now = hr_clock::now();
+
+  duration time_span = std::chrono::duration_cast<duration>(now - this->start);
+  return time_span.count() - this->off_set;
+}
+```
+
+
+</details>
+
 
 ### 📌 Update 4-11
 **New addtions:**
