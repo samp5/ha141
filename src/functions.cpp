@@ -1,6 +1,10 @@
 #include "functions.hpp"
 #include "input_neuron.hpp"
+#include "log.hpp"
+#include "neuron.hpp"
 #include <algorithm>
+#include <fstream>
+#include <sstream>
 #include <string>
 
 bool has_synaptic_connection(Neuron *from_neuron, Neuron *to_neuron) {
@@ -182,6 +186,56 @@ const char *get_active_status_string(bool active) {
   } else {
     const char *inactive = "inactive"; // NOLINT
     return inactive;
+  }
+}
+
+void get_input_neuron_vector(const vector<NeuronGroup *> groups,
+                             vector<InputNeuron *> &input_neurons) {
+  if (!input_neurons.empty()) {
+    lg.log(ERROR, "get_input_neuron_vector: this constructs a new vector! "
+                  "emptying vector that was passed. If Neurons in this vector "
+                  "were dynamically allocated, that memory has NOT been freed");
+    input_neurons.clear();
+  }
+
+  for (const auto &group : groups) {
+    for (auto neuron : group->get_neruon_vector()) {
+      if (neuron->get_type() != Input) {
+        continue;
+      }
+      input_neurons.push_back(dynamic_cast<InputNeuron *>(neuron));
+    }
+  }
+}
+
+void get_next_line(std::string &line) {
+  static std::string file_name = INPUT_FILE;
+  static std::ifstream file(file_name);
+
+  if (!file.is_open()) {
+    lg.log(ERROR, "get_next_line: Unable to open file");
+    return;
+  }
+
+  // Any previous contents of @a \_\_str are erased.
+  std::getline(file, line);
+}
+
+void set_next_line(const vector<InputNeuron *> &input_neurons) {
+  if (input_neurons.empty()) {
+    lg.log(ERROR, "set_next_line: passed empty input neuron vector?");
+    return;
+  }
+
+  std::string line;
+  get_next_line(line);
+
+  std::stringstream s(line);
+  double value;
+
+  for (InputNeuron *input_neuron : input_neurons) {
+    s >> value;
+    input_neuron->set_input_value(value);
   }
 }
 
