@@ -73,7 +73,7 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 - Uses `std::getline` with an `ifstream` to keep track of where we are in the file and read successive lines after a given amount of time
     - Specifics:
         - Successive stimuli **must** be on separate lines, but mnist data is already in this format so it works
-        - For $$n$$ input neurons, only $$n$$ values are read from a given line. The rest are thrown away
+        - For $n$ input neurons, only $n$ values are read from a given line. The rest are thrown away
 
 
 - Graphs showing multiple stimulus switches during a run
