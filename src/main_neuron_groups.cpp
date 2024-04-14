@@ -85,8 +85,30 @@ int main(int argc, char **argv) {
     group->start_thread();
   }
 
-  // sleep for runtime
-  usleep(RUN_TIME);
+  int num_stim = 8;
+  int time_per_stim = (double)RUN_TIME / num_stim;
+
+  for (int i = 1; i < num_stim + 1; i++) {
+
+    usleep(time_per_stim);
+
+    auto start = std::chrono::high_resolution_clock::now();
+    switching_stimulus = true;
+
+    set_next_line(input_neurons);
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration =
+        std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
+
+    lg.set_offset(duration.count());
+
+    pthread_mutex_lock(&stimulus_switch_mutex);
+    switching_stimulus = false;
+    pthread_cond_broadcast(&stimulus_switch_cond);
+    pthread_mutex_unlock(&stimulus_switch_mutex);
+  }
+
   active = false;
 
   for (auto group : neuron_groups) {
