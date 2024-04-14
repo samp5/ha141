@@ -211,8 +211,6 @@ void assign_neuron_types(vector<NeuronGroup *> &groups);
 
 std::string io_type_to_string(Neuron_t type);
 std::string message_type_to_string(Message_t type);
-void set_message_values_for_input_neurons(vector<NeuronGroup *> groups,
-                                          std::string file_name);
 void construct_input_neuron_vector(const vector<NeuronGroup *> &groups,
                                    vector<InputNeuron *> &input_neurons);
 void get_next_line(std::string &line);
