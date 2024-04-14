@@ -2,13 +2,18 @@
 #include "functions.hpp"
 #include "message.hpp"
 #include "neuron.hpp"
-
-InputNeuron::InputNeuron(int _id, NeuronGroup *group)
-    : Neuron(_id, -1, group, Input) {
-  this->activate();
-}
+#include <pthread.h>
 
 void InputNeuron::run_in_group() {
+
+  if (::switching_stimulus) {
+    // wait for all input neurons to switch to the new stimulus
+    pthread_mutex_lock(&::stimulus_switch_mutex);
+    while (::switching_stimulus) {
+      pthread_cond_wait(&::stimulus_switch_cond, &::stimulus_switch_mutex);
+    }
+    pthread_mutex_unlock(&::stimulus_switch_mutex);
+  }
 
   if (!this->check_refractory_period()) {
     lg.log_group_neuron_state(
