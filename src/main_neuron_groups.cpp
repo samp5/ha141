@@ -3,6 +3,7 @@
 #include "log.hpp"
 #include "neuron.hpp"
 #include "neuron_group.hpp"
+#include <chrono>
 #include <pthread.h>
 #include <string>
 #include <unistd.h>
@@ -32,6 +33,8 @@ ostream &STREAM = cout;
 
 Log lg;
 
+pthread_mutex_t stimulus_switch_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t stimulus_switch_cond = PTHREAD_COND_INITIALIZER;
 // Protects the membrane_potential
 pthread_mutex_t potential_mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -50,6 +53,7 @@ volatile double value = 0;
 // This is for group runs
 bool active = true;
 bool finish = false;
+bool switching_stimulus = false;
 
 int main(int argc, char **argv) {
 
@@ -129,5 +133,7 @@ int main(int argc, char **argv) {
   pthread_mutex_destroy(&log_mutex);
   pthread_mutex_destroy(&message_mutex);
   pthread_mutex_destroy(&activation_mutex);
+  pthread_mutex_destroy(&stimulus_switch_mutex);
+  pthread_cond_destroy(&stimulus_switch_cond);
   return 0;
 }
