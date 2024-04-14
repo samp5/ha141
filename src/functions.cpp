@@ -192,9 +192,10 @@ const char *get_active_status_string(bool active) {
 void construct_input_neuron_vector(const vector<NeuronGroup *> &groups,
                                    vector<InputNeuron *> &input_neurons) {
   if (!input_neurons.empty()) {
-    lg.log(ERROR, "get_input_neuron_vector: this constructs a new vector! "
-                  "emptying vector that was passed. If Neurons in this vector "
-                  "were dynamically allocated, that memory has NOT been freed");
+    lg.log(ERROR,
+           "get_input_neuron_vector: this constructs a new vector! "
+           "emptying vector that was passed...\n If Neurons in this vector "
+           "were dynamically allocated, that memory has NOT been freed");
     input_neurons.clear();
   }
 
@@ -236,39 +237,6 @@ void set_next_line(const vector<InputNeuron *> &input_neurons) {
   for (InputNeuron *input_neuron : input_neurons) {
     s >> value;
     input_neuron->set_input_value(value);
-  }
-}
-
-void set_message_values_for_input_neurons(vector<NeuronGroup *> groups,
-                                          std::string file_name) {
-  vector<Neuron *> neuron_vec;
-
-  for (const auto &group : groups) {
-    copy_if(group->get_neruon_vector().begin(),
-            group->get_neruon_vector().end(),
-            std::back_insert_iterator(neuron_vec),
-            [](Neuron *neuron) { return (neuron->get_type() == Input); });
-  }
-
-  std::ifstream file(file_name);
-
-  if (!file.is_open()) {
-    lg.log(ERROR, "set_message_values_for_input_neurons: Unable to open file");
-    return;
-  }
-
-  int number_input_neurons = neuron_vec.size();
-  int data_read = 0;
-  double value;
-
-  while (!file.eof() && data_read < number_input_neurons) {
-    file >> value;
-
-    InputNeuron *input_neuron =
-        dynamic_cast<InputNeuron *>(neuron_vec.at(data_read));
-
-    input_neuron->set_input_value(value);
-    data_read++;
   }
 }
 
