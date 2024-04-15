@@ -334,11 +334,6 @@ void create_base_toml() {
   file << "# DEBUG4" << '\n';
   file << "level = \"INFO\"" << '\n';
   file << '\n';
-  file << "[decay]" << '\n';
-  file << "# Value that each neuron decays every wait_time * wait_loops"
-       << '\n';
-  file << "value = 1.0" << '\n';
-  file << '\n';
   file << "[random]" << '\n';
   file << "# options are 'time' for using the current time, or an integer (as "
           "a string e.g. \"1\")"
@@ -467,12 +462,6 @@ int set_options(const char *file_name) {
     }
   } else {
     lg.log_string(ERROR, "Failed to parse: %s", "random seed");
-  }
-
-  if (tbl["decay"]["value"].as_floating_point()) {
-    DECAY_VALUE = tbl["decay"]["value"].as_floating_point()->get();
-  } else {
-    lg.log_string(ERROR, "Failed to parse: %s", "decay value");
   }
 
   if (tbl["runtime_vars"]["input_file"].as_string()) {
