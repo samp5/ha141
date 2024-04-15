@@ -321,7 +321,7 @@ void create_base_toml() {
   file << "tau = 1.0";
   file << '\n';
   file << "#  poisson_prob_of_success\n";
-  file << "poisson_prob_of_success = 0.01";
+  file << "poisson_prob_of_success = 0.0001";
   file << '\n';
   file << "[debug]" << '\n';
   file << "# Options are" << '\n';
