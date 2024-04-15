@@ -48,13 +48,6 @@ int maximum_edges();
 void check_start_conditions();
 
 void destroy_mutexes();
-// Assign random neighbors to all nodes in vector
-//
-// Reflexive edges and duplicate edges are not allowed.
-// Edge weightes are randomly generated and are between [0, 1]
-// @param1: vector of Neuron pointers
-// @param2: desired number of edges in the entire graph
-void random_neighbors(vector<Neuron *> nodes, int number_neighbors);
 
 // Assign random neighbors to all nodes in vector
 //
