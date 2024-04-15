@@ -117,14 +117,13 @@ int main(int argc, char **argv) {
     pthread_join(group->get_thread_id(), NULL);
   }
 
+  // Deallocate groups
   for (auto group : neuron_groups) {
     delete group;
   }
 
   lg.log(INFO, "Writing data to file...");
   lg.write_data();
-
-  // Deallocate groups
 
   // Destroy mutexes
   destroy_mutexes();
