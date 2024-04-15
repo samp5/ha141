@@ -342,6 +342,8 @@ void create_base_toml() {
   file << "[runtime_vars]" << '\n';
   file << "# in seconds" << '\n';
   file << "runtime = 20" << '\n';
+  file << "# file to read input from" << '\n';
+  file << "input_file = \"./input_files/test\"" << '\n';
 
   file.close();
 }
