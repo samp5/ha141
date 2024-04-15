@@ -68,7 +68,11 @@ public:
 
   // General Log function
   void log(LogLevel level, const char *message, ostream &os = STREAM);
+
+  // Get time stamp from std::chrono::high_resolution_clock
   double get_time_stamp();
+
+  // Sets the offset of all future timestamps
   void set_offset(double value);
 
   // Neuron Logs
