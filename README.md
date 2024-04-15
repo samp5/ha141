@@ -4,36 +4,7 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 ### 📁 Folder Structure
 
 ```
-  build
-  input_files
-  └  test
-  images
-  logs
-  plotting
-    venv
-  └  main.py
-  pthread_ex
-  run_config
-  │  base_config.toml
-  └  toml.hpp
-  src
-  │  functions.cpp
-  │  functions.hpp
-  │  input_neuron.cpp
-  │  input_neuron.hpp
-  │  log.cpp
-  │  log.hpp
-  │  main.cpp
-  │  main_neuron_groups.cpp
-  │  message.hpp
-  │  neuron.cpp
-  │  neuron.hpp
-  │  neuron_group.cpp
-  └  neuron_group.hpp
-   .clangd
-   .gitignore
-   makefile
-   README.md
+
 ```
 
 ### In-Progress 🚀
