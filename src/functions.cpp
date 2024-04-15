@@ -325,6 +325,7 @@ void create_base_toml() {
   file << '\n';
   file << "[debug]" << '\n';
   file << "# Options are" << '\n';
+  file << "# NONE" << '\n';
   file << "# INFO" << '\n';
   file << "# DEBUG" << '\n';
   file << "# DEBUG2" << '\n';
