@@ -101,15 +101,13 @@ int main(int argc, char **argv) {
 
     set_next_line(input_neurons);
 
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration =
-        std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
-
-    lg.set_offset(duration.count());
-
     pthread_mutex_lock(&stimulus_switch_mutex);
     switching_stimulus = false;
     pthread_cond_broadcast(&stimulus_switch_cond);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration =
+        std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
+    lg.set_offset(duration.count());
     pthread_mutex_unlock(&stimulus_switch_mutex);
   }
 
