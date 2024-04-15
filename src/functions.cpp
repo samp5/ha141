@@ -293,7 +293,7 @@ void create_base_toml() {
   file << "[neuron]" << '\n';
   file << '\n';
   file << "# number of neurons" << '\n';
-  file << "neuron_count = 6" << '\n';
+  file << "neuron_count = 2" << '\n';
   file << '\n';
   file << "# number of input type neurons" << '\n';
   file << "input_neuron_count = 3" << '\n';
@@ -302,6 +302,7 @@ void create_base_toml() {
   file << "group_count = 2" << '\n';
   file << '\n';
   file << "# number of connections" << '\n';
+  file << "# option can be \"MAX\" for maximum edges" << '\n';
   file << "edge_count = 4" << '\n';
   file << '\n';
   file << "# value each neuron is initialized with" << '\n';
@@ -497,12 +498,6 @@ int set_options(const char *file_name) {
     lg.log_string(ERROR, "Failed to parse: %s", "initial_membrane_potential");
   }
 
-  if (tbl["neuron"]["edge_count"].as_integer()) {
-    NUMBER_EDGES = tbl["neuron"]["edge_count"].as_integer()->get();
-  } else {
-    lg.log_string(ERROR, "Failed to parse: %s", "edge_count");
-  }
-
   if (tbl["neuron"]["group_count"].as_integer()) {
     NUMBER_GROUPS = tbl["neuron"]["group_count"].as_integer()->get();
   } else {
@@ -513,6 +508,19 @@ int set_options(const char *file_name) {
     NUMBER_NEURONS = tbl["neuron"]["neuron_count"].as_integer()->get();
   } else {
     lg.log_string(ERROR, "Failed to parse: %s", "neuron_count");
+  }
+
+  if (tbl["neuron"]["edge_count"].as_string()) {
+    std::string seed = tbl["neuron"]["edge_count"].as_string()->get();
+    if (seed == "MAX") {
+      NUMBER_EDGES = maximum_edges();
+      lg.log_string(INFO, "Maximum edges selected, setting to %s",
+                    std::to_string(NUMBER_EDGES).c_str());
+    }
+  } else if (tbl["neuron"]["edge_count"].as_integer()) {
+    NUMBER_EDGES = tbl["neuron"]["edge_count"].as_integer()->get();
+  } else {
+    lg.log_string(ERROR, "Failed to parse: %s", "edge_count");
   }
 
   return 1;
