@@ -127,11 +127,7 @@ int main(int argc, char **argv) {
   // Deallocate groups
 
   // Destroy mutexes
-  pthread_mutex_destroy(&potential_mutex);
-  pthread_mutex_destroy(&log_mutex);
-  pthread_mutex_destroy(&message_mutex);
-  pthread_mutex_destroy(&activation_mutex);
-  pthread_mutex_destroy(&stimulus_switch_mutex);
+  destroy_mutexes();
   pthread_cond_destroy(&stimulus_switch_cond);
   return 0;
 }
