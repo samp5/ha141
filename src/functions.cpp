@@ -291,6 +291,9 @@ void create_base_toml() {
   }
 
   file << "[neuron]" << '\n';
+  file << "# NOTE: both the number of neurons and the number of input neurons"
+       << '\n';
+  file << "#       must be divisible by the number of groups" << '\n';
   file << '\n';
   file << "# number of neurons" << '\n';
   file << "neuron_count = 2" << '\n';
