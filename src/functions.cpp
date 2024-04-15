@@ -685,6 +685,7 @@ void destroy_mutexes() {
   pthread_mutex_destroy(&log_mutex);
   pthread_mutex_destroy(&message_mutex);
   pthread_mutex_destroy(&activation_mutex);
+  pthread_mutex_destroy(&stimulus_switch_mutex);
 }
 
 int maximum_edges() {
