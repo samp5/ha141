@@ -8,6 +8,9 @@ testoutput
 logs/*
 input_files/*.txt
 
+# only pulls input neurons
+plotting/main2.py
+
 # exclude all build executables
 build/*
 
