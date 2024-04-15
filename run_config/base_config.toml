@@ -12,12 +12,6 @@ group_count = 5
 # number of connections
 edge_count = 40
 
-# in milliseconds
-wait_time = 2
-
-# integer
-wait_loops = 3
-
 # value each neuron is initialized with
 initial_membrane_potential = -55.0
 

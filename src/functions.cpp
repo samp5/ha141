@@ -304,12 +304,6 @@ void create_base_toml() {
   file << "# number of connections" << '\n';
   file << "edge_count = 4" << '\n';
   file << '\n';
-  file << "# in milliseconds" << '\n';
-  file << "wait_time = 100" << '\n';
-  file << '\n';
-  file << "# integer" << '\n';
-  file << "wait_loops = 5" << '\n';
-  file << '\n';
   file << "# value each neuron is initialized with" << '\n';
   file << "initial_membrane_potential = -55.0" << '\n';
   file << '\n';
@@ -501,18 +495,6 @@ int set_options(const char *file_name) {
         tbl["neuron"]["initial_membrane_potential"].as_floating_point()->get();
   } else {
     lg.log_string(ERROR, "Failed to parse: %s", "initial_membrane_potential");
-  }
-
-  if (tbl["neuron"]["wait_loops"].as_integer()) {
-    WAIT_LOOPS = tbl["neuron"]["wait_loops"].as_integer()->get();
-  } else {
-    lg.log_string(ERROR, "Failed to parse: %s", "wait_loops");
-  }
-
-  if (tbl["neuron"]["wait_time"].as_integer()) {
-    WAIT_TIME = 1000 * tbl["neuron"]["wait_time"].as_integer()->get();
-  } else {
-    lg.log_string(ERROR, "Failed to parse: %s", "wait_time");
   }
 
   if (tbl["neuron"]["edge_count"].as_integer()) {
