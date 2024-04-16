@@ -296,17 +296,20 @@ void create_base_toml() {
   file << "#       must be divisible by the number of groups" << '\n';
   file << '\n';
   file << "# number of neurons" << '\n';
-  file << "neuron_count = 2" << '\n';
+  file << "neuron_count = 10" << '\n';
   file << '\n';
   file << "# number of input type neurons" << '\n';
-  file << "input_neuron_count = 1" << '\n';
+  file << "input_neuron_count = 2" << '\n';
   file << '\n';
   file << "# number of groups" << '\n';
-  file << "group_count = 1" << '\n';
+  file << "group_count = 2" << '\n';
   file << '\n';
   file << "# number of connections" << '\n';
   file << "# option can be \"MAX\" for maximum edges" << '\n';
   file << "edge_count = 1" << '\n';
+  file << '\n';
+  file << "# refractory_duration" << '\n';
+  file << "refractory_duration = 0.5" << '\n';
   file << '\n';
   file << "# value each neuron is initialized with" << '\n';
   file << "initial_membrane_potential = -55.0" << '\n';
@@ -318,7 +321,7 @@ void create_base_toml() {
   file << "refractory_membrane_potential = -70.0" << '\n';
   file << '\n';
   file << "#  tau for the linearlization of the decay function\n";
-  file << "tau = 1.0";
+  file << "tau = 100.0\n";
   file << '\n';
   file << "#  poisson_prob_of_success\n";
   file << "poisson_prob_of_success = 0.0001";
@@ -341,7 +344,7 @@ void create_base_toml() {
   file << '\n';
   file << "[runtime_vars]" << '\n';
   file << "# in seconds" << '\n';
-  file << "runtime = 20" << '\n';
+  file << "runtime = 1" << '\n';
   file << "# file to read input from" << '\n';
   file << "input_file = \"./input_files/test\"" << '\n';
 
