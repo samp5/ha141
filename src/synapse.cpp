@@ -17,6 +17,7 @@ void Synapse::propagate() {
       INFO, "Group %d: Neuron %d is sending a mesage to Group %d: Neuron %d",
       preGroupID, preID, postGroupID, postID);
 
+  // add delay to synapse (some random value around 1 millisecond)
   Message *message_to_send =
       construct_message(message_value, this->getPostSynaptic(), From_Neighbor);
 
