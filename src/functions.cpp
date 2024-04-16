@@ -212,6 +212,7 @@ void construct_input_neuron_vector(const vector<NeuronGroup *> &groups,
 void get_next_line(std::string &line) {
   static std::string file_name = INPUT_FILE;
   static std::ifstream file(file_name);
+  std::string temp;
 
   if (!file.is_open()) {
     lg.log(ERROR, "get_next_line: Unable to open file");
@@ -219,7 +220,15 @@ void get_next_line(std::string &line) {
   }
 
   // Any previous contents of @a \_\_str are erased.
-  std::getline(file, line);
+  std::getline(file, temp);
+
+  for (char ch : temp) {
+    if (ch == ',') {
+      continue;
+    }
+    line += ' ';
+    line += ch;
+  }
 }
 
 void set_next_line(const vector<InputNeuron *> &input_neurons) {

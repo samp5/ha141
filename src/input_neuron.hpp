@@ -25,6 +25,7 @@ public:
   void set_input_value(double value);
   bool check_refractory_period();
   void send_messages_in_group();
+  double get_value() const { return this->input_value; }
 };
 
 #endif // !INPUT_NEURON
