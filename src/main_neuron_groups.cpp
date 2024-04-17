@@ -85,6 +85,7 @@ int main(int argc, char **argv) {
   set_next_line(input_neurons);
 
   // start all group threads
+  lg.start_clock();
   for (auto group : neuron_groups) {
     group->start_thread();
   }

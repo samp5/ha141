@@ -50,6 +50,7 @@ public:
   Log() : start(hr_clock::now()), off_set(0.0f) {}
   // DATA Functions
 
+  void start_clock() { this->start = hr_clock::now(); }
   void write_data(const char *filesname = "./logs/%ld/%ld.log");
 
   void add_data(int group_id, int curr_id, double curr_data);
