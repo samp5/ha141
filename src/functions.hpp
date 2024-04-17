@@ -208,4 +208,6 @@ void construct_input_neuron_vector(const vector<NeuronGroup *> &groups,
                                    vector<InputNeuron *> &input_neurons);
 void get_next_line(std::string &line);
 void set_next_line(const vector<InputNeuron *> &input_neurons);
+void set_line_x(const vector<InputNeuron *> &input_neurons, int target);
+void get_line_x(const vector<InputNeuron *> &input_neurons, int target);
 #endif // !FUNCTIONS
