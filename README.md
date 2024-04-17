@@ -53,7 +53,7 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 
 | Date  | Key Points 🔑   |  Issues 🐛   |
 |--------------- | --------------- |--------------- |
-| [4-16](#-update-4-16)   | Total activation graph |  None |
+| [4-16](#-update-4-16)   | Total activation graph |  mnist data set has weird inital peak that I'm not sure is correct? |
 | [4-14](#-update-4-14)   | Multiple stimuli same run |  None |
 | [4-11](#-update-4-11)   | New synapse class |  None |
 | [4-10](#-update-4-10)   | Graphing looks much much better. New decay functionality, fixed a sneaky SEGV |  None |
