@@ -25,7 +25,9 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 │   └── ...
 ├── plotting 
 │   ├── venv //virtual environment for python packages
+│   ├── total_activation.py
 │   └── main.py
+
 ├── run_config 
 │   ├── base_config.toml // base config
 │   └── toml.hpp // header for toml++
@@ -51,6 +53,7 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 
 | Date  | Key Points 🔑   |  Issues 🐛   |
 |--------------- | --------------- |--------------- |
+| [4-16](#-update-4-16)   | Total activation graph |  None |
 | [4-14](#-update-4-14)   | Multiple stimuli same run |  None |
 | [4-11](#-update-4-11)   | New synapse class |  None |
 | [4-10](#-update-4-10)   | Graphing looks much much better. New decay functionality, fixed a sneaky SEGV |  None |
@@ -67,6 +70,22 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 | [2-29](#-update-2-29)   | Updated Neuron Class with with membrane potentials, refractory phases, Update to edge weights, fixed issue 1, guard clauses on header files.   | "Quit" functionality does not work for the menu [~~Issue 2~~](#-issue-2)|
 | [2-28](#-update-2-28)   | Basic Node class that sends and recieves messages   | `random_neighbors` may repeat edges. [~~Issue 1~~](#-issue-1)|
 
+### 📌 Update 4-16
+**New addtions:**
+- Total Activation graphs!
+    - Local network on dummy data set
+    - ![Local network on dummy data set](https://github.com/samp5/ha141/blob/main/images/3315642.png)
+- First mnist data set run!
+    - Ran with 4900 neurons, 784 input neurons and 500,000 connections over 3 seconds
+    - Mnist data set line 1
+    - ![Mnist data set line 1](https://github.com/samp5/ha141/blob/main/images/3313330.png)
+    - Mnist data set line 4
+    - ![Mnist data set line 4](https://github.com/samp5/ha141/blob/main/images/3315419.png)
+- Added functions to read specific line of a file `set_line_x(const std::vector<InputNeuron *>& vec, int target)`
+- New python script to generate total activation graph. 
+    - `-r` for most recent
+    - `-s <value>` to set the time step (size of segment where activations are counted)
+        - Default value is to have 350 "blocks" or `runtime / 350`
 
 ### 📌 Update 4-14
 **New addtions:**
