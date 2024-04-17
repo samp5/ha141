@@ -82,7 +82,9 @@ int main(int argc, char **argv) {
 
   vector<InputNeuron *> input_neurons;
   construct_input_neuron_vector(neuron_groups, input_neurons);
-  set_next_line(input_neurons);
+
+  // set the input to a specific line
+  set_line_x(input_neurons, 4);
 
   // start all group threads
   lg.start_clock();
