@@ -41,15 +41,8 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 ```
 
 ### In-Progress 🚀
-- [x] ~~Create and integrate Log Class~~
-- [x] ~~Neuron Group Class~~
-- [x] ~~Activate Neuron from file inputs~~
-- [x] ~~Decay functionality~~
-- [x] ~~TOML configuration for run-time options~~
-- [x] ~~Neuron Types for differentiated functionality (input, output)~~
-- [x] Message list sorting
-- [ ] Data structure for tracking presynaptic propagation 
 - [ ] Copy functionality for replicating graph layout
+- [ ] Delay for Synapse
 
 | Date  | Key Points 🔑   |  Issues 🐛   |
 |--------------- | --------------- |--------------- |
