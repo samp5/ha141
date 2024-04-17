@@ -421,11 +421,8 @@ void Log::log_runtime_config(const std::string &name) {
 
   namespace fs = std::filesystem;
   fs::path config_source = CONFIG_FILE;
-  fs::path input_source = INPUT_FILE;
 
   fs::path config_target = "./logs/" + name + "/" + name + ".toml";
-  fs::path input_target = "./logs/" + name + "/" + name + ".txt";
 
   fs::copy_file(config_source, config_target);
-  fs::copy_file(input_source, input_target);
 }
