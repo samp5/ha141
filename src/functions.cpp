@@ -219,7 +219,7 @@ void get_line_x(std::string &line, int target) {
   }
 
   file.seekg(std::ios::beg);
-  for (int i = 0; i < target; i++) {
+  for (int i = 1; i < target; i++) {
     file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
   }
 
