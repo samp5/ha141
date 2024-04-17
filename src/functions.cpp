@@ -209,6 +209,30 @@ void construct_input_neuron_vector(const vector<NeuronGroup *> &groups,
   }
 }
 
+void get_line_x(std::string &line, int target) {
+  static std::string file_name = INPUT_FILE;
+  static std::ifstream file(file_name);
+  std::string temp;
+  if (!file.is_open()) {
+    lg.log(ERROR, "get_next_line: Unable to open file");
+    return;
+  }
+
+  file.seekg(std::ios::beg);
+  for (int i = 0; i < target; i++) {
+    file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+  }
+
+  std::getline(file, temp);
+  for (char ch : temp) {
+    if (ch == ',') {
+      continue;
+    }
+    line += ' ';
+    line += ch;
+  }
+}
+
 void get_next_line(std::string &line) {
   static std::string file_name = INPUT_FILE;
   static std::ifstream file(file_name);
@@ -228,6 +252,24 @@ void get_next_line(std::string &line) {
     }
     line += ' ';
     line += ch;
+  }
+}
+
+void set_line_x(const vector<InputNeuron *> &input_neurons, int target) {
+  if (input_neurons.empty()) {
+    lg.log(ESSENTIAL, "set_line_x: passed empty input neuron vector?");
+    return;
+  }
+
+  std::string line;
+  get_line_x(line, target);
+
+  std::stringstream s(line);
+  double value;
+
+  for (InputNeuron *input_neuron : input_neurons) {
+    s >> value;
+    input_neuron->set_input_value(value);
   }
 }
 
