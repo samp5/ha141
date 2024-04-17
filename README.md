@@ -78,9 +78,11 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 - First mnist data set run!
     - Ran with 4900 neurons, 784 input neurons and 500,000 connections over 3 seconds
     - Mnist data set line 1
-    - ![Mnist data set line 1](https://github.com/samp5/ha141/blob/main/images/3313330.png)
+
+     ![Mnist data set line 1](https://github.com/samp5/ha141/blob/main/images/3313330.png)
     - Mnist data set line 4
-    - ![Mnist data set line 4](https://github.com/samp5/ha141/blob/main/images/3315419.png)
+
+     ![Mnist data set line 4](https://github.com/samp5/ha141/blob/main/images/3315419.png)
 - Added functions to read specific line of a file `set_line_x(const std::vector<InputNeuron *>& vec, int target)`
 - New python script to generate total activation graph. 
     - `-r` for most recent
