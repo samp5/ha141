@@ -74,7 +74,8 @@ Project for CS 141 Honors Supplement: Toy spiking neural network using a multith
 **New addtions:**
 - Total Activation graphs!
     - Local network on dummy data set
-    - ![Local network on dummy data set](https://github.com/samp5/ha141/blob/main/images/3315642.png)
+
+     ![Local network on dummy data set](https://github.com/samp5/ha141/blob/main/images/3315642.png)
 - First mnist data set run!
     - Ran with 4900 neurons, 784 input neurons and 500,000 connections over 3 seconds
     - Mnist data set line 1
