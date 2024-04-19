@@ -76,9 +76,7 @@ int main(int argc, char **argv) {
   assign_groups(neuron_groups);
 
   // Add random edges between neurons
-  random_synapses(neuron_groups, NUMBER_EDGES);
-
-  // Get message vector from file
+  efficient_random_synapses(neuron_groups);
 
   vector<InputNeuron *> input_neurons;
   construct_input_neuron_vector(neuron_groups, input_neurons);

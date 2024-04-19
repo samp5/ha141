@@ -4,8 +4,10 @@
 #include "neuron.hpp"
 #include <algorithm>
 #include <fstream>
+#include <iterator>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 
 bool has_synaptic_connection(Neuron *from_neuron, Neuron *to_neuron) {
   auto pPostsynaptic = from_neuron->getPostSynaptic();
@@ -60,7 +62,84 @@ bool has_neighbor_group(Neuron *from_neuron, Neuron *to_neuron) {
   return ret;
 }
 
-void random_synapses(vector<NeuronGroup *> groups, int number_neighbors) {
+vector<Neuron *> construct_neuron_vector(const vector<NeuronGroup *> &groups) {
+  vector<Neuron *> ret;
+  for (auto group : groups) {
+    for (auto neuron : group->get_neruon_vector()) {
+      ret.push_back(neuron);
+    }
+  }
+  return ret;
+}
+
+std::unordered_map<Neuron *, std::list<Neuron *>>
+construct_neighbor_options(const vector<Neuron *> &neurons) {
+  std::unordered_map<Neuron *, std::list<Neuron *>> map;
+  for (auto neuron_origin : neurons) {
+    std::list<Neuron *> origin_list;
+    for (auto neuron_destination : neurons) {
+      if (neuron_origin == neuron_destination) {
+        continue;
+      }
+      if (neuron_destination->get_type() == Input) {
+        continue;
+      }
+      origin_list.push_back(neuron_destination);
+    }
+    map.insert({neuron_origin, origin_list});
+  }
+  return map;
+}
+
+std::list<Neuron *>::const_iterator find_in_list(std::list<Neuron *> &n_list,
+                                                 Neuron *neuron) {
+  return std::find(n_list.begin(), n_list.end(), neuron);
+}
+
+void efficient_random_synapses(vector<NeuronGroup *> &groups) {
+
+  int synapses_formed = 0;
+  auto neuron_vector = construct_neuron_vector(groups);
+  auto map = construct_neighbor_options(neuron_vector);
+
+  for (auto neuron : neuron_vector) {
+
+    // get the neighbor_options for this neuron from the map
+    std::list<Neuron *> &neighbor_options = map.at(neuron);
+    if (neighbor_options.empty()) {
+      continue;
+    }
+
+    // get a random neuron in this list
+    auto target = neighbor_options.begin();
+    std::advance(target, rand() % neighbor_options.size());
+
+    // get the neighbor_options for the postsynaptic neuron and an iter to
+    // this neuron
+    std::list<Neuron *> &post_synaptic_neuron_options = map.at(*target);
+    auto this_neuron = find_in_list(post_synaptic_neuron_options, neuron);
+
+    // add postsynaptic neuron as a neighbor
+    neuron->add_neighbor(*target, weight_function());
+
+    // erase the postsynaptic neuron from the list and this neuron from the
+    // postsynaptic list
+    neighbor_options.erase(target);
+    if (this_neuron != post_synaptic_neuron_options.end()) {
+      post_synaptic_neuron_options.erase(this_neuron);
+    }
+
+    // increment the synapses
+    synapses_formed += 1;
+
+    // check to make sure we still need edges
+    if (synapses_formed >= NUMBER_EDGES) {
+      break;
+    }
+  }
+}
+
+void random_synapses(vector<NeuronGroup *> &groups, int number_neighbors) {
   int i = 0;
   while (i < number_neighbors) {
 
@@ -166,7 +245,7 @@ void print_node_values(vector<Neuron *> nodes) {
   }
 }
 
-double weight_function() { return (double)rand() / RAND_MAX * 0.1; }
+double weight_function() { return ((double)rand() / RAND_MAX) * 0.1; }
 
 int get_inhibitory_status() {
   int ret;

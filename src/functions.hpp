@@ -56,6 +56,7 @@ void destroy_mutexes();
 // @param1: vector of Neuron pointers
 // @param2: desired number of edges in the entire graph
 void random_synapses(vector<NeuronGroup *> groups, int number_neighbors);
+void efficient_random_synapses(vector<NeuronGroup *> &groups);
 
 // Print membrane potential of all neurons in vector
 //
