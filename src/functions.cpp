@@ -614,7 +614,7 @@ int set_options(const char *file_name) {
   }
 
   if (tbl["runtime_vars"]["line_range"].as_string()) {
-    STIMULUS =
+    STIMULUS_VEC =
         parse_line_range(tbl["runtime_vars"]["line_range"].as_string()->get());
   } else {
     lg.log_string(ERROR, "Failed to parse: %s", "line_range");
