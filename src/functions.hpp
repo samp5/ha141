@@ -40,6 +40,7 @@ extern double INPUT_PROB_SUCCESS;
 extern double REFRACTORY_DURATION;
 extern std::string INPUT_FILE;
 extern std::string CONFIG_FILE;
+extern vector<int> STIMULUS;
 
 typedef std::map<Neuron *, double> weight_map;
 

@@ -21,6 +21,8 @@ int NUMBER_NEURONS;
 int NUMBER_INPUT_NEURONS;
 int WAIT_LOOPS;
 int WAIT_TIME; // in microseconds
+vector<int> STIMULUS_VEC;
+vector<int>::const_iterator STIMULUS;
 double TAU;
 unsigned long RUN_TIME; // in microseconds
 double REFRACTORY_DURATION;
@@ -81,8 +83,10 @@ int main(int argc, char **argv) {
   vector<InputNeuron *> input_neurons;
   construct_input_neuron_vector(neuron_groups, input_neurons);
 
+  STIMULUS = STIMULUS_VEC.begin();
+
   // set the input to a specific line
-  set_line_x(input_neurons, 4);
+  set_line_x(input_neurons, *STIMULUS);
 
   // start all group threads
   lg.start_clock();
@@ -90,7 +94,7 @@ int main(int argc, char **argv) {
     group->start_thread();
   }
 
-  int num_stim = 1;
+  int num_stim = STIMULUS_VEC.size();
   int time_per_stim = (double)RUN_TIME / num_stim;
 
   for (int i = 1; i < num_stim + 1; i++) {
@@ -102,6 +106,7 @@ int main(int argc, char **argv) {
       switching_stimulus = true;
 
       set_next_line(input_neurons);
+      STIMULUS++;
 
       pthread_mutex_lock(&stimulus_switch_mutex);
       switching_stimulus = false;

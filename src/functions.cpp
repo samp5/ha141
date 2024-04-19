@@ -505,6 +505,10 @@ void create_base_toml() {
   file << "runtime = 1" << '\n';
   file << "# file to read input from" << '\n';
   file << "input_file = \"./input_files/test\"" << '\n';
+  file << "# format should be \"x..y\" for reading lines x to y (inclusive) or "
+          "just x for a single line"
+       << '\n';
+  file << "line_range = \"1\"" << '\n';
 
   file.close();
 }
@@ -607,6 +611,13 @@ int set_options(const char *file_name) {
         tbl["neuron"]["input_neuron_count"].as_integer()->get();
   } else {
     lg.log_string(ERROR, "Failed to parse: %s", "input_neuron_count");
+  }
+
+  if (tbl["runtime_vars"]["line_range"].as_string()) {
+    STIMULUS =
+        parse_line_range(tbl["runtime_vars"]["line_range"].as_string()->get());
+  } else {
+    lg.log_string(ERROR, "Failed to parse: %s", "line_range");
   }
 
   if (tbl["runtime_vars"]["runtime"].as_integer()) {
