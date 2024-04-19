@@ -3,11 +3,39 @@
 #include "log.hpp"
 #include "neuron.hpp"
 #include <algorithm>
+#include <cctype>
 #include <fstream>
 #include <iterator>
 #include <sstream>
 #include <string>
 #include <unordered_map>
+
+vector<int> parse_line_range(const std::string &in) {
+  vector<int> ret;
+
+  bool check1 = std::find(in.begin(), in.end(), '.') == in.end();
+  bool check2 = std::all_of(in.begin(), in.end(), ::isdigit);
+
+  if (check1) {
+    if (check2) {
+      ret.push_back(std::stoi(in));
+    }
+  } else {
+    auto pos1 = in.find_first_of('.');
+    auto pos2 = in.find_last_of('.');
+    if (pos1 == std::string::npos || pos2 == std::string::npos) {
+      lg.log(ERROR, "Cannot parse configuratio file. Not a valid range");
+      return ret;
+    }
+    int start = std::stoi(in.substr(0, pos1));
+    int end = std::stoi(in.substr(pos2 + 1));
+
+    for (int i = start; i <= end; i++) {
+      ret.push_back(i);
+    }
+  }
+  return ret;
+}
 
 bool has_synaptic_connection(Neuron *from_neuron, Neuron *to_neuron) {
   auto pPostsynaptic = from_neuron->getPostSynaptic();
