@@ -116,3 +116,12 @@ const vector<Neuron *> &NeuronGroup::get_neruon_vector() {
 void NeuronGroup::print_group() {
   cout << "NeuronGroup::print_group() not implemented\n";
 }
+
+void NeuronGroup::reset() {
+  for (auto neuron : this->neurons) {
+    if (neuron->get_type() == Input) {
+      neuron = dynamic_cast<InputNeuron *>(neuron);
+    }
+    neuron->reset();
+  }
+}
