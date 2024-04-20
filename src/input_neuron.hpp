@@ -20,6 +20,7 @@ public:
     this->activate();
   }
 
+  void reset();
   void run_in_group();
   bool poisson_result();
   void set_input_value(double value);

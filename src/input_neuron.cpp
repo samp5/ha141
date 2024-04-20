@@ -102,3 +102,9 @@ void InputNeuron::set_input_value(double value) {
                             "(Input) (%d) Neuron %d input value set to %f",
                             this->get_group()->get_id(), this->get_id(), value);
 }
+
+void InputNeuron::reset() {
+  this->membrane_potential = INITIAL_MEMBRANE_POTENTIAL;
+  this->last_decay = lg.get_time_stamp();
+  this->refractory_start = 0;
+}
