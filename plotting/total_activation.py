@@ -97,7 +97,7 @@ for data in stimlus_set:
     plt.plot(x_values, y_values, linewidth = 0.5 )
     plt.xlabel("Time")
     plt.ylabel("Activation")
-    plt.title(f"Run {most_recent}")
+    plt.title(f"Run {most_recent} Stimulus #{stim_num}")
     plt.savefig(f"{most_recent}-{stim_num}.png")
     plt.close()
 
