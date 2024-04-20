@@ -56,32 +56,48 @@ with open(file_name, 'r') as file:
         timestamp = float(parts[3])
         value = float(parts[4])
         message_type = parts[5]
+        stimulus_number = int(parts[6])
 
         if message_type == "R":
-            data.append((timestamp, value))
+            data.append((timestamp, value, stimulus_number))
 
 # sort the data
-print(data)
 data = sorted(data, key = lambda x: x[0])
-plt.figure(dpi=300)
 
-# timestep
-timestep = data[-1][0] / 300 if timestep == -1 else timestep
-bins = math.ceil(data[-1][0] / timestep)
-x_values = []
-y_values =  []
-lower = data[0][0];
-upper = lower + timestep;
+#max stimulus_number 
+max_stim = data[-1][2]
+min_stim = data[0][2]
 
-for i in range(0, bins):
-    x_values.append(lower)
-    y_values.append(sum( ((lower <= x[0]) and (x[0] < upper)) for x in data))
-    lower = upper
-    upper = upper + timestep;
+# all stimuli
+stimlus_set = []
+for i in range(min_stim, max_stim + 1):
+    filter = [data_point for data_point in data if data_point[2] == i]
+    stimlus_set.append(filter)
 
-plt.plot(x_values, y_values, linewidth = 0.5 )
-plt.xlabel("Time")
-plt.ylabel("Activation")
-plt.title(f"Run {most_recent}")
-plt.savefig(f"{most_recent}.png")
+for data in stimlus_set:
+    plt.figure(dpi=300)
+
+    # get the stimulus_number
+    stim_num = data[0][2]
+
+    # timestep per bin
+    timestep = (data[-1][0] - data[0][0]) / 300 if timestep == -1 else timestep
+    bins = math.ceil((data[-1][0] - data[0][0]) / timestep)
+    x_values = []
+    y_values = []
+    lower = data[0][0];
+    upper = lower + timestep;
+
+    for i in range(0, bins):
+        x_values.append(lower)
+        y_values.append(sum( ((lower <= x[0]) and (x[0] < upper)) for x in data))
+        lower = upper
+        upper = upper + timestep;
+
+    plt.plot(x_values, y_values, linewidth = 0.5 )
+    plt.xlabel("Time")
+    plt.ylabel("Activation")
+    plt.title(f"Run {most_recent}")
+    plt.savefig(f"{most_recent}-{stim_num}.png")
+    plt.close()
 
