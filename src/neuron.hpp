@@ -92,6 +92,7 @@ public:
   vector<Synapse *> &getSynapses() { return this->PostSynapticConnnections; }
 
   // State operations
+  virtual void reset();
   void refractory();
   void set_type(Neuron_t type);
   void activate();

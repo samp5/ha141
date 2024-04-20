@@ -538,3 +538,14 @@ void Neuron::addPostSynapticConnection(Synapse *synapse) {
 void Neuron::addPreSynapticConnnection(Synapse *synapse) {
   this->PreSynapticConnections.push_back(synapse);
 }
+
+void Neuron::reset() {
+  this->membrane_potential = INITIAL_MEMBRANE_POTENTIAL;
+  for (auto message : this->messages) {
+    delete message;
+  }
+  this->last_decay = lg.get_time_stamp();
+  this->refractory_start = 0;
+  this->messages.clear();
+  this->deactivate();
+}
