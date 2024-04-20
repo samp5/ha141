@@ -107,6 +107,9 @@ int main(int argc, char **argv) {
 
       set_next_line(input_neurons);
       STIMULUS++;
+      for (auto group : neuron_groups) {
+        group->reset();
+      }
 
       pthread_mutex_lock(&stimulus_switch_mutex);
       switching_stimulus = false;
