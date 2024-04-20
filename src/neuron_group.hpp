@@ -40,6 +40,7 @@ public:
   // not implemented
   void print_group();
   int neuron_count();
+  void reset();
   double get_message();
   const vector<Neuron *> &get_neruon_vector();
 
