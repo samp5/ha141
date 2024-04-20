@@ -151,6 +151,7 @@ void Log::add_data(int group_id, int curr_id, double curr_data, double time,
   this_data.neuron_id = curr_id;
   this_data.neuron_type = type;
   this_data.message_type = message_type;
+  this_data.stimulus_number = *STIMULUS;
 
   this->log_data.push_back(this_data);
   pthread_mutex_unlock(&data_mutex);
@@ -165,6 +166,7 @@ void Log::add_data(int group_id, int curr_id, double curr_data, double time,
   this_data->neuron_id = curr_id;
   this_data->neuron_type = type;
   this_data->message_type = message_type;
+  this_data->stimulus_number = *STIMULUS;
   origin->push_back_data(this_data);
 }
 
@@ -204,7 +206,8 @@ void Log::write_data(const char *filename) {
     file << std::fixed << log_data.group_id << " " << log_data.neuron_id << " "
          << io_type_to_string((Neuron_t)log_data.neuron_type) << " "
          << log_data.timestamp << " " << log_data.membrane_potentail << " "
-         << message_type_to_string(log_data.message_type) << '\n';
+         << message_type_to_string(log_data.message_type) << " "
+         << log_data.stimulus_number << '\n';
   }
 
   file.close();
@@ -300,6 +303,7 @@ void Log::add_data(int group_id, int curr_id, double curr_data) {
   this_data.membrane_potentail = curr_data;
   this_data.group_id = group_id;
   this_data.neuron_id = curr_id;
+  this_data.stimulus_number = *STIMULUS;
 
   this->log_data.push_back(this_data);
   pthread_mutex_unlock(&data_mutex);

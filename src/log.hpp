@@ -30,9 +30,11 @@ typedef struct LogData {
   double membrane_potentail;
   int neuron_type = 0;
   Message_t message_type;
+  int stimulus_number;
 } LogData;
 
 extern LogLevel DEBUG_LEVEL;
+extern vector<int>::const_iterator STIMULUS;
 extern ostream &STREAM;
 extern pthread_mutex_t log_mutex;
 
