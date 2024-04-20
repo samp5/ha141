@@ -86,14 +86,15 @@ for data in stimlus_set:
     x_values = []
     y_values = []
     lower = data[0][0];
+    absolute_lowest = lower
     upper = lower + timestep;
 
     for i in range(0, bins):
-        x_values.append(lower)
+        x_values.append(lower - absolute_lowest)
         y_values.append(sum( ((lower <= x[0]) and (x[0] < upper)) for x in data))
         lower = upper
         upper = upper + timestep;
-
+    plt.ylim(0, 30)
     plt.plot(x_values, y_values, linewidth = 0.5 )
     plt.xlabel("Time")
     plt.ylabel("Activation")
