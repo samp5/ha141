@@ -74,9 +74,11 @@ int main(int argc, char **argv) {
   // Reserve the vector memory
   vector<NeuronGroup *> neuron_groups(NUMBER_GROUPS);
 
+  lg.log(ESSENTIAL, "Assigning neuron groups...");
   // Assign neurons to groups
   assign_groups(neuron_groups);
 
+  lg.log(ESSENTIAL, "Adding synapses...");
   auto start = lg.get_time_stamp();
   // Add random edges between neurons
   efficient_random_synapses(neuron_groups);
@@ -132,6 +134,7 @@ int main(int argc, char **argv) {
 
   active = false;
 
+  lg.log(ESSENTIAL, "Waiting for threads to join...");
   for (auto group : neuron_groups) {
     pthread_join(group->get_thread_id(), NULL);
   }
