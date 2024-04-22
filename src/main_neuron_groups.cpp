@@ -134,7 +134,7 @@ int main(int argc, char **argv) {
 
   active = false;
 
-  lg.log(ESSENTIAL, "Waiting for threads to join...");
+  lg.log(ESSENTIAL, "Transfering data from Neurons to Log...");
   for (auto group : neuron_groups) {
     pthread_join(group->get_thread_id(), NULL);
   }
