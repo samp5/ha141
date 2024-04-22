@@ -77,8 +77,13 @@ int main(int argc, char **argv) {
   // Assign neurons to groups
   assign_groups(neuron_groups);
 
+  auto start = lg.get_time_stamp();
   // Add random edges between neurons
   efficient_random_synapses(neuron_groups);
+  auto end = lg.get_time_stamp();
+  std::string msg = "Adding random synapses done: took " +
+                    std::to_string(end - start) + " seconds";
+  lg.log(ESSENTIAL, msg.c_str());
 
   vector<InputNeuron *> input_neurons;
   construct_input_neuron_vector(neuron_groups, input_neurons);
@@ -87,6 +92,7 @@ int main(int argc, char **argv) {
 
   // set the input to a specific line
   set_line_x(input_neurons, *STIMULUS);
+  lg.log_value(ESSENTIAL, "Set stimulus to line %d", *STIMULUS);
 
   // start all group threads
   lg.start_clock();
@@ -105,8 +111,10 @@ int main(int argc, char **argv) {
       auto start = std::chrono::high_resolution_clock::now();
       switching_stimulus = true;
 
-      set_next_line(input_neurons);
       STIMULUS++;
+      set_next_line(input_neurons);
+      lg.log_value(ESSENTIAL, "Set stimulus to line %d", *STIMULUS);
+
       for (auto group : neuron_groups) {
         group->reset();
       }
