@@ -80,6 +80,9 @@ void *NeuronGroup::group_run() {
   while (::active) {
 
     for (Neuron *neuron : this->neurons) {
+      if (!::active) {
+        break;
+      }
 
       lg.log_group_neuron_type(
           DEBUG4, "Checking activation:(%d) Neuron %d is %s", this->get_id(),
