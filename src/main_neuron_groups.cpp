@@ -141,8 +141,9 @@ int main(int argc, char **argv) {
     delete group;
   }
 
-  lg.log(INFO, "Writing data to file...");
+  lg.log(ESSENTIAL, "Writing data to file...");
   lg.write_data();
+  lg.log(ESSENTIAL, "Done writing, exiting");
 
   // Destroy mutexes
   destroy_mutexes();
