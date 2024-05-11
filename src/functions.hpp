@@ -1,3 +1,6 @@
+/**
+ * @file
+ */
 #ifndef FUNCTIONS
 #define FUNCTIONS
 
@@ -50,14 +53,15 @@ void check_start_conditions();
 
 void destroy_mutexes();
 
-// Assign random neighbors to all nodes in vector
-//
-// Reflexive edges and duplicate edges are not allowed.
-// Edge weightes are randomly generated and are between [0, 1]
-// @param1: vector of Neuron pointers
-// @param2: desired number of edges in the entire graph
-void random_synapses(vector<NeuronGroup *> groups, int number_neighbors);
-void efficient_random_synapses(vector<NeuronGroup *> &groups);
+/**
+ * Assign random neighbors to all nodes in vector
+ * Reflexive edges and duplicate edges are not allowed.
+ *
+ * Edge weightes are randomly generated and are between [0, 1]
+ *
+ * @param groups: vector of Neuron pointers
+ */
+void random_synapses(vector<NeuronGroup *> &groups);
 
 // Print membrane potential of all neurons in vector
 //
@@ -104,13 +108,6 @@ Neuron *get_random_neuron(const vector<NeuronGroup *> &group,
 //@param1 bool (Neuron::active)
 //@return const char* of "active" or "inactive"
 const char *get_active_status_string(bool active);
-
-// Construct a message
-//
-//@param1: value for message
-//@param2: target neuron
-//@returns: pointer to dynamically allocated Message
-Message *construct_message(double value, Neuron *target);
 
 // Construct a message
 //

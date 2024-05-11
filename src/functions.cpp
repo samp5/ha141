@@ -124,7 +124,7 @@ std::list<Neuron *>::const_iterator find_in_list(std::list<Neuron *> &n_list,
   return std::find(n_list.begin(), n_list.end(), neuron);
 }
 
-void efficient_random_synapses(vector<NeuronGroup *> &groups) {
+void random_synapses(vector<NeuronGroup *> &groups) {
 
   int synapses_formed = 0;
   auto neuron_vector = construct_neuron_vector(groups);
@@ -396,16 +396,6 @@ void set_next_line(const vector<InputNeuron *> &input_neurons) {
     s >> value;
     input_neuron->set_input_value(value);
   }
-}
-
-Message *construct_message(double value, Neuron *target) {
-  Message *message = new Message;
-  message->message = value;
-  message->timestamp = 0;
-  message->post_synaptic_neuron = target;
-  message->target_neuron_group = target->get_group();
-
-  return message;
 }
 
 Message *construct_message(double value, Neuron *target, Message_t type) {
