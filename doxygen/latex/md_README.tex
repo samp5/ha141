@@ -1,0 +1,2901 @@
+\chapter{Honors Supplement for CS 141}
+\hypertarget{md_README}{}\label{md_README}\index{Honors Supplement for CS 141@{Honors Supplement for CS 141}}
+\label{md_README_autotoc_md0}%
+\Hypertarget{md_README_autotoc_md0}%
+Project for CS 141 Honors Supplement\+: Toy spiking neural network using a multithreaded approach.\hypertarget{md_README_autotoc_md1}{}\doxysubsection{\texorpdfstring{📁 Folder Structure}{📁 Folder Structure}}\label{md_README_autotoc_md1}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{├──\ src}
+\DoxyCodeLine{│\ \ \ ├──\ functions.hpp}
+\DoxyCodeLine{│\ \ \ ├──\ functions.cpp}
+\DoxyCodeLine{│\ \ \ ├──\ input\_neuron.hpp}
+\DoxyCodeLine{│\ \ \ ├──\ input\_neuron.cpp}
+\DoxyCodeLine{│\ \ \ ├──\ log.hpp}
+\DoxyCodeLine{│\ \ \ ├──\ log.cpp}
+\DoxyCodeLine{│\ \ \ ├──\ main.cpp}
+\DoxyCodeLine{│\ \ \ ├──\ main\_neuron\_groups.cpp}
+\DoxyCodeLine{│\ \ \ ├──\ message.hpp}
+\DoxyCodeLine{│\ \ \ ├──\ neuron.hpp}
+\DoxyCodeLine{│\ \ \ ├──\ neuron.cpp}
+\DoxyCodeLine{│\ \ \ ├──\ neuron\_group.hpp}
+\DoxyCodeLine{│\ \ \ ├──\ neuron\_group.cpp}
+\DoxyCodeLine{│\ \ \ ├──\ synapse.hpp}
+\DoxyCodeLine{│\ \ \ └──\ synapse.cpp}
+\DoxyCodeLine{├──\ images\ //\ hold\ images\ for\ README}
+\DoxyCodeLine{├──\ pthred\_ex\ //practice\ pthread\ examples}
+\DoxyCodeLine{│\ \ \ └──\ ...}
+\DoxyCodeLine{├──\ plotting\ }
+\DoxyCodeLine{│\ \ \ ├──\ venv\ //virtual\ environment\ for\ python\ packages}
+\DoxyCodeLine{│\ \ \ ├──\ total\_activation.py}
+\DoxyCodeLine{│\ \ \ └──\ main.py}
+\DoxyCodeLine{}
+\DoxyCodeLine{├──\ run\_config\ }
+\DoxyCodeLine{│\ \ \ ├──\ base\_config.toml\ //\ base\ config}
+\DoxyCodeLine{│\ \ \ └──\ toml.hpp\ //\ header\ for\ toml++}
+\DoxyCodeLine{├──\ logs\ }
+\DoxyCodeLine{│\ \ \ └──\ //\ all\ .log\ files\ ignored\ }
+\DoxyCodeLine{├──\ input\_files\ }
+\DoxyCodeLine{│\ \ \ └──\ ...\ //\ input\ files\ for\ neuron\ activation}
+\DoxyCodeLine{├──\ .gitignore}
+\DoxyCodeLine{├──\ README.md}
+\DoxyCodeLine{└──\ makefile}
+
+\end{DoxyCode}
+\hypertarget{md_README_autotoc_md2}{}\doxysubsection{\texorpdfstring{In-\/\+Progress 🚀}{In-\/\+Progress 🚀}}\label{md_README_autotoc_md2}
+
+\begin{DoxyItemize}
+\item \mbox{[} \mbox{]} Copy functionality for replicating graph layout
+\item \mbox{[} \mbox{]} Delay for Synapse
+\end{DoxyItemize}
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{3}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Date   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Key Points 🔑   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Issues 🐛    }\\\cline{1-3}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Date   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Key Points 🔑   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Issues 🐛    }\\\cline{1-3}
+\endhead
+4-\/16   &Total activation graph   &mnist data set has weird inital peak that I\textquotesingle{}m not sure is correct?    \\\cline{1-3}
+4-\/14   &Multiple stimuli same run   &None    \\\cline{1-3}
+4-\/11   &New synapse class   &None    \\\cline{1-3}
+4-\/10   &Graphing looks much much better. New decay functionality, fixed a sneaky SEGV   &None    \\\cline{1-3}
+4-\/1   &Graph updates (markers for different events) some logic changes for neuron activation/firing/etc. Input Neurons!   &Not entirely sure the neuron implementation is correct, but the graphs are looking more promising    \\\cline{1-3}
+3-\/19   &Changed decay funciton, firing logic, and x-\/axis for graphing   &None    \\\cline{1-3}
+3-\/18   &Neuron input type   &None    \\\cline{1-3}
+3-\/15   &.toml configuration for run-\/time options!   &None    \\\cline{1-3}
+3-\/14   &Messaging working between and within groups! Reading from file. Decay functionality. Basic plotting with Python   &None    \\\cline{1-3}
+3-\/12   &Start of messaging functionality between neuron groups.   &None    \\\cline{1-3}
+3-\/11   &Start of Neruon Group Class   &None    \\\cline{1-3}
+3-\/5   &New fully integrated Log class. Write neuron ids and potential values to a {\ttfamily \texorpdfstring{$<$}{<}current\+\_\+time\texorpdfstring{$>$}{>}.log} file.   &None    \\\cline{1-3}
+3-\/3 pt.2   &Fixed Issue 2   &None    \\\cline{1-3}
+3-\/3   &Added time stamps to logging messages. Added function descriptions.   &None    \\\cline{1-3}
+2-\/29   &Updated Neuron Class with with membrane potentials, refractory phases, Update to edge weights, fixed issue 1, guard clauses on header files.   &"{}\+Quit"{} functionality does not work for the menu \texorpdfstring{$\sim$}{\string~}\texorpdfstring{$\sim$}{\string~}\+Issue 2\texorpdfstring{$\sim$}{\string~}\texorpdfstring{$\sim$}{\string~}    \\\cline{1-3}
+2-\/28   &Basic Node class that sends and recieves messages   &{\ttfamily random\+\_\+neighbors} may repeat edges. \texorpdfstring{$\sim$}{\string~}\texorpdfstring{$\sim$}{\string~}\+Issue 1\texorpdfstring{$\sim$}{\string~}\texorpdfstring{$\sim$}{\string~}   \\\cline{1-3}
+\end{longtabu}
+\hypertarget{md_README_autotoc_md3}{}\doxysubsection{\texorpdfstring{📌 Update 4-\/16}{📌 Update 4-\/16}}\label{md_README_autotoc_md3}
+{\bfseries{New addtions\+:}}
+\begin{DoxyItemize}
+\item Total Activation graphs!
+\begin{DoxyItemize}
+\item Local network on dummy data set
+
+
+\end{DoxyItemize}
+\item First mnist data set run!
+\begin{DoxyItemize}
+\item Ran with 4900 neurons, 784 input neurons and 500,000 connections over 3 seconds
+\item Mnist data set line 1
+
+
+\item Mnist data set line 4
+
+
+\end{DoxyItemize}
+\item Added functions to read specific line of a file {\ttfamily set\+\_\+line\+\_\+x(const std\+::vector\texorpdfstring{$<$}{<}Input\+Neuron \texorpdfstring{$\ast$}{*}\texorpdfstring{$>$}{>}\& vec, int target)}
+\item New python script to generate total activation graph.
+\begin{DoxyItemize}
+\item {\ttfamily -\/r} for most recent
+\item {\ttfamily -\/s \texorpdfstring{$<$}{<}value\texorpdfstring{$>$}{>}} to set the time step (size of segment where activations are counted)
+\begin{DoxyItemize}
+\item Default value is to have 350 "{}blocks"{} or {\ttfamily runtime / 350}
+\end{DoxyItemize}
+\end{DoxyItemize}
+\end{DoxyItemize}\hypertarget{md_README_autotoc_md4}{}\doxysubsection{\texorpdfstring{📌 Update 4-\/14}{📌 Update 4-\/14}}\label{md_README_autotoc_md4}
+{\bfseries{New addtions\+:}}
+\begin{DoxyItemize}
+\item Changed timing system to {\ttfamily std\+::chrono\+::high\+\_\+resolution\+\_\+clock}
+\item Changed the way that input is read and fed to {\ttfamily Input\+Neuron}s
+\item Uses {\ttfamily std\+::getline} with an {\ttfamily ifstream} to keep track of where we are in the file and read successive lines after a given amount of time
+\begin{DoxyItemize}
+\item Specifics\+:
+\begin{DoxyItemize}
+\item Successive stimuli {\bfseries{must}} be on separate lines, but mnist data is already in this format so it works
+\item For \$n\$ input neurons, only \$n\$ values are read from a given line. The rest are thrown away
+\end{DoxyItemize}
+\end{DoxyItemize}
+\item Graphs showing multiple stimulus switches during a run
+\begin{DoxyItemize}
+\item 
+\item 
+\end{DoxyItemize}
+\end{DoxyItemize}\hypertarget{md_README_autotoc_md5}{}\doxysubsubsection{\texorpdfstring{New control path for {\ttfamily Input\+Neuron}s}{New control path for {\ttfamily Input\+Neuron}s}}\label{md_README_autotoc_md5}
+
+\begin{DoxyItemize}
+\item The stimulus values for an {\ttfamily Input\+Neuron} are updated via a {\ttfamily pthread\+\_\+cond\+\_\+signal}
+\begin{DoxyItemize}
+\item Anytime the {\ttfamily Input\+Neuron} is run, a global bool is checked, {\ttfamily switching\+\_\+stimulus}
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (::switching\_stimulus)\ \{}
+\DoxyCodeLine{\textcolor{comment}{//\ wait\ for\ all\ input\ neurons\ to\ switch\ to\ the\ new\ stimulus}}
+\DoxyCodeLine{pthread\_mutex\_lock(\&::stimulus\_switch\_mutex);}
+\DoxyCodeLine{\textcolor{keywordflow}{while}\ (::switching\_stimulus)\ \{}
+\DoxyCodeLine{\ \ pthread\_cond\_wait(\&::stimulus\_switch\_cond,\ \&::stimulus\_switch\_mutex);}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{pthread\_mutex\_unlock(\&::stimulus\_switch\_mutex);}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyItemize}
+\item The input neuron then waits, effectivley haulting its parent group\textquotesingle{}s thread, until all values for all {\ttfamily Input\+Neuron}s have been updated.
+\item To account for the time taken for this process, an offset is introduced to the {\ttfamily Log} member function {\ttfamily get\+\_\+time\+\_\+stamp}
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ main\_neuron\_groups.cpp\ ...\ }}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{auto}\ start\ =\ std::chrono::high\_resolution\_clock::now();}
+\DoxyCodeLine{switching\_stimulus\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ update\ the\ stimulus\ values\ for\ each\ input\_neuron}}
+\DoxyCodeLine{set\_next\_line(input\_neurons);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{auto}\ end\ =\ std::chrono::high\_resolution\_clock::now();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{auto}\ duration\ =}
+\DoxyCodeLine{\ \ \ \ std::chrono::duration\_cast<std::chrono::duration<double>>(end\ -\/\ start);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ adjust\ the\ offset}}
+\DoxyCodeLine{lg.set\_offset(duration.count());}
+\DoxyCodeLine{}
+\DoxyCodeLine{pthread\_mutex\_lock(\&stimulus\_switch\_mutex);}
+\DoxyCodeLine{switching\_stimulus\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{pthread\_cond\_broadcast(\&stimulus\_switch\_cond);}
+\DoxyCodeLine{pthread\_mutex\_unlock(\&stimulus\_switch\_mutex);}
+
+\end{DoxyCode}
+
+
+
+
+{\bfseries{Specifics of helper functions}}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ to\ set\ values\ of\ each\ input\ neuron\ }}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ set\_next\_line(\textcolor{keyword}{const}\ vector<InputNeuron\ *>\ \&input\_neurons)\ \{}
+\DoxyCodeLine{\ \ std::string\ line;}
+\DoxyCodeLine{\ \ get\_next\_line(line);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ std::stringstream\ s(line);}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{double}\ value;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{for}\ (InputNeuron\ *input\_neuron\ :\ input\_neurons)\ \{}
+\DoxyCodeLine{\ \ \ \ s\ >>\ value;}
+\DoxyCodeLine{\ \ \ \ input\_neuron-\/>set\_input\_value(value);}
+\DoxyCodeLine{\ \ \}}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//updated\ get\_time\_stamp}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordtype}{double}\ Log::get\_time\_stamp()\ \{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ hr\_clock::time\_point\ now\ =\ hr\_clock::now();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ duration\ time\_span\ =\ std::chrono::duration\_cast<duration>(now\ -\/\ this-\/>start);}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{return}\ time\_span.count()\ -\/\ this-\/>off\_set;}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+\end{adjustwidth}
+\hypertarget{md_README_autotoc_md6}{}\doxysubsection{\texorpdfstring{📌 Update 4-\/11}{📌 Update 4-\/11}}\label{md_README_autotoc_md6}
+{\bfseries{New addtions\+:}}
+\begin{DoxyItemize}
+\item {\ttfamily Synapse} Class to replace maps in {\ttfamily Neuron} Class
+\item Hopefully will make backpropagation easier
+\begin{DoxyItemize}
+\item Keep track of {\ttfamily last\+\_\+weight} in {\ttfamily Synapse}
+\end{DoxyItemize}
+\item Command-\/line arguments for {\ttfamily main.\+py}
+\begin{DoxyItemize}
+\item use {\ttfamily -\/r} to automatically use the most recent log file in the {\ttfamily logs} folder
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{class\ }Synapse\ \{}
+\DoxyCodeLine{\textcolor{keyword}{public}:}
+\DoxyCodeLine{\ \ Synapse(Neuron\ *from,\ Neuron\ *to,\ \textcolor{keywordtype}{double}\ w)}
+\DoxyCodeLine{\ \ \ \ \ \ :\ \_origin(from),\ \_destination(to),\ \_weight(w)\{\};}
+\DoxyCodeLine{\ \ Neuron\ *getPostSynaptic()\ \{\ \textcolor{keywordflow}{return}\ this-\/>\_destination;\ \}}
+\DoxyCodeLine{\ \ Neuron\ *getPreSynaptic()\ \{\ \textcolor{keywordflow}{return}\ this-\/>\_origin;\ \}}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ propagate();}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ alterWeight(\textcolor{keywordtype}{double}\ weight);}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{double}\ getWeight()\ \{\ \textcolor{keywordflow}{return}\ this-\/>\_weight;\ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{private}:}
+\DoxyCodeLine{\ \ Neuron\ *\_origin\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\ \ Neuron\ *\_destination\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{double}\ \_weight\ =\ 0.0;}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{double}\ \_last\_weight\ =\ -\/1.0;}
+\DoxyCodeLine{\};}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyItemize}
+\item Greatly simplifies sending messages 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ Neuron::send\_messages\_in\_group()\ \{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ synapse\ :\ getPostSynaptic())\ \{}
+\DoxyCodeLine{\ \ \ \ synapse-\/>propagate();}
+\DoxyCodeLine{\ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ lg.log\_group\_neuron\_state(}
+\DoxyCodeLine{\ \ \ \ \ \ INFO,}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{stringliteral}{"{}(\%d)\ Neuron\ \%d\ reached\ activation\ threshold,\ entering\ refractory\ phase"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ this-\/>group-\/>get\_id(),\ this-\/>id);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ this-\/>refractory();}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+\item Rewrote helper functions like {\ttfamily add\+\_\+random\+\_\+neighbors} and {\ttfamily has\+\_\+neighbor} to be {\ttfamily random\+\_\+synapses} and {\ttfamily has\+\_\+synaptic\+\_\+connection} to accommodate the new data structure
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ signatures}}
+\DoxyCodeLine{\textcolor{keywordtype}{bool}\ has\_synaptic\_connection(Neuron\ *from\_neuron,\ Neuron\ *to\_neuron);}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ random\_synapses(vector<NeuronGroup\ *>\ groups,\ \textcolor{keywordtype}{int}\ number\_neighbors);}
+
+\end{DoxyCode}
+
+
+
+
+{\bfseries{Definitions here }}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ random\_synapses(vector<NeuronGroup\ *>\ groups,\ \textcolor{keywordtype}{int}\ number\_neighbors)\ \{}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{int}\ i\ =\ 0;}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{while}\ (i\ <\ number\_neighbors)\ \{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Get\ random\ neurons}}
+\DoxyCodeLine{\ \ \ \ Neuron\ *from\ =\ get\_random\_neuron(groups);}
+\DoxyCodeLine{\ \ \ \ Neuron\ *to\ =\ get\_random\_neuron(groups,\ \textcolor{keyword}{false});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ check\ for\ self\ connections}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ (from\ ==\ to)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ (has\_synaptic\_connection(from,\ to))\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ from-\/>add\_neighbor(to,\ weight\_function());}
+\DoxyCodeLine{\ \ \ \ i++;}
+\DoxyCodeLine{\ \ \}}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordtype}{bool}\ has\_synaptic\_connection(Neuron\ *from\_neuron,\ Neuron\ *to\_neuron)\ \{}
+\DoxyCodeLine{\ \ \textcolor{keyword}{auto}\ pPostsynaptic\ =\ from\_neuron-\/>getPostSynaptic();}
+\DoxyCodeLine{\ \ \textcolor{keyword}{auto}\ pPresynaptic\ =\ from\_neuron-\/>getPresynaptic();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{if}\ (find\_if(pPostsynaptic.begin(),\ pPostsynaptic.end(),}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ [to\_neuron](Synapse\ *syn)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ return\ syn-\/>getPostSynaptic()\ ==\ to\_neuron;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \})\ ==\ pPostsynaptic.end())\ \{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (find\_if(pPresynaptic.begin(),\ pPresynaptic.end(),}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [to\_neuron](Synapse\ *syn)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ return\ syn-\/>getPreSynaptic()\ ==\ to\_neuron;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \})\ ==\ pPresynaptic.end())\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\ \ \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+\end{adjustwidth}
+\hypertarget{md_README_autotoc_md7}{}\doxysubsection{\texorpdfstring{📌 Update 4-\/10}{📌 Update 4-\/10}}\label{md_README_autotoc_md7}
+{\bfseries{New addtions\+:}}
+
+
+\begin{DoxyItemize}
+\item Graphing seems like its working exactly as it should!
+\begin{DoxyItemize}
+\item \href{./images/4101.png}{\texttt{ Group 1 Neuron 2}}
+\item \href{./images/4102.png}{\texttt{ Group 1 Neuron 6}}
+\item \href{./images/4103.png}{\texttt{ Group 3 Neuron 4}}
+\item \href{./images/4104.png}{\texttt{ Group 4 Neuron 4}}
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+{\bfseries{New Decay Function}}
+
+
+\begin{DoxyItemize}
+\item Retroactive decay approach rather than decay helper thread
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ Neuron::retroactive\_decay(\textcolor{keywordtype}{double}\ from,\ \textcolor{keywordtype}{double}\ to,\ \textcolor{keywordtype}{double}\ tau,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ v\_rest)\ \{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ Catches\ the\ first\ decay\ for\ this\ neuron\ (initialized\ to\ -\/1)}}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{if}\ (from\ <\ 0)\ \{}
+\DoxyCodeLine{\ \ \ \ this-\/>last\_decay\ =\ to;}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{double}\ decay\_time\_step\ =\ 2e-\/3;}
+\DoxyCodeLine{\ \ Message\_t\ message\_decay\_type\ =\ Decay;}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{double}\ first\_decay\ =\ from;}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{double}\ i;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{for}\ (i\ =\ first\_decay;\ i\ <\ to;\ i\ +=\ decay\_time\_step)\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{double}\ decay\_value\ =\ (this-\/>membrane\_potential\ -\/\ v\_rest)\ /\ tau;}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ catch\ decays\ that\ are\ negative\ or\ really\ small\ and\ ignore\ them}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ (decay\_value\ <\ 0\ ||\ decay\_value\ <\ 0.0001)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ this-\/>update\_potential(-\/decay\_value);}
+\DoxyCodeLine{\ \ \ \ lg.add\_data(this-\/>get\_group()-\/>get\_id(),\ this-\/>get\_id(),}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>membrane\_potential,\ i,\ this-\/>get\_type(),}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ message\_decay\_type,\ \textcolor{keyword}{this});}
+\DoxyCodeLine{\ \ \}}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ reset\ the\ last\ decay}}
+\DoxyCodeLine{\ \ this-\/>last\_decay\ =\ i;}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+\hypertarget{md_README_autotoc_md8}{}\doxysubsection{\texorpdfstring{📌 Update 4-\/1}{📌 Update 4-\/1}}\label{md_README_autotoc_md8}
+{\bfseries{New addtions\+:}}
+
+
+\begin{DoxyItemize}
+\item Graphs not have legends for (S)timulus (N)eighbor\+Activation (D)ecay (R)efractory
+\begin{DoxyItemize}
+\item \href{./images/group_1neuron_4.png}{\texttt{ Input Neuron Group 1 Neuron 4 Run 1711992931}}
+\item \href{./images/group_1neuron_3.png}{\texttt{ Input Neuron Group 1 Neuron 3 Run 1711992931}}
+\item \href{./images/group_3neuron_5.png}{\texttt{ Input Neuron Group 3 Neuron 5 Run 1711994996}} ( has not incoming connections)
+\item \href{./images/group_3neuron_3.png}{\texttt{ Input Neuron Group 3 Neuron 3 Run 1711994996}} ( seems like the decay function doens\textquotesingle{}t run as often as it should? )
+\end{DoxyItemize}
+\item Input neuron subclass with ({\ttfamily run\+\_\+in\+\_\+group} and {\ttfamily send\+\_\+messages\+\_\+in\+\_\+group} are {\ttfamily virtual} in base class)
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{extern}\ \textcolor{keywordtype}{double}\ INPUT\_PROB\_SUCCESS;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{class\ }InputNeuron\ :\ \textcolor{keyword}{public}\ Neuron\ \{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\};}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyItemize}
+\item Input neurons are mixed in with all other neurons
+\item {\ttfamily dynamic\+\_\+cast} is used to access derived class methods during group run
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//...\ in\ NeuronGroup::group\_run()}}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (neuron-\/>is\_activated())\ \{}
+\DoxyCodeLine{}
+\DoxyCodeLine{lg.log\_group\_neuron\_state(DEBUG2,\ \textcolor{stringliteral}{"{}Running\ (\%d)\ Neuron\ (\%d)"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>get\_id(),\ neuron-\/>get\_id());}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (neuron-\/>get\_type()\ ==\ Input)\ \{}
+\DoxyCodeLine{\ \ InputNeuron\ *neuron\ =\ \textcolor{keyword}{dynamic\_cast<}InputNeuron\ *\textcolor{keyword}{>}(neuron);}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{\textcolor{comment}{//\ Run\ neuron}}
+\DoxyCodeLine{neuron-\/>run\_in\_group();}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyItemize}
+\item Poisson Procces for input neuron
+\begin{DoxyItemize}
+\item Input Neuron run process is
+\begin{DoxyEnumerate}
+\item Check refractory status (ignore any input if still in refractory period)
+\item Recieve input if poisson success
+\begin{DoxyItemize}
+\item Determined by {\ttfamily INPUT\+\_\+\+PROB\+\_\+\+SUCCESS} set by {\ttfamily \mbox{[}"{}neuron"{}\mbox{]}\mbox{[}"{}poisson\+\_\+prop\+\_\+of\+\_\+success"{}\mbox{]}} in toml configuration file
+\end{DoxyItemize}
+\item Check activaiton threshold and fire if above.
+\end{DoxyEnumerate}
+\end{DoxyItemize}
+\item Maximum edges function to ensure runtime configuration is possible
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{int}\ maximum\_edges()\ \{}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ for\ an\ undirected\ graph\ there\ are\ n(n-\/1)\ /\ 2\ edges}}
+\DoxyCodeLine{\ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ Since\ our\ connections\ are\ only\ allowed\ to\ go\ one\ way\ and\ self\ loops\ are\ forbidden\ }}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ the\ network\ is\ essentially\ an\ undirected\ graph.}}
+\DoxyCodeLine{\ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ input\ neurons\ can\ only\ have\ outgoing\ edges\ }}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ the\ parameter\ NUMBER\_NEURONS\ represents\ the\ total\ number\ of\ neurons}}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ then\ n\_t\ =\ NUMBER\_NEURONS}}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ n\_i\ =\ NUMBER\_INPUT\_NEURONS}}
+\DoxyCodeLine{\ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ the\ max\ edges\ are\ the\ total\ number\ of\ maximum\ edges\ minus\ the\ number\ of}}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ edges\ that\ would\ be\ possible\ in\ a\ undirected\ graph\ of\ only\ the\ input}}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ neurons\ maximum\_edges\ =\ n\_t(n\_t)\ /\ 2\ -\/\ n\_i(n\_i-\/1)\ /\ 2}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{int}\ n\_i\ =\ NUMBER\_INPUT\_NEURONS;}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{int}\ n\_t\ =\ NUMBER\_NEURONS;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ always\ even\ so\ division\ is\ fine}}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{int}\ edges\_lost\_to\_input\ =\ n\_i\ *\ (n\_i\ -\/\ 1)\ /\ 2;}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{int}\ max\_edges\ =\ (n\_t\ *\ (n\_t\ -\/\ 1)\ /\ 2)\ -\/\ edges\_lost\_to\_input;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{return}\ max\_edges;}
+
+\end{DoxyCode}
+\hypertarget{md_README_autotoc_md9}{}\doxysubsection{\texorpdfstring{📌 Update 3-\/19}{📌 Update 3-\/19}}\label{md_README_autotoc_md9}
+{\bfseries{New addtions\+:}}
+\begin{DoxyItemize}
+\item Decay logic now includes \$\textbackslash{}tau\$ and \$\+V\+\_\+\{rest\}\$
+\item Refractory period does not use {\ttfamily usleep} but instead is stored in data member {\ttfamily refractory\+\_\+start} and any messages with the timestamp {\ttfamily refractory\+\_\+start + REFRACTORY\+\_\+\+DURATION} are ignored.
+\item Neurons enter refractory period even if they have no neighbors
+\item Added {\ttfamily data\+\_\+mutex} to ensure all data points are added with the correct information to the {\ttfamily log\+\_\+data} vector
+\item Graphs now show activation, refractory periods, and decay
+\end{DoxyItemize}\hypertarget{md_README_autotoc_md10}{}\doxysubsection{\texorpdfstring{📌 Update 3-\/18}{📌 Update 3-\/18}}\label{md_README_autotoc_md10}
+{\bfseries{New addtions\+:}}
+\begin{DoxyItemize}
+\item Neuron types
+\begin{DoxyItemize}
+\item {\ttfamily Input} type fully functional, Output not
+\item Restrictions on {\ttfamily add\+\_\+random\+\_\+neighbors} function for {\ttfamily Input} neurons to add outgoing connections only
+\end{DoxyItemize}
+\item Run-\/time configuration setting for number of input neurons
+\item Shows Neuron type on plot
+\item Log neuron type
+\item Example output with {\ttfamily DEBUG4}
+\begin{DoxyItemize}
+\item \href{./logs/example_output_11}{\texttt{ Example Output 11}}
+\item \href{./logs/1710775791.log}{\texttt{ Corresponding Log}}
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+
+
+{\bfseries{Plot example}}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+\href{./plotting/group_1neuron_2.png}{\texttt{ Example Plot}}
+
+\end{adjustwidth}
+\hypertarget{md_README_autotoc_md11}{}\doxysubsection{\texorpdfstring{📌 Update 3-\/15}{📌 Update 3-\/15}}\label{md_README_autotoc_md11}
+{\bfseries{New addtions\+:}}
+\begin{DoxyItemize}
+\item .toml file for configuring multiple run-\/time options
+\item Specify other .toml files as command line arguement
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{build/ex2\ <filename>\ }
+
+\end{DoxyCode}
+
+
+
+
+{\bfseries{.toml\+\_\+file}}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyItemize}
+\item Base\+\_\+config is regenerated if it isn\textquotesingle{}t found in the directory
+\item Able to change run parameters without re-\/compiling.
+\item Easy to implement more run-\/time options
+\item Uses the \href{https://github.com/marzer/tomlplusplus}{\texttt{ toml++}} library for file parsing
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{[neuron]}
+\DoxyCodeLine{}
+\DoxyCodeLine{\#\ number\ of\ neurons}
+\DoxyCodeLine{neuron\_count\ =\ 6}
+\DoxyCodeLine{}
+\DoxyCodeLine{\#\ number\ of\ groups}
+\DoxyCodeLine{group\_count\ =\ 2}
+\DoxyCodeLine{}
+\DoxyCodeLine{\#\ number\ of\ connections}
+\DoxyCodeLine{edge\_count\ =\ 4}
+\DoxyCodeLine{}
+\DoxyCodeLine{\#\ in\ milliseconds}
+\DoxyCodeLine{wait\_time\ =\ 100}
+\DoxyCodeLine{}
+\DoxyCodeLine{\#\ integer}
+\DoxyCodeLine{wait\_loops\ =\ 5}
+\DoxyCodeLine{}
+\DoxyCodeLine{\#\ value\ each\ neuron\ is\ initialized\ with}
+\DoxyCodeLine{initial\_membrane\_potential\ =\ -\/55.0}
+\DoxyCodeLine{}
+\DoxyCodeLine{\#\ minimum\ potential\ at\ which\ a\ neuron\ will\ fire}
+\DoxyCodeLine{activation\_threshold\ =\ -\/55.0}
+\DoxyCodeLine{}
+\DoxyCodeLine{\#\ value\ that\ each\ neuron\ is\ set\ to\ after\ firing}
+\DoxyCodeLine{refractory\_membrane\_potential\ =\ -\/70.0}
+\DoxyCodeLine{}
+\DoxyCodeLine{[debug]}
+\DoxyCodeLine{\#\ Options\ are}
+\DoxyCodeLine{\#\ INFO}
+\DoxyCodeLine{\#\ DEBUG}
+\DoxyCodeLine{\#\ DEBUG2}
+\DoxyCodeLine{\#\ DEBUG3}
+\DoxyCodeLine{\#\ DEBUG4}
+\DoxyCodeLine{level\ =\ "{}INFO"{}}
+\DoxyCodeLine{}
+\DoxyCodeLine{[decay]}
+\DoxyCodeLine{\#\ Value\ that\ each\ neuron\ decays\ every\ wait\_time\ *\ wait\_loops}
+\DoxyCodeLine{value\ =\ 1.0}
+\DoxyCodeLine{}
+\DoxyCodeLine{[random]}
+\DoxyCodeLine{\#\ options\ are\ 'time'\ for\ using\ the\ current\ time,\ or\ an\ integer\ (as\ a\ string\ e.g.\ "{}1"{})}
+\DoxyCodeLine{seed\ =\ "{}time"{}}
+\DoxyCodeLine{}
+\DoxyCodeLine{[runtime\_vars]}
+\DoxyCodeLine{\#\ in\ seconds}
+\DoxyCodeLine{runtime\ =\ 20}
+
+\end{DoxyCode}
+
+
+\end{adjustwidth}
+\hypertarget{md_README_autotoc_md12}{}\doxysubsection{\texorpdfstring{📌 Update 3-\/14}{📌 Update 3-\/14}}\label{md_README_autotoc_md12}
+{\bfseries{New addtions\+:}}
+\begin{DoxyItemize}
+\item New messaging structure for {\ttfamily Neuron\+Groups}
+\item Additional mutex variables for logging and messaging
+\item Log file for Neuron Groups
+\item Neurons decay over time
+\item Plotting with matplotlib
+\end{DoxyItemize}
+
+
+
+{\bfseries{Plotting}}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyItemize}
+\item Basic plotting with {\ttfamily matplotlib}
+\item {\ttfamily .pngs} are in {\ttfamily group\+\_\+id\+\_\+neuron\+\_\+id.\+png} format
+\item Images are generated in {\ttfamily plotting/}
+\end{DoxyItemize}
+
+\end{adjustwidth}
+
+
+{\bfseries{Neuron potential decay}}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyItemize}
+\item Works on a separate thread, using a mutex to protect the neuron {\ttfamily membrane\+\_\+potential} across threads
+\item Neurons decay based on {\ttfamily DECAY\+\_\+\+VALUE} constant
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ decay\_neurons(vector<NeuronGroup\ *>\ *groups)\ \{}
+\DoxyCodeLine{\ \ vector<Neuron\ *>\ neuron\_vec;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ make\ a\ vector\ of\ all\ available\ neurons}}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&group\ :\ *groups)\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&neuron\ :\ group-\/>get\_neruon\_vector())\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ neuron\_vec.push\_back(neuron);}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{while}\ (::active)\ \{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 1;\ i\ <=\ WAIT\_INCREMENT;\ i++)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ lg.log\_value(DEBUG3,\ \textcolor{stringliteral}{"{}decay\_neurons\ waiting:\ \%d"{}},\ i);}
+\DoxyCodeLine{\ \ \ \ \ \ usleep(WAIT\_TIME);}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ neuron\ :\ neuron\_vec)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ neuron-\/>decay();}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\ \ \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyItemize}
+\item Neuron Decay member function\+:
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{double}\ Neuron::decay()\ \{}
+\DoxyCodeLine{\ \ pthread\_mutex\_lock(\&mutex);}
+\DoxyCodeLine{\ \ this-\/>membrane\_potential\ -\/=\ DECAY\_VALUE;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ lg.add\_data(this-\/>get\_group()-\/>get\_id(),\ this-\/>get\_id(),}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>membrane\_potential);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ pthread\_mutex\_unlock(\&mutex);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ lg.log\_group\_neuron\_value(}
+\DoxyCodeLine{\ \ \ \ \ \ DEBUG2,\ \textcolor{stringliteral}{"{}(\%d)\ Neuron\ \%d\ decaying.\ Membrane\ potential\ now\ \%f"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ this-\/>get\_group()-\/>get\_id(),\ this-\/>get\_id(),\ this-\/>get\_potential());}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{return}\ this-\/>membrane\_potential;}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+\end{adjustwidth}
+
+
+
+
+{\bfseries{Example Output 10 (this is long) }}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyItemize}
+\item This output is for a runtime of 60 seconds, with 5 second wait time on both the messager thread and neuron group threads
+\item {\ttfamily Log\+Level} is {\ttfamily DEBUG3}
+\item There are 2 Neuron groups and 4 total neurons
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Running\ build/ex2}
+\DoxyCodeLine{./build/ex2}
+\DoxyCodeLine{}
+\DoxyCodeLine{Adding\ Neurons}
+\DoxyCodeLine{-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710434170:856328]\ ❶\ \ Adding\ Group\ 1}
+\DoxyCodeLine{[1710434170:856332]\ ⓘ\ \ Group\ 1}
+\DoxyCodeLine{[1710434170:856336]\ ⓘ\ \ (1)\ Neuron\ 1\ added:\ excitatory}
+\DoxyCodeLine{[1710434170:856339]\ ⓘ\ \ (1)\ Neuron\ 2\ added:\ excitatory}
+\DoxyCodeLine{[1710434170:856341]\ ❶\ \ Adding\ Group\ 2}
+\DoxyCodeLine{[1710434170:856342]\ ⓘ\ \ Group\ 2}
+\DoxyCodeLine{[1710434170:856343]\ ⓘ\ \ (2)\ Neuron\ 1\ added:\ excitatory}
+\DoxyCodeLine{[1710434170:856344]\ ⓘ\ \ (2)\ Neuron\ 2\ added:\ excitatory}
+\DoxyCodeLine{}
+\DoxyCodeLine{Adding\ Random\ Edges}
+\DoxyCodeLine{======================}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710434170:856348]\ ❸\ \ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 2\ has\ no\ outgoing\ connections}
+\DoxyCodeLine{[1710434170:856349]\ ❸\ \ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 2\ has\ no\ incoming\ connections}
+\DoxyCodeLine{[1710434170:856349]\ ❸\ \ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 1\ has\ no\ outgoing\ connections}
+\DoxyCodeLine{[1710434170:856350]\ ❸\ \ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 1\ has\ no\ incoming\ connections}
+\DoxyCodeLine{[1710434170:856352]\ ⓘ\ \ Edge\ from\ Neuron\ 2\ to\ Neuron\ 1\ added.}
+\DoxyCodeLine{[1710434170:856355]\ ❷\ \ Neuron\ 2\ added\ to\ the\ \_presynaptic\ map\ of\ Neuron\ }
+\DoxyCodeLine{[1710434170:856357]\ ❷\ \ \ \ \ \ \ \ (2)\ Neuron\ 2\ is\ connected\ to:}
+\DoxyCodeLine{[1710434170:856358]\ ❷\ \ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 1}
+\DoxyCodeLine{[1710434170:856358]\ ❸\ \ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 2\ has\ no\ incoming\ connections}
+\DoxyCodeLine{[1710434170:856359]\ ❸\ \ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 1\ has\ no\ outgoing\ connections}
+\DoxyCodeLine{[1710434170:856360]\ ❷\ \ \ \ \ \ \ \ (1)\ Neuron\ 1\ has\ connections\ from:}
+\DoxyCodeLine{[1710434170:856361]\ ❷\ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710434170:856362]\ ❶\ \ has\_neighbor:\ Neuron\ 2\ is\ already\ connected\ to\ Neuron\ 1}
+\DoxyCodeLine{[1710434170:856363]\ ❸\ \ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 1\ has\ no\ outgoing\ connections}
+\DoxyCodeLine{[1710434170:856363]\ ❷\ \ \ \ \ \ \ \ (1)\ Neuron\ 1\ has\ connections\ from:}
+\DoxyCodeLine{[1710434170:856364]\ ❷\ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710434170:856365]\ ❸\ \ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 2\ has\ no\ outgoing\ connections}
+\DoxyCodeLine{[1710434170:856365]\ ❸\ \ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 2\ has\ no\ incoming\ connections}
+\DoxyCodeLine{[1710434170:856366]\ ⓘ\ \ Edge\ from\ Neuron\ 1\ to\ Neuron\ 2\ added.}
+\DoxyCodeLine{[1710434170:856368]\ ❷\ \ Neuron\ 1\ added\ to\ the\ \_presynaptic\ map\ of\ Neuron\ }
+\DoxyCodeLine{[1710434170:856368]\ ❷\ \ \ \ \ \ \ \ (2)\ Neuron\ 2\ is\ connected\ to:}
+\DoxyCodeLine{[1710434170:856369]\ ❷\ \ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 1}
+\DoxyCodeLine{[1710434170:856370]\ ❸\ \ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 2\ has\ no\ incoming\ connections}
+\DoxyCodeLine{[1710434170:856371]\ ❷\ \ \ \ \ \ \ \ (1)\ Neuron\ 1\ is\ connected\ to:}
+\DoxyCodeLine{[1710434170:856371]\ ❷\ \ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710434170:856372]\ ❷\ \ \ \ \ \ \ \ (1)\ Neuron\ 1\ has\ connections\ from:}
+\DoxyCodeLine{[1710434170:856373]\ ❷\ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710434170:856373]\ ❶\ \ has\_neighbor:\ Neuron\ 2\ is\ already\ connected\ to\ Neuron\ 1}
+\DoxyCodeLine{[1710434170:856374]\ ❸\ \ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 2\ has\ no\ outgoing\ connections}
+\DoxyCodeLine{[1710434170:856375]\ ❷\ \ \ \ \ \ \ \ (1)\ Neuron\ 2\ has\ connections\ from:}
+\DoxyCodeLine{[1710434170:856375]\ ❷\ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 1}
+\DoxyCodeLine{[1710434170:856376]\ ❷\ \ \ \ \ \ \ \ (2)\ Neuron\ 2\ is\ connected\ to:}
+\DoxyCodeLine{[1710434170:856377]\ ❷\ \ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 1}
+\DoxyCodeLine{[1710434170:856377]\ ❸\ \ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 2\ has\ no\ incoming\ connections}
+\DoxyCodeLine{[1710434170:856378]\ ⓘ\ \ Edge\ from\ Neuron\ 2\ to\ Neuron\ 2\ added.}
+\DoxyCodeLine{[1710434170:856379]\ ❷\ \ Neuron\ 2\ added\ to\ the\ \_presynaptic\ map\ of\ Neuron\ }
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710434170:856381]\ ❶\ \ Neuron\ Group\ 1\ (2\ neurons)}
+\DoxyCodeLine{========================================================}
+\DoxyCodeLine{[1710434170:856382]\ ❶\ \ \ \ \ (1)\ Neuron\ 1}
+\DoxyCodeLine{[1710434170:856383]\ ❷\ \ \ \ \ \ \ \ (1)\ Neuron\ 1\ is\ connected\ to:}
+\DoxyCodeLine{[1710434170:856383]\ ❷\ \ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710434170:856384]\ ❷\ \ \ \ \ \ \ \ (1)\ Neuron\ 1\ has\ connections\ from:}
+\DoxyCodeLine{[1710434170:856385]\ ❷\ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710434170:856385]\ ❶\ \ \ \ \ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710434170:856386]\ ❷\ \ \ \ \ \ \ \ (1)\ Neuron\ 2\ is\ connected\ to:}
+\DoxyCodeLine{[1710434170:856387]\ ❷\ \ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710434170:856387]\ ❷\ \ \ \ \ \ \ \ (1)\ Neuron\ 2\ has\ connections\ from:}
+\DoxyCodeLine{[1710434170:856388]\ ❷\ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 1}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710434170:856389]\ ❶\ \ Neuron\ Group\ 2\ (2\ neurons)}
+\DoxyCodeLine{========================================================}
+\DoxyCodeLine{[1710434170:856390]\ ❶\ \ \ \ \ (2)\ Neuron\ 1}
+\DoxyCodeLine{[1710434170:856390]\ ❸\ \ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 1\ has\ no\ outgoing\ connections}
+\DoxyCodeLine{[1710434170:856391]\ ❸\ \ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 1\ has\ no\ incoming\ connections}
+\DoxyCodeLine{[1710434170:856392]\ ❶\ \ \ \ \ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710434170:856392]\ ❷\ \ \ \ \ \ \ \ (2)\ Neuron\ 2\ is\ connected\ to:}
+\DoxyCodeLine{[1710434170:856393]\ ❷\ \ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 1}
+\DoxyCodeLine{[1710434170:856394]\ ❷\ \ \ \ \ \ \ \ (2)\ Neuron\ 2\ has\ connections\ from:}
+\DoxyCodeLine{[1710434170:856394]\ ❷\ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 2}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710434170:856437]\ ❸\ \ Message:\ 0.000000\ 1\ 1\ 1.000000}
+\DoxyCodeLine{[1710434170:856439]\ ❸\ \ Message:\ 0.000000\ 1\ 2\ 2.000000}
+\DoxyCodeLine{[1710434170:856461]\ ❸\ \ Message:\ 0.000000\ 2\ 1\ 1.000000}
+\DoxyCodeLine{[1710434170:856463]\ ❸\ \ Message:\ 0.000000\ 2\ 2\ 2.000000}
+\DoxyCodeLine{[1710434170:856576]\ ❸\ \ send\_messages\ waiting:\ 1}
+\DoxyCodeLine{[1710434170:856724]\ ⓘ\ \ Group\ 2\ running}
+\DoxyCodeLine{[1710434170:856731]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 1\ is\ inactive}
+\DoxyCodeLine{[1710434170:856731]\ ⓘ\ \ Group\ 1\ running}
+\DoxyCodeLine{[1710434170:856733]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 2\ is\ inactive}
+\DoxyCodeLine{[1710434170:856737]\ ❶\ \ Group\ 2\ pausing}
+\DoxyCodeLine{[1710434170:856737]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 1\ is\ inactive}
+\DoxyCodeLine{[1710434170:856738]\ ❸\ \ Group\ 2\ waiting:\ 1}
+\DoxyCodeLine{[1710434170:856740]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 2\ is\ inactive}
+\DoxyCodeLine{[1710434170:856741]\ ❶\ \ Group\ 1\ pausing}
+\DoxyCodeLine{[1710434170:856743]\ ❸\ \ Group\ 1\ waiting:\ 1}
+\DoxyCodeLine{[1710434171:856779]\ ❸\ \ send\_messages\ waiting:\ 2}
+\DoxyCodeLine{[1710434171:856877]\ ❸\ \ Group\ 2\ waiting:\ 2}
+\DoxyCodeLine{[1710434171:856877]\ ❸\ \ Group\ 1\ waiting:\ 2}
+\DoxyCodeLine{[1710434172:856992]\ ❸\ \ send\_messages\ waiting:\ 3}
+\DoxyCodeLine{[1710434172:857038]\ ❸\ \ Group\ 1\ waiting:\ 3}
+\DoxyCodeLine{[1710434172:857038]\ ❸\ \ Group\ 2\ waiting:\ 3}
+\DoxyCodeLine{[1710434173:857168]\ ❸\ \ send\_messages\ waiting:\ 4}
+\DoxyCodeLine{[1710434173:857220]\ ❸\ \ Group\ 1\ waiting:\ 4}
+\DoxyCodeLine{[1710434173:857220]\ ❸\ \ Group\ 2\ waiting:\ 4}
+\DoxyCodeLine{[1710434174:857337]\ ❸\ \ send\_messages\ waiting:\ 5}
+\DoxyCodeLine{[1710434174:857393]\ ❸\ \ Group\ 1\ waiting:\ 5}
+\DoxyCodeLine{[1710434174:857399]\ ❸\ \ Group\ 2\ waiting:\ 5}
+\DoxyCodeLine{[1710434175:857532]\ ❷\ \ Adding\ Message:\ 0.000000\ 1\ 1\ 1.000000}
+\DoxyCodeLine{[1710434175:857553]\ ❷\ \ Adding\ Message:\ 0.000000\ 1\ 2\ 2.000000}
+\DoxyCodeLine{[1710434175:857558]\ ❷\ \ Adding\ Message:\ 0.000000\ 2\ 1\ 1.000000}
+\DoxyCodeLine{[1710434175:857563]\ ❷\ \ Adding\ Message:\ 0.000000\ 2\ 2\ 2.000000}
+\DoxyCodeLine{[1710434175:857566]\ ❸\ \ send\_messages\ waiting:\ 1}
+\DoxyCodeLine{[1710434175:857602]\ ❶\ \ Group\ 2\ resuming}
+\DoxyCodeLine{[1710434175:857632]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 1\ is\ active}
+\DoxyCodeLine{[1710434175:857635]\ ❷\ \ Running\ (2)\ Neuron\ (1)}
+\DoxyCodeLine{[1710434175:857602]\ ❶\ \ Group\ 1\ resuming}
+\DoxyCodeLine{[1710434175:857648]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 1\ is\ active}
+\DoxyCodeLine{[1710434175:857652]\ ❷\ \ Running\ (1)\ Neuron\ (1)}
+\DoxyCodeLine{[1710434175:857652]\ ⓘ\ \ (2)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/54.000000}
+\DoxyCodeLine{[1710434175:857664]\ ❶\ \ No\ additional\ messages\ for\ (2)\ Neuron\ 1}
+\DoxyCodeLine{[1710434175:857667]\ ⓘ\ \ Group\ 2:\ Neuron\ 1\ does\ not\ have\ any\ neighbors}
+\DoxyCodeLine{[1710434175:857671]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 2\ is\ active}
+\DoxyCodeLine{[1710434175:857673]\ ❷\ \ Running\ (2)\ Neuron\ (2)}
+\DoxyCodeLine{[1710434175:857683]\ ⓘ\ \ (1)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/54.000000}
+\DoxyCodeLine{[1710434175:857695]\ ❶\ \ No\ additional\ messages\ for\ (1)\ Neuron\ 1}
+\DoxyCodeLine{[1710434175:857702]\ ⓘ\ \ Group\ 1:\ Neuron\ 1\ is\ sending\ a\ mesage\ to\ Group\ 1:\ Neuron\ 2}
+\DoxyCodeLine{[1710434175:857710]\ ❶\ \ Accumulated\ for\ Group\ 1:\ Neuron\ 1\ is\ -\/54.000000}
+\DoxyCodeLine{[1710434175:857714]\ ⓘ\ \ (2)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/53.000000}
+\DoxyCodeLine{[1710434175:857716]\ ❶\ \ Weight\ for\ Group\ 1:\ Neuron\ 1\ to\ Group\ 1:\ Neuron\ 2\ is\ 0.242887}
+\DoxyCodeLine{[1710434175:857721]\ ❶\ \ No\ additional\ messages\ for\ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710434175:857722]\ ❶\ \ Group\ 1:\ Neuron\ 1\ modifier\ is\ -\/}
+\DoxyCodeLine{[1710434175:857728]\ ⓘ\ \ Group\ 2:\ Neuron\ 2\ is\ sending\ a\ mesage\ to\ Group\ 1:\ Neuron\ 1}
+\DoxyCodeLine{[1710434175:857732]\ ⓘ\ \ Message\ from\ Group\ 1:\ Neuron\ 1\ to\ Group\ 1:\ Neuron\ 2\ is\ 13.115886}
+\DoxyCodeLine{[1710434175:857735]\ ❶\ \ Accumulated\ for\ Group\ 2:\ Neuron\ 2\ is\ -\/53.000000}
+\DoxyCodeLine{[1710434175:857737]\ ⓘ\ \ Neuron\ 1\ fired,\ entering\ refractory\ phase}
+\DoxyCodeLine{[1710434175:857743]\ ❶\ \ Weight\ for\ Group\ 2:\ Neuron\ 2\ to\ Group\ 1:\ Neuron\ 1\ is\ 0.277775}
+\DoxyCodeLine{[1710434175:857748]\ ❶\ \ Group\ 2:\ Neuron\ 2\ modifier\ is\ -\/}
+\DoxyCodeLine{[1710434175:857754]\ ⓘ\ \ Message\ from\ Group\ 2:\ Neuron\ 2\ to\ Group\ 1:\ Neuron\ 1\ is\ 14.722060}
+\DoxyCodeLine{[1710434175:857759]\ ⓘ\ \ Neuron\ 2\ fired,\ entering\ refractory\ phase}
+\DoxyCodeLine{[1710434175:857771]\ ⓘ\ \ Neuron\ 1\ portential\ set\ to\ -\/70.0000}
+\DoxyCodeLine{[1710434175:857774]\ ⓘ\ \ Neuron\ 2\ portential\ set\ to\ -\/70.0000}
+\DoxyCodeLine{[1710434175:859910]\ ⓘ\ \ Neuron\ 1\ completed\ refractory\ phase,\ running}
+\DoxyCodeLine{[1710434175:859937]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 2\ is\ active}
+\DoxyCodeLine{[1710434175:859910]\ ⓘ\ \ Neuron\ 2\ completed\ refractory\ phase,\ running}
+\DoxyCodeLine{[1710434175:859955]\ ❶\ \ Group\ 2\ pausing}
+\DoxyCodeLine{[1710434175:859958]\ ❸\ \ Group\ 2\ waiting:\ 1}
+\DoxyCodeLine{[1710434175:859940]\ ❷\ \ Running\ (1)\ Neuron\ (2)}
+\DoxyCodeLine{[1710434175:859982]\ ⓘ\ \ (1)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/53.000000}
+\DoxyCodeLine{[1710434175:859989]\ ⓘ\ \ (1)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/39.884114}
+\DoxyCodeLine{[1710434175:859997]\ ❶\ \ No\ additional\ messages\ for\ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710434175:860119]\ ⓘ\ \ Group\ 1:\ Neuron\ 2\ is\ sending\ a\ mesage\ to\ Group\ 2:\ Neuron\ 2}
+\DoxyCodeLine{[1710434175:860127]\ ❶\ \ Accumulated\ for\ Group\ 1:\ Neuron\ 2\ is\ -\/39.884114}
+\DoxyCodeLine{[1710434175:860133]\ ❶\ \ Weight\ for\ Group\ 1:\ Neuron\ 2\ to\ Group\ 2:\ Neuron\ 2\ is\ 0.512932}
+\DoxyCodeLine{[1710434175:860137]\ ❶\ \ Group\ 1:\ Neuron\ 2\ modifier\ is\ -\/}
+\DoxyCodeLine{[1710434175:860142]\ ⓘ\ \ Message\ from\ Group\ 1:\ Neuron\ 2\ to\ Group\ 2:\ Neuron\ 2\ is\ 20.457854}
+\DoxyCodeLine{[1710434175:860146]\ ⓘ\ \ Neuron\ 1\ fired,\ entering\ refractory\ phase}
+\DoxyCodeLine{[1710434175:860154]\ ⓘ\ \ Neuron\ 2\ portential\ set\ to\ -\/70.0000}
+\DoxyCodeLine{[1710434175:862348]\ ⓘ\ \ Neuron\ 1\ completed\ refractory\ phase,\ running}
+\DoxyCodeLine{[1710434175:862362]\ ❶\ \ Group\ 1\ pausing}
+\DoxyCodeLine{[1710434175:862365]\ ❸\ \ Group\ 1\ waiting:\ 1}
+\DoxyCodeLine{[1710434176:857708]\ ❸\ \ send\_messages\ waiting:\ 2}
+\DoxyCodeLine{[1710434176:860234]\ ❸\ \ Group\ 2\ waiting:\ 2}
+\DoxyCodeLine{[1710434176:862616]\ ❸\ \ Group\ 1\ waiting:\ 2}
+\DoxyCodeLine{[1710434177:857965]\ ❸\ \ send\_messages\ waiting:\ 3}
+\DoxyCodeLine{[1710434177:860476]\ ❸\ \ Group\ 2\ waiting:\ 3}
+\DoxyCodeLine{[1710434177:862902]\ ❸\ \ Group\ 1\ waiting:\ 3}
+\DoxyCodeLine{[1710434178:858145]\ ❸\ \ send\_messages\ waiting:\ 4}
+\DoxyCodeLine{[1710434178:860751]\ ❸\ \ Group\ 2\ waiting:\ 4}
+\DoxyCodeLine{[1710434178:863141]\ ❸\ \ Group\ 1\ waiting:\ 4}
+\DoxyCodeLine{[1710434179:858383]\ ❸\ \ send\_messages\ waiting:\ 5}
+\DoxyCodeLine{[1710434179:860999]\ ❸\ \ Group\ 2\ waiting:\ 5}
+\DoxyCodeLine{[1710434179:863328]\ ❸\ \ Group\ 1\ waiting:\ 5}
+\DoxyCodeLine{[1710434180:858634]\ ❷\ \ Adding\ Message:\ 0.000000\ 1\ 1\ 1.000000}
+\DoxyCodeLine{[1710434180:858652]\ ❷\ \ Adding\ Message:\ 0.000000\ 1\ 2\ 2.000000}
+\DoxyCodeLine{[1710434180:858656]\ ❷\ \ Adding\ Message:\ 0.000000\ 2\ 1\ 1.000000}
+\DoxyCodeLine{[1710434180:858659]\ ❷\ \ Adding\ Message:\ 0.000000\ 2\ 2\ 2.000000}
+\DoxyCodeLine{[1710434180:858661]\ ❸\ \ send\_messages\ waiting:\ 1}
+\DoxyCodeLine{[1710434180:861218]\ ❶\ \ Group\ 2\ resuming}
+\DoxyCodeLine{[1710434180:861235]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 1\ is\ active}
+\DoxyCodeLine{[1710434180:861237]\ ❷\ \ Running\ (2)\ Neuron\ (1)}
+\DoxyCodeLine{[1710434180:861250]\ ⓘ\ \ (2)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/53.000000}
+\DoxyCodeLine{[1710434180:861253]\ ❶\ \ No\ additional\ messages\ for\ (2)\ Neuron\ 1}
+\DoxyCodeLine{[1710434180:861255]\ ⓘ\ \ Group\ 2:\ Neuron\ 1\ does\ not\ have\ any\ neighbors}
+\DoxyCodeLine{[1710434180:861258]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 2\ is\ active}
+\DoxyCodeLine{[1710434180:861260]\ ❷\ \ Running\ (2)\ Neuron\ (2)}
+\DoxyCodeLine{[1710434180:861264]\ ⓘ\ \ (2)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/49.542146}
+\DoxyCodeLine{[1710434180:861267]\ ⓘ\ \ (2)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/47.542146}
+\DoxyCodeLine{[1710434180:861269]\ ❶\ \ No\ additional\ messages\ for\ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710434180:861273]\ ⓘ\ \ Group\ 2:\ Neuron\ 2\ is\ sending\ a\ mesage\ to\ Group\ 1:\ Neuron\ 1}
+\DoxyCodeLine{[1710434180:861278]\ ❶\ \ Accumulated\ for\ Group\ 2:\ Neuron\ 2\ is\ -\/47.542146}
+\DoxyCodeLine{[1710434180:861282]\ ❶\ \ Weight\ for\ Group\ 2:\ Neuron\ 2\ to\ Group\ 1:\ Neuron\ 1\ is\ 0.277775}
+\DoxyCodeLine{[1710434180:861285]\ ❶\ \ Group\ 2:\ Neuron\ 2\ modifier\ is\ -\/}
+\DoxyCodeLine{[1710434180:861289]\ ⓘ\ \ Message\ from\ Group\ 2:\ Neuron\ 2\ to\ Group\ 1:\ Neuron\ 1\ is\ 13.206006}
+\DoxyCodeLine{[1710434180:861293]\ ⓘ\ \ Neuron\ 2\ fired,\ entering\ refractory\ phase}
+\DoxyCodeLine{[1710434180:861300]\ ⓘ\ \ Neuron\ 2\ portential\ set\ to\ -\/70.0000}
+\DoxyCodeLine{[1710434180:863488]\ ⓘ\ \ Neuron\ 2\ completed\ refractory\ phase,\ running}
+\DoxyCodeLine{[1710434180:863505]\ ❶\ \ Group\ 2\ pausing}
+\DoxyCodeLine{[1710434180:863507]\ ❸\ \ Group\ 2\ waiting:\ 1}
+\DoxyCodeLine{[1710434180:863488]\ ❶\ \ Group\ 1\ resuming}
+\DoxyCodeLine{[1710434180:863516]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 1\ is\ active}
+\DoxyCodeLine{[1710434180:863519]\ ❷\ \ Running\ (1)\ Neuron\ (1)}
+\DoxyCodeLine{[1710434180:863531]\ ⓘ\ \ (1)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/55.277940}
+\DoxyCodeLine{[1710434180:863538]\ ⓘ\ \ (1)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/54.277940}
+\DoxyCodeLine{[1710434180:863542]\ ⓘ\ \ (1)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/41.071935}
+\DoxyCodeLine{[1710434180:863543]\ ❶\ \ No\ additional\ messages\ for\ (1)\ Neuron\ 1}
+\DoxyCodeLine{[1710434180:863547]\ ⓘ\ \ Group\ 1:\ Neuron\ 1\ is\ sending\ a\ mesage\ to\ Group\ 1:\ Neuron\ 2}
+\DoxyCodeLine{[1710434180:863552]\ ❶\ \ Accumulated\ for\ Group\ 1:\ Neuron\ 1\ is\ -\/41.071935}
+\DoxyCodeLine{[1710434180:863555]\ ❶\ \ Weight\ for\ Group\ 1:\ Neuron\ 1\ to\ Group\ 1:\ Neuron\ 2\ is\ 0.242887}
+\DoxyCodeLine{[1710434180:863558]\ ❶\ \ Group\ 1:\ Neuron\ 1\ modifier\ is\ -\/}
+\DoxyCodeLine{[1710434180:863561]\ ⓘ\ \ Message\ from\ Group\ 1:\ Neuron\ 1\ to\ Group\ 1:\ Neuron\ 2\ is\ 9.975830}
+\DoxyCodeLine{[1710434180:863563]\ ⓘ\ \ Neuron\ 1\ fired,\ entering\ refractory\ phase}
+\DoxyCodeLine{[1710434180:863569]\ ⓘ\ \ Neuron\ 1\ portential\ set\ to\ -\/70.0000}
+\DoxyCodeLine{[1710434180:865786]\ ⓘ\ \ Neuron\ 1\ completed\ refractory\ phase,\ running}
+\DoxyCodeLine{[1710434180:865806]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 2\ is\ active}
+\DoxyCodeLine{[1710434180:865809]\ ❷\ \ Running\ (1)\ Neuron\ (2)}
+\DoxyCodeLine{[1710434180:865928]\ ⓘ\ \ (1)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/68.000000}
+\DoxyCodeLine{[1710434180:865934]\ ⓘ\ \ (1)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/58.024170}
+\DoxyCodeLine{[1710434180:865936]\ ❶\ \ No\ additional\ messages\ for\ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710434180:865941]\ ⓘ\ \ Membrane\ potential\ for\ Group\ 1:\ Neuron\ 2\ is\ below\ the\ threshold,\ not\ firing}
+\DoxyCodeLine{[1710434180:865944]\ ❶\ \ Group\ 1\ pausing}
+\DoxyCodeLine{[1710434180:865946]\ ❸\ \ Group\ 1\ waiting:\ 1}
+\DoxyCodeLine{[1710434181:858876]\ ❸\ \ send\_messages\ waiting:\ 2}
+\DoxyCodeLine{[1710434181:863689]\ ❸\ \ Group\ 2\ waiting:\ 2}
+\DoxyCodeLine{[1710434181:866209]\ ❸\ \ Group\ 1\ waiting:\ 2}
+\DoxyCodeLine{[1710434182:859051]\ ❸\ \ send\_messages\ waiting:\ 3}
+\DoxyCodeLine{[1710434182:863907]\ ❸\ \ Group\ 2\ waiting:\ 3}
+\DoxyCodeLine{[1710434182:866485]\ ❸\ \ Group\ 1\ waiting:\ 3}
+\DoxyCodeLine{[1710434183:859325]\ ❸\ \ send\_messages\ waiting:\ 4}
+\DoxyCodeLine{[1710434183:864209]\ ❸\ \ Group\ 2\ waiting:\ 4}
+\DoxyCodeLine{[1710434183:866660]\ ❸\ \ Group\ 1\ waiting:\ 4}
+\DoxyCodeLine{[1710434184:859489]\ ❸\ \ send\_messages\ waiting:\ 5}
+\DoxyCodeLine{[1710434184:864433]\ ❸\ \ Group\ 2\ waiting:\ 5}
+\DoxyCodeLine{[1710434184:866867]\ ❸\ \ Group\ 1\ waiting:\ 5}
+\DoxyCodeLine{[1710434185:859666]\ ❷\ \ Adding\ Message:\ 0.000000\ 1\ 1\ 1.000000}
+\DoxyCodeLine{[1710434185:859687]\ ❷\ \ Adding\ Message:\ 0.000000\ 1\ 2\ 2.000000}
+\DoxyCodeLine{[1710434185:859692]\ ❷\ \ Adding\ Message:\ 0.000000\ 2\ 1\ 1.000000}
+\DoxyCodeLine{[1710434185:859696]\ ❷\ \ Adding\ Message:\ 0.000000\ 2\ 2\ 2.000000}
+\DoxyCodeLine{[1710434185:859699]\ ❸\ \ send\_messages\ waiting:\ 1}
+\DoxyCodeLine{[1710434185:864718]\ ❶\ \ Group\ 2\ resuming}
+\DoxyCodeLine{[1710434185:864739]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 1\ is\ active}
+\DoxyCodeLine{[1710434185:864742]\ ❷\ \ Running\ (2)\ Neuron\ (1)}
+\DoxyCodeLine{[1710434185:864758]\ ⓘ\ \ (2)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/52.000000}
+\DoxyCodeLine{[1710434185:864763]\ ❶\ \ No\ additional\ messages\ for\ (2)\ Neuron\ 1}
+\DoxyCodeLine{[1710434185:864766]\ ⓘ\ \ Group\ 2:\ Neuron\ 1\ does\ not\ have\ any\ neighbors}
+\DoxyCodeLine{[1710434185:864769]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 2\ is\ active}
+\DoxyCodeLine{[1710434185:864771]\ ❷\ \ Running\ (2)\ Neuron\ (2)}
+\DoxyCodeLine{[1710434185:864776]\ ⓘ\ \ (2)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/68.000000}
+\DoxyCodeLine{[1710434185:864778]\ ❶\ \ No\ additional\ messages\ for\ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710434185:864784]\ ⓘ\ \ Membrane\ potential\ for\ Group\ 2:\ Neuron\ 2\ is\ below\ the\ threshold,\ not\ firing}
+\DoxyCodeLine{[1710434185:864786]\ ❶\ \ Group\ 2\ pausing}
+\DoxyCodeLine{[1710434185:864788]\ ❸\ \ Group\ 2\ waiting:\ 1}
+\DoxyCodeLine{[1710434185:867064]\ ❶\ \ Group\ 1\ resuming}
+\DoxyCodeLine{[1710434185:867085]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 1\ is\ active}
+\DoxyCodeLine{[1710434185:867088]\ ❷\ \ Running\ (1)\ Neuron\ (1)}
+\DoxyCodeLine{[1710434185:867103]\ ⓘ\ \ (1)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/69.000000}
+\DoxyCodeLine{[1710434185:867107]\ ❶\ \ No\ additional\ messages\ for\ (1)\ Neuron\ 1}
+\DoxyCodeLine{[1710434185:867111]\ ⓘ\ \ Membrane\ potential\ for\ Group\ 1:\ Neuron\ 1\ is\ below\ the\ threshold,\ not\ firing}
+\DoxyCodeLine{[1710434185:867115]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 2\ is\ active}
+\DoxyCodeLine{[1710434185:867117]\ ❷\ \ Running\ (1)\ Neuron\ (2)}
+\DoxyCodeLine{[1710434185:867122]\ ⓘ\ \ (1)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/56.024170}
+\DoxyCodeLine{[1710434185:867168]\ ❶\ \ No\ additional\ messages\ for\ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710434185:867171]\ ⓘ\ \ Membrane\ potential\ for\ Group\ 1:\ Neuron\ 2\ is\ below\ the\ threshold,\ not\ firing}
+\DoxyCodeLine{[1710434185:867173]\ ❶\ \ Group\ 1\ pausing}
+\DoxyCodeLine{[1710434185:867175]\ ❸\ \ Group\ 1\ waiting:\ 1}
+\DoxyCodeLine{[1710434186:859959]\ ❸\ \ send\_messages\ waiting:\ 2}
+\DoxyCodeLine{[1710434186:865016]\ ❸\ \ Group\ 2\ waiting:\ 2}
+\DoxyCodeLine{[1710434186:867440]\ ❸\ \ Group\ 1\ waiting:\ 2}
+\DoxyCodeLine{[1710434187:860164]\ ❸\ \ send\_messages\ waiting:\ 3}
+\DoxyCodeLine{[1710434187:865283]\ ❸\ \ Group\ 2\ waiting:\ 3}
+\DoxyCodeLine{[1710434187:867638]\ ❸\ \ Group\ 1\ waiting:\ 3}
+\DoxyCodeLine{[1710434188:860324]\ ❸\ \ send\_messages\ waiting:\ 4}
+\DoxyCodeLine{[1710434188:865484]\ ❸\ \ Group\ 2\ waiting:\ 4}
+\DoxyCodeLine{[1710434188:867894]\ ❸\ \ Group\ 1\ waiting:\ 4}
+\DoxyCodeLine{[1710434189:860581]\ ❸\ \ send\_messages\ waiting:\ 5}
+\DoxyCodeLine{[1710434189:865713]\ ❸\ \ Group\ 2\ waiting:\ 5}
+\DoxyCodeLine{[1710434189:868112]\ ❸\ \ Group\ 1\ waiting:\ 5}
+\DoxyCodeLine{[1710434190:860865]\ ❷\ \ Adding\ Message:\ 0.000000\ 1\ 1\ 1.000000}
+\DoxyCodeLine{[1710434190:860878]\ ❷\ \ Adding\ Message:\ 0.000000\ 1\ 2\ 2.000000}
+\DoxyCodeLine{[1710434190:860881]\ ❷\ \ Adding\ Message:\ 0.000000\ 2\ 1\ 1.000000}
+\DoxyCodeLine{[1710434190:860884]\ ❷\ \ Adding\ Message:\ 0.000000\ 2\ 2\ 2.000000}
+\DoxyCodeLine{[1710434190:860885]\ ❸\ \ send\_messages\ waiting:\ 1}
+\DoxyCodeLine{[1710434190:865927]\ ❶\ \ Group\ 2\ resuming}
+\DoxyCodeLine{[1710434190:865943]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 1\ is\ active}
+\DoxyCodeLine{[1710434190:865945]\ ❷\ \ Running\ (2)\ Neuron\ (1)}
+\DoxyCodeLine{[1710434190:865957]\ ⓘ\ \ (2)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/51.000000}
+\DoxyCodeLine{[1710434190:866042]\ ❶\ \ No\ additional\ messages\ for\ (2)\ Neuron\ 1}
+\DoxyCodeLine{[1710434190:866045]\ ⓘ\ \ Group\ 2:\ Neuron\ 1\ does\ not\ have\ any\ neighbors}
+\DoxyCodeLine{[1710434190:866047]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 2\ is\ active}
+\DoxyCodeLine{[1710434190:866049]\ ❷\ \ Running\ (2)\ Neuron\ (2)}
+\DoxyCodeLine{[1710434190:866053]\ ⓘ\ \ (2)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/66.000000}
+\DoxyCodeLine{[1710434190:866055]\ ❶\ \ No\ additional\ messages\ for\ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710434190:866057]\ ⓘ\ \ Membrane\ potential\ for\ Group\ 2:\ Neuron\ 2\ is\ below\ the\ threshold,\ not\ firing}
+\DoxyCodeLine{[1710434190:866059]\ ❶\ \ Group\ 2\ pausing}
+\DoxyCodeLine{[1710434190:866061]\ ❸\ \ Group\ 2\ waiting:\ 1}
+\DoxyCodeLine{[1710434190:868314]\ ❶\ \ Group\ 1\ resuming}
+\DoxyCodeLine{[1710434190:868329]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 1\ is\ active}
+\DoxyCodeLine{[1710434190:868331]\ ❷\ \ Running\ (1)\ Neuron\ (1)}
+\DoxyCodeLine{[1710434190:868343]\ ⓘ\ \ (1)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/68.000000}
+\DoxyCodeLine{[1710434190:868346]\ ❶\ \ No\ additional\ messages\ for\ (1)\ Neuron\ 1}
+\DoxyCodeLine{[1710434190:868349]\ ⓘ\ \ Membrane\ potential\ for\ Group\ 1:\ Neuron\ 1\ is\ below\ the\ threshold,\ not\ firing}
+\DoxyCodeLine{[1710434190:868352]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 2\ is\ active}
+\DoxyCodeLine{[1710434190:868353]\ ❷\ \ Running\ (1)\ Neuron\ (2)}
+\DoxyCodeLine{[1710434190:868357]\ ⓘ\ \ (1)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/54.024170}
+\DoxyCodeLine{[1710434190:868359]\ ❶\ \ No\ additional\ messages\ for\ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710434190:868363]\ ⓘ\ \ Group\ 1:\ Neuron\ 2\ is\ sending\ a\ mesage\ to\ Group\ 2:\ Neuron\ 2}
+\DoxyCodeLine{[1710434190:868367]\ ❶\ \ Accumulated\ for\ Group\ 1:\ Neuron\ 2\ is\ -\/54.024170}
+\DoxyCodeLine{[1710434190:868371]\ ❶\ \ Weight\ for\ Group\ 1:\ Neuron\ 2\ to\ Group\ 2:\ Neuron\ 2\ is\ 0.512932}
+\DoxyCodeLine{[1710434190:868373]\ ❶\ \ Group\ 1:\ Neuron\ 2\ modifier\ is\ -\/}
+\DoxyCodeLine{[1710434190:868377]\ ⓘ\ \ Message\ from\ Group\ 1:\ Neuron\ 2\ to\ Group\ 2:\ Neuron\ 2\ is\ 27.710747}
+\DoxyCodeLine{[1710434190:868380]\ ⓘ\ \ Neuron\ 1\ fired,\ entering\ refractory\ phase}
+\DoxyCodeLine{[1710434190:868387]\ ⓘ\ \ Neuron\ 2\ portential\ set\ to\ -\/70.0000}
+\DoxyCodeLine{[1710434190:870595]\ ⓘ\ \ Neuron\ 1\ completed\ refractory\ phase,\ running}
+\DoxyCodeLine{[1710434190:870610]\ ❶\ \ Group\ 1\ pausing}
+\DoxyCodeLine{[1710434190:870612]\ ❸\ \ Group\ 1\ waiting:\ 1}
+\DoxyCodeLine{[1710434191:861120]\ ❸\ \ send\_messages\ waiting:\ 2}
+\DoxyCodeLine{[1710434191:866315]\ ❸\ \ Group\ 2\ waiting:\ 2}
+\DoxyCodeLine{[1710434191:870795]\ ❸\ \ Group\ 1\ waiting:\ 2}
+\DoxyCodeLine{[1710434192:861415]\ ❸\ \ send\_messages\ waiting:\ 3}
+\DoxyCodeLine{[1710434192:866552]\ ❸\ \ Group\ 2\ waiting:\ 3}
+\DoxyCodeLine{[1710434192:871086]\ ❸\ \ Group\ 1\ waiting:\ 3}
+\DoxyCodeLine{[1710434193:861603]\ ❸\ \ send\_messages\ waiting:\ 4}
+\DoxyCodeLine{[1710434193:866779]\ ❸\ \ Group\ 2\ waiting:\ 4}
+\DoxyCodeLine{[1710434193:871389]\ ❸\ \ Group\ 1\ waiting:\ 4}
+\DoxyCodeLine{[1710434194:861852]\ ❸\ \ send\_messages\ waiting:\ 5}
+\DoxyCodeLine{[1710434194:867006]\ ❸\ \ Group\ 2\ waiting:\ 5}
+\DoxyCodeLine{[1710434194:871662]\ ❸\ \ Group\ 1\ waiting:\ 5}
+\DoxyCodeLine{[1710434195:862014]\ ❷\ \ Adding\ Message:\ 0.000000\ 1\ 1\ 1.000000}
+\DoxyCodeLine{[1710434195:862027]\ ❷\ \ Adding\ Message:\ 0.000000\ 1\ 2\ 2.000000}
+\DoxyCodeLine{[1710434195:862030]\ ❷\ \ Adding\ Message:\ 0.000000\ 2\ 1\ 1.000000}
+\DoxyCodeLine{[1710434195:862033]\ ❷\ \ Adding\ Message:\ 0.000000\ 2\ 2\ 2.000000}
+\DoxyCodeLine{[1710434195:862035]\ ❸\ \ send\_messages\ waiting:\ 1}
+\DoxyCodeLine{[1710434195:867271]\ ❶\ \ Group\ 2\ resuming}
+\DoxyCodeLine{[1710434195:867286]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 1\ is\ active}
+\DoxyCodeLine{[1710434195:867289]\ ❷\ \ Running\ (2)\ Neuron\ (1)}
+\DoxyCodeLine{[1710434195:867300]\ ⓘ\ \ (2)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/50.000000}
+\DoxyCodeLine{[1710434195:867303]\ ❶\ \ No\ additional\ messages\ for\ (2)\ Neuron\ 1}
+\DoxyCodeLine{[1710434195:867306]\ ⓘ\ \ Group\ 2:\ Neuron\ 1\ does\ not\ have\ any\ neighbors}
+\DoxyCodeLine{[1710434195:867308]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 2\ is\ active}
+\DoxyCodeLine{[1710434195:867309]\ ❷\ \ Running\ (2)\ Neuron\ (2)}
+\DoxyCodeLine{[1710434195:867313]\ ⓘ\ \ (2)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/38.289253}
+\DoxyCodeLine{[1710434195:867317]\ ⓘ\ \ (2)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/36.289253}
+\DoxyCodeLine{[1710434195:867318]\ ❶\ \ No\ additional\ messages\ for\ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710434195:867322]\ ⓘ\ \ Group\ 2:\ Neuron\ 2\ is\ sending\ a\ mesage\ to\ Group\ 1:\ Neuron\ 1}
+\DoxyCodeLine{[1710434195:867326]\ ❶\ \ Accumulated\ for\ Group\ 2:\ Neuron\ 2\ is\ -\/36.289253}
+\DoxyCodeLine{[1710434195:867330]\ ❶\ \ Weight\ for\ Group\ 2:\ Neuron\ 2\ to\ Group\ 1:\ Neuron\ 1\ is\ 0.277775}
+\DoxyCodeLine{[1710434195:867333]\ ❶\ \ Group\ 2:\ Neuron\ 2\ modifier\ is\ -\/}
+\DoxyCodeLine{[1710434195:867337]\ ⓘ\ \ Message\ from\ Group\ 2:\ Neuron\ 2\ to\ Group\ 1:\ Neuron\ 1\ is\ 10.080237}
+\DoxyCodeLine{[1710434195:867340]\ ⓘ\ \ Neuron\ 2\ fired,\ entering\ refractory\ phase}
+\DoxyCodeLine{[1710434195:867346]\ ⓘ\ \ Neuron\ 2\ portential\ set\ to\ -\/70.0000}
+\DoxyCodeLine{[1710434195:869543]\ ⓘ\ \ Neuron\ 2\ completed\ refractory\ phase,\ running}
+\DoxyCodeLine{[1710434195:869646]\ ❶\ \ Group\ 2\ pausing}
+\DoxyCodeLine{[1710434195:869649]\ ❸\ \ Group\ 2\ waiting:\ 1}
+\DoxyCodeLine{[1710434195:871955]\ ❶\ \ Group\ 1\ resuming}
+\DoxyCodeLine{[1710434195:871975]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 1\ is\ active}
+\DoxyCodeLine{[1710434195:871978]\ ❷\ \ Running\ (1)\ Neuron\ (1)}
+\DoxyCodeLine{[1710434195:871994]\ ⓘ\ \ (1)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/67.000000}
+\DoxyCodeLine{[1710434195:872001]\ ⓘ\ \ (1)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/56.919763}
+\DoxyCodeLine{[1710434195:872003]\ ❶\ \ No\ additional\ messages\ for\ (1)\ Neuron\ 1}
+\DoxyCodeLine{[1710434195:872007]\ ⓘ\ \ Membrane\ potential\ for\ Group\ 1:\ Neuron\ 1\ is\ below\ the\ threshold,\ not\ firing}
+\DoxyCodeLine{[1710434195:872010]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 2\ is\ active}
+\DoxyCodeLine{[1710434195:872012]\ ❷\ \ Running\ (1)\ Neuron\ (2)}
+\DoxyCodeLine{[1710434195:872017]\ ⓘ\ \ (1)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/68.000000}
+\DoxyCodeLine{[1710434195:872019]\ ❶\ \ No\ additional\ messages\ for\ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710434195:872021]\ ⓘ\ \ Membrane\ potential\ for\ Group\ 1:\ Neuron\ 2\ is\ below\ the\ threshold,\ not\ firing}
+\DoxyCodeLine{[1710434195:872023]\ ❶\ \ Group\ 1\ pausing}
+\DoxyCodeLine{[1710434195:872026]\ ❸\ \ Group\ 1\ waiting:\ 1}
+\DoxyCodeLine{[1710434196:862217]\ ❸\ \ send\_messages\ waiting:\ 2}
+\DoxyCodeLine{[1710434196:869823]\ ❸\ \ Group\ 2\ waiting:\ 2}
+\DoxyCodeLine{[1710434196:872208]\ ❸\ \ Group\ 1\ waiting:\ 2}
+\DoxyCodeLine{[1710434197:862475]\ ❸\ \ send\_messages\ waiting:\ 3}
+\DoxyCodeLine{[1710434197:870022]\ ❸\ \ Group\ 2\ waiting:\ 3}
+\DoxyCodeLine{[1710434197:872406]\ ❸\ \ Group\ 1\ waiting:\ 3}
+\DoxyCodeLine{[1710434198:862749]\ ❸\ \ send\_messages\ waiting:\ 4}
+\DoxyCodeLine{[1710434198:870257]\ ❸\ \ Group\ 2\ waiting:\ 4}
+\DoxyCodeLine{[1710434198:872694]\ ❸\ \ Group\ 1\ waiting:\ 4}
+\DoxyCodeLine{[1710434199:863002]\ ❸\ \ send\_messages\ waiting:\ 5}
+\DoxyCodeLine{[1710434199:870471]\ ❸\ \ Group\ 2\ waiting:\ 5}
+\DoxyCodeLine{[1710434199:873000]\ ❸\ \ Group\ 1\ waiting:\ 5}
+\DoxyCodeLine{[1710434200:863252]\ ❷\ \ Adding\ Message:\ 0.000000\ 1\ 1\ 1.000000}
+\DoxyCodeLine{[1710434200:863267]\ ❷\ \ Adding\ Message:\ 0.000000\ 1\ 2\ 2.000000}
+\DoxyCodeLine{[1710434200:863271]\ ❷\ \ Adding\ Message:\ 0.000000\ 2\ 1\ 1.000000}
+\DoxyCodeLine{[1710434200:863274]\ ❷\ \ Adding\ Message:\ 0.000000\ 2\ 2\ 2.000000}
+\DoxyCodeLine{[1710434200:863276]\ ❸\ \ send\_messages\ waiting:\ 1}
+\DoxyCodeLine{[1710434200:870669]\ ❶\ \ Group\ 2\ resuming}
+\DoxyCodeLine{[1710434200:870684]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 1\ is\ active}
+\DoxyCodeLine{[1710434200:870686]\ ❷\ \ Running\ (2)\ Neuron\ (1)}
+\DoxyCodeLine{[1710434200:870698]\ ⓘ\ \ (2)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/49.000000}
+\DoxyCodeLine{[1710434200:870701]\ ❶\ \ No\ additional\ messages\ for\ (2)\ Neuron\ 1}
+\DoxyCodeLine{[1710434200:870703]\ ⓘ\ \ Group\ 2:\ Neuron\ 1\ does\ not\ have\ any\ neighbors}
+\DoxyCodeLine{[1710434200:870705]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 2\ is\ active}
+\DoxyCodeLine{[1710434200:870707]\ ❷\ \ Running\ (2)\ Neuron\ (2)}
+\DoxyCodeLine{[1710434200:870710]\ ⓘ\ \ (2)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/68.000000}
+\DoxyCodeLine{[1710434200:870712]\ ❶\ \ No\ additional\ messages\ for\ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710434200:870715]\ ⓘ\ \ Membrane\ potential\ for\ Group\ 2:\ Neuron\ 2\ is\ below\ the\ threshold,\ not\ firing}
+\DoxyCodeLine{[1710434200:870716]\ ❶\ \ Group\ 2\ pausing}
+\DoxyCodeLine{[1710434200:870718]\ ❸\ \ Group\ 2\ waiting:\ 1}
+\DoxyCodeLine{[1710434200:873224]\ ❶\ \ Group\ 1\ resuming}
+\DoxyCodeLine{[1710434200:873241]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 1\ is\ active}
+\DoxyCodeLine{[1710434200:873243]\ ❷\ \ Running\ (1)\ Neuron\ (1)}
+\DoxyCodeLine{[1710434200:873256]\ ⓘ\ \ (1)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/55.919763}
+\DoxyCodeLine{[1710434200:873259]\ ❶\ \ No\ additional\ messages\ for\ (1)\ Neuron\ 1}
+\DoxyCodeLine{[1710434200:873262]\ ⓘ\ \ Membrane\ potential\ for\ Group\ 1:\ Neuron\ 1\ is\ below\ the\ threshold,\ not\ firing}
+\DoxyCodeLine{[1710434200:873264]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 2\ is\ active}
+\DoxyCodeLine{[1710434200:873266]\ ❷\ \ Running\ (1)\ Neuron\ (2)}
+\DoxyCodeLine{[1710434200:873270]\ ⓘ\ \ (1)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/66.000000}
+\DoxyCodeLine{[1710434200:873271]\ ❶\ \ No\ additional\ messages\ for\ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710434200:873273]\ ⓘ\ \ Membrane\ potential\ for\ Group\ 1:\ Neuron\ 2\ is\ below\ the\ threshold,\ not\ firing}
+\DoxyCodeLine{[1710434200:873275]\ ❶\ \ Group\ 1\ pausing}
+\DoxyCodeLine{[1710434200:873277]\ ❸\ \ Group\ 1\ waiting:\ 1}
+\DoxyCodeLine{[1710434201:863423]\ ❸\ \ send\_messages\ waiting:\ 2}
+\DoxyCodeLine{[1710434201:870937]\ ❸\ \ Group\ 2\ waiting:\ 2}
+\DoxyCodeLine{[1710434201:873517]\ ❸\ \ Group\ 1\ waiting:\ 2}
+\DoxyCodeLine{[1710434202:863586]\ ❸\ \ send\_messages\ waiting:\ 3}
+\DoxyCodeLine{[1710434202:871135]\ ❸\ \ Group\ 2\ waiting:\ 3}
+\DoxyCodeLine{[1710434202:873726]\ ❸\ \ Group\ 1\ waiting:\ 3}
+\DoxyCodeLine{[1710434203:863738]\ ❸\ \ send\_messages\ waiting:\ 4}
+\DoxyCodeLine{[1710434203:871302]\ ❸\ \ Group\ 2\ waiting:\ 4}
+\DoxyCodeLine{[1710434203:873958]\ ❸\ \ Group\ 1\ waiting:\ 4}
+\DoxyCodeLine{[1710434204:863976]\ ❸\ \ send\_messages\ waiting:\ 5}
+\DoxyCodeLine{[1710434204:871565]\ ❸\ \ Group\ 2\ waiting:\ 5}
+\DoxyCodeLine{[1710434204:874244]\ ❸\ \ Group\ 1\ waiting:\ 5}
+\DoxyCodeLine{[1710434205:864218]\ ❷\ \ Adding\ Message:\ 0.000000\ 1\ 1\ 1.000000}
+\DoxyCodeLine{[1710434205:864233]\ ❷\ \ Adding\ Message:\ 0.000000\ 1\ 2\ 2.000000}
+\DoxyCodeLine{[1710434205:864237]\ ❷\ \ Adding\ Message:\ 0.000000\ 2\ 1\ 1.000000}
+\DoxyCodeLine{[1710434205:864239]\ ❷\ \ Adding\ Message:\ 0.000000\ 2\ 2\ 2.000000}
+\DoxyCodeLine{[1710434205:864241]\ ❸\ \ send\_messages\ waiting:\ 1}
+\DoxyCodeLine{[1710434205:871853]\ ❶\ \ Group\ 2\ resuming}
+\DoxyCodeLine{[1710434205:871870]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 1\ is\ active}
+\DoxyCodeLine{[1710434205:871872]\ ❷\ \ Running\ (2)\ Neuron\ (1)}
+\DoxyCodeLine{[1710434205:871885]\ ⓘ\ \ (2)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/48.000000}
+\DoxyCodeLine{[1710434205:871888]\ ❶\ \ No\ additional\ messages\ for\ (2)\ Neuron\ 1}
+\DoxyCodeLine{[1710434205:871891]\ ⓘ\ \ Group\ 2:\ Neuron\ 1\ does\ not\ have\ any\ neighbors}
+\DoxyCodeLine{[1710434205:871893]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 2\ is\ active}
+\DoxyCodeLine{[1710434205:871895]\ ❷\ \ Running\ (2)\ Neuron\ (2)}
+\DoxyCodeLine{[1710434205:871898]\ ⓘ\ \ (2)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/66.000000}
+\DoxyCodeLine{[1710434205:871933]\ ❶\ \ No\ additional\ messages\ for\ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710434205:871936]\ ⓘ\ \ Membrane\ potential\ for\ Group\ 2:\ Neuron\ 2\ is\ below\ the\ threshold,\ not\ firing}
+\DoxyCodeLine{[1710434205:871938]\ ❶\ \ Group\ 2\ pausing}
+\DoxyCodeLine{[1710434205:871940]\ ❸\ \ Group\ 2\ waiting:\ 1}
+\DoxyCodeLine{[1710434205:874589]\ ❶\ \ Group\ 1\ resuming}
+\DoxyCodeLine{[1710434205:874606]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 1\ is\ active}
+\DoxyCodeLine{[1710434205:874608]\ ❷\ \ Running\ (1)\ Neuron\ (1)}
+\DoxyCodeLine{[1710434205:874621]\ ⓘ\ \ (1)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/54.919763}
+\DoxyCodeLine{[1710434205:874624]\ ❶\ \ No\ additional\ messages\ for\ (1)\ Neuron\ 1}
+\DoxyCodeLine{[1710434205:874629]\ ⓘ\ \ Group\ 1:\ Neuron\ 1\ is\ sending\ a\ mesage\ to\ Group\ 1:\ Neuron\ 2}
+\DoxyCodeLine{[1710434205:874634]\ ❶\ \ Accumulated\ for\ Group\ 1:\ Neuron\ 1\ is\ -\/54.919763}
+\DoxyCodeLine{[1710434205:874639]\ ❶\ \ Weight\ for\ Group\ 1:\ Neuron\ 1\ to\ Group\ 1:\ Neuron\ 2\ is\ 0.242887}
+\DoxyCodeLine{[1710434205:874641]\ ❶\ \ Group\ 1:\ Neuron\ 1\ modifier\ is\ -\/}
+\DoxyCodeLine{[1710434205:874645]\ ⓘ\ \ Message\ from\ Group\ 1:\ Neuron\ 1\ to\ Group\ 1:\ Neuron\ 2\ is\ 13.339284}
+\DoxyCodeLine{[1710434205:874649]\ ⓘ\ \ Neuron\ 1\ fired,\ entering\ refractory\ phase}
+\DoxyCodeLine{[1710434205:874656]\ ⓘ\ \ Neuron\ 1\ portential\ set\ to\ -\/70.0000}
+\DoxyCodeLine{[1710434205:876832]\ ⓘ\ \ Neuron\ 1\ completed\ refractory\ phase,\ running}
+\DoxyCodeLine{[1710434205:876852]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 2\ is\ active}
+\DoxyCodeLine{[1710434205:876855]\ ❷\ \ Running\ (1)\ Neuron\ (2)}
+\DoxyCodeLine{[1710434205:876870]\ ⓘ\ \ (1)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/64.000000}
+\DoxyCodeLine{[1710434205:876877]\ ⓘ\ \ (1)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/50.660716}
+\DoxyCodeLine{[1710434205:876879]\ ❶\ \ No\ additional\ messages\ for\ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710434205:876885]\ ⓘ\ \ Group\ 1:\ Neuron\ 2\ is\ sending\ a\ mesage\ to\ Group\ 2:\ Neuron\ 2}
+\DoxyCodeLine{[1710434205:876891]\ ❶\ \ Accumulated\ for\ Group\ 1:\ Neuron\ 2\ is\ -\/50.660716}
+\DoxyCodeLine{[1710434205:876895]\ ❶\ \ Weight\ for\ Group\ 1:\ Neuron\ 2\ to\ Group\ 2:\ Neuron\ 2\ is\ 0.512932}
+\DoxyCodeLine{[1710434205:876899]\ ❶\ \ Group\ 1:\ Neuron\ 2\ modifier\ is\ -\/}
+\DoxyCodeLine{[1710434205:876903]\ ⓘ\ \ Message\ from\ Group\ 1:\ Neuron\ 2\ to\ Group\ 2:\ Neuron\ 2\ is\ 25.985522}
+\DoxyCodeLine{[1710434205:876907]\ ⓘ\ \ Neuron\ 1\ fired,\ entering\ refractory\ phase}
+\DoxyCodeLine{[1710434205:876915]\ ⓘ\ \ Neuron\ 2\ portential\ set\ to\ -\/70.0000}
+\DoxyCodeLine{[1710434205:879194]\ ⓘ\ \ Neuron\ 1\ completed\ refractory\ phase,\ running}
+\DoxyCodeLine{[1710434205:879215]\ ❶\ \ Group\ 1\ pausing}
+\DoxyCodeLine{[1710434205:879219]\ ❸\ \ Group\ 1\ waiting:\ 1}
+\DoxyCodeLine{[1710434206:864459]\ ❸\ \ send\_messages\ waiting:\ 2}
+\DoxyCodeLine{[1710434206:872104]\ ❸\ \ Group\ 2\ waiting:\ 2}
+\DoxyCodeLine{[1710434206:879443]\ ❸\ \ Group\ 1\ waiting:\ 2}
+\DoxyCodeLine{[1710434207:864648]\ ❸\ \ send\_messages\ waiting:\ 3}
+\DoxyCodeLine{[1710434207:872282]\ ❸\ \ Group\ 2\ waiting:\ 3}
+\DoxyCodeLine{[1710434207:879720]\ ❸\ \ Group\ 1\ waiting:\ 3}
+\DoxyCodeLine{[1710434208:864730]\ ❸\ \ send\_messages\ waiting:\ 4}
+\DoxyCodeLine{[1710434208:872440]\ ❸\ \ Group\ 2\ waiting:\ 4}
+\DoxyCodeLine{[1710434208:879907]\ ❸\ \ Group\ 1\ waiting:\ 4}
+\DoxyCodeLine{[1710434209:864909]\ ❸\ \ send\_messages\ waiting:\ 5}
+\DoxyCodeLine{[1710434209:872702]\ ❸\ \ Group\ 2\ waiting:\ 5}
+\DoxyCodeLine{[1710434209:880110]\ ❸\ \ Group\ 1\ waiting:\ 5}
+\DoxyCodeLine{[1710434210:865204]\ ❷\ \ Adding\ Message:\ 0.000000\ 1\ 1\ 1.000000}
+\DoxyCodeLine{[1710434210:865230]\ ❷\ \ Adding\ Message:\ 0.000000\ 1\ 2\ 2.000000}
+\DoxyCodeLine{[1710434210:865237]\ ❷\ \ Adding\ Message:\ 0.000000\ 2\ 1\ 1.000000}
+\DoxyCodeLine{[1710434210:865243]\ ❷\ \ Adding\ Message:\ 0.000000\ 2\ 2\ 2.000000}
+\DoxyCodeLine{[1710434210:865247]\ ❸\ \ send\_messages\ waiting:\ 1}
+\DoxyCodeLine{[1710434210:872923]\ ❶\ \ Group\ 2\ resuming}
+\DoxyCodeLine{[1710434210:872946]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 1\ is\ active}
+\DoxyCodeLine{[1710434210:872949]\ ❷\ \ Running\ (2)\ Neuron\ (1)}
+\DoxyCodeLine{[1710434210:873087]\ ⓘ\ \ (2)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/47.000000}
+\DoxyCodeLine{[1710434210:873092]\ ❶\ \ No\ additional\ messages\ for\ (2)\ Neuron\ 1}
+\DoxyCodeLine{[1710434210:873096]\ ⓘ\ \ Group\ 2:\ Neuron\ 1\ does\ not\ have\ any\ neighbors}
+\DoxyCodeLine{[1710434210:873100]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 2\ is\ active}
+\DoxyCodeLine{[1710434210:873102]\ ❷\ \ Running\ (2)\ Neuron\ (2)}
+\DoxyCodeLine{[1710434210:873109]\ ⓘ\ \ (2)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/40.014478}
+\DoxyCodeLine{[1710434210:873114]\ ⓘ\ \ (2)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/38.014478}
+\DoxyCodeLine{[1710434210:873116]\ ❶\ \ No\ additional\ messages\ for\ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710434210:873122]\ ⓘ\ \ Group\ 2:\ Neuron\ 2\ is\ sending\ a\ mesage\ to\ Group\ 1:\ Neuron\ 1}
+\DoxyCodeLine{[1710434210:873129]\ ❶\ \ Accumulated\ for\ Group\ 2:\ Neuron\ 2\ is\ -\/38.014478}
+\DoxyCodeLine{[1710434210:873135]\ ❶\ \ Weight\ for\ Group\ 2:\ Neuron\ 2\ to\ Group\ 1:\ Neuron\ 1\ is\ 0.277775}
+\DoxyCodeLine{[1710434210:873140]\ ❶\ \ Group\ 2:\ Neuron\ 2\ modifier\ is\ -\/}
+\DoxyCodeLine{[1710434210:873146]\ ⓘ\ \ Message\ from\ Group\ 2:\ Neuron\ 2\ to\ Group\ 1:\ Neuron\ 1\ is\ 10.559461}
+\DoxyCodeLine{[1710434210:873151]\ ⓘ\ \ Neuron\ 2\ fired,\ entering\ refractory\ phase}
+\DoxyCodeLine{[1710434210:873161]\ ⓘ\ \ Neuron\ 2\ portential\ set\ to\ -\/70.0000}
+\DoxyCodeLine{[1710434210:875358]\ ⓘ\ \ Neuron\ 2\ completed\ refractory\ phase,\ running}
+\DoxyCodeLine{[1710434210:875378]\ ❶\ \ Group\ 2\ pausing}
+\DoxyCodeLine{[1710434210:875381]\ ❸\ \ Group\ 2\ waiting:\ 1}
+\DoxyCodeLine{[1710434210:880429]\ ❶\ \ Group\ 1\ resuming}
+\DoxyCodeLine{[1710434210:880450]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 1\ is\ active}
+\DoxyCodeLine{[1710434210:880454]\ ❷\ \ Running\ (1)\ Neuron\ (1)}
+\DoxyCodeLine{[1710434210:880472]\ ⓘ\ \ (1)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/69.000000}
+\DoxyCodeLine{[1710434210:880481]\ ⓘ\ \ (1)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/58.440539}
+\DoxyCodeLine{[1710434210:880485]\ ❶\ \ No\ additional\ messages\ for\ (1)\ Neuron\ 1}
+\DoxyCodeLine{[1710434210:880489]\ ⓘ\ \ Membrane\ potential\ for\ Group\ 1:\ Neuron\ 1\ is\ below\ the\ threshold,\ not\ firing}
+\DoxyCodeLine{[1710434210:880492]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 2\ is\ active}
+\DoxyCodeLine{[1710434210:880495]\ ❷\ \ Running\ (1)\ Neuron\ (2)}
+\DoxyCodeLine{[1710434210:880501]\ ⓘ\ \ (1)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/68.000000}
+\DoxyCodeLine{[1710434210:880503]\ ❶\ \ No\ additional\ messages\ for\ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710434210:880506]\ ⓘ\ \ Membrane\ potential\ for\ Group\ 1:\ Neuron\ 2\ is\ below\ the\ threshold,\ not\ firing}
+\DoxyCodeLine{[1710434210:880509]\ ❶\ \ Group\ 1\ pausing}
+\DoxyCodeLine{[1710434210:880512]\ ❸\ \ Group\ 1\ waiting:\ 1}
+\DoxyCodeLine{[1710434211:865361]\ ❸\ \ send\_messages\ waiting:\ 2}
+\DoxyCodeLine{[1710434211:875500]\ ❸\ \ Group\ 2\ waiting:\ 2}
+\DoxyCodeLine{[1710434211:880673]\ ❸\ \ Group\ 1\ waiting:\ 2}
+\DoxyCodeLine{[1710434212:865522]\ ❸\ \ send\_messages\ waiting:\ 3}
+\DoxyCodeLine{[1710434212:875698]\ ❸\ \ Group\ 2\ waiting:\ 3}
+\DoxyCodeLine{[1710434212:880865]\ ❸\ \ Group\ 1\ waiting:\ 3}
+\DoxyCodeLine{[1710434213:865695]\ ❸\ \ send\_messages\ waiting:\ 4}
+\DoxyCodeLine{[1710434213:875899]\ ❸\ \ Group\ 2\ waiting:\ 4}
+\DoxyCodeLine{[1710434213:881012]\ ❸\ \ Group\ 1\ waiting:\ 4}
+\DoxyCodeLine{[1710434214:865835]\ ❸\ \ send\_messages\ waiting:\ 5}
+\DoxyCodeLine{[1710434214:876022]\ ❸\ \ Group\ 2\ waiting:\ 5}
+\DoxyCodeLine{[1710434214:881242]\ ❸\ \ Group\ 1\ waiting:\ 5}
+\DoxyCodeLine{[1710434215:866066]\ ❷\ \ Adding\ Message:\ 0.000000\ 1\ 1\ 1.000000}
+\DoxyCodeLine{[1710434215:866087]\ ❷\ \ Adding\ Message:\ 0.000000\ 1\ 2\ 2.000000}
+\DoxyCodeLine{[1710434215:866092]\ ❷\ \ Adding\ Message:\ 0.000000\ 2\ 1\ 1.000000}
+\DoxyCodeLine{[1710434215:866096]\ ❷\ \ Adding\ Message:\ 0.000000\ 2\ 2\ 2.000000}
+\DoxyCodeLine{[1710434215:866099]\ ❸\ \ send\_messages\ waiting:\ 1}
+\DoxyCodeLine{[1710434215:876134]\ ❶\ \ Group\ 2\ resuming}
+\DoxyCodeLine{[1710434215:876152]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 1\ is\ active}
+\DoxyCodeLine{[1710434215:876155]\ ❷\ \ Running\ (2)\ Neuron\ (1)}
+\DoxyCodeLine{[1710434215:876169]\ ⓘ\ \ (2)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/46.000000}
+\DoxyCodeLine{[1710434215:876173]\ ❶\ \ No\ additional\ messages\ for\ (2)\ Neuron\ 1}
+\DoxyCodeLine{[1710434215:876175]\ ⓘ\ \ Group\ 2:\ Neuron\ 1\ does\ not\ have\ any\ neighbors}
+\DoxyCodeLine{[1710434215:876178]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 2\ is\ active}
+\DoxyCodeLine{[1710434215:876180]\ ❷\ \ Running\ (2)\ Neuron\ (2)}
+\DoxyCodeLine{[1710434215:876184]\ ⓘ\ \ (2)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/68.000000}
+\DoxyCodeLine{[1710434215:876186]\ ❶\ \ No\ additional\ messages\ for\ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710434215:876188]\ ⓘ\ \ Membrane\ potential\ for\ Group\ 2:\ Neuron\ 2\ is\ below\ the\ threshold,\ not\ firing}
+\DoxyCodeLine{[1710434215:876190]\ ❶\ \ Group\ 2\ pausing}
+\DoxyCodeLine{[1710434215:876192]\ ❸\ \ Group\ 2\ waiting:\ 1}
+\DoxyCodeLine{[1710434215:881519]\ ❶\ \ Group\ 1\ resuming}
+\DoxyCodeLine{[1710434215:881544]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 1\ is\ active}
+\DoxyCodeLine{[1710434215:881548]\ ❷\ \ Running\ (1)\ Neuron\ (1)}
+\DoxyCodeLine{[1710434215:881568]\ ⓘ\ \ (1)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/57.440539}
+\DoxyCodeLine{[1710434215:881693]\ ❶\ \ No\ additional\ messages\ for\ (1)\ Neuron\ 1}
+\DoxyCodeLine{[1710434215:881699]\ ⓘ\ \ Membrane\ potential\ for\ Group\ 1:\ Neuron\ 1\ is\ below\ the\ threshold,\ not\ firing}
+\DoxyCodeLine{[1710434215:881703]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 2\ is\ active}
+\DoxyCodeLine{[1710434215:881706]\ ❷\ \ Running\ (1)\ Neuron\ (2)}
+\DoxyCodeLine{[1710434215:881714]\ ⓘ\ \ (1)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/66.000000}
+\DoxyCodeLine{[1710434215:881717]\ ❶\ \ No\ additional\ messages\ for\ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710434215:881720]\ ⓘ\ \ Membrane\ potential\ for\ Group\ 1:\ Neuron\ 2\ is\ below\ the\ threshold,\ not\ firing}
+\DoxyCodeLine{[1710434215:881723]\ ❶\ \ Group\ 1\ pausing}
+\DoxyCodeLine{[1710434215:881726]\ ❸\ \ Group\ 1\ waiting:\ 1}
+\DoxyCodeLine{[1710434216:866213]\ ❸\ \ send\_messages\ waiting:\ 2}
+\DoxyCodeLine{[1710434216:876458]\ ❸\ \ Group\ 2\ waiting:\ 2}
+\DoxyCodeLine{[1710434216:881980]\ ❸\ \ Group\ 1\ waiting:\ 2}
+\DoxyCodeLine{[1710434217:866475]\ ❸\ \ send\_messages\ waiting:\ 3}
+\DoxyCodeLine{[1710434217:876648]\ ❸\ \ Group\ 2\ waiting:\ 3}
+\DoxyCodeLine{[1710434217:882162]\ ❸\ \ Group\ 1\ waiting:\ 3}
+\DoxyCodeLine{[1710434218:866616]\ ❸\ \ send\_messages\ waiting:\ 4}
+\DoxyCodeLine{[1710434218:876855]\ ❸\ \ Group\ 2\ waiting:\ 4}
+\DoxyCodeLine{[1710434218:882410]\ ❸\ \ Group\ 1\ waiting:\ 4}
+\DoxyCodeLine{[1710434219:866819]\ ❸\ \ send\_messages\ waiting:\ 5}
+\DoxyCodeLine{[1710434219:877076]\ ❸\ \ Group\ 2\ waiting:\ 5}
+\DoxyCodeLine{[1710434219:882623]\ ❸\ \ Group\ 1\ waiting:\ 5}
+\DoxyCodeLine{[1710434220:867011]\ ❷\ \ Adding\ Message:\ 0.000000\ 1\ 1\ 1.000000}
+\DoxyCodeLine{[1710434220:867030]\ ❷\ \ Adding\ Message:\ 0.000000\ 1\ 2\ 2.000000}
+\DoxyCodeLine{[1710434220:867035]\ ❷\ \ Adding\ Message:\ 0.000000\ 2\ 1\ 1.000000}
+\DoxyCodeLine{[1710434220:867038]\ ❷\ \ Adding\ Message:\ 0.000000\ 2\ 2\ 2.000000}
+\DoxyCodeLine{[1710434220:867041]\ ❸\ \ send\_messages\ waiting:\ 1}
+\DoxyCodeLine{[1710434220:877354]\ ❶\ \ Group\ 2\ resuming}
+\DoxyCodeLine{[1710434220:877372]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 1\ is\ active}
+\DoxyCodeLine{[1710434220:877375]\ ❷\ \ Running\ (2)\ Neuron\ (1)}
+\DoxyCodeLine{[1710434220:877389]\ ⓘ\ \ (2)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/45.000000}
+\DoxyCodeLine{[1710434220:877393]\ ❶\ \ No\ additional\ messages\ for\ (2)\ Neuron\ 1}
+\DoxyCodeLine{[1710434220:877396]\ ⓘ\ \ Group\ 2:\ Neuron\ 1\ does\ not\ have\ any\ neighbors}
+\DoxyCodeLine{[1710434220:877399]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 2\ is\ active}
+\DoxyCodeLine{[1710434220:877400]\ ❷\ \ Running\ (2)\ Neuron\ (2)}
+\DoxyCodeLine{[1710434220:877404]\ ⓘ\ \ (2)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/66.000000}
+\DoxyCodeLine{[1710434220:877406]\ ❶\ \ No\ additional\ messages\ for\ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710434220:877410]\ ⓘ\ \ Membrane\ potential\ for\ Group\ 2:\ Neuron\ 2\ is\ below\ the\ threshold,\ not\ firing}
+\DoxyCodeLine{[1710434220:877412]\ ❶\ \ Group\ 2\ pausing}
+\DoxyCodeLine{[1710434220:877414]\ ❸\ \ Group\ 2\ waiting:\ 1}
+\DoxyCodeLine{[1710434220:882900]\ ❶\ \ Group\ 1\ resuming}
+\DoxyCodeLine{[1710434220:882916]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 1\ is\ active}
+\DoxyCodeLine{[1710434220:882918]\ ❷\ \ Running\ (1)\ Neuron\ (1)}
+\DoxyCodeLine{[1710434220:882932]\ ⓘ\ \ (1)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/56.440539}
+\DoxyCodeLine{[1710434220:882935]\ ❶\ \ No\ additional\ messages\ for\ (1)\ Neuron\ 1}
+\DoxyCodeLine{[1710434220:882938]\ ⓘ\ \ Membrane\ potential\ for\ Group\ 1:\ Neuron\ 1\ is\ below\ the\ threshold,\ not\ firing}
+\DoxyCodeLine{[1710434220:882941]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 2\ is\ active}
+\DoxyCodeLine{[1710434220:882942]\ ❷\ \ Running\ (1)\ Neuron\ (2)}
+\DoxyCodeLine{[1710434220:882946]\ ⓘ\ \ (1)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/64.000000}
+\DoxyCodeLine{[1710434220:882948]\ ❶\ \ No\ additional\ messages\ for\ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710434220:882950]\ ⓘ\ \ Membrane\ potential\ for\ Group\ 1:\ Neuron\ 2\ is\ below\ the\ threshold,\ not\ firing}
+\DoxyCodeLine{[1710434220:882952]\ ❶\ \ Group\ 1\ pausing}
+\DoxyCodeLine{[1710434220:882953]\ ❸\ \ Group\ 1\ waiting:\ 1}
+\DoxyCodeLine{[1710434221:867264]\ ❸\ \ send\_messages\ waiting:\ 2}
+\DoxyCodeLine{[1710434221:877621]\ ❸\ \ Group\ 2\ waiting:\ 2}
+\DoxyCodeLine{[1710434221:883180]\ ❸\ \ Group\ 1\ waiting:\ 2}
+\DoxyCodeLine{[1710434222:867440]\ ❸\ \ send\_messages\ waiting:\ 3}
+\DoxyCodeLine{[1710434222:877887]\ ❸\ \ Group\ 2\ waiting:\ 3}
+\DoxyCodeLine{[1710434222:883455]\ ❸\ \ Group\ 1\ waiting:\ 3}
+\DoxyCodeLine{[1710434223:867603]\ ❸\ \ send\_messages\ waiting:\ 4}
+\DoxyCodeLine{[1710434223:878158]\ ❸\ \ Group\ 2\ waiting:\ 4}
+\DoxyCodeLine{[1710434223:883756]\ ❸\ \ Group\ 1\ waiting:\ 4}
+\DoxyCodeLine{[1710434224:867788]\ ❸\ \ send\_messages\ waiting:\ 5}
+\DoxyCodeLine{[1710434224:878420]\ ❸\ \ Group\ 2\ waiting:\ 5}
+\DoxyCodeLine{[1710434224:883916]\ ❸\ \ Group\ 1\ waiting:\ 5}
+\DoxyCodeLine{[1710434225:867973]\ ❷\ \ Adding\ Message:\ 0.000000\ 1\ 1\ 1.000000}
+\DoxyCodeLine{[1710434225:867994]\ ❷\ \ Adding\ Message:\ 0.000000\ 1\ 2\ 2.000000}
+\DoxyCodeLine{[1710434225:867999]\ ❷\ \ Adding\ Message:\ 0.000000\ 2\ 1\ 1.000000}
+\DoxyCodeLine{[1710434225:868003]\ ❷\ \ Adding\ Message:\ 0.000000\ 2\ 2\ 2.000000}
+\DoxyCodeLine{[1710434225:868005]\ ❸\ \ send\_messages\ waiting:\ 1}
+\DoxyCodeLine{[1710434225:878729]\ ❶\ \ Group\ 2\ resuming}
+\DoxyCodeLine{[1710434225:878747]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 1\ is\ active}
+\DoxyCodeLine{[1710434225:878853]\ ❷\ \ Running\ (2)\ Neuron\ (1)}
+\DoxyCodeLine{[1710434225:878868]\ ⓘ\ \ (2)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/44.000000}
+\DoxyCodeLine{[1710434225:878871]\ ❶\ \ No\ additional\ messages\ for\ (2)\ Neuron\ 1}
+\DoxyCodeLine{[1710434225:878874]\ ⓘ\ \ Group\ 2:\ Neuron\ 1\ does\ not\ have\ any\ neighbors}
+\DoxyCodeLine{[1710434225:878877]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 2\ is\ active}
+\DoxyCodeLine{[1710434225:878879]\ ❷\ \ Running\ (2)\ Neuron\ (2)}
+\DoxyCodeLine{[1710434225:878883]\ ⓘ\ \ (2)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/64.000000}
+\DoxyCodeLine{[1710434225:878885]\ ❶\ \ No\ additional\ messages\ for\ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710434225:878888]\ ⓘ\ \ Membrane\ potential\ for\ Group\ 2:\ Neuron\ 2\ is\ below\ the\ threshold,\ not\ firing}
+\DoxyCodeLine{[1710434225:878890]\ ❶\ \ Group\ 2\ pausing}
+\DoxyCodeLine{[1710434225:878892]\ ❸\ \ Group\ 2\ waiting:\ 1}
+\DoxyCodeLine{[1710434225:884156]\ ❶\ \ Group\ 1\ resuming}
+\DoxyCodeLine{[1710434225:884172]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 1\ is\ active}
+\DoxyCodeLine{[1710434225:884174]\ ❷\ \ Running\ (1)\ Neuron\ (1)}
+\DoxyCodeLine{[1710434225:884188]\ ⓘ\ \ (1)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/55.440539}
+\DoxyCodeLine{[1710434225:884191]\ ❶\ \ No\ additional\ messages\ for\ (1)\ Neuron\ 1}
+\DoxyCodeLine{[1710434225:884194]\ ⓘ\ \ Membrane\ potential\ for\ Group\ 1:\ Neuron\ 1\ is\ below\ the\ threshold,\ not\ firing}
+\DoxyCodeLine{[1710434225:884197]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 2\ is\ active}
+\DoxyCodeLine{[1710434225:884199]\ ❷\ \ Running\ (1)\ Neuron\ (2)}
+\DoxyCodeLine{[1710434225:884203]\ ⓘ\ \ (1)\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/62.000000}
+\DoxyCodeLine{[1710434225:884205]\ ❶\ \ No\ additional\ messages\ for\ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710434225:884207]\ ⓘ\ \ Membrane\ potential\ for\ Group\ 1:\ Neuron\ 2\ is\ below\ the\ threshold,\ not\ firing}
+\DoxyCodeLine{[1710434225:884208]\ ❶\ \ Group\ 1\ pausing}
+\DoxyCodeLine{[1710434225:884210]\ ❸\ \ Group\ 1\ waiting:\ 1}
+\DoxyCodeLine{[1710434226:868182]\ ❸\ \ send\_messages\ waiting:\ 2}
+\DoxyCodeLine{[1710434226:879136]\ ❸\ \ Group\ 2\ waiting:\ 2}
+\DoxyCodeLine{[1710434226:884455]\ ❸\ \ Group\ 1\ waiting:\ 2}
+\DoxyCodeLine{[1710434227:868400]\ ❸\ \ send\_messages\ waiting:\ 3}
+\DoxyCodeLine{[1710434227:879352]\ ❸\ \ Group\ 2\ waiting:\ 3}
+\DoxyCodeLine{[1710434227:884718]\ ❸\ \ Group\ 1\ waiting:\ 3}
+\DoxyCodeLine{[1710434228:868580]\ ❸\ \ send\_messages\ waiting:\ 4}
+\DoxyCodeLine{[1710434228:879655]\ ❸\ \ Group\ 2\ waiting:\ 4}
+\DoxyCodeLine{[1710434228:884904]\ ❸\ \ Group\ 1\ waiting:\ 4}
+\DoxyCodeLine{[1710434229:868797]\ ❸\ \ send\_messages\ waiting:\ 5}
+\DoxyCodeLine{[1710434229:879855]\ ❸\ \ Group\ 2\ waiting:\ 5}
+\DoxyCodeLine{[1710434229:885211]\ ❸\ \ Group\ 1\ waiting:\ 5}
+\DoxyCodeLine{[1710434230:856652]\ ⓘ\ \ Writing\ data\ to\ file...}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710434230:857030]\ ❶\ \ Neuron\ Group\ 1\ (2\ neurons)}
+\DoxyCodeLine{========================================================}
+\DoxyCodeLine{[1710434230:857033]\ ❶\ \ \ \ \ (1)\ Neuron\ 1}
+\DoxyCodeLine{[1710434230:857036]\ ❷\ \ \ \ \ \ \ \ (1)\ Neuron\ 1\ is\ connected\ to:}
+\DoxyCodeLine{[1710434230:857038]\ ❷\ \ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710434230:857040]\ ❷\ \ \ \ \ \ \ \ (1)\ Neuron\ 1\ has\ connections\ from:}
+\DoxyCodeLine{[1710434230:857042]\ ❷\ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710434230:857043]\ ❶\ \ \ \ \ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710434230:857045]\ ❷\ \ \ \ \ \ \ \ (1)\ Neuron\ 2\ is\ connected\ to:}
+\DoxyCodeLine{[1710434230:857046]\ ❷\ \ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710434230:857047]\ ❷\ \ \ \ \ \ \ \ (1)\ Neuron\ 2\ has\ connections\ from:}
+\DoxyCodeLine{[1710434230:857048]\ ❷\ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 1}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710434230:857050]\ ❶\ \ Neuron\ Group\ 2\ (2\ neurons)}
+\DoxyCodeLine{========================================================}
+\DoxyCodeLine{[1710434230:857052]\ ❶\ \ \ \ \ (2)\ Neuron\ 1}
+\DoxyCodeLine{[1710434230:857053]\ ❸\ \ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 1\ has\ no\ outgoing\ connections}
+\DoxyCodeLine{[1710434230:857054]\ ❸\ \ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 1\ has\ no\ incoming\ connections}
+\DoxyCodeLine{[1710434230:857056]\ ❶\ \ \ \ \ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710434230:857057]\ ❷\ \ \ \ \ \ \ \ (2)\ Neuron\ 2\ is\ connected\ to:}
+\DoxyCodeLine{[1710434230:857058]\ ❷\ \ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 1}
+\DoxyCodeLine{[1710434230:857059]\ ❷\ \ \ \ \ \ \ \ (2)\ Neuron\ 2\ has\ connections\ from:}
+\DoxyCodeLine{[1710434230:857060]\ ❷\ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 2}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710434230:857063]\ ❶\ \ Deleteing\ Group\ 1\ Neuron\ 1}
+\DoxyCodeLine{[1710434230:857067]\ ❶\ \ Deleteing\ Group\ 1\ Neuron\ 2}
+\DoxyCodeLine{[1710434230:857069]\ ❶\ \ Deleteing\ Group\ 2\ Neuron\ 1}
+\DoxyCodeLine{[1710434230:857070]\ ❶\ \ Deleteing\ Group\ 2\ Neuron\ 2}
+
+\end{DoxyCode}
+
+
+\end{adjustwidth}
+
+
+
+
+{\bfseries{Log file}}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyItemize}
+\item This log is for a runtime of 60 seconds, with 5 second wait time on both the messager thread and neuron group threads
+\item Example\+:
+\begin{DoxyItemize}
+\item Columns are {\ttfamily group\+\_\+id neuron\+\_\+id time potential}
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{2\ 1\ 1710432472.534000\ -\/54.000000}
+\DoxyCodeLine{1\ 1\ 1710432472.533860\ -\/54.000000}
+\DoxyCodeLine{2\ 2\ 1710432472.534050\ -\/53.000000}
+\DoxyCodeLine{1\ 2\ 1710432472.533950\ -\/53.000000}
+\DoxyCodeLine{1\ 2\ 1710432472.535760\ -\/39.884114}
+\DoxyCodeLine{2\ 1\ 1710432477.544780\ -\/53.000000}
+\DoxyCodeLine{2\ 2\ 1710432472.560560\ -\/49.542146}
+\DoxyCodeLine{2\ 2\ 1710432477.544840\ -\/47.542146}
+\DoxyCodeLine{1\ 1\ 1710432472.536580\ -\/55.277940}
+\DoxyCodeLine{1\ 1\ 1710432477.544610\ -\/54.277940}
+\DoxyCodeLine{1\ 1\ 1710432477.571260\ -\/41.071935}
+\DoxyCodeLine{1\ 2\ 1710432477.544720\ -\/68.000000}
+\DoxyCodeLine{1\ 2\ 1710432477.595780\ -\/58.024170}
+\DoxyCodeLine{2\ 1\ 1710432482.556490\ -\/52.000000}
+\DoxyCodeLine{2\ 2\ 1710432482.556560\ -\/68.000000}
+\DoxyCodeLine{1\ 1\ 1710432482.556310\ -\/69.000000}
+\DoxyCodeLine{1\ 2\ 1710432482.556430\ -\/56.024170}
+\DoxyCodeLine{2\ 1\ 1710432487.568480\ -\/51.000000}
+\DoxyCodeLine{2\ 2\ 1710432487.568560\ -\/66.000000}
+\DoxyCodeLine{1\ 1\ 1710432487.568280\ -\/68.000000}
+\DoxyCodeLine{1\ 2\ 1710432487.568410\ -\/54.024170}
+\DoxyCodeLine{2\ 1\ 1710432492.580400\ -\/50.000000}
+\DoxyCodeLine{2\ 2\ 1710432487.643090\ -\/38.289253}
+\DoxyCodeLine{2\ 2\ 1710432492.580610\ -\/36.289253}
+\DoxyCodeLine{1\ 1\ 1710432492.579830\ -\/67.000000}
+\DoxyCodeLine{1\ 1\ 1710432492.631490\ -\/56.919763}
+\DoxyCodeLine{1\ 2\ 1710432492.580100\ -\/68.000000}
+\DoxyCodeLine{2\ 1\ 1710432497.592390\ -\/49.000000}
+\DoxyCodeLine{2\ 2\ 1710432497.592500\ -\/68.000000}
+\DoxyCodeLine{1\ 1\ 1710432497.591940\ -\/55.919763}
+\DoxyCodeLine{1\ 2\ 1710432497.592240\ -\/66.000000}
+\DoxyCodeLine{2\ 1\ 1710432502.606400\ -\/48.000000}
+\DoxyCodeLine{2\ 2\ 1710432502.606490\ -\/66.000000}
+\DoxyCodeLine{1\ 1\ 1710432502.606110\ -\/54.919763}
+\DoxyCodeLine{1\ 2\ 1710432502.606280\ -\/64.000000}
+\DoxyCodeLine{1\ 2\ 1710432502.704360\ -\/50.660716}
+\DoxyCodeLine{2\ 1\ 1710432507.618390\ -\/47.000000}
+\DoxyCodeLine{2\ 2\ 1710432502.727340\ -\/40.014478}
+\DoxyCodeLine{2\ 2\ 1710432507.618450\ -\/38.014478}
+\DoxyCodeLine{1\ 1\ 1710432507.618230\ -\/69.000000}
+\DoxyCodeLine{1\ 1\ 1710432507.699600\ -\/58.440539}
+\DoxyCodeLine{1\ 2\ 1710432507.618330\ -\/68.000000}
+\DoxyCodeLine{2\ 1\ 1710432512.630750\ -\/46.000000}
+\DoxyCodeLine{2\ 2\ 1710432512.630790\ -\/68.000000}
+\DoxyCodeLine{1\ 1\ 1710432512.630600\ -\/57.440539}
+\DoxyCodeLine{1\ 2\ 1710432512.630690\ -\/66.000000}
+\DoxyCodeLine{2\ 1\ 1710432517.642160\ -\/45.000000}
+\DoxyCodeLine{2\ 2\ 1710432517.642210\ -\/66.000000}
+\DoxyCodeLine{1\ 1\ 1710432517.641950\ -\/56.440539}
+\DoxyCodeLine{1\ 2\ 1710432517.642080\ -\/64.000000}
+\DoxyCodeLine{2\ 1\ 1710432522.653550\ -\/44.000000}
+\DoxyCodeLine{2\ 2\ 1710432522.653590\ -\/64.000000}
+\DoxyCodeLine{1\ 1\ 1710432522.653410\ -\/55.440539}
+\DoxyCodeLine{1\ 2\ 1710432522.653500\ -\/62.000000}
+
+\end{DoxyCode}
+
+
+\end{adjustwidth}
+
+
+{\bfseries{Messaging Structure}}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyItemize}
+\item The messaging structure works as follows\+:
+\begin{DoxyEnumerate}
+\item Messager thread starts and reads from file
+\item Messager thread sends messages to neurons and then waits {\ttfamily WAIT\+\_\+\+TIME} {\ttfamily WAIT\+\_\+\+INCREMENT} times
+\item Each {\ttfamily Neuron\+Group} thread loops through its neurons and checks their activation status
+\begin{DoxyItemize}
+\item if activated the neuron runs, exhausts its message queue, and sends messages to any neighbor neurons (by adding to each respective queue)
+\end{DoxyItemize}
+\item After running through all its neurons, the {\ttfamily Neuron\+Group} waits {\ttfamily WAIT\+\_\+\+TIME} {\ttfamily WAIT\+\_\+\+INCREMENT} times.
+\end{DoxyEnumerate}
+\item The message queue is implemented as {\ttfamily std\+::list} because random access is not needed and popping from the front is neccessary.
+\item Main message function 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ send\_messages(\textcolor{keyword}{const}\ vector<Message\ *>\ *messages)\ \{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{while}\ (::active)\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 1;\ i\ <=\ WAIT\_INCREMENT;\ i++)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ lg.log\_value(DEBUG3,\ \textcolor{stringliteral}{"{}send\_messages\ waiting:\ \%d"{}},\ i);}
+\DoxyCodeLine{\ \ \ \ \ \ usleep(WAIT\_TIME);}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ message\ :\ *messages)\ \{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ lg.log\_message(DEBUG2,\ \textcolor{stringliteral}{"{}Adding\ Message:\ \%f\ \%d\ \%d\ \%f"{}},\ message-\/>timestamp,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ message-\/>target\_neuron\_group-\/>get\_id(),}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ message-\/>target\_neuron-\/>get\_id(),\ message-\/>message);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ Message\ *message\_copy\ =}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ construct\_message(message-\/>message,\ message-\/>target\_neuron);}
+\DoxyCodeLine{\ \ \ \ \ \ message\_copy-\/>timestamp\ =\ lg.get\_time\_stamp();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ message-\/>target\_neuron-\/>add\_message(message\_copy);}
+\DoxyCodeLine{\ \ \ \ \ \ message-\/>target\_neuron-\/>activate();}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\ \ \}}
+\DoxyCodeLine{\ \ pthread\_exit(NULL);}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+\item Both the message function and the {\ttfamily run\+\_\+group} function are controlled by the global variable {\ttfamily active}
+\begin{DoxyItemize}
+\item This is deactivated based on the constant {\ttfamily RUN\+\_\+\+TIME}; 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ main\_neuron\_groups.cpp}}
+\DoxyCodeLine{usleep(RUN\_TIME);}
+\DoxyCodeLine{active\ =\ \textcolor{keyword}{false};}
+
+\end{DoxyCode}
+
+\end{DoxyItemize}
+\item Constructing messages from a file input
+\begin{DoxyItemize}
+\item Constructs a vector of dynamically allocated Messages (deallocated in {\ttfamily deallocate\+\_\+message\+\_\+vector})
+\item The message value corresponds directly the the value in the file but this could be changed easily.
+\item In the future, the construct message from file could take a vector of {\ttfamily INPUT} neurons only. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{vector<Message\ *>}
+\DoxyCodeLine{construct\_message\_vector\_from\_file(vector<NeuronGroup\ *>\ groups,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *file\_name)\ \{}
+\DoxyCodeLine{\ \ vector<Neuron\ *>\ neuron\_vec;}
+\DoxyCodeLine{\ \ vector<Message\ *>\ message\_vector;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ make\ a\ vector\ of\ all\ available\ neurons}}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&group\ :\ groups)\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&neuron\ :\ group-\/>get\_neruon\_vector())\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ neuron\_vec.push\_back(neuron);}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ std::ifstream\ file(file\_name);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{if}\ (!file.is\_open())\ \{}
+\DoxyCodeLine{\ \ \ \ lg.log(ERROR,\ \textcolor{stringliteral}{"{}construct\_message\_vector\_from\_file:\ Unable\ to\ open\ file"{}});}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ message\_vector;}
+\DoxyCodeLine{\ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{int}\ number\_neurons\ =\ neuron\_vec.size();}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{int}\ data\_read\ =\ 0;}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{double}\ value;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{while}\ (!file.eof()\ \&\&\ data\_read\ <\ number\_neurons)\ \{}
+\DoxyCodeLine{\ \ \ \ file\ >>\ value;}
+\DoxyCodeLine{\ \ \ \ message\_vector.push\_back(construct\_message(value,\ neuron\_vec[data\_read]));}
+\DoxyCodeLine{\ \ \ \ data\_read++;}
+\DoxyCodeLine{\ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{return}\ message\_vector;}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\end{adjustwidth}
+\hypertarget{md_README_autotoc_md13}{}\doxysubsection{\texorpdfstring{📌 Update 3-\/12}{📌 Update 3-\/12}}\label{md_README_autotoc_md13}
+{\bfseries{New addtions\+:}}
+\begin{DoxyItemize}
+\item Basic {\ttfamily Neuron\+Group} messaging.
+\item {\ttfamily Neuron\+Group}s run in separate threads
+\item Messaging struct
+\item Changed Logging struct
+\item Changed logging output for readability
+\begin{DoxyItemize}
+\item ⓘ for {\ttfamily INFO}
+\item ❶ for {\ttfamily DEBUG}
+\item ❷ for {\ttfamily DEBUG2}
+\item and so on for {\ttfamily DEBUG3} and {\ttfamily DEBUG4}
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+
+
+{\bfseries{Logging Struct}}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{int}\ neuron\_id;}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{int}\ group\_id;}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{double}\ timestamp;}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{double}\ membrane\_potentail;}
+\DoxyCodeLine{\}\ LogData;}
+
+\end{DoxyCode}
+
+
+\end{adjustwidth}
+
+
+{\bfseries{Message Struct}}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{double}\ message;}
+\DoxyCodeLine{\ \ Neuron\ *target\_neuron;}
+\DoxyCodeLine{\ \ NeuronGroup\ *target\_neuron\_group;}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{double}\ timestamp;}
+\DoxyCodeLine{\}\ Message;}
+
+\end{DoxyCode}
+
+
+\end{adjustwidth}
+
+
+{\bfseries{Example Output 9 (summarized)}}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{//\ adding\ neurons\ }
+\DoxyCodeLine{//\ random\ edges}
+\DoxyCodeLine{}
+\DoxyCodeLine{//\ new\ output}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710275464:285432]\ ❶\ \ Neuron\ Group\ 1\ (4\ neurons)}
+\DoxyCodeLine{========================================================}
+\DoxyCodeLine{[1710275464:285434]\ ❶\ \ \ \ \ (1)\ Neuron\ 1}
+\DoxyCodeLine{[1710275464:285435]\ ❶\ \ \ \ \ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710275464:285437]\ ❶\ \ \ \ \ (1)\ Neuron\ 3}
+\DoxyCodeLine{[1710275464:285438]\ ❶\ \ \ \ \ (1)\ Neuron\ 4}
+\DoxyCodeLine{[1710275464:285439]\ ❷\ \ \ \ \ \ \ \ (1)\ Neuron\ 4\ has\ connections\ from:}
+\DoxyCodeLine{[1710275464:285441]\ ❷\ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 2}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710275464:285442]\ ❶\ \ Neuron\ Group\ 2\ (4\ neurons)}
+\DoxyCodeLine{========================================================}
+\DoxyCodeLine{[1710275464:285443]\ ❶\ \ \ \ \ (2)\ Neuron\ 1}
+\DoxyCodeLine{[1710275464:285444]\ ❶\ \ \ \ \ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710275464:285446]\ ❷\ \ \ \ \ \ \ \ (2)\ Neuron\ 2\ is\ connected\ to:}
+\DoxyCodeLine{[1710275464:285447]\ ❷\ \ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 4}
+\DoxyCodeLine{[1710275464:285448]\ ❶\ \ \ \ \ (2)\ Neuron\ 3}
+\DoxyCodeLine{[1710275464:285449]\ ❶\ \ \ \ \ (2)\ Neuron\ 4}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710275464:285453]\ ❷\ \ Thread\ started\ for\ group\ 1}
+\DoxyCodeLine{[1710275464:285503]\ ❷\ \ Thread\ started\ for\ group\ 2}
+\DoxyCodeLine{[1710275464:285653]\ ⓘ\ \ Group\ 2\ running}
+\DoxyCodeLine{[1710275464:285661]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 1\ is\ inactive}
+\DoxyCodeLine{[1710275464:285663]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 2\ is\ inactive}
+\DoxyCodeLine{[1710275464:285664]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 3\ is\ inactive}
+\DoxyCodeLine{[1710275464:285665]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 4\ is\ inactive}
+\DoxyCodeLine{[1710275464:285667]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 1\ is\ inactive}
+\DoxyCodeLine{[1710275464:285668]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 2\ is\ inactive}
+\DoxyCodeLine{[1710275464:285669]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 3\ is\ inactive}
+\DoxyCodeLine{[1710275464:285670]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 4\ is\ inactive}
+\DoxyCodeLine{[1710275464:285672]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 1\ is\ inactive}
+\DoxyCodeLine{[1710275464:285673]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 2\ is\ inactive}
+\DoxyCodeLine{[1710275464:285674]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 3\ is\ inactive}
+\DoxyCodeLine{[1710275464:285675]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 4\ is\ inactive}
+\DoxyCodeLine{[1710275464:285722]\ ⓘ\ \ Group\ 1\ running}
+\DoxyCodeLine{[1710275464:285729]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 1\ is\ active}
+\DoxyCodeLine{[1710275464:285731]\ ❷\ \ Running\ (1)\ Neuron\ (1)}
+\DoxyCodeLine{[1710275464:285742]\ ⓘ\ \ (1)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/45.000000}
+\DoxyCodeLine{[1710275464:285745]\ ⓘ\ \ Group\ 1:\ Neuron\ 1\ does\ not\ have\ any\ neighbors}
+\DoxyCodeLine{[1710275464:285747]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 2\ is\ inactive}
+\DoxyCodeLine{[1710275464:285748]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 3\ is\ inactive}
+\DoxyCodeLine{[1710275464:285750]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 4\ is\ active}
+\DoxyCodeLine{[1710275464:285751]\ ❷\ \ Running\ (1)\ Neuron\ (4)}
+\DoxyCodeLine{[1710275464:285753]\ ⓘ\ \ (1)\ Neuron\ 4\ is\ activated,\ accumulated\ equal\ to\ -\/45.000000}
+\DoxyCodeLine{[1710275464:285755]\ ⓘ\ \ Group\ 1:\ Neuron\ 4\ does\ not\ have\ any\ neighbors}
+\DoxyCodeLine{[1710275464:285757]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 1\ is\ inactive}
+\DoxyCodeLine{[1710275464:285758]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 2\ is\ inactive}
+\DoxyCodeLine{[1710275464:285759]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 3\ is\ inactive}
+\DoxyCodeLine{[1710275464:285760]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 4\ is\ inactive}
+\DoxyCodeLine{[1710275464:285762]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 1\ is\ inactive}
+\DoxyCodeLine{[1710275464:285763]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 2\ is\ inactive}
+\DoxyCodeLine{[1710275464:285764]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 3\ is\ inactive}
+\DoxyCodeLine{[1710275464:285765]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 4\ is\ inactive}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710275464:285986]\ ❶\ \ Deleteing\ Group\ 1\ Neuron\ 1}
+\DoxyCodeLine{[1710275464:285990]\ ❶\ \ Deleteing\ Group\ 1\ Neuron\ 2}
+\DoxyCodeLine{[1710275464:285992]\ ❶\ \ Deleteing\ Group\ 1\ Neuron\ 3}
+\DoxyCodeLine{[1710275464:285994]\ ❶\ \ Deleteing\ Group\ 1\ Neuron\ 4}
+\DoxyCodeLine{[1710275464:285998]\ ❶\ \ Deleteing\ Group\ 2\ Neuron\ 1}
+\DoxyCodeLine{[1710275464:285999]\ ❶\ \ Deleteing\ Group\ 2\ Neuron\ 2}
+\DoxyCodeLine{[1710275464:286001]\ ❶\ \ Deleteing\ Group\ 2\ Neuron\ 3}
+\DoxyCodeLine{[1710275464:286003]\ ❶\ \ Deleteing\ Group\ 2\ Neuron\ 4}
+
+\end{DoxyCode}
+ \end{adjustwidth}
+
+
+
+
+{\bfseries{Example Output 9 (all ouput)}}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Adding\ Neurons}
+\DoxyCodeLine{-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710275464:285392]\ ❶\ \ Adding\ Group\ 1}
+\DoxyCodeLine{[1710275464:285398]\ ⓘ\ \ Group\ 1}
+\DoxyCodeLine{[1710275464:285403]\ ⓘ\ \ (1)\ Neuron\ 1\ added:\ excitatory}
+\DoxyCodeLine{[1710275464:285406]\ ⓘ\ \ (1)\ Neuron\ 2\ added:\ excitatory}
+\DoxyCodeLine{[1710275464:285408]\ ⓘ\ \ (1)\ Neuron\ 3\ added:\ excitatory}
+\DoxyCodeLine{[1710275464:285410]\ ⓘ\ \ (1)\ Neuron\ 4\ added:\ excitatory}
+\DoxyCodeLine{[1710275464:285412]\ ❶\ \ Adding\ Group\ 2}
+\DoxyCodeLine{[1710275464:285412]\ ⓘ\ \ Group\ 2}
+\DoxyCodeLine{[1710275464:285414]\ ⓘ\ \ (2)\ Neuron\ 1\ added:\ excitatory}
+\DoxyCodeLine{[1710275464:285415]\ ⓘ\ \ (2)\ Neuron\ 2\ added:\ inhibitory}
+\DoxyCodeLine{[1710275464:285417]\ ⓘ\ \ (2)\ Neuron\ 3\ added:\ excitatory}
+\DoxyCodeLine{[1710275464:285418]\ ⓘ\ \ (2)\ Neuron\ 4\ added:\ excitatory}
+\DoxyCodeLine{}
+\DoxyCodeLine{Adding\ Random\ Edges}
+\DoxyCodeLine{======================}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710275464:285425]\ ⓘ\ \ Edge\ from\ Neuron\ 2\ to\ Neuron\ 4\ added.}
+\DoxyCodeLine{[1710275464:285430]\ ❷\ \ Neuron\ 2\ added\ to\ the\ \_presynaptic\ map\ of\ Neuron\ }
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710275464:285432]\ ❶\ \ Neuron\ Group\ 1\ (4\ neurons)}
+\DoxyCodeLine{========================================================}
+\DoxyCodeLine{[1710275464:285434]\ ❶\ \ \ \ \ (1)\ Neuron\ 1}
+\DoxyCodeLine{[1710275464:285435]\ ❶\ \ \ \ \ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710275464:285437]\ ❶\ \ \ \ \ (1)\ Neuron\ 3}
+\DoxyCodeLine{[1710275464:285438]\ ❶\ \ \ \ \ (1)\ Neuron\ 4}
+\DoxyCodeLine{[1710275464:285439]\ ❷\ \ \ \ \ \ \ \ (1)\ Neuron\ 4\ has\ connections\ from:}
+\DoxyCodeLine{[1710275464:285441]\ ❷\ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 2}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710275464:285442]\ ❶\ \ Neuron\ Group\ 2\ (4\ neurons)}
+\DoxyCodeLine{========================================================}
+\DoxyCodeLine{[1710275464:285443]\ ❶\ \ \ \ \ (2)\ Neuron\ 1}
+\DoxyCodeLine{[1710275464:285444]\ ❶\ \ \ \ \ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710275464:285446]\ ❷\ \ \ \ \ \ \ \ (2)\ Neuron\ 2\ is\ connected\ to:}
+\DoxyCodeLine{[1710275464:285447]\ ❷\ \ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 4}
+\DoxyCodeLine{[1710275464:285448]\ ❶\ \ \ \ \ (2)\ Neuron\ 3}
+\DoxyCodeLine{[1710275464:285449]\ ❶\ \ \ \ \ (2)\ Neuron\ 4}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710275464:285453]\ ❷\ \ Thread\ started\ for\ group\ 1}
+\DoxyCodeLine{[1710275464:285503]\ ❷\ \ Thread\ started\ for\ group\ 2}
+\DoxyCodeLine{[1710275464:285653]\ ⓘ\ \ Group\ 2\ running}
+\DoxyCodeLine{[1710275464:285661]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 1\ is\ inactive}
+\DoxyCodeLine{[1710275464:285663]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 2\ is\ inactive}
+\DoxyCodeLine{[1710275464:285664]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 3\ is\ inactive}
+\DoxyCodeLine{[1710275464:285665]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 4\ is\ inactive}
+\DoxyCodeLine{[1710275464:285667]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 1\ is\ inactive}
+\DoxyCodeLine{[1710275464:285668]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 2\ is\ inactive}
+\DoxyCodeLine{[1710275464:285669]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 3\ is\ inactive}
+\DoxyCodeLine{[1710275464:285670]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 4\ is\ inactive}
+\DoxyCodeLine{[1710275464:285672]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 1\ is\ inactive}
+\DoxyCodeLine{[1710275464:285673]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 2\ is\ inactive}
+\DoxyCodeLine{[1710275464:285674]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 3\ is\ inactive}
+\DoxyCodeLine{[1710275464:285675]\ ❷\ \ Checking\ activation:(2)\ Neuron\ 4\ is\ inactive}
+\DoxyCodeLine{[1710275464:285722]\ ⓘ\ \ Group\ 1\ running}
+\DoxyCodeLine{[1710275464:285729]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 1\ is\ active}
+\DoxyCodeLine{[1710275464:285731]\ ❷\ \ Running\ (1)\ Neuron\ (1)}
+\DoxyCodeLine{[1710275464:285742]\ ⓘ\ \ (1)\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/45.000000}
+\DoxyCodeLine{[1710275464:285745]\ ⓘ\ \ Group\ 1:\ Neuron\ 1\ does\ not\ have\ any\ neighbors}
+\DoxyCodeLine{[1710275464:285747]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 2\ is\ inactive}
+\DoxyCodeLine{[1710275464:285748]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 3\ is\ inactive}
+\DoxyCodeLine{[1710275464:285750]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 4\ is\ active}
+\DoxyCodeLine{[1710275464:285751]\ ❷\ \ Running\ (1)\ Neuron\ (4)}
+\DoxyCodeLine{[1710275464:285753]\ ⓘ\ \ (1)\ Neuron\ 4\ is\ activated,\ accumulated\ equal\ to\ -\/45.000000}
+\DoxyCodeLine{[1710275464:285755]\ ⓘ\ \ Group\ 1:\ Neuron\ 4\ does\ not\ have\ any\ neighbors}
+\DoxyCodeLine{[1710275464:285757]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 1\ is\ inactive}
+\DoxyCodeLine{[1710275464:285758]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 2\ is\ inactive}
+\DoxyCodeLine{[1710275464:285759]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 3\ is\ inactive}
+\DoxyCodeLine{[1710275464:285760]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 4\ is\ inactive}
+\DoxyCodeLine{[1710275464:285762]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 1\ is\ inactive}
+\DoxyCodeLine{[1710275464:285763]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 2\ is\ inactive}
+\DoxyCodeLine{[1710275464:285764]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 3\ is\ inactive}
+\DoxyCodeLine{[1710275464:285765]\ ❷\ \ Checking\ activation:(1)\ Neuron\ 4\ is\ inactive}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710275464:285986]\ ❶\ \ Deleteing\ Group\ 1\ Neuron\ 1}
+\DoxyCodeLine{[1710275464:285990]\ ❶\ \ Deleteing\ Group\ 1\ Neuron\ 2}
+\DoxyCodeLine{[1710275464:285992]\ ❶\ \ Deleteing\ Group\ 1\ Neuron\ 3}
+\DoxyCodeLine{[1710275464:285994]\ ❶\ \ Deleteing\ Group\ 1\ Neuron\ 4}
+\DoxyCodeLine{[1710275464:285998]\ ❶\ \ Deleteing\ Group\ 2\ Neuron\ 1}
+\DoxyCodeLine{[1710275464:285999]\ ❶\ \ Deleteing\ Group\ 2\ Neuron\ 2}
+\DoxyCodeLine{[1710275464:286001]\ ❶\ \ Deleteing\ Group\ 2\ Neuron\ 3}
+\DoxyCodeLine{[1710275464:286003]\ ❶\ \ Deleteing\ Group\ 2\ Neuron\ 4}
+
+\end{DoxyCode}
+ \end{adjustwidth}
+\hypertarget{md_README_autotoc_md14}{}\doxysubsection{\texorpdfstring{📌 Update 3-\/11}{📌 Update 3-\/11}}\label{md_README_autotoc_md14}
+{\bfseries{New addtions\+:}}
+\begin{DoxyItemize}
+\item Neuron Group Class
+\begin{DoxyItemize}
+\item Add intergroup and intragroup edges
+\item New functions for adding neigbors between groups and within groups
+\item New logging functions for reporting group values, state, and grouped neuron interactions
+\item Not complete!
+\begin{DoxyItemize}
+\item Unable to send messages
+\item Some functions that are aimed to do that, but they are not tested at all
+\end{DoxyItemize}
+\end{DoxyItemize}
+\item Some new logging functionality
+\begin{DoxyItemize}
+\item {\ttfamily Neuron\+Group} logging;
+\item {\ttfamily DEBUG2} debug level
+\item {\ttfamily Neuron\+Group} versions of other logging
+\end{DoxyItemize}
+\item Updated makefile
+\begin{DoxyItemize}
+\item To build without groups use the {\ttfamily build1} target (and {\ttfamily run1} target to run)
+\item To build with groups use the {\ttfamily build2} target (and {\ttfamily run2} target to run)
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+
+
+{\bfseries{Neuron Group Class}}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ cpp}
+\DoxyCodeLine{class\ NeuronGroup\ \{}
+\DoxyCodeLine{\ \ //\ NOT\ COMPLETE}
+\DoxyCodeLine{private:}
+\DoxyCodeLine{\ \ vector<Neuron\ *>\ neurons;}
+\DoxyCodeLine{\ \ int\ id;}
+\DoxyCodeLine{\ \ pthread\_t\ thread;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ //\ this\ variable\ should\ be\ read\ only\ from\ outside\ the\ class}
+\DoxyCodeLine{\ \ //\ Analagous\ to\ "{}value"{}\ in\ previous\ version}
+\DoxyCodeLine{\ \ int\ message;}
+\DoxyCodeLine{}
+\DoxyCodeLine{public:}
+\DoxyCodeLine{\ \ NeuronGroup(int\ \_id,\ int\ number\_neurons);}
+\DoxyCodeLine{\ \ //\ might\ move\ neuron\ memory\ responsibilities\ to\ this\ class}
+\DoxyCodeLine{\ \ \string~NeuronGroup();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ void\ *group\_run();}
+\DoxyCodeLine{\ \ void\ start\_thread()\ \{\ pthread\_create(\&thread,\ NULL,\ thread\_helper,\ this);\ \}}
+\DoxyCodeLine{\ \ double\ get\_message()\ const\ \{\ return\ message;\ \}}
+\DoxyCodeLine{\ \ double\ get\_id()\ const\ \{\ return\ id;\ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ void\ set\_message(double\ message);}
+\DoxyCodeLine{\ \ void\ print\_group();}
+\DoxyCodeLine{\ \ int\ neuron\_count();}
+\DoxyCodeLine{\ \ const\ vector<Neuron\ *>\ \&get\_neruon\_vector();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ /*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*\(\backslash\)}
+\DoxyCodeLine{\ \ \ *\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Thread\ helper:}
+\DoxyCodeLine{\ \ \ *\ \ \ \ POSIX\ needs\ a\ void*\ (*)(void*)\ function\ signature}
+\DoxyCodeLine{\ \ \ *\ \ \ \ This\ function\ allows\ us\ to\ use\ the\ run()\ member\ funciton}
+\DoxyCodeLine{\ \ \(\backslash\)-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}
+\DoxyCodeLine{\ \ static\ void\ *thread\_helper(void\ *instance)\ \{}
+\DoxyCodeLine{\ \ \ \ return\ ((NeuronGroup\ *)instance)-\/>group\_run();}
+\DoxyCodeLine{\ \ \}}
+\DoxyCodeLine{\};}
+
+\end{DoxyCode}
+
+
+\end{adjustwidth}
+
+
+
+
+{\bfseries{Example Output 8}}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyItemize}
+\item Debug level \+: {\ttfamily DEBUG2}
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Running\ build/ex2}
+\DoxyCodeLine{./build/ex2}
+\DoxyCodeLine{}
+\DoxyCodeLine{Adding\ Neurons}
+\DoxyCodeLine{-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710180962:736259]\ [Debug]\ Adding\ Group\ 1}
+\DoxyCodeLine{[1710180962:736263]\ [Info]\ Group\ 1}
+\DoxyCodeLine{[1710180962:736268]\ [Info]\ (1)\ Neuron\ 1\ added:\ excitatory}
+\DoxyCodeLine{[1710180962:736271]\ [Info]\ (1)\ Neuron\ 2\ added:\ inhibitory}
+\DoxyCodeLine{[1710180962:736273]\ [Info]\ (1)\ Neuron\ 3\ added:\ excitatory}
+\DoxyCodeLine{[1710180962:736275]\ [Debug]\ Adding\ Group\ 2}
+\DoxyCodeLine{[1710180962:736275]\ [Info]\ Group\ 2}
+\DoxyCodeLine{[1710180962:736277]\ [Info]\ (2)\ Neuron\ 1\ added:\ excitatory}
+\DoxyCodeLine{[1710180962:736278]\ [Info]\ (2)\ Neuron\ 2\ added:\ excitatory}
+\DoxyCodeLine{[1710180962:736279]\ [Info]\ (2)\ Neuron\ 3\ added:\ excitatory}
+\DoxyCodeLine{}
+\DoxyCodeLine{Adding\ Random\ Edges}
+\DoxyCodeLine{======================}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710180962:736284]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 3\ has\ no\ outgoing\ connections}
+\DoxyCodeLine{[1710180962:736285]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 3\ has\ no\ incoming\ connections}
+\DoxyCodeLine{[1710180962:736286]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 2\ has\ no\ outgoing\ connections}
+\DoxyCodeLine{[1710180962:736287]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 2\ has\ no\ incoming\ connections}
+\DoxyCodeLine{[1710180962:736289]\ [Info]\ Edge\ from\ Neuron\ 3\ to\ Neuron\ 2\ added.}
+\DoxyCodeLine{[1710180962:736293]\ [Debug2]\ Neuron\ 3\ added\ to\ the\ \_presynaptic\ map\ of\ Neuron\ }
+\DoxyCodeLine{[1710180962:736294]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 3\ has\ no\ outgoing\ connections}
+\DoxyCodeLine{[1710180962:736295]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 3\ has\ no\ incoming\ connections}
+\DoxyCodeLine{[1710180962:736296]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 2\ has\ no\ outgoing\ connections}
+\DoxyCodeLine{[1710180962:736297]\ [Debug2]\ \ \ \ \ \ \ (1)\ Neuron\ 2\ has\ connections\ from:}
+\DoxyCodeLine{[1710180962:736298]\ [Debug2]\ \ \ \ \ \ \ \ \ (2)\ Neuron\ 3}
+\DoxyCodeLine{[1710180962:736299]\ [Info]\ Edge\ from\ Neuron\ 3\ to\ Neuron\ 2\ added.}
+\DoxyCodeLine{[1710180962:736301]\ [Debug2]\ Neuron\ 3\ added\ to\ the\ \_presynaptic\ map\ of\ Neuron\ }
+\DoxyCodeLine{[1710180962:736302]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 2\ has\ no\ outgoing\ connections}
+\DoxyCodeLine{[1710180962:736303]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 2\ has\ no\ incoming\ connections}
+\DoxyCodeLine{[1710180962:736304]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 1\ has\ no\ outgoing\ connections}
+\DoxyCodeLine{[1710180962:736304]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 1\ has\ no\ incoming\ connections}
+\DoxyCodeLine{[1710180962:736305]\ [Info]\ Edge\ from\ Neuron\ 2\ to\ Neuron\ 1\ added.}
+\DoxyCodeLine{[1710180962:736307]\ [Debug2]\ Neuron\ 2\ added\ to\ the\ \_presynaptic\ map\ of\ Neuron\ }
+\DoxyCodeLine{[1710180962:736308]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 2\ has\ no\ outgoing\ connections}
+\DoxyCodeLine{[1710180962:736309]\ [Debug2]\ \ \ \ \ \ \ (1)\ Neuron\ 2\ has\ connections\ from:}
+\DoxyCodeLine{[1710180962:736309]\ [Debug2]\ \ \ \ \ \ \ \ \ (1)\ Neuron\ 3}
+\DoxyCodeLine{[1710180962:736310]\ [Debug2]\ \ \ \ \ \ \ \ \ (2)\ Neuron\ 3}
+\DoxyCodeLine{[1710180962:736311]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 1\ has\ no\ outgoing\ connections}
+\DoxyCodeLine{[1710180962:736312]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 1\ has\ no\ incoming\ connections}
+\DoxyCodeLine{[1710180962:736313]\ [Info]\ Edge\ from\ Neuron\ 2\ to\ Neuron\ 1\ added.}
+\DoxyCodeLine{[1710180962:736314]\ [Debug2]\ Neuron\ 2\ added\ to\ the\ \_presynaptic\ map\ of\ Neuron\ }
+\DoxyCodeLine{[1710180962:736315]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 1\ has\ no\ outgoing\ connections}
+\DoxyCodeLine{[1710180962:736316]\ [Debug2]\ \ \ \ \ \ \ (1)\ Neuron\ 1\ has\ connections\ from:}
+\DoxyCodeLine{[1710180962:736317]\ [Debug2]\ \ \ \ \ \ \ \ \ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710180962:736318]\ [Debug2]\ \ \ \ \ \ \ (2)\ Neuron\ 3\ is\ connected\ to:}
+\DoxyCodeLine{[1710180962:736319]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710180962:736320]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 3\ has\ no\ incoming\ connections}
+\DoxyCodeLine{[1710180962:736321]\ [Info]\ Edge\ from\ Neuron\ 1\ to\ Neuron\ 3\ added.}
+\DoxyCodeLine{[1710180962:736322]\ [Debug2]\ Neuron\ 1\ added\ to\ the\ \_presynaptic\ map\ of\ Neuron\ }
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710180962:736324]\ [Debug]\ Neuron\ Group\ 1\ (3\ neurons)}
+\DoxyCodeLine{========================================================}
+\DoxyCodeLine{[1710180962:736326]\ [Debug]\ \ \ \ (1)\ Neuron\ 1}
+\DoxyCodeLine{[1710180962:736327]\ [Debug2]\ \ \ \ \ \ \ (1)\ Neuron\ 1\ is\ connected\ to:}
+\DoxyCodeLine{[1710180962:736327]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 3}
+\DoxyCodeLine{[1710180962:736328]\ [Debug2]\ \ \ \ \ \ \ (1)\ Neuron\ 1\ has\ connections\ from:}
+\DoxyCodeLine{[1710180962:736329]\ [Debug2]\ \ \ \ \ \ \ \ \ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710180962:736330]\ [Debug]\ \ \ \ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710180962:736330]\ [Debug2]\ \ \ \ \ \ \ (1)\ Neuron\ 2\ is\ connected\ to:}
+\DoxyCodeLine{[1710180962:736331]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 1}
+\DoxyCodeLine{[1710180962:736332]\ [Debug2]\ \ \ \ \ \ \ (1)\ Neuron\ 2\ has\ connections\ from:}
+\DoxyCodeLine{[1710180962:736333]\ [Debug2]\ \ \ \ \ \ \ \ \ (1)\ Neuron\ 3}
+\DoxyCodeLine{[1710180962:736334]\ [Debug2]\ \ \ \ \ \ \ \ \ (2)\ Neuron\ 3}
+\DoxyCodeLine{[1710180962:736334]\ [Debug]\ \ \ \ (1)\ Neuron\ 3}
+\DoxyCodeLine{[1710180962:736335]\ [Debug2]\ \ \ \ \ \ \ (1)\ Neuron\ 3\ is\ connected\ to:}
+\DoxyCodeLine{[1710180962:736336]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710180962:736337]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 3\ has\ no\ incoming\ connections}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710180962:736338]\ [Debug]\ Neuron\ Group\ 2\ (3\ neurons)}
+\DoxyCodeLine{========================================================}
+\DoxyCodeLine{[1710180962:736361]\ [Debug]\ \ \ \ (2)\ Neuron\ 1}
+\DoxyCodeLine{[1710180962:736362]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 1\ has\ no\ outgoing\ connections}
+\DoxyCodeLine{[1710180962:736363]\ [Debug2]\ \ \ \ \ \ \ (2)\ Neuron\ 1\ has\ connections\ from:}
+\DoxyCodeLine{[1710180962:736364]\ [Debug2]\ \ \ \ \ \ \ \ \ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710180962:736364]\ [Debug]\ \ \ \ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710180962:736365]\ [Debug2]\ \ \ \ \ \ \ (2)\ Neuron\ 2\ is\ connected\ to:}
+\DoxyCodeLine{[1710180962:736366]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 1}
+\DoxyCodeLine{[1710180962:736367]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (2)\ Neuron\ 2\ has\ no\ incoming\ connections}
+\DoxyCodeLine{[1710180962:736368]\ [Debug]\ \ \ \ (2)\ Neuron\ 3}
+\DoxyCodeLine{[1710180962:736368]\ [Debug2]\ \ \ \ \ \ \ (2)\ Neuron\ 3\ is\ connected\ to:}
+\DoxyCodeLine{[1710180962:736369]\ [Debug2]\ \ \ \ \ \ \ \ \ \ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710180962:736370]\ [Debug2]\ \ \ \ \ \ \ (2)\ Neuron\ 3\ has\ connections\ from:}
+\DoxyCodeLine{[1710180962:736371]\ [Debug2]\ \ \ \ \ \ \ \ \ (1)\ Neuron\ 1}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710180962:736372]\ [Debug]\ Deleteing\ Group\ 1\ Neuron\ 1}
+\DoxyCodeLine{[1710180962:736374]\ [Debug]\ Deleteing\ Group\ 1\ Neuron\ 2}
+\DoxyCodeLine{[1710180962:736375]\ [Debug]\ Deleteing\ Group\ 1\ Neuron\ 3}
+\DoxyCodeLine{[1710180962:736377]\ [Debug]\ Deleteing\ Group\ 2\ Neuron\ 1}
+\DoxyCodeLine{[1710180962:736378]\ [Debug]\ Deleteing\ Group\ 2\ Neuron\ 2}
+\DoxyCodeLine{[1710180962:736379]\ [Debug]\ Deleteing\ Group\ 2\ Neuron\ 3}
+
+\end{DoxyCode}
+ \end{adjustwidth}
+
+
+
+
+{\bfseries{Example Output 7}}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Running\ build/ex2}
+\DoxyCodeLine{./build/ex2}
+\DoxyCodeLine{}
+\DoxyCodeLine{Adding\ Neurons}
+\DoxyCodeLine{-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710180872:468797]\ [Debug]\ Adding\ Group\ 1}
+\DoxyCodeLine{[1710180872:468800]\ [Info]\ Group\ 1}
+\DoxyCodeLine{[1710180872:468803]\ [Info]\ (1)\ Neuron\ 1\ added:\ excitatory}
+\DoxyCodeLine{[1710180872:468805]\ [Info]\ (1)\ Neuron\ 2\ added:\ excitatory}
+\DoxyCodeLine{[1710180872:468807]\ [Info]\ (1)\ Neuron\ 3\ added:\ excitatory}
+\DoxyCodeLine{[1710180872:468808]\ [Debug]\ Adding\ Group\ 2}
+\DoxyCodeLine{[1710180872:468808]\ [Info]\ Group\ 2}
+\DoxyCodeLine{[1710180872:468809]\ [Info]\ (2)\ Neuron\ 1\ added:\ excitatory}
+\DoxyCodeLine{[1710180872:468810]\ [Info]\ (2)\ Neuron\ 2\ added:\ inhibitory}
+\DoxyCodeLine{[1710180872:468811]\ [Info]\ (2)\ Neuron\ 3\ added:\ excitatory}
+\DoxyCodeLine{}
+\DoxyCodeLine{Adding\ Random\ Edges}
+\DoxyCodeLine{======================}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710180872:468815]\ [Info]\ Edge\ from\ Neuron\ 3\ to\ Neuron\ 1\ added.}
+\DoxyCodeLine{[1710180872:468821]\ [Info]\ Edge\ from\ Neuron\ 1\ to\ Neuron\ 2\ added.}
+\DoxyCodeLine{[1710180872:468823]\ [Info]\ Edge\ from\ Neuron\ 2\ to\ Neuron\ 2\ added.}
+\DoxyCodeLine{[1710180872:468827]\ [Info]\ Edge\ from\ Neuron\ 1\ to\ Neuron\ 2\ added.}
+\DoxyCodeLine{[1710180872:468830]\ [Info]\ Edge\ from\ Neuron\ 2\ to\ Neuron\ 3\ added.}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710180872:468832]\ [Debug]\ Neuron\ Group\ 1\ (3\ neurons)}
+\DoxyCodeLine{========================================================}
+\DoxyCodeLine{[1710180872:468832]\ [Debug]\ \ \ \ (1)\ Neuron\ 1}
+\DoxyCodeLine{[1710180872:468833]\ [Debug]\ \ \ \ (1)\ Neuron\ 2}
+\DoxyCodeLine{[1710180872:468835]\ [Debug]\ \ \ \ (1)\ Neuron\ 3}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710180872:468836]\ [Debug]\ Neuron\ Group\ 2\ (3\ neurons)}
+\DoxyCodeLine{========================================================}
+\DoxyCodeLine{[1710180872:468837]\ [Debug]\ \ \ \ (2)\ Neuron\ 1}
+\DoxyCodeLine{[1710180872:468839]\ [Debug]\ \ \ \ (2)\ Neuron\ 2}
+\DoxyCodeLine{[1710180872:468840]\ [Debug]\ \ \ \ (2)\ Neuron\ 3}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1710180872:468841]\ [Debug]\ Deleteing\ Group\ 1\ Neuron\ 1}
+\DoxyCodeLine{[1710180872:468842]\ [Debug]\ Deleteing\ Group\ 1\ Neuron\ 2}
+\DoxyCodeLine{[1710180872:468843]\ [Debug]\ Deleteing\ Group\ 1\ Neuron\ 3}
+\DoxyCodeLine{[1710180872:468844]\ [Debug]\ Deleteing\ Group\ 2\ Neuron\ 1}
+\DoxyCodeLine{[1710180872:468845]\ [Debug]\ Deleteing\ Group\ 2\ Neuron\ 2}
+\DoxyCodeLine{[1710180872:468845]\ [Debug]\ Deleteing\ Group\ 2\ Neuron\ 3}
+
+\end{DoxyCode}
+
+
+\end{adjustwidth}
+\hypertarget{md_README_autotoc_md15}{}\doxysubsection{\texorpdfstring{📌 Update 3-\/5}{📌 Update 3-\/5}}\label{md_README_autotoc_md15}
+{\bfseries{New addtions\+:}}
+\begin{DoxyItemize}
+\item Fully integrated {\ttfamily Log} class with Debug Level functionality.
+\item Collect Neuron ID and Membrane Potential durring execution and write to a {\ttfamily \texorpdfstring{$<$}{<}current\+\_\+time\texorpdfstring{$>$}{>}.log} file for later use in graphing potential vs time.
+\begin{DoxyItemize}
+\item Logs are stored in {\ttfamily ./logs}
+\end{DoxyItemize}
+\item Swapped out bare data member refrences with {\ttfamily this-\/\texorpdfstring{$>$}{>}data\+\_\+member} for readability
+\item Debug Levels\+:
+\begin{DoxyItemize}
+\item level is set in {\ttfamily main.\+cpp\+:27} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{enum}\ LogLevel\ \{\ }
+\DoxyCodeLine{\ \ DATA,}
+\DoxyCodeLine{\ \ ERROR,}
+\DoxyCodeLine{\ \ WARNING,}
+\DoxyCodeLine{\ \ INFO,}
+\DoxyCodeLine{\ \ DEBUG,}
+\DoxyCodeLine{\};}
+
+\end{DoxyCode}
+
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+
+
+{\bfseries{Log File Example}}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyItemize}
+\item Format is "{}time neuron\+\_\+id memabrane\+\_\+potential"{} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1709662312.633490\ 1\ -\/55.000000}
+\DoxyCodeLine{1709662317.948280\ 2\ -\/55.000000}
+\DoxyCodeLine{1709662314.449250\ 3\ -\/55.000000}
+\DoxyCodeLine{1709662314.452480\ 2\ -\/106.695394}
+\DoxyCodeLine{1709662314.455150\ 5\ -\/90.316228}
+\DoxyCodeLine{1709662314.457940\ 6\ -\/92.203995}
+\DoxyCodeLine{1709662314.158270\ 4\ -\/55.000000}
+\DoxyCodeLine{1709662321.825460\ 5\ -\/90.316228}
+\DoxyCodeLine{1709662320.091510\ 6\ -\/92.203995}
+\DoxyCodeLine{1709662318.345790\ 1\ -\/55.000000}
+
+\end{DoxyCode}
+ 
+\end{DoxyItemize}\end{adjustwidth}
+
+
+
+
+{\bfseries{Example Output 6 }}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Adding\ Neurons}
+\DoxyCodeLine{-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1709787252:721647]\ [Info]\ Neuron\ 1\ added:\ inhibitory}
+\DoxyCodeLine{[1709787252:721652]\ [Info]\ Neuron\ 2\ added:\ inhibitory}
+\DoxyCodeLine{[1709787252:721654]\ [Info]\ Neuron\ 3\ added:\ excitatory}
+\DoxyCodeLine{[1709787252:721655]\ [Info]\ Neuron\ 4\ added:\ excitatory}
+\DoxyCodeLine{[1709787252:721657]\ [Info]\ Neuron\ 5\ added:\ inhibitory}
+\DoxyCodeLine{[1709787252:721659]\ [Info]\ Neuron\ 6\ added:\ excitatory}
+\DoxyCodeLine{}
+\DoxyCodeLine{Adding\ Random\ Edges}
+\DoxyCodeLine{-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1709787252:721663]\ [Info]\ Edge\ from\ Neuron\ 3\ to\ Neuron\ 4\ added.}
+\DoxyCodeLine{[1709787252:721670]\ [Info]\ Edge\ from\ Neuron\ 4\ to\ Neuron\ 5\ added.}
+\DoxyCodeLine{[1709787252:721673]\ [Info]\ Edge\ from\ Neuron\ 3\ to\ Neuron\ 2\ added.}
+\DoxyCodeLine{[1709787252:721676]\ [Info]\ Edge\ from\ Neuron\ 1\ to\ Neuron\ 5\ added.}
+\DoxyCodeLine{[1709787252:721680]\ [Info]\ Edge\ from\ Neuron\ 4\ to\ Neuron\ 6\ added.}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1709787252:721815]\ [Info]\ Neuron\ 1\ is\ waiting}
+\DoxyCodeLine{[1709787252:721907]\ [Info]\ Neuron\ 3\ is\ waiting}
+\DoxyCodeLine{[1709787252:722201]\ [Info]\ Neuron\ 2\ is\ waiting}
+\DoxyCodeLine{[1709787252:722283]\ [Info]\ Neuron\ 6\ is\ waiting}
+\DoxyCodeLine{[1709787252:722379]\ [Info]\ Neuron\ 5\ is\ waiting}
+\DoxyCodeLine{[1709787252:722471]\ [Info]\ Neuron\ 4\ is\ waiting}
+\DoxyCodeLine{}
+\DoxyCodeLine{Activate\ neuron\ (\ or\ [-\/1]\ to\ quit\ )}
+\DoxyCodeLine{\ Neuron\ 1}
+\DoxyCodeLine{\ Neuron\ 2}
+\DoxyCodeLine{\ Neuron\ 3}
+\DoxyCodeLine{\ Neuron\ 4}
+\DoxyCodeLine{\ Neuron\ 5}
+\DoxyCodeLine{\ Neuron\ 6}
+\DoxyCodeLine{Input:\ 1}
+\DoxyCodeLine{}
+\DoxyCodeLine{[1709787256:21207]\ [Info]\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/55.0000}
+\DoxyCodeLine{[1709787256:21345]\ [Info]\ Neuron\ 1\ is\ sending\ a\ mesage\ to\ Neuron\ 5}
+\DoxyCodeLine{[1709787256:21569]\ [Info]\ Message\ from\ Neuron\ 1\ to\ Neuron\ 5\ is\ -\/43.278355}
+\DoxyCodeLine{[1709787256:21765]\ [Info]\ Neuron\ 5\ is\ activated,\ accumulated\ equal\ to\ -\/98.2783}
+\DoxyCodeLine{[1709787256:21869]\ [Info]\ Neuron\ 5\ does\ not\ have\ any\ neighbors}
+\DoxyCodeLine{[1709787256:22018]\ [Info]\ Neuron\ 5\ is\ waiting}
+\DoxyCodeLine{[1709787256:21929]\ [Info]\ Neuron\ 1\ fired,\ entering\ refractory\ phase}
+\DoxyCodeLine{[1709787256:22238]\ [Info]\ Neuron\ 1\ portential\ set\ to\ -\/70.0000}
+\DoxyCodeLine{[1709787256:24797]\ [Info]\ Neuron\ 1\ completed\ refractory\ phase,\ running}
+\DoxyCodeLine{[1709787256:24959]\ [Info]\ Neuron\ 1\ is\ waiting}
+
+\end{DoxyCode}
+
+
+\end{adjustwidth}
+
+
+
+
+{\bfseries{Log Class }}\begin{adjustwidth}{1em}{0em}
+
+
+~\newline
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{using\ }std::vector;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{enum}\ LogLevel\ \{}
+\DoxyCodeLine{\ \ DATA,}
+\DoxyCodeLine{\ \ ERROR,}
+\DoxyCodeLine{\ \ WARNING,}
+\DoxyCodeLine{\ \ INFO,}
+\DoxyCodeLine{\ \ DEBUG,}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{extern}\ LogLevel\ level;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{class\ }Log\ \{}
+\DoxyCodeLine{\textcolor{keyword}{public}:}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ constructor}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ add\_data(\textcolor{keywordtype}{int}\ \textcolor{keywordtype}{id},\ \textcolor{keywordtype}{double}\ data);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ write\_data(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *filesname\ =\ \textcolor{stringliteral}{"{}./logs/\%ld.log"{}});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ log(LogLevel\ level,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,\ std::ostream\ \&os\ =\ std::cout);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ log\_neuron\_state(LogLevel\ level,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,\ \textcolor{keywordtype}{int}\ \textcolor{keywordtype}{id});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ log\_neuron\_interaction(LogLevel\ level,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,\ \textcolor{keywordtype}{int}\ id1,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ id2);}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ log\_neuron\_interaction(LogLevel\ level,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,\ \textcolor{keywordtype}{int}\ id1,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ id2,\ \textcolor{keywordtype}{double}\ value);}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ log\_neuron\_value(LogLevel\ level,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,\ \textcolor{keywordtype}{int}\ \textcolor{keywordtype}{id},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ accumulated);}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ log\_neuron\_type(LogLevel\ level,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,\ \textcolor{keywordtype}{int}\ \textcolor{keywordtype}{id},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *type);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{private}:}
+\DoxyCodeLine{\ \ vector<double>\ time;}
+\DoxyCodeLine{\ \ vector<double>\ data;}
+\DoxyCodeLine{\ \ vector<int>\ id;}
+\DoxyCodeLine{\};}
+
+\end{DoxyCode}
+
+
+\end{adjustwidth}
+\hypertarget{md_README_autotoc_md16}{}\doxysubsection{\texorpdfstring{📌 Update 3-\/3 Part 2}{📌 Update 3-\/3 Part 2}}\label{md_README_autotoc_md16}
+{\bfseries{New addtions\+:}}
+\begin{DoxyItemize}
+\item Working quit functionality on menu!
+\item Memory deallocation working.
+\item Additional logging
+\end{DoxyItemize}
+
+
+
+{\bfseries{Example Output 5 }}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ text}
+\DoxyCodeLine{Time\ format\ is\ |HH:MM:SS:mircroseconds|}
+\DoxyCodeLine{}
+\DoxyCodeLine{Adding\ Neurons}
+\DoxyCodeLine{-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}
+\DoxyCodeLine{}
+\DoxyCodeLine{|14:30:0:926336|\ Neuron\ 1\ added\ (excitatory\ type)}
+\DoxyCodeLine{|14:30:0:926380|\ Neuron\ 2\ added\ (excitatory\ type)}
+\DoxyCodeLine{|14:30:0:926383|\ Neuron\ 3\ added\ (inhibitory\ type)}
+\DoxyCodeLine{}
+\DoxyCodeLine{Adding\ Random\ Edges}
+\DoxyCodeLine{-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}
+\DoxyCodeLine{}
+\DoxyCodeLine{|14:30:0:926387|\ Edge\ from\ Neuron\ 2\ to\ Neuron\ 3\ added}
+\DoxyCodeLine{|14:30:0:926391|\ Neuron\ 2\ added\ to\ \_presynaptic\ of\ Neuron\ 3}
+\DoxyCodeLine{|14:30:0:926416|\ Neuron\ 2\ is\ connected\ to:}
+\DoxyCodeLine{|14:30:0:926481|\ -\/\ Neuron3}
+\DoxyCodeLine{|14:30:0:926487|\ Edge\ from\ Neuron\ 1\ to\ Neuron\ 2\ added}
+\DoxyCodeLine{|14:30:0:926491|\ Neuron\ 1\ added\ to\ \_presynaptic\ of\ Neuron\ 2}
+\DoxyCodeLine{}
+\DoxyCodeLine{|14:30:0:926609|\ Neuron\ 1\ is\ waiting}
+\DoxyCodeLine{|14:30:0:926647|\ Neuron\ 3\ is\ waiting}
+\DoxyCodeLine{|14:30:0:926870|\ Neuron\ 2\ is\ waiting}
+\DoxyCodeLine{}
+\DoxyCodeLine{Activate\ neuron\ (\ or\ [-\/1]\ to\ quit\ )}
+\DoxyCodeLine{\ Neuron\ 1}
+\DoxyCodeLine{\ Neuron\ 2}
+\DoxyCodeLine{\ Neuron\ 3}
+\DoxyCodeLine{Input:\ 1}
+\DoxyCodeLine{}
+\DoxyCodeLine{|14:30:7:536435|\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/55}
+\DoxyCodeLine{|14:30:7:536569|\ Neuron\ 1\ is\ sending\ a\ message\ to\ Neuron\ 2}
+\DoxyCodeLine{|14:30:7:536580|\ Accumulated\ value\ for\ Neuron\ 1\ is\ -\/55}
+\DoxyCodeLine{|14:30:7:536587|\ Weight\ for\ Neuron\ 1\ to\ Neuron\ 2\ is\ 0.517304}
+\DoxyCodeLine{|14:30:7:536596|\ Neuron\ 1\ modifier\ is\ -\/1}
+\DoxyCodeLine{|14:30:7:536602|\ Message\ is\ 28.4517}
+\DoxyCodeLine{|14:30:7:536788|\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/26.5483}
+\DoxyCodeLine{|14:30:7:536944|\ Neuron\ 2\ is\ sending\ a\ message\ to\ Neuron\ 3}
+\DoxyCodeLine{|14:30:7:536964|\ Accumulated\ value\ for\ Neuron\ 2\ is\ -\/26.5483}
+\DoxyCodeLine{|14:30:7:536964|\ Neuron\ 1\ fired,\ entering\ refractory\ phase}
+\DoxyCodeLine{|14:30:7:537079|\ Neuron\ 1\ potential\ set\ to\ -\/70}
+\DoxyCodeLine{|14:30:7:536983|\ Weight\ for\ Neuron\ 2\ to\ Neuron\ 3\ is\ 0.352867}
+\DoxyCodeLine{|14:30:7:537319|\ Neuron\ 2\ modifier\ is\ -\/1}
+\DoxyCodeLine{|14:30:7:537327|\ Message\ is\ 9.36803}
+\DoxyCodeLine{|14:30:7:537535|\ Neuron\ 3\ is\ activated,\ accumulated\ equal\ to\ -\/45.632}
+\DoxyCodeLine{|14:30:7:537721|\ Neuron\ 3\ does\ not\ have\ any\ neigbors!}
+\DoxyCodeLine{|14:30:7:537742|\ Neuron\ 3\ is\ waiting}
+\DoxyCodeLine{|14:30:7:537744|\ Neuron\ 2\ fired,\ entering\ refractory\ phase}
+\DoxyCodeLine{|14:30:7:537842|\ Neuron\ 2\ potential\ set\ to\ -\/70}
+\DoxyCodeLine{|14:30:7:539698|\ Neuron\ 1\ completed\ refractory\ phase,\ running}
+\DoxyCodeLine{|14:30:7:539861|\ Neuron\ 1\ is\ waiting}
+\DoxyCodeLine{|14:30:7:540311|\ Neuron\ 2\ completed\ refractory\ phase,\ running}
+\DoxyCodeLine{|14:30:7:540440|\ Neuron\ 2\ is\ waiting}
+\DoxyCodeLine{}
+\DoxyCodeLine{Activate\ neuron\ (\ or\ [-\/1]\ to\ quit\ )}
+\DoxyCodeLine{\ Neuron\ 1}
+\DoxyCodeLine{\ Neuron\ 2}
+\DoxyCodeLine{\ Neuron\ 3}
+\DoxyCodeLine{Input:\ 3}
+\DoxyCodeLine{}
+\DoxyCodeLine{|14:30:10:979676|\ Neuron\ 3\ is\ activated,\ accumulated\ equal\ to\ -\/45.632}
+\DoxyCodeLine{|14:30:10:979797|\ Neuron\ 3\ does\ not\ have\ any\ neigbors!}
+\DoxyCodeLine{|14:30:10:979805|\ Neuron\ 3\ is\ waiting}
+\DoxyCodeLine{}
+\DoxyCodeLine{Activate\ neuron\ (\ or\ [-\/1]\ to\ quit\ )}
+\DoxyCodeLine{\ Neuron\ 1}
+\DoxyCodeLine{\ Neuron\ 2}
+\DoxyCodeLine{\ Neuron\ 3}
+\DoxyCodeLine{Input:\ -\/1}
+\DoxyCodeLine{}
+\DoxyCodeLine{|14:30:15:945951|\ Exiting...}
+\DoxyCodeLine{|14:30:15:946038|\ Neuron\ 1\ is\ exiting}
+\DoxyCodeLine{|14:30:15:946054|\ Neuron\ 2\ is\ exiting}
+\DoxyCodeLine{|14:30:15:946085|\ Neuron\ 3\ is\ exiting}
+\DoxyCodeLine{}
+\DoxyCodeLine{Final\ Neuron\ Values}
+\DoxyCodeLine{-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}
+\DoxyCodeLine{}
+\DoxyCodeLine{|14:30:15:946269|\ Neuron\ 1:\ -\/70}
+\DoxyCodeLine{|14:30:15:946316|\ Neuron\ 2:\ -\/70}
+\DoxyCodeLine{|14:30:15:946354|\ Neuron\ 3:\ -\/45.632}
+\DoxyCodeLine{}
+\DoxyCodeLine{Deallocation}
+\DoxyCodeLine{-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}
+\DoxyCodeLine{}
+\DoxyCodeLine{|14:30:15:946390|\ Deleting\ Neuron\ 1}
+\DoxyCodeLine{|14:30:15:946397|\ Deleting\ Neuron\ 2}
+\DoxyCodeLine{|14:30:15:946400|\ Deleting\ Neuron\ 3}
+
+\end{DoxyCode}
+ \end{adjustwidth}
+
+
+
+
+{\bfseries{Valgrind Output}}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyItemize}
+\item No Memory Leaks 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{==229124==}
+\DoxyCodeLine{==229124==\ HEAP\ SUMMARY:}
+\DoxyCodeLine{==229124==\ \ \ \ \ in\ use\ at\ exit:\ 0\ bytes\ in\ 0\ blocks}
+\DoxyCodeLine{==229124==\ \ \ total\ heap\ usage:\ 54\ allocs,\ 54\ frees,\ 86,137\ bytes\ allocated}
+\DoxyCodeLine{==229124==}
+\DoxyCodeLine{==229124==\ All\ heap\ blocks\ were\ freed\ -\/-\/\ no\ leaks\ are\ possible}
+\DoxyCodeLine{==229124==}
+\DoxyCodeLine{==229124==\ For\ lists\ of\ detected\ and\ suppressed\ errors,\ rerun\ with:\ -\/s}
+
+\end{DoxyCode}
+ 
+\end{DoxyItemize}\end{adjustwidth}
+\hypertarget{md_README_autotoc_md17}{}\doxysubsection{\texorpdfstring{📌 Update 3-\/3}{📌 Update 3-\/3}}\label{md_README_autotoc_md17}
+{\bfseries{New addtions\+:}}
+\begin{DoxyItemize}
+\item Time stamps on logging messages
+\end{DoxyItemize}
+
+
+
+{\bfseries{Example output 4 }}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ text}
+\DoxyCodeLine{Time\ format\ is\ |HH:MM:SS:mircroseconds|}
+\DoxyCodeLine{}
+\DoxyCodeLine{Adding\ Neurons}
+\DoxyCodeLine{-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}
+\DoxyCodeLine{}
+\DoxyCodeLine{|11:52:26:434641|\ Neuron\ 1\ added\ (excitatory\ type)}
+\DoxyCodeLine{|11:52:26:434669|\ Neuron\ 2\ added\ (inhibitory\ type)}
+\DoxyCodeLine{|11:52:26:434672|\ Neuron\ 3\ added\ (excitatory\ type)}
+\DoxyCodeLine{|11:52:26:434674|\ Neuron\ 4\ added\ (inhibitory\ type)}
+\DoxyCodeLine{|11:52:26:434676|\ Neuron\ 5\ added\ (excitatory\ type)}
+\DoxyCodeLine{|11:52:26:434679|\ Neuron\ 6\ added\ (excitatory\ type)}
+\DoxyCodeLine{}
+\DoxyCodeLine{Adding\ Random\ Edges}
+\DoxyCodeLine{-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}
+\DoxyCodeLine{}
+\DoxyCodeLine{|11:52:26:434707|\ Edge\ from\ Neuron\ 1\ to\ Neuron\ 5\ added}
+\DoxyCodeLine{|11:52:26:434734|\ Neuron\ 1\ added\ to\ \_presynaptic\ of\ Neuron\ 5}
+\DoxyCodeLine{|11:52:26:434742|\ Neuron\ 5\ has\ connections\ from}
+\DoxyCodeLine{|11:52:26:434746|\ -\/\ Neuron1}
+\DoxyCodeLine{|11:52:26:434768|\ Edge\ from\ Neuron\ 5\ to\ Neuron\ 2\ added}
+\DoxyCodeLine{|11:52:26:434774|\ Neuron\ 5\ added\ to\ \_presynaptic\ of\ Neuron\ 2}
+\DoxyCodeLine{|11:52:26:434797|\ Edge\ from\ Neuron\ 3\ to\ Neuron\ 6\ added}
+\DoxyCodeLine{|11:52:26:434804|\ Neuron\ 3\ added\ to\ \_presynaptic\ of\ Neuron\ 6}
+\DoxyCodeLine{|11:52:26:434827|\ Neuron\ 2\ has\ connections\ from}
+\DoxyCodeLine{|11:52:26:434832|\ -\/\ Neuron5}
+\DoxyCodeLine{|11:52:26:434835|\ Edge\ from\ Neuron\ 4\ to\ Neuron\ 2\ added}
+\DoxyCodeLine{|11:52:26:434838|\ Neuron\ 4\ added\ to\ \_presynaptic\ of\ Neuron\ 2}
+\DoxyCodeLine{|11:52:26:434841|\ Neuron\ 5\ is\ connected\ to:}
+\DoxyCodeLine{|11:52:26:434843|\ -\/\ Neuron2}
+\DoxyCodeLine{|11:52:26:434845|\ Neuron\ 5\ has\ connections\ from}
+\DoxyCodeLine{|11:52:26:434847|\ -\/\ Neuron1}
+\DoxyCodeLine{|11:52:26:434849|\ Neuron\ 6\ has\ connections\ from}
+\DoxyCodeLine{|11:52:26:434851|\ -\/\ Neuron3}
+\DoxyCodeLine{|11:52:26:434853|\ Edge\ from\ Neuron\ 5\ to\ Neuron\ 6\ added}
+\DoxyCodeLine{|11:52:26:434856|\ Neuron\ 5\ added\ to\ \_presynaptic\ of\ Neuron\ 6}
+\DoxyCodeLine{}
+\DoxyCodeLine{|11:52:26:434943|\ Neuron\ 1\ is\ waiting}
+\DoxyCodeLine{|11:52:26:434982|\ Neuron\ 2\ is\ waiting}
+\DoxyCodeLine{|11:52:26:435038|\ Neuron\ 3\ is\ waiting}
+\DoxyCodeLine{|11:52:26:435085|\ Neuron\ 4\ is\ waiting}
+\DoxyCodeLine{|11:52:26:435141|\ Neuron\ 5\ is\ waiting}
+\DoxyCodeLine{|11:52:26:435197|\ Neuron\ 6\ is\ waiting}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{Activate\ neuron\ (\ or\ [-\/1]\ to\ quit\ )}
+\DoxyCodeLine{\ Neuron\ 1}
+\DoxyCodeLine{\ Neuron\ 2}
+\DoxyCodeLine{\ Neuron\ 3}
+\DoxyCodeLine{\ Neuron\ 4}
+\DoxyCodeLine{\ Neuron\ 5}
+\DoxyCodeLine{\ Neuron\ 6}
+\DoxyCodeLine{Input:\ 1}
+\DoxyCodeLine{}
+\DoxyCodeLine{|11:52:30:499664|\ Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/55}
+\DoxyCodeLine{|11:52:30:500392|\ Neuron\ 1\ is\ sending\ a\ message\ to\ Neuron\ 5}
+\DoxyCodeLine{|11:52:30:500416|\ Accumulated\ value\ for\ Neuron\ 1\ is\ -\/55}
+\DoxyCodeLine{|11:52:30:500431|\ Weight\ for\ Neuron\ 1\ to\ Neuron\ 5\ is\ 0.833798}
+\DoxyCodeLine{|11:52:30:500444|\ Neuron\ 1\ modifier\ is\ -\/1}
+\DoxyCodeLine{|11:52:30:500453|\ Message\ is\ 45.8589}
+\DoxyCodeLine{|11:52:30:500645|\ Neuron\ 5\ is\ activated,\ accumulated\ equal\ to\ -\/9.14112}
+\DoxyCodeLine{|11:52:30:500827|\ Neuron\ 5\ is\ sending\ a\ message\ to\ Neuron\ 2}
+\DoxyCodeLine{|11:52:30:500848|\ Accumulated\ value\ for\ Neuron\ 5\ is\ -\/9.14112}
+\DoxyCodeLine{|11:52:30:500860|\ Weight\ for\ Neuron\ 5\ to\ Neuron\ 2\ is\ 0.0295779}
+\DoxyCodeLine{|11:52:30:500868|\ Neuron\ 5\ modifier\ is\ -\/1}
+\DoxyCodeLine{|11:52:30:500927|\ Message\ is\ 0.270375}
+\DoxyCodeLine{|11:52:30:501054|\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/54.7296}
+\DoxyCodeLine{|11:52:30:501296|\ Neuron\ 2\ does\ not\ have\ any\ neigbors!}
+\DoxyCodeLine{|11:52:30:501326|\ Neuron\ 2\ is\ waiting}
+\DoxyCodeLine{|11:52:30:501347|\ Neuron\ 5\ is\ sending\ a\ message\ to\ Neuron\ 6}
+\DoxyCodeLine{|11:52:30:501615|\ Accumulated\ value\ for\ Neuron\ 5\ is\ -\/9.14112}
+\DoxyCodeLine{|11:52:30:501765|\ Weight\ for\ Neuron\ 5\ to\ Neuron\ 6\ is\ 0.22352}
+\DoxyCodeLine{|11:52:30:501922|\ Neuron\ 5\ modifier\ is\ -\/1}
+\DoxyCodeLine{|11:52:30:501952|\ Message\ is\ 2.04322}
+\DoxyCodeLine{|11:52:30:501349|\ Neuron\ 1\ fired,\ entering\ refractory\ phase}
+\DoxyCodeLine{|11:52:30:502118|\ Neuron\ 6\ is\ activated,\ accumulated\ equal\ to\ -\/52.9568}
+\DoxyCodeLine{|11:52:30:502135|\ Neuron\ 1\ potential\ set\ to\ -\/70|}
+\DoxyCodeLine{11:52:30:502389|\ Neuron\ 6\ does\ not\ have\ any\ neigbors!}
+\DoxyCodeLine{|11:52:30:502682|\ Neuron\ 6\ is\ waiting}
+\DoxyCodeLine{|11:52:30:502431|\ Neuron\ 5\ fired,\ entering\ refractory\ phase}
+\DoxyCodeLine{|11:52:30:502956|\ Neuron\ 5\ potential\ set\ to\ -\/70}
+\DoxyCodeLine{|11:52:30:505017|\ Neuron\ 1\ completed\ refractory\ phase,\ running}
+\DoxyCodeLine{|11:52:30:505085|\ Neuron\ 1\ is\ waiting}
+\DoxyCodeLine{|11:52:30:514351|\ Neuron\ 5\ completed\ refractory\ phase,\ running}
+\DoxyCodeLine{|11:52:30:514546|\ Neuron\ 5\ is\ waiting}
+\DoxyCodeLine{}
+\DoxyCodeLine{Activate\ neuron\ (\ or\ [-\/1]\ to\ quit\ )}
+\DoxyCodeLine{\ Neuron\ 1}
+\DoxyCodeLine{\ Neuron\ 2}
+\DoxyCodeLine{\ Neuron\ 3}
+\DoxyCodeLine{\ Neuron\ 4}
+\DoxyCodeLine{\ Neuron\ 5}
+\DoxyCodeLine{\ Neuron\ 6}
+\DoxyCodeLine{Input:\ 2}
+\DoxyCodeLine{}
+\DoxyCodeLine{|11:52:31:823041|\ Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/54.7296}
+\DoxyCodeLine{|11:52:31:823208|\ Neuron\ 2\ does\ not\ have\ any\ neigbors!}
+\DoxyCodeLine{|11:52:31:823215|\ Neuron\ 2\ is\ waiting}
+\DoxyCodeLine{}
+\DoxyCodeLine{Activate\ neuron\ (\ or\ [-\/1]\ to\ quit\ )}
+\DoxyCodeLine{\ Neuron\ 1}
+\DoxyCodeLine{\ Neuron\ 2}
+\DoxyCodeLine{\ Neuron\ 3}
+\DoxyCodeLine{\ Neuron\ 4}
+\DoxyCodeLine{\ Neuron\ 5}
+\DoxyCodeLine{\ Neuron\ 6}
+\DoxyCodeLine{Input:\ 3}
+\DoxyCodeLine{}
+\DoxyCodeLine{|11:52:32:926770|\ Neuron\ 3\ is\ activated,\ accumulated\ equal\ to\ -\/55}
+\DoxyCodeLine{|11:52:32:926912|\ Neuron\ 3\ is\ sending\ a\ message\ to\ Neuron\ 6}
+\DoxyCodeLine{|11:52:32:926932|\ Accumulated\ value\ for\ Neuron\ 3\ is\ -\/55}
+\DoxyCodeLine{|11:52:32:926944|\ Weight\ for\ Neuron\ 3\ to\ Neuron\ 6\ is\ 0.191137}
+\DoxyCodeLine{|11:52:32:926952|\ Neuron\ 3\ modifier\ is\ -\/1}
+\DoxyCodeLine{|11:52:32:927043|\ Message\ is\ 10.5125}
+\DoxyCodeLine{|11:52:32:927120|\ Neuron\ 3\ fired,\ entering\ refractory\ phase}
+\DoxyCodeLine{|11:52:32:927190|\ Neuron\ 3\ potential\ set\ to\ -\/70}
+\DoxyCodeLine{|11:52:32:927203|\ Neuron\ 6\ is\ activated,\ accumulated\ equal\ to\ -\/42.4443}
+\DoxyCodeLine{|11:52:32:927395|\ Neuron\ 6\ does\ not\ have\ any\ neigbors!}
+\DoxyCodeLine{|11:52:32:927481|\ Neuron\ 6\ is\ waiting}
+\DoxyCodeLine{|11:52:32:929689|\ Neuron\ 3\ completed\ refractory\ phase,\ running}
+\DoxyCodeLine{|11:52:32:929789|\ Neuron\ 3\ is\ waiting}
+\DoxyCodeLine{}
+\DoxyCodeLine{Activate\ neuron\ (\ or\ [-\/1]\ to\ quit\ )}
+\DoxyCodeLine{\ Neuron\ 1}
+\DoxyCodeLine{\ Neuron\ 2}
+\DoxyCodeLine{\ Neuron\ 3}
+\DoxyCodeLine{\ Neuron\ 4}
+\DoxyCodeLine{\ Neuron\ 5}
+\DoxyCodeLine{\ Neuron\ 6}
+\DoxyCodeLine{Input:}
+
+\end{DoxyCode}
+ \end{adjustwidth}
+\hypertarget{md_README_autotoc_md18}{}\doxysubsection{\texorpdfstring{📌 Update 2-\/29}{📌 Update 2-\/29}}\label{md_README_autotoc_md18}
+{\bfseries{New Additions\+:}}
+\begin{DoxyItemize}
+\item Choose neuron to activate
+\item Activation based on membrane potential
+\item Refractory period
+\item Edge weights are \mbox{[}0, 1\mbox{]}
+\item Constants are preprocessor defintions
+\end{DoxyItemize}
+
+
+
+{\bfseries{Example Output 3 }}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Neuron\ 1\ added\ (inhibitory\ type)}
+\DoxyCodeLine{Neuron\ 2\ added\ (inhibitory\ type)}
+\DoxyCodeLine{Neuron\ 3\ added\ (inhibitory\ type)}
+\DoxyCodeLine{Adding\ Random\ Neighbors}
+\DoxyCodeLine{Edge\ from\ Neuron\ 3\ to\ Neuron\ 2\ added}
+\DoxyCodeLine{Edge\ from\ Neuron\ 3\ to\ Neuron\ 1\ added}
+\DoxyCodeLine{Neuron\ 1\ is\ waiting}
+\DoxyCodeLine{Neuron\ 2\ is\ waiting}
+\DoxyCodeLine{Neuron\ 3\ is\ waiting}
+\DoxyCodeLine{Activate\ neuron\ (\ or\ [-\/1]\ to\ quit\ )}
+\DoxyCodeLine{\ Neuron\ 1}
+\DoxyCodeLine{\ Neuron\ 2}
+\DoxyCodeLine{\ Neuron\ 3}
+\DoxyCodeLine{Input:\ 3}
+\DoxyCodeLine{Neuron\ 3\ is\ activated,\ accumulated\ equal\ to\ -\/55}
+\DoxyCodeLine{Neuron\ 3\ is\ sending\ a\ message\ to\ Neuron\ 1}
+\DoxyCodeLine{Accumulated\ value\ for\ Neuron\ 3\ is\ -\/55}
+\DoxyCodeLine{Weight\ for\ Neuron\ 3\ to\ Neuron\ 1\ is\ 0.080745}
+\DoxyCodeLine{Neuron\ 3\ modifier\ is\ -\/1}
+\DoxyCodeLine{Message\ is\ 4.44097}
+\DoxyCodeLine{Neuron\ 1\ is\ activated,\ accumulated\ equal\ to\ -\/50.559}
+\DoxyCodeLine{Neuron\ 1\ does\ not\ have\ any\ neigbors!}
+\DoxyCodeLine{Neuron\ 1\ is\ waiting}
+\DoxyCodeLine{Neuron\ 3\ is\ sending\ a\ message\ to\ Neuron\ 2}
+\DoxyCodeLine{Accumulated\ value\ for\ Neuron\ 3\ is\ -\/55}
+\DoxyCodeLine{Weight\ for\ Neuron\ 3\ to\ Neuron\ 2\ is\ 0.694781}
+\DoxyCodeLine{Neuron\ 3\ modifier\ is\ -\/1}
+\DoxyCodeLine{Message\ is\ 38.213}
+\DoxyCodeLine{Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/16.787}
+\DoxyCodeLine{Neuron\ 2\ does\ not\ have\ any\ neigbors!}
+\DoxyCodeLine{Neuron\ 2\ is\ waiting}
+\DoxyCodeLine{Neuron\ 3\ fired,\ entering\ refractory\ phase}
+\DoxyCodeLine{Neuron\ 3\ potential\ set\ to\ -\/70}
+\DoxyCodeLine{Neuron\ 3\ completed\ refractory\ phase,\ running}
+\DoxyCodeLine{Neuron\ 3\ is\ waiting}
+\DoxyCodeLine{Activate\ neuron\ (\ or\ [-\/1]\ to\ quit\ )}
+\DoxyCodeLine{\ Neuron\ 1}
+\DoxyCodeLine{\ Neuron\ 2}
+\DoxyCodeLine{\ Neuron\ 3}
+\DoxyCodeLine{Input:\ 3}
+
+\end{DoxyCode}
+
+\begin{DoxyItemize}
+\item If Neuron 3 is then activated again
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Neuron\ 3\ is\ activated,\ accumulated\ equal\ to\ -\/70}
+\DoxyCodeLine{Membrane\ potential\ for\ Neuron\ 3\ is\ below\ the\ threshold,\ not\ firing}
+\DoxyCodeLine{Neuron\ 3\ is\ waiting}
+\DoxyCodeLine{Activate\ neuron\ (\ or\ [-\/1]\ to\ quit\ )}
+\DoxyCodeLine{\ Neuron\ 1}
+\DoxyCodeLine{\ Neuron\ 2}
+\DoxyCodeLine{\ Neuron\ 3}
+\DoxyCodeLine{Input:\ }
+
+\end{DoxyCode}
+
+\begin{DoxyItemize}
+\item Or if a neuron without edges is activated\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Neuron\ 2\ is\ activated,\ accumulated\ equal\ to\ -\/16.787}
+\DoxyCodeLine{Neuron\ 2\ does\ not\ have\ any\ neigbors!}
+\DoxyCodeLine{Neuron\ 2\ is\ waiting}
+\DoxyCodeLine{Activate\ neuron\ (\ or\ [-\/1]\ to\ quit\ )}
+\DoxyCodeLine{\ Neuron\ 1}
+\DoxyCodeLine{\ Neuron\ 2}
+\DoxyCodeLine{\ Neuron\ 3}
+\DoxyCodeLine{Input:}
+
+\end{DoxyCode}
+ 
+\end{DoxyItemize}\end{adjustwidth}
+
+
+
+
+{\bfseries{Upadated Neuron Class}}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{class\ }Neuron\ \{}
+\DoxyCodeLine{\textcolor{keyword}{private}:}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{double}\ membrane\_potential\ =\ INITIAL\_MEMBRANE\_POTENTIAL;}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{int}\ id;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keyword}{typedef}\ std::map<Neuron\ *,\ double>\ weight\_map;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ weight\_map\ \_postsynaptic;}
+\DoxyCodeLine{\ \ weight\_map\ \_presynaptic;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ pthread\_t\ thread;}
+\DoxyCodeLine{\ \ pthread\_cond\_t\ cond\ =\ PTHREAD\_COND\_INITIALIZER;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{bool}\ active\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{bool}\ recieved\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{int}\ excit\_inhib\_value;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{public}:}
+\DoxyCodeLine{\ \ Neuron(\textcolor{keywordtype}{int}\ \_id,\ \textcolor{keywordtype}{int}\ inhibitory);}
+\DoxyCodeLine{\ \ \string~Neuron();}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ add\_neighbor(Neuron\ *neighbor,\ \textcolor{keywordtype}{double}\ weight);}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ add\_next(Neuron\ *neighbor,\ \textcolor{keywordtype}{double}\ weight);}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ add\_previous(Neuron\ *neighbor,\ \textcolor{keywordtype}{double}\ weight);}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ *run();}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ start\_thread();}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ join\_thread();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ refractory();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ activate()\ \{\ active\ =\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ deactivate()\ \{\ active\ =\ \textcolor{keyword}{false};\ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{comment}{//>>>>>>>>>>>>>>\ Access\ to\ private\ variables\ <<<<<<<<<<<}}
+\DoxyCodeLine{\ \ pthread\_cond\_t\ *get\_cond()\ \{\ \textcolor{keywordflow}{return}\ \&cond;\ \}}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{int}\ get\_id()\ \{\ \textcolor{keywordflow}{return}\ id;\ \}}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{double}\ get\_potential()\ \{\ \textcolor{keywordflow}{return}\ membrane\_potential;\ \}}
+\DoxyCodeLine{\ \ \textcolor{keyword}{const}\ weight\_map\ *get\_presynaptic()\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{const}\ weight\_map\ *p\_presynaptic\ =\ \&\_presynaptic;}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ p\_presynaptic;}
+\DoxyCodeLine{\ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keyword}{const}\ weight\_map\ *get\_postsynaptic()\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{const}\ weight\_map\ *p\_postsynaptic\ =\ \&\_postsynaptic;}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ p\_postsynaptic;}
+\DoxyCodeLine{\ \ \}}
+\DoxyCodeLine{\ \ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*\(\backslash\)}}
+\DoxyCodeLine{\textcolor{comment}{\ \ \ *\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Thread\ helper:}}
+\DoxyCodeLine{\textcolor{comment}{\ \ \ *\ \ \ \ POSIX\ needs\ a\ void*\ (*)(void*)\ function\ signature}}
+\DoxyCodeLine{\textcolor{comment}{\ \ \ *\ \ \ \ This\ function\ allows\ us\ to\ use\ the\ run()\ member\ funciton}}
+\DoxyCodeLine{\textcolor{comment}{\ \ \(\backslash\)-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ *thread\_helper(\textcolor{keywordtype}{void}\ *instance)\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ ((Neuron\ *)instance)-\/>run();}
+\DoxyCodeLine{\ \ \}}
+\DoxyCodeLine{\};}
+
+\end{DoxyCode}
+ \end{adjustwidth}
+\hypertarget{md_README_autotoc_md19}{}\doxyparagraph{\texorpdfstring{🐛 \sout{Issue 2}}{🐛 \sout{Issue 2}}}\label{md_README_autotoc_md19}
+
+\begin{DoxyItemize}
+\item I think the quit functionality of the menu sticks executable in a thread lock. Not sure how to fix it.
+\item I tried
+\begin{DoxyItemize}
+\item Adjusting the mutex positioning to inside the for loop even through it should be on the outside
+\item using a pthread barrier to align thread execution before quitting
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+
+
+{\bfseries{Issue 2 code }}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ cpp}
+\DoxyCodeLine{//\ main.cpp}
+\DoxyCodeLine{while\ (!finish)\ \{}
+\DoxyCodeLine{}
+\DoxyCodeLine{//\ sleep\ for\ menu\ timing}
+\DoxyCodeLine{\ \ \ \ usleep(100000);}
+\DoxyCodeLine{\ \ \ \ cout\ <<\ "{}Activate\ neuron\ (\ or\ [-\/1]\ to\ quit\ )\(\backslash\)n"{};}
+\DoxyCodeLine{\ \ \ \ for\ (Neuron\ *neuron\ :\ neurons)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ cout\ <<\ "{}\ Neuron\ "{}\ <<\ neuron-\/>get\_id()\ <<\ '\(\backslash\)n';}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ cout\ <<\ "{}Input:\ "{};}
+\DoxyCodeLine{\ \ \ \ cin\ >>\ activate;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ if\ (activate\ ==\ -\/1)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ //locking\ mutex}
+\DoxyCodeLine{\ \ \ \ \ \ pthread\_mutex\_lock(\&mutex);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ //\ adjusting\ variable}
+\DoxyCodeLine{\ \ \ \ \ \ finish\ =\ true;}
+\DoxyCodeLine{\ \ \ \ \ \ }
+\DoxyCodeLine{\ \ \ \ \ \ //\ signaling\ each\ neuron\ to\ pthread\_exit()}
+\DoxyCodeLine{\ \ \ \ \ \ //\ At\ this\ point\ all\ neurons\ should\ be\ the\ in\ the\ "{}waiting\ state"{}}
+\DoxyCodeLine{\ \ \ \ \ \ for\ (Neuron\ *neuron\ :\ neurons)\ \{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ //\ activate\ neuron\ and\ signal}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ neuron-\/>activate();}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ pthread\_cond\_signal(neuron-\/>get\_cond());}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ //\ unlock}
+\DoxyCodeLine{\ \ \ \ \ \ pthread\_mutex\_unlock(\&mutex);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \}\ else\ if\ (activate\ <=\ num\_neurons\ \&\&\ activate\ >=\ 0)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ neurons[activate\ -\/\ 1]-\/>activate();}
+\DoxyCodeLine{\ \ \ \ \ \ pthread\_cond\_signal(neurons[activate\ -\/\ 1]-\/>get\_cond());}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{//\ neuron.cpp}
+\DoxyCodeLine{//...}
+\DoxyCodeLine{\ \ pthread\_mutex\_lock(\&mutex);}
+\DoxyCodeLine{\ \ while\ (!active)\ \{}
+\DoxyCodeLine{\ \ \ \ cout\ <<\ "{}Neuron\ "{}\ <<\ id\ <<\ "{}\ is\ waiting\(\backslash\)n"{};}
+\DoxyCodeLine{\ \ \ \ pthread\_cond\_wait(\&cond,\ \&mutex);}
+\DoxyCodeLine{\ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ if\ (finish)\ \{}
+\DoxyCodeLine{\ \ \ \ pthread\_exit(NULL);}
+\DoxyCodeLine{\ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ pthread\_mutex\_unlock(\&mutex);}
+\DoxyCodeLine{//...}
+
+\end{DoxyCode}
+ \end{adjustwidth}
+\hypertarget{md_README_autotoc_md20}{}\doxysubsection{\texorpdfstring{📌 Update 2-\/28}{📌 Update 2-\/28}}\label{md_README_autotoc_md20}
+{\bfseries{New Additions\+:}}
+\begin{DoxyItemize}
+\item First update 
+
+{\bfseries{Example Output 1 }}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Node\ 1\ added}
+\DoxyCodeLine{Node\ 2\ added}
+\DoxyCodeLine{Node\ 3\ added}
+\DoxyCodeLine{Adding\ Random\ Neighbors}
+\DoxyCodeLine{Edge\ from\ Node\ 1\ to\ Node\ 2\ added}
+\DoxyCodeLine{Edge\ from\ Node\ 2\ to\ Node\ 3\ added}
+\DoxyCodeLine{Node\ 1\ is\ waiting}
+\DoxyCodeLine{Node\ 3\ is\ waiting}
+\DoxyCodeLine{Node\ 1\ is\ activated,\ setting\ accumulated\ to\ 1}
+\DoxyCodeLine{Node\ 1\ is\ running}
+\DoxyCodeLine{Node\ 1\ is\ sending\ a\ message\ to\ Node2}
+\DoxyCodeLine{Accumulated\ value\ for\ Node\ 1\ is\ 1}
+\DoxyCodeLine{Weight\ for\ Node\ 1\ to\ Node\ 2\ is\ 4}
+\DoxyCodeLine{Message\ is\ 4}
+\DoxyCodeLine{Node\ 2\ is\ activated,\ setting\ accumulated\ to\ 4}
+\DoxyCodeLine{Node\ 2\ is\ running}
+\DoxyCodeLine{Node\ 2\ is\ sending\ a\ message\ to\ Node3}
+\DoxyCodeLine{Accumulated\ value\ for\ Node\ 2\ is\ 4}
+\DoxyCodeLine{Weight\ for\ Node\ 2\ to\ Node\ 3\ is\ 3}
+\DoxyCodeLine{Message\ is\ 12}
+\DoxyCodeLine{Node\ 3\ is\ activated,\ setting\ accumulated\ to\ 12}
+\DoxyCodeLine{Node\ 3\ is\ running}
+\DoxyCodeLine{Total\ Value\ is\ 12}
+
+\end{DoxyCode}
+ \end{adjustwidth}
+
+\end{DoxyItemize}
+
+
+
+{\bfseries{Example Output 2 }}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Node\ 1\ added}
+\DoxyCodeLine{Node\ 2\ added}
+\DoxyCodeLine{Node\ 3\ added}
+\DoxyCodeLine{Edge\ from\ Node\ 1\ to\ Node\ 2\ added}
+\DoxyCodeLine{Edge\ from\ Node\ 1\ to\ Node\ 3\ added}
+\DoxyCodeLine{Node\ 1\ is\ waiting}
+\DoxyCodeLine{Node\ 2\ is\ waiting}
+\DoxyCodeLine{Node\ 3\ is\ waiting}
+\DoxyCodeLine{Activate?\ 1}
+\DoxyCodeLine{Node\ 1\ is\ activated,\ accumulated\ set\ to\ 1}
+\DoxyCodeLine{Node\ 1\ is\ running}
+\DoxyCodeLine{Node\ 1\ is\ sending\ a\ message\ to\ Node\ 2}
+\DoxyCodeLine{Accumulated\ value\ for\ Node\ 1\ is\ 1}
+\DoxyCodeLine{Weight\ for\ Node\ 1\ to\ Node\ 2\ is\ 3}
+\DoxyCodeLine{Message\ is\ 3}
+\DoxyCodeLine{Node\ 2\ is\ activated,\ accumulated\ set\ to\ 3}
+\DoxyCodeLine{Node\ 2\ is\ running}
+\DoxyCodeLine{Node\ 2\ does\ not\ have\ any\ neigbors!}
+\DoxyCodeLine{Node\ 1\ is\ sending\ a\ message\ to\ Node\ 3}
+\DoxyCodeLine{Accumulated\ value\ for\ Node\ 1\ is\ 1}
+\DoxyCodeLine{Weight\ for\ Node\ 1\ to\ Node\ 3\ is\ 2}
+\DoxyCodeLine{Message\ is\ 2}
+\DoxyCodeLine{Node\ 3\ is\ activated,\ accumulated\ set\ to\ 2}
+\DoxyCodeLine{Node\ 3\ is\ running}
+\DoxyCodeLine{Node\ 3\ does\ not\ have\ any\ neigbors!}
+\DoxyCodeLine{Node\ 1\ has\ an\ accumulated\ value\ of\ 1}
+\DoxyCodeLine{Node\ 2\ has\ an\ accumulated\ value\ of\ 3}
+\DoxyCodeLine{Node\ 3\ has\ an\ accumulated\ value\ of\ 2}
+
+\end{DoxyCode}
+ \end{adjustwidth}
+
+
+\doxysubparagraph*{🐛\texorpdfstring{$\sim$}{\string~}\texorpdfstring{$\sim$}{\string~}\+Issue 1\texorpdfstring{$\sim$}{\string~}\texorpdfstring{$\sim$}{\string~}}
+
+
+\begin{DoxyItemize}
+\item Random neighbor funciton still needs adjustments to avoid repeat edges 
+
+{\bfseries{Random neighbor function }}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ random\_neighbors(vector<Node\ *>\ nodes,\ \textcolor{keywordtype}{int}\ number\_neighbors)\ \{}
+\DoxyCodeLine{\ \ cout\ <<\ \textcolor{stringliteral}{"{}Adding\ Random\ Neighbors\(\backslash\)n"{}};}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{int}\ size\ =\ nodes.size();}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{int}\ i\ =\ 0;}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{while}\ (i\ <\ number\_neighbors)\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ from\ =\ rand()\ \%\ size;}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ to\ =\ rand()\ \%\ size;}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ (from\ ==\ to)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ nodes[from]-\/>add\_neighbor(nodes[to],\ rand()\ \%\ 5\ +\ 1);}
+\DoxyCodeLine{\ \ \ \ i++;}
+\DoxyCodeLine{\ \ \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+ \end{adjustwidth}
+
+\end{DoxyItemize}
+
+
+
+{\bfseries{Basic Node class that can send and recieve messages from other nodes\+:}}\begin{adjustwidth}{1em}{0em}
+~\newline
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{class\ }Node\ \{}
+\DoxyCodeLine{\textcolor{keyword}{private}:}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{double}\ accumulated\ =\ 4;}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{int}\ id;}
+\DoxyCodeLine{\ \ std::map<Node\ *,\ double>\ neighbors;}
+\DoxyCodeLine{\ \ pthread\_t\ thread;}
+\DoxyCodeLine{\ \ pthread\_cond\_t\ cond;}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{bool}\ active\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{bool}\ recieved\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{public}:}
+\DoxyCodeLine{\ \ Node(\textcolor{keywordtype}{int}\ \_id)\ :\ id(\_id)\ \{\}}
+\DoxyCodeLine{\ \ \string~Node();}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ add\_neighbor(Node\ *neighbor,\ \textcolor{keywordtype}{double}\ weight);}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ *run();}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ start\_thread();}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ join\_thread();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ activate()\ \{\ active\ =\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ deactivate()\ \{\ active\ =\ \textcolor{keyword}{false};\ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{comment}{//>>>>>>>>>>>>>>\ Access\ to\ private\ variables\ <<<<<<<<<<<}}
+\DoxyCodeLine{\ \ pthread\_cond\_t\ *get\_cond()\ \{\ \textcolor{keywordflow}{return}\ \&cond;\ \}}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{int}\ get\_id()\ \{\ \textcolor{keywordflow}{return}\ id;\ \}}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{double}\ get\_accumulated()\ \{\ \textcolor{keywordflow}{return}\ accumulated;\ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*\(\backslash\)}}
+\DoxyCodeLine{\textcolor{comment}{\ \ \ *\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Thread\ helper:}}
+\DoxyCodeLine{\textcolor{comment}{\ \ \ *\ \ \ \ POSIX\ needs\ a\ void*\ (*)(void*)\ function\ signature}}
+\DoxyCodeLine{\textcolor{comment}{\ \ \ *\ \ \ \ This\ function\ allows\ us\ to\ use\ the\ run()\ member\ funciton}}
+\DoxyCodeLine{\textcolor{comment}{\ \ \(\backslash\)-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ *thread\_helper(\textcolor{keywordtype}{void}\ *instance)\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ ((Node\ *)instance)-\/>run();}
+\DoxyCodeLine{\ \ \}}
+\DoxyCodeLine{\};}
+
+\end{DoxyCode}
+ \end{adjustwidth}

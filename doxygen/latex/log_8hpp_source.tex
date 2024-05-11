@@ -1,0 +1,136 @@
+\doxysection{log.\+hpp}
+\hypertarget{log_8hpp_source}{}\label{log_8hpp_source}\index{src/log.hpp@{src/log.hpp}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ LOG}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ LOG}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}message.hpp"{}}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <chrono>}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{keyword}{using\ }std::cout;}
+\DoxyCodeLine{00010\ \textcolor{keyword}{using\ }std::ostream;}
+\DoxyCodeLine{00011\ \textcolor{keyword}{using\ }std::vector;}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \textcolor{keyword}{enum}\ LogLevel\ \{}
+\DoxyCodeLine{00014\ \ \ ESSENTIAL,}
+\DoxyCodeLine{00015\ \ \ NONE,}
+\DoxyCodeLine{00016\ \ \ DATA,}
+\DoxyCodeLine{00017\ \ \ ERROR,}
+\DoxyCodeLine{00018\ \ \ WARNING,}
+\DoxyCodeLine{00019\ \ \ INFO,}
+\DoxyCodeLine{00020\ \ \ DEBUG,}
+\DoxyCodeLine{00021\ \ \ DEBUG2,}
+\DoxyCodeLine{00022\ \ \ DEBUG3,}
+\DoxyCodeLine{00023\ \ \ DEBUG4,}
+\DoxyCodeLine{00024\ \};}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structLogData}{LogData}}\ \{}
+\DoxyCodeLine{00027\ \ \ \textcolor{keywordtype}{int}\ neuron\_id;}
+\DoxyCodeLine{00028\ \ \ \textcolor{keywordtype}{int}\ group\_id;}
+\DoxyCodeLine{00029\ \ \ \textcolor{keywordtype}{double}\ timestamp;}
+\DoxyCodeLine{00030\ \ \ \textcolor{keywordtype}{double}\ membrane\_potentail;}
+\DoxyCodeLine{00031\ \ \ \textcolor{keywordtype}{int}\ neuron\_type\ =\ 0;}
+\DoxyCodeLine{00032\ \ \ Message\_t\ message\_type;}
+\DoxyCodeLine{00033\ \ \ \textcolor{keywordtype}{int}\ stimulus\_number;}
+\DoxyCodeLine{00034\ \}\ \mbox{\hyperlink{structLogData}{LogData}};}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \textcolor{keyword}{extern}\ LogLevel\ DEBUG\_LEVEL;}
+\DoxyCodeLine{00037\ \textcolor{keyword}{extern}\ vector<int>::const\_iterator\ STIMULUS;}
+\DoxyCodeLine{00038\ \textcolor{keyword}{extern}\ ostream\ \&STREAM;}
+\DoxyCodeLine{00039\ \textcolor{keyword}{extern}\ pthread\_mutex\_t\ log\_mutex;}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \textcolor{keyword}{using\ }hr\_clock\ =\ std::chrono::high\_resolution\_clock;}
+\DoxyCodeLine{00042\ \textcolor{keyword}{using\ }duration\ =\ std::chrono::duration<double>;}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classLog}{Log}}\ \{}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00047\ \ \ hr\_clock::time\_point\ start;}
+\DoxyCodeLine{00048\ \ \ \textcolor{keywordtype}{double}\ off\_set;}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00051\ \ \ \textcolor{comment}{//\ constructor}}
+\DoxyCodeLine{00052\ \ \ \mbox{\hyperlink{classLog}{Log}}()\ :\ start(hr\_clock::now()),\ off\_set(0.0f)\ \{\}}
+\DoxyCodeLine{00053\ \ \ \textcolor{comment}{//\ DATA\ Functions}}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \textcolor{keywordtype}{void}\ start\_clock()\ \{\ this-\/>start\ =\ hr\_clock::now();\ \}}
+\DoxyCodeLine{00056\ \ \ \textcolor{keywordtype}{void}\ write\_data(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *filesname\ =\ \textcolor{stringliteral}{"{}./logs/\%ld/\%ld.log"{}});}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \textcolor{keywordtype}{void}\ add\_data(\textcolor{keywordtype}{int}\ group\_id,\ \textcolor{keywordtype}{int}\ curr\_id,\ \textcolor{keywordtype}{double}\ curr\_data);}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \textcolor{keywordtype}{void}\ add\_data(\textcolor{keywordtype}{int}\ group\_id,\ \textcolor{keywordtype}{int}\ curr\_id,\ \textcolor{keywordtype}{double}\ curr\_data,\ \textcolor{keywordtype}{double}\ time);}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \textcolor{keywordtype}{void}\ add\_data(\textcolor{keywordtype}{int}\ group\_id,\ \textcolor{keywordtype}{int}\ curr\_id,\ \textcolor{keywordtype}{double}\ curr\_data,\ \textcolor{keywordtype}{double}\ time,}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ type,\ Message\_t\ message\_type);}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \ \ \textcolor{keywordtype}{void}\ add\_data(\textcolor{keywordtype}{int}\ group\_id,\ \textcolor{keywordtype}{int}\ curr\_id,\ \textcolor{keywordtype}{double}\ curr\_data,\ \textcolor{keywordtype}{double}\ time,}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ type,\ Message\_t\ message\_type,\ \mbox{\hyperlink{classNeuron}{Neuron}}\ *origin);}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \ \ \textcolor{keywordtype}{void}\ add\_data(\mbox{\hyperlink{structLogData}{LogData}}\ data);}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \textcolor{keywordtype}{void}\ log\_runtime\_config(\textcolor{keyword}{const}\ std::string\ \&name);}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \textcolor{comment}{//\ General\ Log\ function}}
+\DoxyCodeLine{00073\ \ \ \textcolor{keywordtype}{void}\ log(LogLevel\ level,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,\ ostream\ \&os\ =\ STREAM);}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \ \ \textcolor{comment}{//\ Get\ time\ stamp\ from\ std::chrono::high\_resolution\_clock}}
+\DoxyCodeLine{00076\ \ \ \textcolor{keywordtype}{double}\ get\_time\_stamp();}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \textcolor{comment}{//\ Sets\ the\ offset\ of\ all\ future\ timestamps}}
+\DoxyCodeLine{00079\ \ \ \textcolor{keywordtype}{void}\ set\_offset(\textcolor{keywordtype}{double}\ value);}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \ \ \textcolor{comment}{//\ Neuron\ Logs}}
+\DoxyCodeLine{00082\ \ \ \textcolor{keywordtype}{void}\ log\_neuron\_state(LogLevel\ level,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,\ \textcolor{keywordtype}{int}\ \textcolor{keywordtype}{id});}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \textcolor{keywordtype}{void}\ log\_neuron\_interaction(LogLevel\ level,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,\ \textcolor{keywordtype}{int}\ id1,}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ id2);}
+\DoxyCodeLine{00086\ \ \ \textcolor{keywordtype}{void}\ log\_neuron\_interaction(LogLevel\ level,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,\ \textcolor{keywordtype}{int}\ id1,}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ id2,\ \textcolor{keywordtype}{double}\ value);}
+\DoxyCodeLine{00088\ \ \ \textcolor{keywordtype}{void}\ log\_neuron\_value(LogLevel\ level,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,\ \textcolor{keywordtype}{int}\ \textcolor{keywordtype}{id},}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ accumulated);}
+\DoxyCodeLine{00090\ \ \ \textcolor{keywordtype}{void}\ log\_neuron\_type(LogLevel\ level,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,\ \textcolor{keywordtype}{int}\ \textcolor{keywordtype}{id},}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *type);}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ \ \ \textcolor{comment}{//\ Neuron\ Logs\ for\ Neurons\ in\ Groups}}
+\DoxyCodeLine{00094\ \ \ \textcolor{keywordtype}{void}\ log\_group\_neuron\_state(LogLevel\ level,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,\ \textcolor{keywordtype}{int}\ group\_id,}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \textcolor{keywordtype}{id});}
+\DoxyCodeLine{00096\ \ \ \textcolor{keywordtype}{void}\ log\_group\_neuron\_value(LogLevel\ level,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,\ \textcolor{keywordtype}{int}\ group\_id,}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \textcolor{keywordtype}{id},\ \textcolor{keywordtype}{double}\ value);}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \textcolor{keywordtype}{void}\ log\_group\_neuron\_type(LogLevel\ level,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,\ \textcolor{keywordtype}{int}\ group\_id,}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \textcolor{keywordtype}{id},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *type);}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \ \ \textcolor{keywordtype}{void}\ log\_group\_neuron\_interaction(LogLevel\ level,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ group\_id1,\ \textcolor{keywordtype}{int}\ id1,\ \textcolor{keywordtype}{int}\ group\_id2,}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ id2);}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \ \ \textcolor{keywordtype}{void}\ log\_group\_neuron\_interaction(LogLevel\ level,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ group\_id1,\ \textcolor{keywordtype}{int}\ id1,\ \textcolor{keywordtype}{int}\ group\_id2,}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ id2,\ \textcolor{keywordtype}{double}\ value);}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \ \ \textcolor{comment}{//\ Neuron\ Group\ Logs}}
+\DoxyCodeLine{00111\ \ \ \textcolor{keywordtype}{void}\ log\_group\_state(LogLevel\ level,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,\ \textcolor{keywordtype}{int}\ group\_id);}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ \textcolor{keywordtype}{void}\ log\_group\_value(LogLevel\ level,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,\ \textcolor{keywordtype}{int}\ group\_id,}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ value);}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \ \ \textcolor{keywordtype}{void}\ log\_string(LogLevel\ level,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keywordtype}{string});}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \ \ \textcolor{keywordtype}{void}\ print(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,\ \textcolor{keywordtype}{bool}\ newline\ =\ \textcolor{keyword}{true},}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ std::ostream\ \&os\ =\ STREAM);}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ \ \ \textcolor{keywordtype}{void}\ log\_message(LogLevel\ level,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,\ \textcolor{keywordtype}{double}\ timestamp,}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ group\_id,\ \textcolor{keywordtype}{int}\ \textcolor{keywordtype}{id},\ \textcolor{keywordtype}{double}\ value);}
+\DoxyCodeLine{00123\ \ \ \textcolor{keywordtype}{void}\ log\_value(LogLevel\ level,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,\ \textcolor{keywordtype}{int}\ value);}
+\DoxyCodeLine{00124\ \ \ \textcolor{keywordtype}{void}\ log\_value(LogLevel\ level,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,\ \textcolor{keywordtype}{int}\ value,\ \textcolor{keywordtype}{int}\ value2);}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00127\ \ \ vector<LogData>\ log\_data;}
+\DoxyCodeLine{00128\ \};}
+\DoxyCodeLine{00129\ }
+\DoxyCodeLine{00130\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ !LOG}}
+
+\end{DoxyCode}

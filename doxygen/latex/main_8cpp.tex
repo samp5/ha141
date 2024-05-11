@@ -1,0 +1,129 @@
+\doxysection{src/main.cpp File Reference}
+\hypertarget{main_8cpp}{}\label{main_8cpp}\index{src/main.cpp@{src/main.cpp}}
+{\ttfamily \#include "{}functions.\+hpp"{}}\newline
+{\ttfamily \#include "{}log.\+hpp"{}}\newline
+{\ttfamily \#include "{}neuron.\+hpp"{}}\newline
+{\ttfamily \#include $<$pthread.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{define}} \mbox{\hyperlink{main_8cpp_a32ee58f73d9de0d1d41ad46f7bff2719}{RAND\+\_\+\+SEED}}~\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{time}}(0)
+\item 
+\#\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{define}} \mbox{\hyperlink{main_8cpp_a9e950cc4442f436447bc38d9200d4f28}{NUMBER\+\_\+\+NODES}}~6
+\item 
+\#\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{define}} \mbox{\hyperlink{main_8cpp_a7c6de1e99e85b1fb31558d9cfaccc056}{NUMBER\+\_\+\+EDGES}}~5
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{int}} \mbox{\hyperlink{main_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+ostream \& \mbox{\hyperlink{main_8cpp_ab3683118689eaffb475489c02c9f4487}{STREAM}} = cout
+\item 
+\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{pthread\+\_\+mutex\+\_\+t}} \mbox{\hyperlink{main_8cpp_a4acff8232e4aec9cd5c6dc200ac55ef3}{mutex}} = \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{PTHREAD\+\_\+\+MUTEX\+\_\+\+INITIALIZER}}
+\item 
+\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{pthread\+\_\+mutex\+\_\+t}} \mbox{\hyperlink{main_8cpp_a54baead9ac1aa7d2d2f886956ac57c1e}{log\+\_\+mutex}} = \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{PTHREAD\+\_\+\+MUTEX\+\_\+\+INITIALIZER}}
+\item 
+\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{pthread\+\_\+barrier\+\_\+t}} \mbox{\hyperlink{main_8cpp_a779bfbbb688cf46720cfb65109ea4858}{barrier}}
+\item 
+\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{volatile}} \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{double}} \mbox{\hyperlink{main_8cpp_a53a5900246dd620f740857ddc5c60575}{value}} = 0
+\item 
+\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{bool}} \mbox{\hyperlink{main_8cpp_ad24ebffc3b7cd5e04988c49fdcb80293}{finish}} = \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{false}}
+\item 
+\mbox{\hyperlink{classLog}{Log}} \mbox{\hyperlink{main_8cpp_a22f4b6a812aab67fdcabc97844fb6bed}{lg}}
+\item 
+\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{bool}} \mbox{\hyperlink{main_8cpp_a03c996f9fcf0e10baeb3e700be0c409a}{active}}
+\item 
+\mbox{\hyperlink{log_8hpp_aca1fd1d8935433e6ba2e3918214e07f9}{Log\+Level}} \mbox{\hyperlink{main_8cpp_a853c8cf2ecbe6ef4b9cc07263369dbdc}{level}} = \mbox{\hyperlink{log_8hpp_aca1fd1d8935433e6ba2e3918214e07f9ab03d2afd0c05cf9e3b1a3f60c2545b67}{DEBUG4}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{main_8cpp_a7c6de1e99e85b1fb31558d9cfaccc056}\label{main_8cpp_a7c6de1e99e85b1fb31558d9cfaccc056} 
+\index{main.cpp@{main.cpp}!NUMBER\_EDGES@{NUMBER\_EDGES}}
+\index{NUMBER\_EDGES@{NUMBER\_EDGES}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{NUMBER\_EDGES}{NUMBER\_EDGES}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{define}} NUMBER\+\_\+\+EDGES~5}
+
+\Hypertarget{main_8cpp_a9e950cc4442f436447bc38d9200d4f28}\label{main_8cpp_a9e950cc4442f436447bc38d9200d4f28} 
+\index{main.cpp@{main.cpp}!NUMBER\_NODES@{NUMBER\_NODES}}
+\index{NUMBER\_NODES@{NUMBER\_NODES}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{NUMBER\_NODES}{NUMBER\_NODES}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{define}} NUMBER\+\_\+\+NODES~6}
+
+\Hypertarget{main_8cpp_a32ee58f73d9de0d1d41ad46f7bff2719}\label{main_8cpp_a32ee58f73d9de0d1d41ad46f7bff2719} 
+\index{main.cpp@{main.cpp}!RAND\_SEED@{RAND\_SEED}}
+\index{RAND\_SEED@{RAND\_SEED}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{RAND\_SEED}{RAND\_SEED}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{define}} RAND\+\_\+\+SEED~\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{time}}(0)}
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{main_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\label{main_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+\index{main.cpp@{main.cpp}!main@{main}}
+\index{main@{main}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{int}} main (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{main_8cpp_a03c996f9fcf0e10baeb3e700be0c409a}\label{main_8cpp_a03c996f9fcf0e10baeb3e700be0c409a} 
+\index{main.cpp@{main.cpp}!active@{active}}
+\index{active@{active}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{active}{active}}
+{\footnotesize\ttfamily \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{bool}} active}
+
+\Hypertarget{main_8cpp_a779bfbbb688cf46720cfb65109ea4858}\label{main_8cpp_a779bfbbb688cf46720cfb65109ea4858} 
+\index{main.cpp@{main.cpp}!barrier@{barrier}}
+\index{barrier@{barrier}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{barrier}{barrier}}
+{\footnotesize\ttfamily \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{pthread\+\_\+barrier\+\_\+t}} barrier}
+
+\Hypertarget{main_8cpp_ad24ebffc3b7cd5e04988c49fdcb80293}\label{main_8cpp_ad24ebffc3b7cd5e04988c49fdcb80293} 
+\index{main.cpp@{main.cpp}!finish@{finish}}
+\index{finish@{finish}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{finish}{finish}}
+{\footnotesize\ttfamily \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{bool}} finish = \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{false}}}
+
+\Hypertarget{main_8cpp_a853c8cf2ecbe6ef4b9cc07263369dbdc}\label{main_8cpp_a853c8cf2ecbe6ef4b9cc07263369dbdc} 
+\index{main.cpp@{main.cpp}!level@{level}}
+\index{level@{level}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{level}{level}}
+{\footnotesize\ttfamily \mbox{\hyperlink{log_8hpp_aca1fd1d8935433e6ba2e3918214e07f9}{Log\+Level}} level = \mbox{\hyperlink{log_8hpp_aca1fd1d8935433e6ba2e3918214e07f9ab03d2afd0c05cf9e3b1a3f60c2545b67}{DEBUG4}}}
+
+\Hypertarget{main_8cpp_a22f4b6a812aab67fdcabc97844fb6bed}\label{main_8cpp_a22f4b6a812aab67fdcabc97844fb6bed} 
+\index{main.cpp@{main.cpp}!lg@{lg}}
+\index{lg@{lg}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{lg}{lg}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classLog}{Log}} lg}
+
+\Hypertarget{main_8cpp_a54baead9ac1aa7d2d2f886956ac57c1e}\label{main_8cpp_a54baead9ac1aa7d2d2f886956ac57c1e} 
+\index{main.cpp@{main.cpp}!log\_mutex@{log\_mutex}}
+\index{log\_mutex@{log\_mutex}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{log\_mutex}{log\_mutex}}
+{\footnotesize\ttfamily \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{pthread\+\_\+mutex\+\_\+t}} log\+\_\+mutex = \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{PTHREAD\+\_\+\+MUTEX\+\_\+\+INITIALIZER}}}
+
+\Hypertarget{main_8cpp_a4acff8232e4aec9cd5c6dc200ac55ef3}\label{main_8cpp_a4acff8232e4aec9cd5c6dc200ac55ef3} 
+\index{main.cpp@{main.cpp}!mutex@{mutex}}
+\index{mutex@{mutex}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{mutex}{mutex}}
+{\footnotesize\ttfamily \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{pthread\+\_\+mutex\+\_\+t}} mutex = \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{PTHREAD\+\_\+\+MUTEX\+\_\+\+INITIALIZER}}}
+
+\Hypertarget{main_8cpp_ab3683118689eaffb475489c02c9f4487}\label{main_8cpp_ab3683118689eaffb475489c02c9f4487} 
+\index{main.cpp@{main.cpp}!STREAM@{STREAM}}
+\index{STREAM@{STREAM}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{STREAM}{STREAM}}
+{\footnotesize\ttfamily ostream\& STREAM = cout}
+
+\Hypertarget{main_8cpp_a53a5900246dd620f740857ddc5c60575}\label{main_8cpp_a53a5900246dd620f740857ddc5c60575} 
+\index{main.cpp@{main.cpp}!value@{value}}
+\index{value@{value}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{value}{value}}
+{\footnotesize\ttfamily \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{volatile}} \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{double}} value = 0}
+

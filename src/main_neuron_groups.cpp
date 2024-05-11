@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
   lg.log(ESSENTIAL, "Adding synapses...");
   auto start = lg.get_time_stamp();
   // Add random edges between neurons
-  efficient_random_synapses(neuron_groups);
+  random_synapses(neuron_groups);
   auto end = lg.get_time_stamp();
   std::string msg = "Adding random synapses done: took " +
                     std::to_string(end - start) + " seconds";

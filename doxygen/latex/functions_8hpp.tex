@@ -1,0 +1,208 @@
+\doxysection{src/functions.hpp File Reference}
+\hypertarget{functions_8hpp}{}\label{functions_8hpp}\index{src/functions.hpp@{src/functions.hpp}}
+{\ttfamily \#include "{}../run\+\_\+config/toml.\+hpp"{}}\newline
+{\ttfamily \#include "{}input\+\_\+neuron.\+hpp"{}}\newline
+{\ttfamily \#include "{}log.\+hpp"{}}\newline
+{\ttfamily \#include "{}neuron.\+hpp"{}}\newline
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$filesystem$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$ostream$>$}\newline
+{\ttfamily \#include $<$pthread.\+h$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{functions_8hpp_a9fc48a6d365e419eec7e72c21c4b8dea}\label{functions_8hpp_a9fc48a6d365e419eec7e72c21c4b8dea} 
+typedef std\+::map$<$ \mbox{\hyperlink{classNeuron}{Neuron}} \texorpdfstring{$\ast$}{*}, double $>$ {\bfseries weight\+\_\+map}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{functions_8hpp_ac411b17feb9fa99fac963a821e47dc06}\label{functions_8hpp_ac411b17feb9fa99fac963a821e47dc06} 
+int {\bfseries maximum\+\_\+edges} ()
+\item 
+\Hypertarget{functions_8hpp_a10ba258a70586f45086cc56004db21e1}\label{functions_8hpp_a10ba258a70586f45086cc56004db21e1} 
+void {\bfseries check\+\_\+start\+\_\+conditions} ()
+\item 
+\Hypertarget{functions_8hpp_aad001bb171de1008b4db42c225447684}\label{functions_8hpp_aad001bb171de1008b4db42c225447684} 
+void {\bfseries destroy\+\_\+mutexes} ()
+\item 
+void \mbox{\hyperlink{functions_8hpp_a958ffc3242e8552f1eaa225dbe86ecff}{random\+\_\+synapses}} (vector$<$ \mbox{\hyperlink{classNeuronGroup}{Neuron\+Group}} \texorpdfstring{$\ast$}{*} $>$ \&groups)
+\item 
+\Hypertarget{functions_8hpp_a50c67405884b50f7c60e26abbd814221}\label{functions_8hpp_a50c67405884b50f7c60e26abbd814221} 
+void {\bfseries print\+\_\+node\+\_\+values} (vector$<$ \mbox{\hyperlink{classNeuron}{Neuron}} \texorpdfstring{$\ast$}{*} $>$ nodes)
+\item 
+\Hypertarget{functions_8hpp_a9d150489066bf1141cc6750e48309c08}\label{functions_8hpp_a9d150489066bf1141cc6750e48309c08} 
+void {\bfseries print\+\_\+time} (std\+::ostream \&os=std\+::cout)
+\item 
+\Hypertarget{functions_8hpp_af50513a4dcd39882ace756268160bc20}\label{functions_8hpp_af50513a4dcd39882ace756268160bc20} 
+double {\bfseries weight\+\_\+function} ()
+\item 
+\Hypertarget{functions_8hpp_a5b103bc5bd5facb8c2be3e86f1156fe8}\label{functions_8hpp_a5b103bc5bd5facb8c2be3e86f1156fe8} 
+int {\bfseries get\+\_\+inhibitory\+\_\+status} ()
+\item 
+\Hypertarget{functions_8hpp_ac3afe69f2ee758388bbbdbf36d932e16}\label{functions_8hpp_ac3afe69f2ee758388bbbdbf36d932e16} 
+int {\bfseries get\+\_\+neuron\+\_\+count} (const vector$<$ \mbox{\hyperlink{classNeuronGroup}{Neuron\+Group}} \texorpdfstring{$\ast$}{*} $>$ \&groups)
+\item 
+\Hypertarget{functions_8hpp_ae20d0622bd333ad582471a0ccd9755e8}\label{functions_8hpp_ae20d0622bd333ad582471a0ccd9755e8} 
+\mbox{\hyperlink{classNeuron}{Neuron}} \texorpdfstring{$\ast$}{*} {\bfseries get\+\_\+random\+\_\+neuron} (const vector$<$ \mbox{\hyperlink{classNeuronGroup}{Neuron\+Group}} \texorpdfstring{$\ast$}{*} $>$ \&group, bool input\+\_\+type\+\_\+allowed=true)
+\item 
+\Hypertarget{functions_8hpp_a489258f3b3841e7d7e5045f0c2205045}\label{functions_8hpp_a489258f3b3841e7d7e5045f0c2205045} 
+const char \texorpdfstring{$\ast$}{*} {\bfseries get\+\_\+active\+\_\+status\+\_\+string} (bool active)
+\item 
+\Hypertarget{functions_8hpp_a839362c7d235f4d3698d53b9510f31e5}\label{functions_8hpp_a839362c7d235f4d3698d53b9510f31e5} 
+\mbox{\hyperlink{structMessage}{Message}} \texorpdfstring{$\ast$}{*} {\bfseries construct\+\_\+message} (double value, \mbox{\hyperlink{classNeuron}{Neuron}} \texorpdfstring{$\ast$}{*}target)
+\item 
+\Hypertarget{functions_8hpp_a79e32918383b48c87d279ba4bc960479}\label{functions_8hpp_a79e32918383b48c87d279ba4bc960479} 
+\mbox{\hyperlink{structMessage}{Message}} \texorpdfstring{$\ast$}{*} {\bfseries construct\+\_\+message} (double value, \mbox{\hyperlink{classNeuron}{Neuron}} \texorpdfstring{$\ast$}{*}target, Message\+\_\+t type)
+\item 
+\Hypertarget{functions_8hpp_a0c57aa618fcade83ca41fdbc5645dd6b}\label{functions_8hpp_a0c57aa618fcade83ca41fdbc5645dd6b} 
+void {\bfseries print\+\_\+message} (\mbox{\hyperlink{structMessage}{Message}} \texorpdfstring{$\ast$}{*}message)
+\item 
+\Hypertarget{functions_8hpp_a73fe7f98bb68c8c41a0add4a3180cd27}\label{functions_8hpp_a73fe7f98bb68c8c41a0add4a3180cd27} 
+void \texorpdfstring{$\ast$}{*} {\bfseries send\+\_\+message\+\_\+helper} (void \texorpdfstring{$\ast$}{*}messages)
+\item 
+\Hypertarget{functions_8hpp_a929a0cea51d2e1d365894a944e92202d}\label{functions_8hpp_a929a0cea51d2e1d365894a944e92202d} 
+void {\bfseries send\+\_\+messages} (const vector$<$ \mbox{\hyperlink{structMessage}{Message}} \texorpdfstring{$\ast$}{*} $>$ \texorpdfstring{$\ast$}{*}messages)
+\item 
+\Hypertarget{functions_8hpp_ac8e9c0a4748db511a9d4323d8e9ab6e9}\label{functions_8hpp_ac8e9c0a4748db511a9d4323d8e9ab6e9} 
+void {\bfseries deallocate\+\_\+message\+\_\+vector} (const vector$<$ \mbox{\hyperlink{structMessage}{Message}} \texorpdfstring{$\ast$}{*} $>$ \texorpdfstring{$\ast$}{*}messages)
+\item 
+\Hypertarget{functions_8hpp_adbf32028b3c37a457155f634605eb226}\label{functions_8hpp_adbf32028b3c37a457155f634605eb226} 
+void \texorpdfstring{$\ast$}{*} {\bfseries decay\+\_\+helper} (void \texorpdfstring{$\ast$}{*}groups)
+\item 
+\Hypertarget{functions_8hpp_a3338948c80af3b3a8a4ec1d2963c3b05}\label{functions_8hpp_a3338948c80af3b3a8a4ec1d2963c3b05} 
+void {\bfseries decay\+\_\+neurons} (vector$<$ \mbox{\hyperlink{classNeuronGroup}{Neuron\+Group}} \texorpdfstring{$\ast$}{*} $>$ \texorpdfstring{$\ast$}{*}groups)
+\item 
+\Hypertarget{functions_8hpp_a30ac5d37c30fb174fce89fbfe0331b3b}\label{functions_8hpp_a30ac5d37c30fb174fce89fbfe0331b3b} 
+int {\bfseries parse\+\_\+command\+\_\+line\+\_\+args} (char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}argv, int argc)
+\item 
+\Hypertarget{functions_8hpp_a1ff864932c059518d5418aae1267bfe2}\label{functions_8hpp_a1ff864932c059518d5418aae1267bfe2} 
+void {\bfseries use\+\_\+base\+\_\+toml} ()
+\item 
+\Hypertarget{functions_8hpp_adfc6e1e5e6fdaf2d6fb99e8c2d88ad6b}\label{functions_8hpp_adfc6e1e5e6fdaf2d6fb99e8c2d88ad6b} 
+void {\bfseries create\+\_\+base\+\_\+toml} ()
+\item 
+\Hypertarget{functions_8hpp_afc33cb5b324236fed6d059ba1b658587}\label{functions_8hpp_afc33cb5b324236fed6d059ba1b658587} 
+int {\bfseries set\+\_\+options} (const char \texorpdfstring{$\ast$}{*}file\+\_\+name)
+\item 
+\Hypertarget{functions_8hpp_a07610d3a6787ca02aa3d340759bcb8c9}\label{functions_8hpp_a07610d3a6787ca02aa3d340759bcb8c9} 
+bool {\bfseries file\+\_\+exists} (const char \texorpdfstring{$\ast$}{*}file\+\_\+name)
+\item 
+\Hypertarget{functions_8hpp_af2a886a3d735fb4aa3c78f3ac755f45e}\label{functions_8hpp_af2a886a3d735fb4aa3c78f3ac755f45e} 
+Log\+Level {\bfseries get\+\_\+level\+\_\+from\+\_\+string} (std\+::string level)
+\item 
+\Hypertarget{functions_8hpp_a88d342d843a076c411d01db9ae07c178}\label{functions_8hpp_a88d342d843a076c411d01db9ae07c178} 
+void {\bfseries assign\+\_\+groups} (vector$<$ \mbox{\hyperlink{classNeuronGroup}{Neuron\+Group}} \texorpdfstring{$\ast$}{*} $>$ \&neuron\+\_\+groups)
+\item 
+\Hypertarget{functions_8hpp_a3b09632d9c40660916d0db4adb5ba220}\label{functions_8hpp_a3b09632d9c40660916d0db4adb5ba220} 
+void {\bfseries assign\+\_\+neuron\+\_\+types} (vector$<$ \mbox{\hyperlink{classNeuronGroup}{Neuron\+Group}} \texorpdfstring{$\ast$}{*} $>$ \&groups)
+\item 
+\Hypertarget{functions_8hpp_af67f5d39eece4d8931845ab03e5047dd}\label{functions_8hpp_af67f5d39eece4d8931845ab03e5047dd} 
+std\+::string {\bfseries io\+\_\+type\+\_\+to\+\_\+string} (Neuron\+\_\+t type)
+\item 
+\Hypertarget{functions_8hpp_a98a11df150ac4b17f94b04ec0b87c02c}\label{functions_8hpp_a98a11df150ac4b17f94b04ec0b87c02c} 
+std\+::string {\bfseries message\+\_\+type\+\_\+to\+\_\+string} (Message\+\_\+t type)
+\item 
+\Hypertarget{functions_8hpp_aeefe982f796e71824dcb8fddb021409f}\label{functions_8hpp_aeefe982f796e71824dcb8fddb021409f} 
+void {\bfseries construct\+\_\+input\+\_\+neuron\+\_\+vector} (const vector$<$ \mbox{\hyperlink{classNeuronGroup}{Neuron\+Group}} \texorpdfstring{$\ast$}{*} $>$ \&groups, vector$<$ \mbox{\hyperlink{classInputNeuron}{Input\+Neuron}} \texorpdfstring{$\ast$}{*} $>$ \&input\+\_\+neurons)
+\item 
+\Hypertarget{functions_8hpp_a1c2d669e44f2dec00fc6d9d59c2abd26}\label{functions_8hpp_a1c2d669e44f2dec00fc6d9d59c2abd26} 
+void {\bfseries get\+\_\+next\+\_\+line} (std\+::string \&line)
+\item 
+\Hypertarget{functions_8hpp_a9e05b337932fa986f9efb2a6208f8e1c}\label{functions_8hpp_a9e05b337932fa986f9efb2a6208f8e1c} 
+void {\bfseries set\+\_\+next\+\_\+line} (const vector$<$ \mbox{\hyperlink{classInputNeuron}{Input\+Neuron}} \texorpdfstring{$\ast$}{*} $>$ \&input\+\_\+neurons)
+\item 
+\Hypertarget{functions_8hpp_ae954db11a2df56cba232707afcb8e1df}\label{functions_8hpp_ae954db11a2df56cba232707afcb8e1df} 
+void {\bfseries set\+\_\+line\+\_\+x} (const vector$<$ \mbox{\hyperlink{classInputNeuron}{Input\+Neuron}} \texorpdfstring{$\ast$}{*} $>$ \&input\+\_\+neurons, int target)
+\item 
+\Hypertarget{functions_8hpp_afee4324eb2cdfc8c63ef9eb1b1bc5dcd}\label{functions_8hpp_afee4324eb2cdfc8c63ef9eb1b1bc5dcd} 
+void {\bfseries get\+\_\+line\+\_\+x} (std\+::string \&line, int target)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{functions_8hpp_a22f4b6a812aab67fdcabc97844fb6bed}\label{functions_8hpp_a22f4b6a812aab67fdcabc97844fb6bed} 
+\mbox{\hyperlink{classLog}{Log}} {\bfseries lg}
+\item 
+\Hypertarget{functions_8hpp_a03c996f9fcf0e10baeb3e700be0c409a}\label{functions_8hpp_a03c996f9fcf0e10baeb3e700be0c409a} 
+bool {\bfseries active}
+\item 
+\Hypertarget{functions_8hpp_a4645aa981c557daeee051849d694cc52}\label{functions_8hpp_a4645aa981c557daeee051849d694cc52} 
+int {\bfseries WAIT\+\_\+\+TIME}
+\item 
+\Hypertarget{functions_8hpp_a8c86881a0fc53aba524b8224f05493b1}\label{functions_8hpp_a8c86881a0fc53aba524b8224f05493b1} 
+int {\bfseries WAIT\+\_\+\+LOOPS}
+\item 
+\Hypertarget{functions_8hpp_ab5a8ee6404d7949cc2978dfa6118ac54}\label{functions_8hpp_ab5a8ee6404d7949cc2978dfa6118ac54} 
+double {\bfseries DECAY\+\_\+\+VALUE}
+\item 
+\Hypertarget{functions_8hpp_a510a833df2ebbe8d35e0529a1e1f1ddc}\label{functions_8hpp_a510a833df2ebbe8d35e0529a1e1f1ddc} 
+int {\bfseries RAND\+\_\+\+SEED}
+\item 
+\Hypertarget{functions_8hpp_a9b21b166679aef979dd4aeb2c0465611}\label{functions_8hpp_a9b21b166679aef979dd4aeb2c0465611} 
+int {\bfseries NUMBER\+\_\+\+NEURONS}
+\item 
+\Hypertarget{functions_8hpp_a19fa25415a9fc70d8ffc218fe8703a88}\label{functions_8hpp_a19fa25415a9fc70d8ffc218fe8703a88} 
+int {\bfseries NUMBER\+\_\+\+EDGES}
+\item 
+\Hypertarget{functions_8hpp_a4b50ef4335f57a8db1789309666417bb}\label{functions_8hpp_a4b50ef4335f57a8db1789309666417bb} 
+int {\bfseries NUMBER\+\_\+\+GROUPS}
+\item 
+\Hypertarget{functions_8hpp_af170cb5cc9cc03efa7bce2dc79a9a176}\label{functions_8hpp_af170cb5cc9cc03efa7bce2dc79a9a176} 
+unsigned long {\bfseries RUN\+\_\+\+TIME}
+\item 
+\Hypertarget{functions_8hpp_ab3683118689eaffb475489c02c9f4487}\label{functions_8hpp_ab3683118689eaffb475489c02c9f4487} 
+ostream \& {\bfseries STREAM}
+\item 
+\Hypertarget{functions_8hpp_a34b43b8903e8d472977e07078f605819}\label{functions_8hpp_a34b43b8903e8d472977e07078f605819} 
+int {\bfseries INITIAL\+\_\+\+MEMBRANE\+\_\+\+POTENTIAL}
+\item 
+\Hypertarget{functions_8hpp_a0f6b9abfac3845623e9b4ff9900b6b5f}\label{functions_8hpp_a0f6b9abfac3845623e9b4ff9900b6b5f} 
+int {\bfseries ACTIVATION\+\_\+\+THRESHOLD}
+\item 
+\Hypertarget{functions_8hpp_afb5c7793fc3335b257fc99e340b0b31a}\label{functions_8hpp_afb5c7793fc3335b257fc99e340b0b31a} 
+int {\bfseries REFRACTORY\+\_\+\+MEMBRANE\+\_\+\+POTENTIAL}
+\item 
+\Hypertarget{functions_8hpp_a83dff06d59b8d2759dfee2f8d236b0d6}\label{functions_8hpp_a83dff06d59b8d2759dfee2f8d236b0d6} 
+int {\bfseries NUMBER\+\_\+\+INPUT\+\_\+\+NEURONS}
+\item 
+\Hypertarget{functions_8hpp_a2402d01265d5bd81590c350d075846e8}\label{functions_8hpp_a2402d01265d5bd81590c350d075846e8} 
+double {\bfseries TAU}
+\item 
+\Hypertarget{functions_8hpp_a88a124fa808ae77cee46cd7f4391fce0}\label{functions_8hpp_a88a124fa808ae77cee46cd7f4391fce0} 
+double {\bfseries INPUT\+\_\+\+PROB\+\_\+\+SUCCESS}
+\item 
+\Hypertarget{functions_8hpp_a86d6ef38591b96ed64798a7cf83b6b23}\label{functions_8hpp_a86d6ef38591b96ed64798a7cf83b6b23} 
+double {\bfseries REFRACTORY\+\_\+\+DURATION}
+\item 
+\Hypertarget{functions_8hpp_ad6e76a995cf9d782a498741a4ce293e6}\label{functions_8hpp_ad6e76a995cf9d782a498741a4ce293e6} 
+std\+::string {\bfseries INPUT\+\_\+\+FILE}
+\item 
+\Hypertarget{functions_8hpp_af126a949d32adc9eb6dcd427e79a100a}\label{functions_8hpp_af126a949d32adc9eb6dcd427e79a100a} 
+std\+::string {\bfseries CONFIG\+\_\+\+FILE}
+\item 
+\Hypertarget{functions_8hpp_a40c183c30bb060b64326e95948c4644a}\label{functions_8hpp_a40c183c30bb060b64326e95948c4644a} 
+vector$<$ int $>$ {\bfseries STIMULUS\+\_\+\+VEC}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{functions_8hpp_a958ffc3242e8552f1eaa225dbe86ecff}\label{functions_8hpp_a958ffc3242e8552f1eaa225dbe86ecff} 
+\index{functions.hpp@{functions.hpp}!random\_synapses@{random\_synapses}}
+\index{random\_synapses@{random\_synapses}!functions.hpp@{functions.hpp}}
+\doxysubsubsection{\texorpdfstring{random\_synapses()}{random\_synapses()}}
+{\footnotesize\ttfamily void random\+\_\+synapses (\begin{DoxyParamCaption}\item[{vector$<$ \mbox{\hyperlink{classNeuronGroup}{Neuron\+Group}} \texorpdfstring{$\ast$}{*} $>$ \&}]{groups }\end{DoxyParamCaption})}
+
+Assign random neighbors to all nodes in vector Reflexive edges and duplicate edges are not allowed.
+
+Edge weightes are randomly generated and are between \mbox{[}0, 1\mbox{]}
+
+
+\begin{DoxyParams}{Parameters}
+{\em groups} & vector of \doxylink{classNeuron}{Neuron} pointers \\
+\hline
+\end{DoxyParams}

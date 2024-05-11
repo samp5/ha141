@@ -108,7 +108,12 @@ public:
   void join_thread();
 
   //>>>>>>>>>>>>>> Access to private variables <<<<<<<<<<<
+
+  /*!
+   * Returns the value of the the `pthread_t` thread id
+   */
   pthread_t get_thread_id() { return thread; }
+
   pthread_cond_t *get_cond() { return &cond; }
   double get_last_decay() { return this->last_decay; }
   const vector<Synapse *> &getPostSynaptic() const {

@@ -1,0 +1,154 @@
+\doxysection{neuron.\+hpp}
+\hypertarget{neuron_8hpp_source}{}\label{neuron_8hpp_source}\index{src/neuron.hpp@{src/neuron.hpp}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ NEURON}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ NEURON}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}log.hpp"{}}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ "{}message.hpp"{}}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ "{}neuron\_group.hpp"{}}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ "{}synapse.hpp"{}}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ <list>}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ <map>}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ <pthread.h>}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#include\ <unistd.h>}}
+\DoxyCodeLine{00013\ }
+\DoxyCodeLine{00014\ \textcolor{keyword}{using\ }std::cout;}
+\DoxyCodeLine{00015\ \textcolor{keyword}{using\ }std::list;}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \textcolor{keyword}{extern}\ pthread\_mutex\_t\ potential\_mutex;}
+\DoxyCodeLine{00018\ \textcolor{keyword}{extern}\ pthread\_mutex\_t\ message\_mutex;}
+\DoxyCodeLine{00019\ \textcolor{keyword}{extern}\ pthread\_mutex\_t\ activation\_mutex;}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{keyword}{extern}\ \textcolor{keyword}{volatile}\ \textcolor{keywordtype}{double}\ value;}
+\DoxyCodeLine{00022\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{bool}\ finish;}
+\DoxyCodeLine{00023\ \textcolor{keyword}{extern}\ pthread\_barrier\_t\ barrier;}
+\DoxyCodeLine{00024\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{classLog}{Log}}\ lg;}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{double}\ DECAY\_VALUE;}
+\DoxyCodeLine{00027\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{double}\ TAU;}
+\DoxyCodeLine{00028\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{int}\ INITIAL\_MEMBRANE\_POTENTIAL;}
+\DoxyCodeLine{00029\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{int}\ ACTIVATION\_THRESHOLD;}
+\DoxyCodeLine{00030\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{int}\ REFRACTORY\_MEMBRANE\_POTENTIAL;}
+\DoxyCodeLine{00031\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{double}\ REFRACTORY\_DURATION;}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classNeuronGroup}{NeuronGroup}};}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \textcolor{keyword}{enum}\ Neuron\_t\ \{\ None\ =\ 0,\ Input\ =\ 1,\ Hidden\ =\ 2,\ Output\ =\ 3\ \};}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classNeuron}{Neuron}}\ \{}
+\DoxyCodeLine{00038\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{00039\ \ \ vector<LogData\ *>\ log\_data;}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \ \ \textcolor{comment}{//\ Neuron\ vaules}}
+\DoxyCodeLine{00042\ \ \ \textcolor{keywordtype}{double}\ membrane\_potential\ =\ INITIAL\_MEMBRANE\_POTENTIAL;}
+\DoxyCodeLine{00043\ \ \ \textcolor{keywordtype}{int}\ excit\_inhib\_value;}
+\DoxyCodeLine{00044\ \ \ \textcolor{keywordtype}{int}\ id;}
+\DoxyCodeLine{00045\ \ \ Neuron\_t\ type;}
+\DoxyCodeLine{00046\ \ \ \mbox{\hyperlink{classNeuronGroup}{NeuronGroup}}\ *group;}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \textcolor{comment}{//\ timestamp\ data}}
+\DoxyCodeLine{00049\ \ \ \textcolor{keywordtype}{double}\ last\_decay;}
+\DoxyCodeLine{00050\ \ \ \textcolor{keywordtype}{double}\ refractory\_start\ =\ 0.0;}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \textcolor{comment}{//\ Edge\ values}}
+\DoxyCodeLine{00053\ \ \ vector<Synapse\ *>\ PostSynapticConnnections;}
+\DoxyCodeLine{00054\ \ \ vector<Synapse\ *>\ PreSynapticConnections;}
+\DoxyCodeLine{00055\ \ \ \textcolor{keyword}{typedef}\ std::map<Neuron\ *,\ double>\ weight\_map;}
+\DoxyCodeLine{00056\ \ \ weight\_map\ \_postsynaptic;}
+\DoxyCodeLine{00057\ \ \ weight\_map\ \_presynaptic;}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \ \ \textcolor{comment}{//\ pthread\ values}}
+\DoxyCodeLine{00060\ \ \ pthread\_t\ thread;}
+\DoxyCodeLine{00061\ \ \ pthread\_cond\_t\ cond\ =\ PTHREAD\_COND\_INITIALIZER;}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \ \ \textcolor{comment}{//\ Conditional\ execution\ values}}
+\DoxyCodeLine{00064\ \ \ \textcolor{keywordtype}{bool}\ active\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00065\ \ \ \textcolor{keywordtype}{bool}\ recieved\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ \textcolor{comment}{//\ message\ list}}
+\DoxyCodeLine{00068\ \ \ list<Message\ *>\ messages;}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00071\ \ \ \mbox{\hyperlink{classNeuron}{Neuron}}(\textcolor{keywordtype}{int}\ \_id,\ \textcolor{keywordtype}{int}\ inhibitory);}
+\DoxyCodeLine{00072\ \ \ \mbox{\hyperlink{classNeuron}{Neuron}}(\textcolor{keywordtype}{int}\ \_id,\ \textcolor{keywordtype}{int}\ inhibitory,\ \mbox{\hyperlink{classNeuronGroup}{NeuronGroup}}\ *group,\ Neuron\_t\ type);}
+\DoxyCodeLine{00073\ \ \ \mbox{\hyperlink{classNeuron}{Neuron}}(\textcolor{keywordtype}{int}\ \_id,\ \textcolor{keywordtype}{int}\ inhibitory,\ \mbox{\hyperlink{classNeuronGroup}{NeuronGroup}}\ *group);}
+\DoxyCodeLine{00074\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classNeuron}{\string~Neuron}}();}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \ \ \textcolor{keywordtype}{void}\ add\_neighbor(\mbox{\hyperlink{classNeuron}{Neuron}}\ *neighbor,\ \textcolor{keywordtype}{double}\ weight);}
+\DoxyCodeLine{00077\ \ \ \textcolor{keywordtype}{void}\ add\_next(\mbox{\hyperlink{classNeuron}{Neuron}}\ *neighbor,\ \textcolor{keywordtype}{double}\ weight);}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \textcolor{keywordtype}{void}\ addPostSynapticConnection(\mbox{\hyperlink{classSynapse}{Synapse}}\ *synapse);}
+\DoxyCodeLine{00080\ \ \ \textcolor{keywordtype}{void}\ addPreSynapticConnnection(\mbox{\hyperlink{classSynapse}{Synapse}}\ *synapse);}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \ \ \textcolor{keywordtype}{void}\ add\_previous(\mbox{\hyperlink{classNeuron}{Neuron}}\ *neighbor,\ \textcolor{keywordtype}{double}\ weight);}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \textcolor{comment}{//\ Running\ and\ messaging}}
+\DoxyCodeLine{00085\ \ \ \textcolor{keywordtype}{void}\ *run();}
+\DoxyCodeLine{00086\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ run\_in\_group();}
+\DoxyCodeLine{00087\ \ \ \textcolor{keywordtype}{int}\ recieve\_in\_group();}
+\DoxyCodeLine{00088\ \ \ \textcolor{keywordtype}{int}\ check\_run\_conditions();}
+\DoxyCodeLine{00089\ \ \ \textcolor{keywordtype}{void}\ add\_message(\mbox{\hyperlink{structMessage}{Message}}\ *);}
+\DoxyCodeLine{00090\ \ \ \mbox{\hyperlink{structMessage}{Message}}\ *get\_message();}
+\DoxyCodeLine{00091\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ send\_messages\_in\_group();}
+\DoxyCodeLine{00092\ \ \ vector<Synapse\ *>\ \&getSynapses()\ \{\ \textcolor{keywordflow}{return}\ this-\/>PostSynapticConnnections;\ \}}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \ \ \textcolor{comment}{//\ State\ operations}}
+\DoxyCodeLine{00095\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ reset();}
+\DoxyCodeLine{00096\ \ \ \textcolor{keywordtype}{void}\ refractory();}
+\DoxyCodeLine{00097\ \ \ \textcolor{keywordtype}{void}\ set\_type(Neuron\_t\ type);}
+\DoxyCodeLine{00098\ \ \ \textcolor{keywordtype}{void}\ activate();}
+\DoxyCodeLine{00099\ \ \ \textcolor{keywordtype}{void}\ deactivate();}
+\DoxyCodeLine{00100\ \ \ \textcolor{keywordtype}{double}\ decay(\textcolor{keywordtype}{double}\ timestamp,\ \textcolor{keywordtype}{double}\ tau\ =\ TAU,}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ v\_rest\ =\ REFRACTORY\_MEMBRANE\_POTENTIAL);}
+\DoxyCodeLine{00102\ \ \ \textcolor{keywordtype}{void}\ retroactive\_decay(\textcolor{keywordtype}{double}\ from,\ \textcolor{keywordtype}{double}\ to,\ \textcolor{keywordtype}{double}\ tau\ =\ TAU,}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ v\_rest\ =\ REFRACTORY\_MEMBRANE\_POTENTIAL);}
+\DoxyCodeLine{00104\ \ \ \textcolor{keywordtype}{void}\ update\_potential(\textcolor{keywordtype}{double}\ value);}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \ \ \textcolor{comment}{//\ Thread\ operations}}
+\DoxyCodeLine{00107\ \ \ \textcolor{keywordtype}{void}\ start\_thread();}
+\DoxyCodeLine{00108\ \ \ \textcolor{keywordtype}{void}\ join\_thread();}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \ \ \textcolor{comment}{//>>>>>>>>>>>>>>\ Access\ to\ private\ variables\ <<<<<<<<<<<}}
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00115\ \ \ pthread\_t\ \mbox{\hyperlink{classNeuron_a2298baa28cc0ba5ea86b86808be231af}{get\_thread\_id}}()\ \{\ \textcolor{keywordflow}{return}\ thread;\ \}}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \ \ pthread\_cond\_t\ *get\_cond()\ \{\ \textcolor{keywordflow}{return}\ \&cond;\ \}}
+\DoxyCodeLine{00118\ \ \ \textcolor{keywordtype}{double}\ get\_last\_decay()\ \{\ \textcolor{keywordflow}{return}\ this-\/>last\_decay;\ \}}
+\DoxyCodeLine{00119\ \ \ \textcolor{keyword}{const}\ vector<Synapse\ *>\ \&getPostSynaptic()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00120\ \ \ \ \ \textcolor{keywordflow}{return}\ this-\/>PostSynapticConnnections;}
+\DoxyCodeLine{00121\ \ \ \}}
+\DoxyCodeLine{00122\ \ \ \textcolor{keyword}{const}\ vector<Synapse\ *>\ \&getPresynaptic()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00123\ \ \ \ \ \textcolor{keywordflow}{return}\ this-\/>PreSynapticConnections;}
+\DoxyCodeLine{00124\ \ \ \}}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ \ \ \textcolor{comment}{//\ returns\ the\ IO\ type\ of\ the\ neuron}}
+\DoxyCodeLine{00127\ \ \ Neuron\_t\ get\_type()\ \{\ \textcolor{keywordflow}{return}\ this-\/>type;\ \}}
+\DoxyCodeLine{00128\ \ \ \textcolor{keywordtype}{int}\ get\_id()\ \{\ \textcolor{keywordflow}{return}\ id;\ \}}
+\DoxyCodeLine{00129\ \ \ \textcolor{keywordtype}{double}\ get\_potential();}
+\DoxyCodeLine{00130\ \ \ \textcolor{keyword}{const}\ list<Message\ *>\ \&get\_message\_vector();}
+\DoxyCodeLine{00131\ \ \ \textcolor{keyword}{const}\ weight\_map\ *get\_presynaptic()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00132\ \ \ \textcolor{keyword}{const}\ weight\_map\ *get\_postsynaptic()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00133\ \ \ \mbox{\hyperlink{classNeuronGroup}{NeuronGroup}}\ *get\_group();}
+\DoxyCodeLine{00134\ \ \ \textcolor{keywordtype}{bool}\ is\_activated()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00135\ \ \ \textcolor{keywordtype}{int}\ getBias()\ \{\ \textcolor{keywordflow}{return}\ this-\/>excit\_inhib\_value;\ \}}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \ \ \textcolor{comment}{//\ log\ operations}}
+\DoxyCodeLine{00138\ \ \ \textcolor{keywordtype}{void}\ push\_back\_data(\mbox{\hyperlink{structLogData}{LogData}}\ *data)\ \{\ this-\/>log\_data.push\_back(data);\ \}}
+\DoxyCodeLine{00139\ \ \ \textcolor{keywordtype}{void}\ transfer\_data();}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00141\ \ \ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*\(\backslash\)}}
+\DoxyCodeLine{00142\ \textcolor{comment}{\ \ \ *\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Thread\ helper:}}
+\DoxyCodeLine{00143\ \textcolor{comment}{\ \ \ *\ \ \ \ POSIX\ needs\ a\ void*\ (*)(void*)\ function\ signature}}
+\DoxyCodeLine{00144\ \textcolor{comment}{\ \ \ *\ \ \ \ This\ function\ allows\ us\ to\ use\ the\ run()\ member\ funciton}}
+\DoxyCodeLine{00145\ \textcolor{comment}{\ \ \(\backslash\)-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00146\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ *thread\_helper(\textcolor{keywordtype}{void}\ *instance)\ \{}
+\DoxyCodeLine{00147\ \ \ \ \ \textcolor{keywordflow}{return}\ ((\mbox{\hyperlink{classNeuron}{Neuron}}\ *)instance)-\/>run();}
+\DoxyCodeLine{00148\ \ \ \}}
+\DoxyCodeLine{00149\ \};}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ !NEURON}}
+
+\end{DoxyCode}

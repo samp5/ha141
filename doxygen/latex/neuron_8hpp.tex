@@ -1,0 +1,162 @@
+\doxysection{src/neuron.hpp File Reference}
+\hypertarget{neuron_8hpp}{}\label{neuron_8hpp}\index{src/neuron.hpp@{src/neuron.hpp}}
+{\ttfamily \#include "{}log.\+hpp"{}}\newline
+{\ttfamily \#include "{}message.\+hpp"{}}\newline
+{\ttfamily \#include "{}neuron\+\_\+group.\+hpp"{}}\newline
+{\ttfamily \#include "{}synapse.\+hpp"{}}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$list$>$}\newline
+{\ttfamily \#include $<$map$>$}\newline
+{\ttfamily \#include $<$pthread.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classNeuron}{Neuron}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{neuron_8hpp_af3c0f8866699cbcabbaba758cc3d027e}{Neuron\+\_\+t}} \{ \mbox{\hyperlink{neuron_8hpp_af3c0f8866699cbcabbaba758cc3d027eac9d3e887722f2bc482bcca9d41c512af}{None}} = 0
+, \mbox{\hyperlink{neuron_8hpp_af3c0f8866699cbcabbaba758cc3d027eabd62348391d75c7fc8c130ea346cba29}{Input}} = 1
+, \mbox{\hyperlink{neuron_8hpp_af3c0f8866699cbcabbaba758cc3d027eacf46e529658ebc6532c204f3246929f4}{Hidden}} = 2
+, \mbox{\hyperlink{neuron_8hpp_af3c0f8866699cbcabbaba758cc3d027eae18e94624772459b0083ef7cc362fc96}{Output}} = 3
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{pthread\+\_\+mutex\+\_\+t}} \mbox{\hyperlink{neuron_8hpp_ac332962574fca35aced1de069d6c3201}{potential\+\_\+mutex}}
+\item 
+\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{pthread\+\_\+mutex\+\_\+t}} \mbox{\hyperlink{neuron_8hpp_ac50582e3f690b1bad285c668ff0c97da}{message\+\_\+mutex}}
+\item 
+\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{pthread\+\_\+mutex\+\_\+t}} \mbox{\hyperlink{neuron_8hpp_a8b19a68e41b5efebd71fef7e03e42dff}{activation\+\_\+mutex}}
+\item 
+\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{volatile}} \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{double}} \mbox{\hyperlink{neuron_8hpp_a53a5900246dd620f740857ddc5c60575}{value}}
+\item 
+\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{bool}} \mbox{\hyperlink{neuron_8hpp_ad24ebffc3b7cd5e04988c49fdcb80293}{finish}}
+\item 
+\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{pthread\+\_\+barrier\+\_\+t}} \mbox{\hyperlink{neuron_8hpp_a779bfbbb688cf46720cfb65109ea4858}{barrier}}
+\item 
+\mbox{\hyperlink{classLog}{Log}} \mbox{\hyperlink{neuron_8hpp_a22f4b6a812aab67fdcabc97844fb6bed}{lg}}
+\item 
+\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{double}} \mbox{\hyperlink{neuron_8hpp_ab5a8ee6404d7949cc2978dfa6118ac54}{DECAY\+\_\+\+VALUE}}
+\item 
+\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{double}} \mbox{\hyperlink{neuron_8hpp_a2402d01265d5bd81590c350d075846e8}{TAU}}
+\item 
+\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{int}} \mbox{\hyperlink{neuron_8hpp_a34b43b8903e8d472977e07078f605819}{INITIAL\+\_\+\+MEMBRANE\+\_\+\+POTENTIAL}}
+\item 
+\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{int}} \mbox{\hyperlink{neuron_8hpp_a0f6b9abfac3845623e9b4ff9900b6b5f}{ACTIVATION\+\_\+\+THRESHOLD}}
+\item 
+\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{int}} \mbox{\hyperlink{neuron_8hpp_afb5c7793fc3335b257fc99e340b0b31a}{REFRACTORY\+\_\+\+MEMBRANE\+\_\+\+POTENTIAL}}
+\item 
+\mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{double}} \mbox{\hyperlink{neuron_8hpp_a86d6ef38591b96ed64798a7cf83b6b23}{REFRACTORY\+\_\+\+DURATION}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{neuron_8hpp_af3c0f8866699cbcabbaba758cc3d027e}\label{neuron_8hpp_af3c0f8866699cbcabbaba758cc3d027e} 
+\index{neuron.hpp@{neuron.hpp}!Neuron\_t@{Neuron\_t}}
+\index{Neuron\_t@{Neuron\_t}!neuron.hpp@{neuron.hpp}}
+\doxysubsubsection{\texorpdfstring{Neuron\_t}{Neuron\_t}}
+{\footnotesize\ttfamily \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{enum}} \mbox{\hyperlink{neuron_8hpp_af3c0f8866699cbcabbaba758cc3d027e}{Neuron\+\_\+t}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{None@{None}!neuron.hpp@{neuron.hpp}}\index{neuron.hpp@{neuron.hpp}!None@{None}}}\Hypertarget{neuron_8hpp_af3c0f8866699cbcabbaba758cc3d027eac9d3e887722f2bc482bcca9d41c512af}\label{neuron_8hpp_af3c0f8866699cbcabbaba758cc3d027eac9d3e887722f2bc482bcca9d41c512af} 
+None&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Input@{Input}!neuron.hpp@{neuron.hpp}}\index{neuron.hpp@{neuron.hpp}!Input@{Input}}}\Hypertarget{neuron_8hpp_af3c0f8866699cbcabbaba758cc3d027eabd62348391d75c7fc8c130ea346cba29}\label{neuron_8hpp_af3c0f8866699cbcabbaba758cc3d027eabd62348391d75c7fc8c130ea346cba29} 
+Input&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Hidden@{Hidden}!neuron.hpp@{neuron.hpp}}\index{neuron.hpp@{neuron.hpp}!Hidden@{Hidden}}}\Hypertarget{neuron_8hpp_af3c0f8866699cbcabbaba758cc3d027eacf46e529658ebc6532c204f3246929f4}\label{neuron_8hpp_af3c0f8866699cbcabbaba758cc3d027eacf46e529658ebc6532c204f3246929f4} 
+Hidden&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Output@{Output}!neuron.hpp@{neuron.hpp}}\index{neuron.hpp@{neuron.hpp}!Output@{Output}}}\Hypertarget{neuron_8hpp_af3c0f8866699cbcabbaba758cc3d027eae18e94624772459b0083ef7cc362fc96}\label{neuron_8hpp_af3c0f8866699cbcabbaba758cc3d027eae18e94624772459b0083ef7cc362fc96} 
+Output&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{neuron_8hpp_a8b19a68e41b5efebd71fef7e03e42dff}\label{neuron_8hpp_a8b19a68e41b5efebd71fef7e03e42dff} 
+\index{neuron.hpp@{neuron.hpp}!activation\_mutex@{activation\_mutex}}
+\index{activation\_mutex@{activation\_mutex}!neuron.hpp@{neuron.hpp}}
+\doxysubsubsection{\texorpdfstring{activation\_mutex}{activation\_mutex}}
+{\footnotesize\ttfamily \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{pthread\+\_\+mutex\+\_\+t}} activation\+\_\+mutex\hspace{0.3cm}{\ttfamily [extern]}}
+
+\Hypertarget{neuron_8hpp_a0f6b9abfac3845623e9b4ff9900b6b5f}\label{neuron_8hpp_a0f6b9abfac3845623e9b4ff9900b6b5f} 
+\index{neuron.hpp@{neuron.hpp}!ACTIVATION\_THRESHOLD@{ACTIVATION\_THRESHOLD}}
+\index{ACTIVATION\_THRESHOLD@{ACTIVATION\_THRESHOLD}!neuron.hpp@{neuron.hpp}}
+\doxysubsubsection{\texorpdfstring{ACTIVATION\_THRESHOLD}{ACTIVATION\_THRESHOLD}}
+{\footnotesize\ttfamily \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{int}} ACTIVATION\+\_\+\+THRESHOLD\hspace{0.3cm}{\ttfamily [extern]}}
+
+\Hypertarget{neuron_8hpp_a779bfbbb688cf46720cfb65109ea4858}\label{neuron_8hpp_a779bfbbb688cf46720cfb65109ea4858} 
+\index{neuron.hpp@{neuron.hpp}!barrier@{barrier}}
+\index{barrier@{barrier}!neuron.hpp@{neuron.hpp}}
+\doxysubsubsection{\texorpdfstring{barrier}{barrier}}
+{\footnotesize\ttfamily \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{pthread\+\_\+barrier\+\_\+t}} barrier\hspace{0.3cm}{\ttfamily [extern]}}
+
+\Hypertarget{neuron_8hpp_ab5a8ee6404d7949cc2978dfa6118ac54}\label{neuron_8hpp_ab5a8ee6404d7949cc2978dfa6118ac54} 
+\index{neuron.hpp@{neuron.hpp}!DECAY\_VALUE@{DECAY\_VALUE}}
+\index{DECAY\_VALUE@{DECAY\_VALUE}!neuron.hpp@{neuron.hpp}}
+\doxysubsubsection{\texorpdfstring{DECAY\_VALUE}{DECAY\_VALUE}}
+{\footnotesize\ttfamily \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{double}} DECAY\+\_\+\+VALUE\hspace{0.3cm}{\ttfamily [extern]}}
+
+\Hypertarget{neuron_8hpp_ad24ebffc3b7cd5e04988c49fdcb80293}\label{neuron_8hpp_ad24ebffc3b7cd5e04988c49fdcb80293} 
+\index{neuron.hpp@{neuron.hpp}!finish@{finish}}
+\index{finish@{finish}!neuron.hpp@{neuron.hpp}}
+\doxysubsubsection{\texorpdfstring{finish}{finish}}
+{\footnotesize\ttfamily \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{bool}} finish\hspace{0.3cm}{\ttfamily [extern]}}
+
+\Hypertarget{neuron_8hpp_a34b43b8903e8d472977e07078f605819}\label{neuron_8hpp_a34b43b8903e8d472977e07078f605819} 
+\index{neuron.hpp@{neuron.hpp}!INITIAL\_MEMBRANE\_POTENTIAL@{INITIAL\_MEMBRANE\_POTENTIAL}}
+\index{INITIAL\_MEMBRANE\_POTENTIAL@{INITIAL\_MEMBRANE\_POTENTIAL}!neuron.hpp@{neuron.hpp}}
+\doxysubsubsection{\texorpdfstring{INITIAL\_MEMBRANE\_POTENTIAL}{INITIAL\_MEMBRANE\_POTENTIAL}}
+{\footnotesize\ttfamily \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{int}} INITIAL\+\_\+\+MEMBRANE\+\_\+\+POTENTIAL\hspace{0.3cm}{\ttfamily [extern]}}
+
+\Hypertarget{neuron_8hpp_a22f4b6a812aab67fdcabc97844fb6bed}\label{neuron_8hpp_a22f4b6a812aab67fdcabc97844fb6bed} 
+\index{neuron.hpp@{neuron.hpp}!lg@{lg}}
+\index{lg@{lg}!neuron.hpp@{neuron.hpp}}
+\doxysubsubsection{\texorpdfstring{lg}{lg}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classLog}{Log}} lg\hspace{0.3cm}{\ttfamily [extern]}}
+
+\Hypertarget{neuron_8hpp_ac50582e3f690b1bad285c668ff0c97da}\label{neuron_8hpp_ac50582e3f690b1bad285c668ff0c97da} 
+\index{neuron.hpp@{neuron.hpp}!message\_mutex@{message\_mutex}}
+\index{message\_mutex@{message\_mutex}!neuron.hpp@{neuron.hpp}}
+\doxysubsubsection{\texorpdfstring{message\_mutex}{message\_mutex}}
+{\footnotesize\ttfamily \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{pthread\+\_\+mutex\+\_\+t}} message\+\_\+mutex\hspace{0.3cm}{\ttfamily [extern]}}
+
+\Hypertarget{neuron_8hpp_ac332962574fca35aced1de069d6c3201}\label{neuron_8hpp_ac332962574fca35aced1de069d6c3201} 
+\index{neuron.hpp@{neuron.hpp}!potential\_mutex@{potential\_mutex}}
+\index{potential\_mutex@{potential\_mutex}!neuron.hpp@{neuron.hpp}}
+\doxysubsubsection{\texorpdfstring{potential\_mutex}{potential\_mutex}}
+{\footnotesize\ttfamily \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{pthread\+\_\+mutex\+\_\+t}} potential\+\_\+mutex\hspace{0.3cm}{\ttfamily [extern]}}
+
+\Hypertarget{neuron_8hpp_a86d6ef38591b96ed64798a7cf83b6b23}\label{neuron_8hpp_a86d6ef38591b96ed64798a7cf83b6b23} 
+\index{neuron.hpp@{neuron.hpp}!REFRACTORY\_DURATION@{REFRACTORY\_DURATION}}
+\index{REFRACTORY\_DURATION@{REFRACTORY\_DURATION}!neuron.hpp@{neuron.hpp}}
+\doxysubsubsection{\texorpdfstring{REFRACTORY\_DURATION}{REFRACTORY\_DURATION}}
+{\footnotesize\ttfamily \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{double}} REFRACTORY\+\_\+\+DURATION\hspace{0.3cm}{\ttfamily [extern]}}
+
+\Hypertarget{neuron_8hpp_afb5c7793fc3335b257fc99e340b0b31a}\label{neuron_8hpp_afb5c7793fc3335b257fc99e340b0b31a} 
+\index{neuron.hpp@{neuron.hpp}!REFRACTORY\_MEMBRANE\_POTENTIAL@{REFRACTORY\_MEMBRANE\_POTENTIAL}}
+\index{REFRACTORY\_MEMBRANE\_POTENTIAL@{REFRACTORY\_MEMBRANE\_POTENTIAL}!neuron.hpp@{neuron.hpp}}
+\doxysubsubsection{\texorpdfstring{REFRACTORY\_MEMBRANE\_POTENTIAL}{REFRACTORY\_MEMBRANE\_POTENTIAL}}
+{\footnotesize\ttfamily \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{int}} REFRACTORY\+\_\+\+MEMBRANE\+\_\+\+POTENTIAL\hspace{0.3cm}{\ttfamily [extern]}}
+
+\Hypertarget{neuron_8hpp_a2402d01265d5bd81590c350d075846e8}\label{neuron_8hpp_a2402d01265d5bd81590c350d075846e8} 
+\index{neuron.hpp@{neuron.hpp}!TAU@{TAU}}
+\index{TAU@{TAU}!neuron.hpp@{neuron.hpp}}
+\doxysubsubsection{\texorpdfstring{TAU}{TAU}}
+{\footnotesize\ttfamily \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{double}} TAU\hspace{0.3cm}{\ttfamily [extern]}}
+
+\Hypertarget{neuron_8hpp_a53a5900246dd620f740857ddc5c60575}\label{neuron_8hpp_a53a5900246dd620f740857ddc5c60575} 
+\index{neuron.hpp@{neuron.hpp}!value@{value}}
+\index{value@{value}!neuron.hpp@{neuron.hpp}}
+\doxysubsubsection{\texorpdfstring{value}{value}}
+{\footnotesize\ttfamily \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{volatile}} \mbox{\hyperlink{log_8hpp_a9c39221bced7be480ae3438a91a74574}{double}} value\hspace{0.3cm}{\ttfamily [extern]}}
+
