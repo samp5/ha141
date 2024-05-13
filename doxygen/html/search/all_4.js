@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['message_0',['Message',['../structMessage.html',1,'']]]
+  ['neuron_0',['Neuron',['../classNeuron.html',1,'']]],
+  ['neurongroup_1',['NeuronGroup',['../classNeuronGroup.html',1,'']]]
 ];

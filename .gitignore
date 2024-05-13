@@ -17,6 +17,11 @@ build/*
 # core dumps
 core*
 
+
+# doxygen output
+doxygen/html/
+doxygen/latex/
+
 #ingore venv
 plotting/venv/*
 plotting/*.png
