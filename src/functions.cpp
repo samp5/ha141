@@ -1,14 +1,18 @@
 #include "functions.hpp"
+#include "../run_config/toml.hpp"
+#include "globals.hpp"
 #include "input_neuron.hpp"
 #include "log.hpp"
 #include "neuron.hpp"
-#include <algorithm>
 #include <cctype>
+#include <cstring>
 #include <fstream>
 #include <iterator>
 #include <sstream>
-#include <string>
 #include <unordered_map>
+
+extern RuntimConfig cf;
+extern Mutex mx;
 
 vector<int> parse_line_range(const std::string &in) {
   vector<int> ret;
@@ -57,39 +61,6 @@ bool has_synaptic_connection(Neuron *from_neuron, Neuron *to_neuron) {
   }
 }
 
-bool has_neighbor_group(Neuron *from_neuron, Neuron *to_neuron) {
-  bool ret;
-  const weight_map *p_postsyntapic = from_neuron->get_postsynaptic();
-  const weight_map *p_presyntapic = from_neuron->get_presynaptic();
-
-  // print maps as debugging measure
-  // print_group_maps(from_neuron);
-  // print_group_maps(to_neuron);
-
-  // check for connection FROM from_neuron TO to_neuron
-  if (p_postsyntapic->find(to_neuron) != p_postsyntapic->end()) {
-
-    lg.log_neuron_interaction(
-        DEBUG, "has_neighbor: Neuron %d is already connected to Neuron %d",
-        from_neuron->get_id(), to_neuron->get_id());
-
-    // if the to neuron is not already in the postsynaptic map
-    ret = true;
-  }
-  // check for connections FROM to_neuron TO from_neuron
-  else if (p_presyntapic->find(to_neuron) != p_presyntapic->end()) {
-    lg.log_neuron_interaction(
-        DEBUG, "has_neighbor: Neuron %d already has connection from Neuron %d",
-        to_neuron->get_id(), from_neuron->get_id());
-
-    // if the to_neuron is in the presynaptic list
-    ret = true;
-  } else {
-    ret = false;
-  }
-  return ret;
-}
-
 vector<Neuron *> construct_neuron_vector(const vector<NeuronGroup *> &groups) {
   vector<Neuron *> ret;
   for (auto group : groups) {
@@ -109,7 +80,7 @@ construct_neighbor_options(const vector<Neuron *> &neurons) {
       if (neuron_origin == neuron_destination) {
         continue;
       }
-      if (neuron_destination->get_type() == Input) {
+      if (neuron_destination->getType() == Input) {
         continue;
       }
       origin_list.push_back(neuron_destination);
@@ -148,7 +119,7 @@ void random_synapses(vector<NeuronGroup *> &groups) {
     auto this_neuron = find_in_list(post_synaptic_neuron_options, neuron);
 
     // add postsynaptic neuron as a neighbor
-    neuron->add_neighbor(*target, weight_function());
+    neuron->addNeighbor(*target, weight_function());
 
     // erase the postsynaptic neuron from the list and this neuron from the
     // postsynaptic list
@@ -161,30 +132,9 @@ void random_synapses(vector<NeuronGroup *> &groups) {
     synapses_formed += 1;
 
     // check to make sure we still need edges
-    if (synapses_formed >= NUMBER_EDGES) {
+    if (synapses_formed >= cf.NUMBER_EDGES) {
       break;
     }
-  }
-}
-
-void random_synapses(vector<NeuronGroup *> &groups, int number_neighbors) {
-  int i = 0;
-  while (i < number_neighbors) {
-
-    // Get random neurons
-    Neuron *from = get_random_neuron(groups);
-    Neuron *to = get_random_neuron(groups, false);
-
-    // check for self connections
-    if (from == to) {
-      continue;
-    }
-    if (has_synaptic_connection(from, to)) {
-      continue;
-    }
-
-    from->add_neighbor(to, weight_function());
-    i++;
   }
 }
 
@@ -196,86 +146,18 @@ int get_neuron_count(const vector<NeuronGroup *> &groups) {
   return size;
 }
 
-Neuron *get_random_neuron(const vector<NeuronGroup *> &groups,
-                          bool input_type_allowed) {
-
-  typedef vector<Neuron *>::size_type vec_sz_t;
-
-  vec_sz_t group_number = rand() % groups.size();
-
-  if (input_type_allowed) {
-
-    // If input type is allowed, normal thing
-    int neuron_number = rand() % groups.at(group_number)->neuron_count();
-
-    return groups.at(group_number)->get_neruon_vector().at(neuron_number);
-
-  } else {
-
-    lg.log(DEBUG4, "Finding non-input neuron...");
-
-    bool try_again;
-    unsigned long tries = 0;
-    Neuron *ret_neuron;
-
-    do {
-      // make a vector to hold all the candiate neurons (non input)
-      vector<Neuron *> group_neurons(
-          groups[group_number]->get_neruon_vector().size());
-
-      // copy all non-input neurons to new vector
-      // fancy lamda function
-      auto end = copy_if(groups.at(group_number)->get_neruon_vector().begin(),
-                         groups.at(group_number)->get_neruon_vector().end(),
-                         group_neurons.begin(), [](Neuron *neuron) {
-                           return neuron->get_type() != Input;
-                         });
-
-      // shrink to fit
-      group_neurons.resize(distance(group_neurons.begin(), end));
-
-      lg.log_value(DEBUG4, "Group %d has %d non-input neuron(s)",
-                   groups.at(group_number)->get_id(), group_neurons.size());
-
-      // If there are no input neurons
-      if (group_neurons.empty()) {
-        lg.log_group_state(
-            WARNING,
-            "There are no non-input neurons in Group %d: trying a "
-            "different group...",
-            groups[group_number]->get_id());
-
-        group_number = group_number == groups.size() ? 0 : group_number + 1;
-        try_again = true;
-        tries++;
-
-      } else {
-        try_again = false;
-        ret_neuron = group_neurons.at(rand() % group_neurons.size());
-      }
-    } while (try_again && tries < groups.size());
-
-    if (tries == groups.size()) {
-      lg.log(ERROR, "Unable to find non-input neuron, exitting");
-      exit(1);
-    }
-
-    return ret_neuron;
-  }
-}
-
 void print_node_values(vector<Neuron *> nodes) {
   cout << "\nFinal Neuron Values\n";
   cout << "-------------------\n\n";
   for (Neuron *node : nodes) {
-    lg.log_neuron_value(INFO, "Neuron %d : %f", node->get_id(),
-                        node->get_potential());
+    lg.log_neuron_value(INFO, "Neuron %d : %f", node->getID(),
+                        node->getPotential());
   }
 }
 
 double weight_function() { return ((double)rand() / RAND_MAX) * 0.1; }
 
-int get_inhibitory_status() {
+int get_inhibitory_value() {
   int ret;
   double x = (double)rand() / RAND_MAX;
   if (x >= 0.1) {
@@ -308,7 +190,7 @@ void construct_input_neuron_vector(const vector<NeuronGroup *> &groups,
 
   for (const auto &group : groups) {
     for (auto neuron : group->get_neruon_vector()) {
-      if (neuron->get_type() != Input) {
+      if (neuron->getType() != Input) {
         continue;
       }
       input_neurons.push_back(dynamic_cast<InputNeuron *>(neuron));
@@ -317,7 +199,7 @@ void construct_input_neuron_vector(const vector<NeuronGroup *> &groups,
 }
 
 void get_line_x(std::string &line, int target) {
-  static std::string file_name = INPUT_FILE;
+  static std::string file_name = cf.INPUT_FILE;
   static std::ifstream file(file_name);
   std::string temp;
   if (!file.is_open()) {
@@ -341,7 +223,7 @@ void get_line_x(std::string &line, int target) {
 }
 
 void get_next_line(std::string &line) {
-  static std::string file_name = INPUT_FILE;
+  static std::string file_name = cf.INPUT_FILE;
   static std::ifstream file(file_name);
   std::string temp;
 
@@ -396,24 +278,6 @@ void set_next_line(const vector<InputNeuron *> &input_neurons) {
     s >> value;
     input_neuron->set_input_value(value);
   }
-}
-
-Message *construct_message(double value, Neuron *target, Message_t type) {
-  Message *message = new Message;
-  message->message = value;
-  message->timestamp = lg.get_time_stamp();
-  message->post_synaptic_neuron = target;
-  message->target_neuron_group = target->get_group();
-  message->message_type = type;
-  return message;
-}
-
-void print_message(Message *message) {
-  lg.log_message(DEBUG3,
-                 "Message: \n\tdummy_time:\t%f \n\ttarget neuron:\t%d "
-                 "\n\ttarget_group:\t%d \n\tvalue:\t%f",
-                 message->timestamp, message->target_neuron_group->get_id(),
-                 message->post_synaptic_neuron->get_id(), message->message);
 }
 
 void deallocate_message_vector(const vector<Message *> *messages) {
@@ -564,7 +428,7 @@ int parse_command_line_args(char **argv, int argc) {
 
 int set_options(const char *file_name) {
 
-  CONFIG_FILE = file_name;
+  cf.CONFIG_FILE = file_name;
   toml::table tbl;
 
   try {
@@ -575,7 +439,7 @@ int set_options(const char *file_name) {
   }
 
   if (tbl["neuron"]["poisson_prob_of_success"].as_floating_point()) {
-    INPUT_PROB_SUCCESS =
+    cf.INPUT_PROB_SUCCESS =
         tbl["neuron"]["poisson_prob_of_success"].as_floating_point()->get();
   } else {
     lg.log_string(ERROR, "Failed to parse: %s", "poisson_prob_of_success");
@@ -583,7 +447,7 @@ int set_options(const char *file_name) {
 
   if (tbl["neuron"]["refractory_duration"].as_floating_point()) {
     // convert to seconds
-    REFRACTORY_DURATION =
+    cf.REFRACTORY_DURATION =
         tbl["neuron"]["refractory_duration"].as_floating_point()->get() /
         1000.0f;
   } else {
@@ -591,27 +455,27 @@ int set_options(const char *file_name) {
   }
 
   if (tbl["neuron"]["tau"].as_floating_point()) {
-    TAU = tbl["neuron"]["tau"].as_floating_point()->get();
+    cf.TAU = tbl["neuron"]["tau"].as_floating_point()->get();
   } else {
     lg.log_string(ERROR, "Failed to parse: %s", "tau");
   }
 
   if (tbl["neuron"]["input_neuron_count"].as_integer()) {
-    NUMBER_INPUT_NEURONS =
+    cf.NUMBER_INPUT_NEURONS =
         tbl["neuron"]["input_neuron_count"].as_integer()->get();
   } else {
     lg.log_string(ERROR, "Failed to parse: %s", "input_neuron_count");
   }
 
   if (tbl["runtime_vars"]["line_range"].as_string()) {
-    STIMULUS_VEC =
+    cf.STIMULUS_VEC =
         parse_line_range(tbl["runtime_vars"]["line_range"].as_string()->get());
   } else {
     lg.log_string(ERROR, "Failed to parse: %s", "line_range");
   }
 
   if (tbl["runtime_vars"]["runtime"].as_integer()) {
-    RUN_TIME = 1e6 * tbl["runtime_vars"]["runtime"].as_integer()->get();
+    cf.RUN_TIME = 1e6 * tbl["runtime_vars"]["runtime"].as_integer()->get();
   } else {
     lg.log_string(ERROR, "Failed to parse: %s", "runtime");
   }
@@ -619,9 +483,9 @@ int set_options(const char *file_name) {
   if (tbl["random"]["seed"].as_string()) {
     std::string seed = tbl["random"]["seed"].as_string()->get();
     if (seed == "time") {
-      RAND_SEED = time(0);
+      cf.RAND_SEED = time(0);
     } else if (tbl["random"]["seed"].as_integer()) {
-      RAND_SEED = tbl["random"]["seed"].as_integer()->get();
+      cf.RAND_SEED = tbl["random"]["seed"].as_integer()->get();
     }
   } else {
     lg.log_string(ERROR, "Failed to parse: %s", "random seed");
@@ -629,21 +493,20 @@ int set_options(const char *file_name) {
 
   if (tbl["runtime_vars"]["input_file"].as_string()) {
     std::string file = tbl["runtime_vars"]["input_file"].as_string()->get();
-    INPUT_FILE = file;
+    cf.INPUT_FILE = file;
   } else {
     lg.log_string(ERROR, "Failed to parse: %s", "input_file");
   }
 
   if (tbl["debug"]["level"].as_string()) {
     std::string level = tbl["debug"]["level"].as_string()->get();
-    ::DEBUG_LEVEL = get_level_from_string(level);
+    cf.DEBUG_LEVEL = get_level_from_string(level);
   } else {
-    lg.log_string(ERROR, "Failed to parse: %s",
-                  "refractory_membrane_potential");
+    lg.log_string(ERROR, "Failed to parse: %s", "Debug level");
   }
 
   if (tbl["neuron"]["refractory_membrane_potential"].as_floating_point()) {
-    REFRACTORY_MEMBRANE_POTENTIAL =
+    cf.REFRACTORY_MEMBRANE_POTENTIAL =
         tbl["neuron"]["refractory_membrane_potential"]
             .as_floating_point()
             ->get();
@@ -653,27 +516,27 @@ int set_options(const char *file_name) {
   }
 
   if (tbl["neuron"]["activation_threshold"].as_floating_point()) {
-    ACTIVATION_THRESHOLD =
+    cf.ACTIVATION_THRESHOLD =
         tbl["neuron"]["activation_threshold"].as_floating_point()->get();
   } else {
     lg.log_string(ERROR, "Failed to parse: %s", "activation_threshold");
   }
 
   if (tbl["neuron"]["initial_membrane_potential"].as_floating_point()) {
-    INITIAL_MEMBRANE_POTENTIAL =
+    cf.INITIAL_MEMBRANE_POTENTIAL =
         tbl["neuron"]["initial_membrane_potential"].as_floating_point()->get();
   } else {
     lg.log_string(ERROR, "Failed to parse: %s", "initial_membrane_potential");
   }
 
   if (tbl["neuron"]["group_count"].as_integer()) {
-    NUMBER_GROUPS = tbl["neuron"]["group_count"].as_integer()->get();
+    cf.NUMBER_GROUPS = tbl["neuron"]["group_count"].as_integer()->get();
   } else {
     lg.log_string(ERROR, "Failed to parse: %s", "group_count");
   }
 
   if (tbl["neuron"]["neuron_count"].as_integer()) {
-    NUMBER_NEURONS = tbl["neuron"]["neuron_count"].as_integer()->get();
+    cf.NUMBER_NEURONS = tbl["neuron"]["neuron_count"].as_integer()->get();
   } else {
     lg.log_string(ERROR, "Failed to parse: %s", "neuron_count");
   }
@@ -681,12 +544,12 @@ int set_options(const char *file_name) {
   if (tbl["neuron"]["edge_count"].as_string()) {
     std::string seed = tbl["neuron"]["edge_count"].as_string()->get();
     if (seed == "MAX") {
-      NUMBER_EDGES = maximum_edges();
+      cf.NUMBER_EDGES = maximum_edges();
       lg.log_string(INFO, "Maximum edges selected, setting to %s",
-                    std::to_string(NUMBER_EDGES).c_str());
+                    std::to_string(cf.NUMBER_EDGES).c_str());
     }
   } else if (tbl["neuron"]["edge_count"].as_integer()) {
-    NUMBER_EDGES = tbl["neuron"]["edge_count"].as_integer()->get();
+    cf.NUMBER_EDGES = tbl["neuron"]["edge_count"].as_integer()->get();
   } else {
     lg.log_string(ERROR, "Failed to parse: %s", "edge_count");
   }
@@ -714,10 +577,10 @@ LogLevel get_level_from_string(std::string level) {
 
 void assign_groups(vector<NeuronGroup *> &neuron_groups) {
 
-  int neuron_per_group = NUMBER_NEURONS / NUMBER_GROUPS;
-  int input_neurons_per_group = NUMBER_INPUT_NEURONS / NUMBER_GROUPS;
+  int neuron_per_group = cf.NUMBER_NEURONS / cf.NUMBER_GROUPS;
+  int input_neurons_per_group = cf.NUMBER_INPUT_NEURONS / cf.NUMBER_GROUPS;
 
-  for (int i = 0; i < NUMBER_GROUPS; i++) {
+  for (int i = 0; i < cf.NUMBER_GROUPS; i++) {
 
     // allocate for this group
     NeuronGroup *this_group =
@@ -743,18 +606,18 @@ void assign_neuron_types(vector<NeuronGroup *> &groups) {
 
   vec_sz_t vecsize = neuron_vec.size();
 
-  int input_count = NUMBER_INPUT_NEURONS;
+  int input_count = cf.NUMBER_INPUT_NEURONS;
 
   while (input_count) {
 
     vec_sz_t rand_index = rand() % vecsize;
 
-    if (neuron_vec.at(rand_index)->get_type() == None) {
+    if (neuron_vec.at(rand_index)->getType() == None) {
 
       neuron_vec.at(rand_index)->set_type(Input);
       lg.log_group_neuron_type(DEBUG, "(%d) Neuron %d is a %s type",
-                               neuron_vec.at(rand_index)->get_group()->get_id(),
-                               neuron_vec.at(rand_index)->get_id(), "Input");
+                               neuron_vec.at(rand_index)->getGroup()->get_id(),
+                               neuron_vec.at(rand_index)->getID(), "Input");
 
       input_count--;
     }
@@ -802,37 +665,29 @@ std::string io_type_to_string(Neuron_t type) {
 }
 void check_start_conditions() {
   bool error = false;
-  if (NUMBER_INPUT_NEURONS >= NUMBER_NEURONS) {
+  if (cf.NUMBER_INPUT_NEURONS >= cf.NUMBER_NEURONS) {
     lg.log(ERROR, "NUMBER_INPUT_NEURONS greater than or equal to "
                   "NUMBER_NEURONS... quitting");
     error = true;
-  } else if (NUMBER_NEURONS % NUMBER_GROUPS != 0) {
+  } else if (cf.NUMBER_NEURONS % cf.NUMBER_GROUPS != 0) {
     lg.log(ERROR, "NUMBER_NEURONS not divisible by NUMBER_GROUPS... quitting");
     error = true;
-  } else if (NUMBER_INPUT_NEURONS % NUMBER_GROUPS != 0) {
+  } else if (cf.NUMBER_INPUT_NEURONS % cf.NUMBER_GROUPS != 0) {
     lg.log(ERROR,
            "NUMBER_INPUT_NEURONS not divisible by NUMBER_GROUPS... quitting");
     error = true;
-  } else if (NUMBER_EDGES > maximum_edges()) {
+  } else if (cf.NUMBER_EDGES > maximum_edges()) {
     lg.log_string(ERROR,
                   "Maximum number of possible edges (%s) exceeded .. quitting",
                   std::to_string(maximum_edges()).c_str());
     error = true;
   }
   if (error) {
-    destroy_mutexes();
+    mx.destroy_mutexes();
     exit(0);
   } else {
     return;
   }
-}
-
-void destroy_mutexes() {
-  pthread_mutex_destroy(&potential_mutex);
-  pthread_mutex_destroy(&log_mutex);
-  pthread_mutex_destroy(&message_mutex);
-  pthread_mutex_destroy(&activation_mutex);
-  pthread_mutex_destroy(&stimulus_switch_mutex);
 }
 
 int maximum_edges() {
@@ -850,8 +705,8 @@ int maximum_edges() {
   // edges that would be possible in a undirected graph of only the input
   // neurons maximum_edges = n_t(n_t) / 2 - n_i(n_i-1) / 2
 
-  int n_i = NUMBER_INPUT_NEURONS;
-  int n_t = NUMBER_NEURONS;
+  int n_i = cf.NUMBER_INPUT_NEURONS;
+  int n_t = cf.NUMBER_NEURONS;
 
   // always even so division is fine
   int edges_lost_to_input = n_i * (n_i - 1) / 2;

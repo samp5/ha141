@@ -9,8 +9,6 @@
 class Neuron;
 
 extern Log lg;
-extern int WAIT_TIME;
-extern int WAIT_LOOPS;
 extern bool active;
 using std::list;
 
@@ -26,7 +24,6 @@ private:
 
 public:
   NeuronGroup(int _id, int number_neurons, int number_input_neurons);
-  NeuronGroup(int _id, int number_neurons);
   ~NeuronGroup();
 
   void *group_run();

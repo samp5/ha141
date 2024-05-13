@@ -1,5 +1,6 @@
 #include "log.hpp"
 #include "functions.hpp"
+#include "globals.hpp"
 #include "message.hpp"
 #include <bits/types/struct_timeval.h>
 #include <chrono>
@@ -12,13 +13,15 @@
 #include <stdio.h>
 #include <string>
 #include <sys/time.h>
+extern Mutex mx;
+extern RuntimConfig cf;
 
 pthread_mutex_t data_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void Log::log(LogLevel level, const char *message,
               std::ostream &os) { // default output stream is standard output
 
-  if (level > ::DEBUG_LEVEL) {
+  if (level > cf.DEBUG_LEVEL) {
     return;
   }
 
@@ -151,7 +154,7 @@ void Log::add_data(int group_id, int curr_id, double curr_data, double time,
   this_data.neuron_id = curr_id;
   this_data.neuron_type = type;
   this_data.message_type = message_type;
-  this_data.stimulus_number = *STIMULUS;
+  this_data.stimulus_number = *cf.STIMULUS;
 
   this->log_data.push_back(this_data);
   pthread_mutex_unlock(&data_mutex);
@@ -166,7 +169,7 @@ void Log::add_data(int group_id, int curr_id, double curr_data, double time,
   this_data->neuron_id = curr_id;
   this_data->neuron_type = type;
   this_data->message_type = message_type;
-  this_data->stimulus_number = *STIMULUS;
+  this_data->stimulus_number = *cf.STIMULUS;
   origin->push_back_data(this_data);
 }
 
@@ -303,7 +306,7 @@ void Log::add_data(int group_id, int curr_id, double curr_data) {
   this_data.membrane_potentail = curr_data;
   this_data.group_id = group_id;
   this_data.neuron_id = curr_id;
-  this_data.stimulus_number = *STIMULUS;
+  this_data.stimulus_number = *cf.STIMULUS;
 
   this->log_data.push_back(this_data);
   pthread_mutex_unlock(&data_mutex);
@@ -424,7 +427,7 @@ void Log::log_string(LogLevel level, const char *message, const char *string) {
 void Log::log_runtime_config(const std::string &name) {
 
   namespace fs = std::filesystem;
-  fs::path config_source = CONFIG_FILE;
+  fs::path config_source = cf.CONFIG_FILE;
 
   fs::path config_target = "./logs/" + name + "/" + name + ".toml";
 

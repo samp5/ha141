@@ -27,7 +27,8 @@ NeuronGroup::NeuronGroup(int _id, int number_neurons,
 
     if (roll && number_neurons) {
 
-      Neuron *neuron = new Neuron(id, get_inhibitory_status(), this);
+      Neuron *neuron =
+          new Neuron(id, get_inhibitory_value(), this, Neuron_t::None);
       this->neurons.push_back(neuron);
       number_neurons--;
       id++;
@@ -42,27 +43,12 @@ NeuronGroup::NeuronGroup(int _id, int number_neurons,
   }
 }
 
-// Constructor
-NeuronGroup::NeuronGroup(int _id, int number_neurons) {
-  lg.log_group_state(DEBUG, "Adding Group %d", _id);
-
-  this->id = _id;
-
-  // add neurons;
-  lg.log_group_state(INFO, "Group %d", this->id);
-
-  for (int i = 0; i < number_neurons; i++) {
-    Neuron *neuron = new Neuron(i + 1, get_inhibitory_status(), this);
-    this->neurons.push_back(neuron);
-  }
-}
-
 // Destructor
 NeuronGroup::~NeuronGroup() {
   for (auto neuron : this->neurons) {
 
     lg.log_group_neuron_state(DEBUG, "Deleteing Group %d Neuron %d", this->id,
-                              neuron->get_id());
+                              neuron->getID());
 
     delete neuron;
   }
@@ -86,19 +72,19 @@ void *NeuronGroup::group_run() {
 
       lg.log_group_neuron_type(
           DEBUG4, "Checking activation:(%d) Neuron %d is %s", this->get_id(),
-          neuron->get_id(), get_active_status_string(neuron->is_activated()));
+          neuron->getID(), get_active_status_string(neuron->isActivated()));
 
-      if (neuron->is_activated()) {
+      if (neuron->isActivated()) {
 
         lg.log_group_neuron_state(DEBUG2, "Running (%d) Neuron (%d)",
-                                  this->get_id(), neuron->get_id());
-        neuron = neuron->get_type() == Input
+                                  this->get_id(), neuron->getID());
+        neuron = neuron->getType() == Input
                      ? dynamic_cast<InputNeuron *>(neuron)
                      : neuron;
         neuron->run_in_group();
       } else {
         double time = lg.get_time_stamp();
-        neuron->retroactive_decay(neuron->get_last_decay(), time);
+        neuron->retroactive_decay(neuron->getLastDecay(), time);
       }
     }
   }
@@ -122,7 +108,7 @@ void NeuronGroup::print_group() {
 
 void NeuronGroup::reset() {
   for (auto neuron : this->neurons) {
-    if (neuron->get_type() == Input) {
+    if (neuron->getType() == Input) {
       neuron = dynamic_cast<InputNeuron *>(neuron);
     }
     neuron->reset();

@@ -6,6 +6,11 @@
 #include <iostream>
 #include <vector>
 
+struct Mutex;
+struct RuntimConfig;
+extern Mutex mx;
+extern RuntimConfig cf;
+
 using std::cout;
 using std::ostream;
 using std::vector;
@@ -32,11 +37,6 @@ typedef struct LogData {
   Message_t message_type;
   int stimulus_number;
 } LogData;
-
-extern LogLevel DEBUG_LEVEL;
-extern vector<int>::const_iterator STIMULUS;
-extern ostream &STREAM;
-extern pthread_mutex_t log_mutex;
 
 using hr_clock = std::chrono::high_resolution_clock;
 using duration = std::chrono::duration<double>;
@@ -70,7 +70,7 @@ public:
   void log_runtime_config(const std::string &name);
 
   // General Log function
-  void log(LogLevel level, const char *message, ostream &os = STREAM);
+  void log(LogLevel level, const char *message, ostream &os = std::cout);
 
   // Get time stamp from std::chrono::high_resolution_clock
   double get_time_stamp();
@@ -116,7 +116,7 @@ public:
   void log_string(LogLevel level, const char *message, const char *string);
 
   void print(const char *message, bool newline = true,
-             std::ostream &os = STREAM);
+             std::ostream &os = std::cout);
 
   void log_message(LogLevel level, const char *message, double timestamp,
                    int group_id, int id, double value);

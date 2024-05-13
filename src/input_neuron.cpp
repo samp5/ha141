@@ -1,32 +1,41 @@
 #include "input_neuron.hpp"
 #include "functions.hpp"
+#include "globals.hpp"
 #include "message.hpp"
 #include "neuron.hpp"
 #include <pthread.h>
+extern Mutex mx;
+extern RuntimConfig cf;
+
+InputNeuron::InputNeuron(int _id, NeuronGroup *group)
+    : Neuron(_id, -1, group, Input),
+      probalility_of_success(cf.INPUT_PROB_SUCCESS) {
+  this->activate();
+}
 
 void InputNeuron::run_in_group() {
 
   if (::switching_stimulus) {
     // wait for all input neurons to switch to the new stimulus
-    pthread_mutex_lock(&::stimulus_switch_mutex);
+    pthread_mutex_lock(&mx.stimulus);
     while (::switching_stimulus) {
-      pthread_cond_wait(&::stimulus_switch_cond, &::stimulus_switch_mutex);
+      pthread_cond_wait(&::stimulus_switch_cond, &mx.stimulus);
     }
-    pthread_mutex_unlock(&::stimulus_switch_mutex);
+    pthread_mutex_unlock(&mx.stimulus);
   }
 
   if (!this->check_refractory_period()) {
     lg.log_group_neuron_state(
         INFO,
         "INPUT: (%d) Neuron %d is still in refractory period, ignoring input",
-        this->get_group()->get_id(), this->get_id());
+        this->getGroup()->get_id(), this->getID());
     return;
   }
 
   double time = lg.get_time_stamp();
   this->retroactive_decay(this->last_decay, time);
 
-  if (this->membrane_potential >= ACTIVATION_THRESHOLD) {
+  if (this->membrane_potential >= cf.ACTIVATION_THRESHOLD) {
     this->send_messages_in_group();
   }
 
@@ -36,18 +45,18 @@ void InputNeuron::run_in_group() {
 
     this->update_potential(this->input_value);
 
-    lg.add_data(this->get_group()->get_id(), this->get_id(),
-                this->membrane_potential, time_rn, this->get_type(), Stimulus,
+    lg.add_data(this->getGroup()->get_id(), this->getID(),
+                this->membrane_potential, time_rn, this->getType(), Stimulus,
                 this);
 
     lg.log_group_neuron_value(
         INFO,
         "(Input) (%d) Neuron %d poisson success! Adding input value to "
         "membrane_potential. membrane_potential now %f",
-        this->get_group()->get_id(), this->get_id(), this->membrane_potential);
+        this->getGroup()->get_id(), this->getID(), this->membrane_potential);
   }
 
-  if (this->membrane_potential >= ACTIVATION_THRESHOLD) {
+  if (this->membrane_potential >= cf.ACTIVATION_THRESHOLD) {
     this->send_messages_in_group();
   }
 }
@@ -70,11 +79,11 @@ bool InputNeuron::check_refractory_period() {
   // #askpedram
 
   // first check refractory status
-  if (timestamp < this->refractory_start + REFRACTORY_DURATION) {
+  if (timestamp < this->refractory_start + cf.REFRACTORY_DURATION) {
 
     lg.log_group_neuron_state(
         INFO, "(%d) Neuron %d is still in refractory period, ignoring message",
-        this->get_group()->get_id(), this->get_id());
+        this->getGroup()->get_id(), this->getID());
 
     return false;
   }
@@ -100,11 +109,11 @@ void InputNeuron::set_input_value(double value) {
   this->input_value = value;
   lg.log_group_neuron_value(DEBUG3,
                             "(Input) (%d) Neuron %d input value set to %f",
-                            this->get_group()->get_id(), this->get_id(), value);
+                            this->getGroup()->get_id(), this->getID(), value);
 }
 
 void InputNeuron::reset() {
-  this->membrane_potential = INITIAL_MEMBRANE_POTENTIAL;
+  this->membrane_potential = cf.INITIAL_MEMBRANE_POTENTIAL;
   this->last_decay = lg.get_time_stamp();
   this->refractory_start = 0;
 }

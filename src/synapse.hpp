@@ -1,6 +1,5 @@
 #ifndef SYNAPSE
 #define SYNAPSE
-
 #include "message.hpp"
 class Neuron;
 

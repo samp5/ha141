@@ -1,7 +1,9 @@
 [neuron]
+# NOTE: both the number of neurons and the number of input neurons
+#       must be divisible by the number of groups
 
 # number of neurons
-neuron_count = 30
+neuron_count = 50
 
 # number of input type neurons
 input_neuron_count = 10
@@ -10,7 +12,11 @@ input_neuron_count = 10
 group_count = 5
 
 # number of connections
-edge_count = 40
+# option can be "MAX" for maximum edges
+edge_count = "MAX"
+
+# refractory_duration
+refractory_duration = 0.5
 
 # value each neuron is initialized with
 initial_membrane_potential = -55.0
@@ -21,36 +27,29 @@ activation_threshold = -55.0
 # value that each neuron is set to after firing
 refractory_membrane_potential = -70.0
 
-# duration in milliseconds
-refractory_duration = 3.0
-
-# tau for the linearlization of the decay function
+#  tau for the linearlization of the decay function
 tau = 100.0
 
-# input neuron probability of success
-poisson_prob_of_success = 0.01
-
+#  poisson_prob_of_success
+poisson_prob_of_success = 0.0001
 [debug]
 # Options are
+# NONE
 # INFO
 # DEBUG
 # DEBUG2
 # DEBUG3
 # DEBUG4
-level = "DEBUG2"
-
-[decay]
-# Value that each neuron decays every wait_time * wait_loops
-value = 1
-
+level = "INFO"
 
 [random]
 # options are 'time' for using the current time, or an integer (as a string e.g. "1")
-seed = "1"
+seed = "time"
 
 [runtime_vars]
 # in seconds
-runtime = 10
-
+runtime = 5
 # file to read input from
 input_file = "./input_files/test"
+# format should be "x..y" for reading lines x to y (inclusive) or just x for a single line
+line_range = "1"
