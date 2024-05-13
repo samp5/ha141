@@ -37,6 +37,16 @@ struct RuntimConfig {
   std::string INPUT_FILE;
   std::string CONFIG_FILE;
   ostream &STREAM = std::cout;
+  int num_stimulus;
+  int time_per_stimulus;
+
+public:
+  vector<int> parse_line_range(const std::string &in);
+  int setOptions();
+  void generateNewConfig();
+  void useBaseToml();
+  int parseArgs(char **argv, int argc);
+  void checkStartCond();
 };
 
 #endif // !GLOBALS

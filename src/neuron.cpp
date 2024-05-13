@@ -1,8 +1,7 @@
 #include "neuron.hpp"
-#include "functions.hpp"
-#include "globals.hpp"
 #include "log.hpp"
 #include "message.hpp"
+#include "runtime.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -21,16 +20,16 @@ extern Mutex mx;
 // @param1: Neuron ID
 // @param2: excitatory/inhibitory value (1 or -1)
 // @param3: Pointer to the parent group
-Neuron::Neuron(int _id, int inhibitory, NeuronGroup *group, Neuron_t type) {
+Neuron::Neuron(int _id, NeuronGroup *group, Neuron_t type) {
   this->type = type;
   this->id = _id;
-  this->excit_inhib_value = inhibitory;
   this->group = group;
   this->membrane_potential = cf.INITIAL_MEMBRANE_POTENTIAL;
-  this->excit_inhib_value = inhibitory;
+  this->excit_inhib_value = this->generateInhibitoryStatus();
   this->last_decay = -1;
 
-  const char *inhib = inhibitory == -1 ? "excitatory\0" : "inhibitory\0";
+  const char *inhib =
+      this->excit_inhib_value == -1 ? "excitatory\0" : "inhibitory\0";
 
   lg.log_group_neuron_type(INFO, "(%d) Neuron %d added: %s",
                            this->group->get_id(), _id, inhib);
@@ -366,4 +365,15 @@ void Neuron::reset() {
   this->refractory_start = 0;
   this->messages.clear();
   this->deactivate();
+}
+
+int Neuron::generateInhibitoryStatus() {
+  int ret;
+  double x = (double)rand() / RAND_MAX;
+  if (x >= 0.1) {
+    ret = -1;
+  } else {
+    ret = 1;
+  }
+  return ret;
 }

@@ -1,4 +1,3 @@
-#include "functions.hpp"
 #include "input_neuron.hpp"
 #include "log.hpp"
 #include "neuron.hpp"
@@ -27,8 +26,7 @@ NeuronGroup::NeuronGroup(int _id, int number_neurons,
 
     if (roll && number_neurons) {
 
-      Neuron *neuron =
-          new Neuron(id, get_inhibitory_value(), this, Neuron_t::None);
+      Neuron *neuron = new Neuron(id, this, Neuron_t::None);
       this->neurons.push_back(neuron);
       number_neurons--;
       id++;
@@ -72,7 +70,7 @@ void *NeuronGroup::group_run() {
 
       lg.log_group_neuron_type(
           DEBUG4, "Checking activation:(%d) Neuron %d is %s", this->get_id(),
-          neuron->getID(), get_active_status_string(neuron->isActivated()));
+          neuron->getID(), lg.get_active_status_string(neuron->isActivated()));
 
       if (neuron->isActivated()) {
 

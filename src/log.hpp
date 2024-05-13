@@ -123,6 +123,10 @@ public:
   void log_value(LogLevel level, const char *message, int value);
   void log_value(LogLevel level, const char *message, int value, int value2);
 
+  const char *get_active_status_string(bool active);
+  LogLevel get_level_from_string(std::string level);
+  std::string messageTypeToString(Message_t type);
+
 private:
   vector<LogData> log_data;
 };

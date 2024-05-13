@@ -1,15 +1,14 @@
 #include "input_neuron.hpp"
-#include "functions.hpp"
-#include "globals.hpp"
 #include "message.hpp"
 #include "neuron.hpp"
+#include "runtime.hpp"
 #include <pthread.h>
 extern Mutex mx;
 extern RuntimConfig cf;
 
 InputNeuron::InputNeuron(int _id, NeuronGroup *group)
-    : Neuron(_id, -1, group, Input),
-      probalility_of_success(cf.INPUT_PROB_SUCCESS) {
+    : Neuron(_id, group, Input), probalility_of_success(cf.INPUT_PROB_SUCCESS) {
+  this->excit_inhib_value = -1;
   this->activate();
 }
 

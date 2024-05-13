@@ -1,6 +1,7 @@
 #ifndef MESSAGE
 #define MESSAGE
 
+#include <string>
 class NeuronGroup;
 class Neuron;
 

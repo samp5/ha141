@@ -54,7 +54,7 @@ protected:
   list<Message *> messages;
 
 public:
-  Neuron(int _id, int inhibitory, NeuronGroup *group, Neuron_t type);
+  Neuron(int _id, NeuronGroup *group, Neuron_t type);
   virtual ~Neuron();
 
   void addNeighbor(Neuron *neighbor, double weight);
@@ -79,6 +79,7 @@ public:
   double decay(double timestamp);
   void retroactive_decay(double from, double to);
   void update_potential(double value);
+  int generateInhibitoryStatus();
 
   // Thread operations
   void start_thread();

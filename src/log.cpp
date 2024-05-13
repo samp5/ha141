@@ -1,12 +1,11 @@
 #include "log.hpp"
-#include "functions.hpp"
-#include "globals.hpp"
 #include "message.hpp"
+#include "neuron.hpp"
+#include "runtime.hpp"
 #include <bits/types/struct_timeval.h>
 #include <chrono>
 #include <filesystem>
 #include <fstream>
-#include <ios>
 #include <iostream>
 #include <ostream>
 #include <pthread.h>
@@ -15,6 +14,25 @@
 #include <sys/time.h>
 extern Mutex mx;
 extern RuntimConfig cf;
+
+std::string io_type_to_string(Neuron_t type) {
+  std::string ret;
+  switch (type) {
+  case None:
+    ret = "None";
+    break;
+  case Input:
+    ret = "Input";
+    break;
+  case Hidden:
+    ret = "Hidden";
+    break;
+  case Output:
+    ret = "Output";
+    break;
+  }
+  return ret;
+}
 
 pthread_mutex_t data_mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -209,7 +227,7 @@ void Log::write_data(const char *filename) {
     file << std::fixed << log_data.group_id << " " << log_data.neuron_id << " "
          << io_type_to_string((Neuron_t)log_data.neuron_type) << " "
          << log_data.timestamp << " " << log_data.membrane_potentail << " "
-         << message_type_to_string(log_data.message_type) << " "
+         << messageTypeToString(log_data.message_type) << " "
          << log_data.stimulus_number << '\n';
   }
 
@@ -432,4 +450,53 @@ void Log::log_runtime_config(const std::string &name) {
   fs::path config_target = "./logs/" + name + "/" + name + ".toml";
 
   fs::copy_file(config_source, config_target);
+}
+
+const char *Log::get_active_status_string(bool active) {
+  if (active) {
+    const char *active = "active"; // NOLINT
+    return active;
+  } else {
+    const char *inactive = "inactive"; // NOLINT
+    return inactive;
+  }
+}
+
+LogLevel Log::get_level_from_string(std::string level) {
+  if (level == "NONE")
+    return NONE;
+  if (level == "INFO")
+    return INFO;
+  if (level == "DEBUG")
+    return DEBUG;
+  if (level == "DEBUG2")
+    return DEBUG2;
+  if (level == "DEBUG3")
+    return DEBUG3;
+  if (level == "DEBUG4")
+    return DEBUG4;
+  lg.log(WARNING, "\"level\" does not match any available options: setting "
+                  "LogLevel to INFO");
+  return INFO;
+}
+std::string Log::messageTypeToString(Message_t type) {
+  std::string ret;
+  switch (type) {
+  case Stimulus:
+    ret = "S";
+    break;
+  case Refractory:
+    ret = "R";
+    break;
+  case From_Neighbor:
+    ret = "N";
+    break;
+  case Decay:
+    ret = "D";
+    break;
+  case Checked:
+    ret = "C";
+    break;
+  }
+  return ret;
 }
