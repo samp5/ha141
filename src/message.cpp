@@ -5,5 +5,5 @@
 extern Log lg;
 Message::Message(double value, Neuron *target, Message_t type)
     : message(value), post_synaptic_neuron(target),
-      target_neuron_group(target->getGroup()), timestamp(lg.get_time_stamp()),
+      target_neuron_group(target->getGroup()), timestamp(lg.time()),
       message_type(type) {}

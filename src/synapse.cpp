@@ -12,7 +12,7 @@ void Synapse::propagate() {
   double message_value = this->getPreSynaptic()->getPotential() *
                          this->getWeight() * this->getPreSynaptic()->getBias();
 
-  lg.log_group_neuron_interaction(
+  lg.neuronInteraction(
       INFO, "Group %d: Neuron %d is sending a mesage to Group %d: Neuron %d",
       preGroupID, preID, postGroupID, postID);
 

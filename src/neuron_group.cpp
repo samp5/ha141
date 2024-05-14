@@ -8,11 +8,11 @@
 // Constructor
 NeuronGroup::NeuronGroup(int _id, int number_neurons,
                          int number_input_neurons) {
-  lg.log_group_state(DEBUG, "Adding Group %d", _id);
+  lg.state(DEBUG, "Adding Group %d", _id);
 
   this->id = _id;
 
-  lg.log_group_state(INFO, "Group %d", this->id);
+  lg.state(INFO, "Group %d", this->id);
 
   // we only need this many of "regular neurons"
   number_neurons -= number_input_neurons;
@@ -45,8 +45,8 @@ NeuronGroup::NeuronGroup(int _id, int number_neurons,
 NeuronGroup::~NeuronGroup() {
   for (auto neuron : this->neurons) {
 
-    lg.log_group_neuron_state(DEBUG, "Deleteing Group %d Neuron %d", this->id,
-                              neuron->getID());
+    lg.groupNeuronState(DEBUG, "Deleteing Group %d Neuron %d", this->id,
+                        neuron->getID());
 
     delete neuron;
   }
@@ -58,7 +58,7 @@ NeuronGroup::~NeuronGroup() {
 void *NeuronGroup::run() {
 
   // Log running status
-  lg.log_group_state(INFO, "Group %d running", this->getID());
+  lg.state(INFO, "Group %d running", this->getID());
 
   // While the network is running...
   while (::active) {
@@ -68,20 +68,20 @@ void *NeuronGroup::run() {
         break;
       }
 
-      lg.log_group_neuron_type(
-          DEBUG4, "Checking activation:(%d) Neuron %d is %s", this->getID(),
-          neuron->getID(), lg.get_active_status_string(neuron->isActivated()));
+      lg.neuronType(DEBUG4, "Checking activation:(%d) Neuron %d is %s",
+                    this->getID(), neuron->getID(),
+                    lg.activeStatusString(neuron->isActivated()));
 
       if (neuron->isActivated()) {
 
-        lg.log_group_neuron_state(DEBUG2, "Running (%d) Neuron (%d)",
-                                  this->getID(), neuron->getID());
+        lg.groupNeuronState(DEBUG2, "Running (%d) Neuron (%d)", this->getID(),
+                            neuron->getID());
         neuron = neuron->getType() == Input
                      ? dynamic_cast<InputNeuron *>(neuron)
                      : neuron;
         neuron->run();
       } else {
-        double time = lg.get_time_stamp();
+        double time = lg.time();
         neuron->retroactiveDecay(neuron->getLastDecay(), time);
       }
     }

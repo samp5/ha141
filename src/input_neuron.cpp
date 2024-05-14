@@ -21,6 +21,15 @@ InputNeuron::InputNeuron(int _id, NeuronGroup *group)
   this->activate();
 }
 
+/**
+ * @brief Main run sequence for an InputNeuron.
+ *
+ * - Waits on stimulus switch halting thread.
+ * - Ignores message during refractory period.
+ * - Updates potential based on InputNeuron::input_value on
+ * - poisson success
+ * - Sends messages through all synapses
+ */
 void InputNeuron::run() {
 
   if (::switching_stimulus) {
@@ -32,15 +41,15 @@ void InputNeuron::run() {
     pthread_mutex_unlock(&mx.stimulus);
   }
 
-  if (!this->checkRefractoryPeriod()) {
-    lg.log_group_neuron_state(
+  if (this->inRefractory()) {
+    lg.groupNeuronState(
         INFO,
         "INPUT: (%d) Neuron %d is still in refractory period, ignoring input",
         this->getGroup()->getID(), this->getID());
     return;
   }
 
-  double time = lg.get_time_stamp();
+  double time = lg.time();
   this->retroactiveDecay(this->last_decay, time);
 
   if (this->membrane_potential >= cf.ACTIVATION_THRESHOLD) {
@@ -49,15 +58,12 @@ void InputNeuron::run() {
 
   if (poissonResult()) {
 
-    double time_rn = lg.get_time_stamp();
+    double time_rn = lg.time();
 
     this->accumulatePotential(this->input_value);
+    this->addData(time_rn, Message_t::Stimulus);
 
-    lg.add_data(this->getGroup()->getID(), this->getID(),
-                this->membrane_potential, time_rn, this->getType(), Stimulus,
-                this);
-
-    lg.log_group_neuron_value(
+    lg.neuronValue(
         INFO,
         "(Input) (%d) Neuron %d poisson success! Adding input value to "
         "membrane_potential. membrane_potential now %f",
@@ -69,6 +75,14 @@ void InputNeuron::run() {
   }
 }
 
+/**
+ * @brief Calculates poisson result.
+ *
+ * Based on InputNeuron::probalility_of_success.
+ * This value is set in RuntimConfig
+ *
+ * @return `true` for success `false` for failure
+ */
 bool InputNeuron::poissonResult() {
 
   double roll = (double)rand() / RAND_MAX;
@@ -80,48 +94,77 @@ bool InputNeuron::poissonResult() {
   }
 }
 
-bool InputNeuron::checkRefractoryPeriod() {
+/**
+ * @brief Checks refractory status of neuron.
+ *
+ *
+ *
+ * @return `true` for in refractory, `false` otherwise
+ */
+bool InputNeuron::inRefractory() {
 
-  double timestamp = lg.get_time_stamp();
+  double timestamp = lg.time();
 
   // #askpedram
 
   // first check refractory status
   if (timestamp < this->refractory_start + cf.REFRACTORY_DURATION) {
 
-    lg.log_group_neuron_state(
+    lg.groupNeuronState(
         INFO, "(%d) Neuron %d is still in refractory period, ignoring message",
         this->getGroup()->getID(), this->getID());
 
-    return false;
+    return true;
   }
 
-  return true;
+  return false;
 }
 
+/**
+ * @brief Sends messages to all connections.
+ *
+ * Propagates messages across all synapses then enters a
+ * refractory phase
+ *
+ */
 void InputNeuron::sendMessages() {
 
   for (const auto synapse : getSynapses()) {
     synapse->propagate();
   }
 
-  lg.log_group_neuron_state(
+  lg.groupNeuronState(
       INFO,
       "(%d) Neuron %d reached activation threshold, entering refractory phase",
       this->group->getID(), this->id);
 
   this->refractory();
 }
-
+/**
+ * @brief Sets input value (stimulus).
+ *
+ * Set the input value of the neuron.
+ * This value is added to the membrane potential of
+ * the neuron on each poisson sucess
+ *
+ * @param value The new value of the InputNeuron
+ */
 void InputNeuron::setInputValue(double value) {
   this->input_value = value;
-  lg.log_group_neuron_value(DEBUG3,
-                            "(Input) (%d) Neuron %d input value set to %f",
-                            this->getGroup()->getID(), this->getID(), value);
+  lg.neuronValue(DEBUG3, "(Input) (%d) Neuron %d input value set to %f",
+                 this->getGroup()->getID(), this->getID(), value);
 }
 
+/**
+ * @brief Resets the InputNeuron.
+ *
+ * Set membrane_potential to INITIAL_MEMBRANE_POTENTIAL
+ * Set last_decay to now
+ * Resets refractory_start
+ *
+ */
 void InputNeuron::reset() {
   this->membrane_potential = cf.INITIAL_MEMBRANE_POTENTIAL;
-  this->last_decay = lg.get_time_stamp();
+  this->last_decay = lg.time();
   this->refractory_start = 0;
 }

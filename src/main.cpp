@@ -20,38 +20,32 @@ bool active = true;
 bool switching_stimulus = false;
 
 int main(int argc, char **argv) {
-
-  // If we are unable to parse, just quit
   if (!cf.parseArgs(argv, argc)) {
     mx.destroy_mutexes();
     return 0;
   }
-  // Check the start conditions
-  cf.checkStartCond();
 
-  // Set seed
+  cf.checkStartCond();
   srand(cf.RAND_SEED);
 
   lg.log(ESSENTIAL, "Assigning neuron groups...");
-
   SNN snn = SNN(&cf);
 
-  // Add random edges between neurons
   lg.log(ESSENTIAL, "Adding synapses...");
   snn.generateRandomSynapses();
 
-  lg.start_clock();
+  lg.startClock();
   snn.start();
 
   lg.log(ESSENTIAL, "Transfering data from Neurons to Log...");
   snn.join();
 
   lg.log(ESSENTIAL, "Writing data to file...");
-  lg.write_data();
-  lg.log(ESSENTIAL, "Done writing, exiting");
+  lg.writeData();
 
-  // Destroy mutexes
+  lg.log(ESSENTIAL, "Done writing, exiting");
   mx.destroy_mutexes();
+
   pthread_cond_destroy(&stimulus_switch_cond);
   return 0;
 }

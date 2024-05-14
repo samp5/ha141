@@ -5,22 +5,23 @@
 #include "neuron_group.hpp"
 #include <pthread.h>
 
-extern bool switching_stimulus;
-extern pthread_cond_t stimulus_switch_cond;
+extern bool
+    switching_stimulus; /**< Global bool for when stimulus is switching */
+extern pthread_cond_t stimulus_switch_cond; /**< pthread_cond_t for halting
+                                               threads on stimulus switch */
 
 class InputNeuron : public Neuron {
 protected:
-  double input_value;
-  double probalility_of_success;
+  double input_value;            /**< Stimulus value */
+  double probalility_of_success; /**< Probability of poisson sucess */
 
 public:
   InputNeuron(int _id, NeuronGroup *group);
-
   void reset();
   void run();
   bool poissonResult();
   void setInputValue(double value);
-  bool checkRefractoryPeriod();
+  bool inRefractory();
   void sendMessages();
   double getInputValue() const { return this->input_value; }
 };

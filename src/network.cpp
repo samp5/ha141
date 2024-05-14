@@ -77,7 +77,7 @@ SNN::generateNeighborOptions() {
 }
 
 void SNN::generateRandomSynapses() {
-  auto start = lg.get_time_stamp();
+  auto start = lg.time();
   int synapses_formed = 0;
   if (this->neurons.empty()) {
     generateNeuronVec();
@@ -102,7 +102,7 @@ void SNN::generateRandomSynapses() {
     auto this_neuron = std::find(post_opts.begin(), post_opts.end(), neuron);
 
     // add postsynaptic neuron as a neighbor
-    neuron->addNeighbor(*target, this->weight_function());
+    neuron->addNeighbor(*target, this->generateSynapseWeight());
 
     // erase the postsynaptic neuron from the list and this neuron from the
     // postsynaptic list
@@ -119,13 +119,15 @@ void SNN::generateRandomSynapses() {
       break;
     }
   }
-  auto end = lg.get_time_stamp();
+  auto end = lg.time();
   std::string msg = "Adding random synapses done: took " +
                     std::to_string(end - start) + " seconds";
   lg.log(ESSENTIAL, msg.c_str());
 }
 
-double SNN::weight_function() { return ((double)rand() / RAND_MAX) * 0.1; }
+double SNN::generateSynapseWeight() {
+  return ((double)rand() / RAND_MAX) * 0.1;
+}
 
 void SNN::join() {
   for (auto group : this->groups) {
@@ -155,7 +157,7 @@ void SNN::start() {
 
       config->STIMULUS++;
       this->setNextStim();
-      lg.log_value(ESSENTIAL, "Set stimulus to line %d", *cf.STIMULUS);
+      lg.value(ESSENTIAL, "Set stimulus to line %d", *cf.STIMULUS);
 
       this->reset();
 
@@ -165,7 +167,7 @@ void SNN::start() {
       auto end = std::chrono::high_resolution_clock::now();
       auto duration = std::chrono::duration_cast<std::chrono::duration<double>>(
           end - start);
-      lg.set_offset(duration.count());
+      lg.addOffset(duration.count());
       pthread_mutex_unlock(&mx.stimulus);
     }
   }
@@ -174,7 +176,7 @@ void SNN::start() {
 
 void SNN::setStimLineX(int target) {
 
-  lg.log_value(ESSENTIAL, "Set stimulus to line %d", *cf.STIMULUS);
+  lg.value(ESSENTIAL, "Set stimulus to line %d", *cf.STIMULUS);
 
   if (input_neurons.empty()) {
     lg.log(ESSENTIAL, "set_line_x: passed empty input neuron vector?");

@@ -17,7 +17,13 @@ extern RuntimConfig cf;
 
 pthread_mutex_t data_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-std::string io_type_to_string(Neuron_t type) {
+/**
+ * @brief Stringify Neuron_t.
+ *
+ *
+ * @return String version of Neuron_t
+ */
+std::string neuronTypeString(Neuron_t type) {
   std::string ret;
   switch (type) {
   case None:
@@ -36,14 +42,23 @@ std::string io_type_to_string(Neuron_t type) {
   return ret;
 }
 
+/**
+ * @brief Main log function.
+ *
+ * All log functions pass through this main log function
+ * before going to the output stream. This function decorates
+ * the message with the correct flag and time.
+ *
+ * @param level LogLevel that decides whether the message is printed
+ * @param  os The output stream to be used default is standard output
+ */
+
 void Log::log(LogLevel level, const char *message,
               std::ostream &os) { // default output stream is standard output
 
   if (level > cf.DEBUG_LEVEL) {
     return;
   }
-
-  // get time for log message
 
   const char *_level;
 
@@ -80,7 +95,7 @@ void Log::log(LogLevel level, const char *message,
     return;
   }
 
-  double time_rn = lg.get_time_stamp();
+  double time_rn = lg.time();
   int length = snprintf(nullptr, 0, _level, time_rn);
   char *message_prefix = new char[length + 1];
 
@@ -91,54 +106,26 @@ void Log::log(LogLevel level, const char *message,
   delete[] message_prefix;
 }
 
-void Log::log_neuron_interaction(LogLevel level, const char *message, int id1,
-                                 int id2) {
-  // length
-  int length = snprintf(nullptr, 0, message, id1, id2);
-  // allocate
-  char *formatted_msg = new char[length + 1];
-  // format
-  snprintf(formatted_msg, length + 1, message, id1, id2);
-  // log
-  this->log(level, formatted_msg);
-  // deallocate
-  delete[] formatted_msg;
-}
-
-void Log::log_neuron_value(LogLevel level, const char *message, int id,
-                           double accumulated) {
-  // length of message
-  int length = snprintf(nullptr, 0, message, id);
-  // allocate
-  char *formatted_msg = new char[length + 1];
-  // format
-  snprintf(formatted_msg, length + 1, message, id, accumulated);
-  // log
-  this->log(level, formatted_msg);
-  // deallocate
-  delete[] formatted_msg;
-}
-
-void Log::add_data(int group_id, int curr_id, double curr_data, double time,
-                   int type, Message_t message_type, Neuron *origin) {
-  LogData *this_data = new LogData;
-  this_data->timestamp = time;
-  this_data->membrane_potentail = curr_data;
-  this_data->group_id = group_id;
-  this_data->neuron_id = curr_id;
-  this_data->neuron_type = type;
-  this_data->message_type = message_type;
-  this_data->stimulus_number = *cf.STIMULUS;
-  origin->addData(this_data);
-}
-
-void Log::add_data(LogData data) {
+/**
+ * @brief Add data to Log::log_data.
+ *
+ *
+ * @param data LogData instance
+ */
+void Log::addData(LogData *data) {
   pthread_mutex_lock(&data_mutex);
   this->log_data.push_back(data);
   pthread_mutex_unlock(&data_mutex);
 }
 
-void Log::write_data(const char *filename) {
+/**
+ * @brief Write data to a log file.
+ *
+ * Write data to log file specified in RuntimConfig
+ *
+ * @param filename Name of file
+ */
+void Log::writeData(const char *filename) {
 
   namespace fs = std::filesystem;
 
@@ -165,23 +152,28 @@ void Log::write_data(const char *filename) {
     return;
   }
 
-  for (LogData log_data : this->log_data) {
-    file << std::fixed << log_data.group_id << " " << log_data.neuron_id << " "
-         << io_type_to_string((Neuron_t)log_data.neuron_type) << " "
-         << log_data.timestamp << " " << log_data.membrane_potentail << " "
-         << messageTypeToString(log_data.message_type) << " "
-         << log_data.stimulus_number << '\n';
+  for (LogData *log_data : this->log_data) {
+    file << std::fixed << log_data->group_id << " " << log_data->neuron_id
+         << " " << neuronTypeString((Neuron_t)log_data->neuron_type) << " "
+         << log_data->timestamp << " " << log_data->potential << " "
+         << messageTypeToString(log_data->message_type) << " "
+         << log_data->stimulus_number << '\n';
+    delete log_data;
   }
 
   file.close();
 
   // deallocate
   delete[] file_name;
-  this->log_runtime_config(std::to_string(name));
+  this->logConfig(std::to_string(name));
 }
 
-void Log::log_group_neuron_state(LogLevel level, const char *message,
-                                 int group_id, int id) {
+/**
+ * @brief Log a message about the state of a neuron.
+ *
+ */
+void Log::groupNeuronState(LogLevel level, const char *message, int group_id,
+                           int id) {
   // length
   int length = snprintf(nullptr, 0, message, group_id, id);
   // allocate
@@ -194,8 +186,12 @@ void Log::log_group_neuron_state(LogLevel level, const char *message,
   delete[] formatted_msg;
 }
 
-void Log::log_group_neuron_value(LogLevel level, const char *message,
-                                 int group_id, int id, double accumulated) {
+/**
+ * @brief Log a message about the value of a neuron.
+ *
+ */
+void Log::neuronValue(LogLevel level, const char *message, int group_id, int id,
+                      double accumulated) {
   // length of message
   int length = snprintf(nullptr, 0, message, group_id, id, accumulated);
   // allocate
@@ -208,9 +204,12 @@ void Log::log_group_neuron_value(LogLevel level, const char *message,
   delete[] formatted_msg;
 }
 
-void Log::log_group_neuron_interaction(LogLevel level, const char *message,
-                                       int group_id1, int id1, int group_id2,
-                                       int id2) {
+/**
+ * @brief Log a message about the interaction between 2 neurons.
+ *
+ */
+void Log::neuronInteraction(LogLevel level, const char *message, int group_id1,
+                            int id1, int group_id2, int id2) {
   // length
   int length = snprintf(nullptr, 0, message, group_id1, id1, group_id2, id2);
   // allocate
@@ -223,7 +222,11 @@ void Log::log_group_neuron_interaction(LogLevel level, const char *message,
   delete[] formatted_msg;
 }
 
-void Log::log_group_state(LogLevel level, const char *message, int group_id) {
+/**
+ * @brief Log a message about the state of a group.
+ *
+ */
+void Log::state(LogLevel level, const char *message, int group_id) {
   // length
   int length = snprintf(nullptr, 0, message, group_id);
   // allocate
@@ -236,8 +239,12 @@ void Log::log_group_state(LogLevel level, const char *message, int group_id) {
   delete[] formatted_msg;
 }
 
-void Log::log_group_neuron_type(LogLevel level, const char *message,
-                                int group_id, int id, const char *type) {
+/**
+ * @brief Log a message about the type of a neuron.
+ *
+ */
+void Log::neuronType(LogLevel level, const char *message, int group_id, int id,
+                     const char *type) {
 
   // length
   int length = snprintf(nullptr, 0, message, group_id, id, type);
@@ -251,6 +258,10 @@ void Log::log_group_neuron_type(LogLevel level, const char *message,
   delete[] formatted_msg;
 }
 
+/**
+ * @brief Log a message
+ *
+ */
 void Log::print(const char *message, bool newline, std::ostream &os) {
   if (newline)
     os << message << '\n';
@@ -258,17 +269,27 @@ void Log::print(const char *message, bool newline, std::ostream &os) {
     os << message;
 }
 
-void Log::set_offset(double value) { this->off_set += value; }
+/**
+ * @brief Update the Log::off_set value
+ *
+ * @param value Value to be added
+ *
+ */
+void Log::addOffset(double value) { this->offset += value; }
 
-double Log::get_time_stamp() {
+double Log::time() {
 
   hr_clock::time_point now = hr_clock::now();
 
   duration time_span = std::chrono::duration_cast<duration>(now - this->start);
-  return time_span.count() - this->off_set;
+  return time_span.count() - this->offset;
 }
 
-void Log::log_value(LogLevel level, const char *message, int value) {
+/**
+ * @brief Log an integer
+ *
+ */
+void Log::value(LogLevel level, const char *message, int value) {
   // length
   int length = snprintf(nullptr, 0, message, value);
   // allocate
@@ -281,7 +302,11 @@ void Log::log_value(LogLevel level, const char *message, int value) {
   delete[] formatted_msg;
 }
 
-void Log::log_string(LogLevel level, const char *message, const char *string) {
+/**
+ * @brief Log a string
+ *
+ */
+void Log::string(LogLevel level, const char *message, const char *string) {
   // length
   int length = snprintf(nullptr, 0, message, string);
   // allocate
@@ -294,7 +319,11 @@ void Log::log_string(LogLevel level, const char *message, const char *string) {
   delete[] formatted_msg;
 }
 
-void Log::log_runtime_config(const std::string &name) {
+/**
+ * @brief Copy the configuration file used for a run into the log folder
+ *
+ */
+void Log::logConfig(const std::string &name) {
 
   namespace fs = std::filesystem;
   fs::path config_source = cf.CONFIG_FILE;
@@ -304,7 +333,7 @@ void Log::log_runtime_config(const std::string &name) {
   fs::copy_file(config_source, config_target);
 }
 
-const char *Log::get_active_status_string(bool active) {
+const char *Log::activeStatusString(bool active) {
   if (active) {
     const char *active = "active"; // NOLINT
     return active;
@@ -314,7 +343,7 @@ const char *Log::get_active_status_string(bool active) {
   }
 }
 
-LogLevel Log::get_level_from_string(std::string level) {
+LogLevel Log::debugLevelString(std::string level) {
   if (level == "NONE")
     return NONE;
   if (level == "INFO")

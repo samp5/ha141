@@ -1,12 +1,21 @@
+/** @file */
 #ifndef MESSAGE
 #define MESSAGE
-
-#include <string>
 class NeuronGroup;
 class Neuron;
 
-enum Message_t { Decay, Stimulus, From_Neighbor, Refractory, Checked };
+/**
+ * \enum Message_t
+ * Message type.
+ */
+enum Message_t { Decay, Stimulus, From_Neighbor, Refractory };
 
+/**
+ *
+ * \struct Message
+ * Datastructure for messages.
+ *
+ */
 struct Message {
 public:
   Message(double value, Neuron *target, Message_t type);

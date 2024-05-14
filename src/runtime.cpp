@@ -135,7 +135,7 @@ int RuntimConfig::setOptions() {
   try {
     tbl = toml::parse_file(file_name);
   } catch (const toml::parse_error &err) {
-    lg.log_string(ERROR, "Parsing failed:", err.what());
+    lg.string(ERROR, "Parsing failed:", err.what());
     return 0;
   }
 
@@ -143,7 +143,7 @@ int RuntimConfig::setOptions() {
     INPUT_PROB_SUCCESS =
         tbl["neuron"]["poisson_prob_of_success"].as_floating_point()->get();
   } else {
-    lg.log_string(ERROR, "Failed to parse: %s", "poisson_prob_of_success");
+    lg.string(ERROR, "Failed to parse: %s", "poisson_prob_of_success");
   }
 
   if (tbl["neuron"]["refractory_duration"].as_floating_point()) {
@@ -152,33 +152,33 @@ int RuntimConfig::setOptions() {
         tbl["neuron"]["refractory_duration"].as_floating_point()->get() /
         1000.0f;
   } else {
-    lg.log_string(ERROR, "Failed to parse: %s", "refractory_duration");
+    lg.string(ERROR, "Failed to parse: %s", "refractory_duration");
   }
 
   if (tbl["neuron"]["tau"].as_floating_point()) {
     TAU = tbl["neuron"]["tau"].as_floating_point()->get();
   } else {
-    lg.log_string(ERROR, "Failed to parse: %s", "tau");
+    lg.string(ERROR, "Failed to parse: %s", "tau");
   }
 
   if (tbl["neuron"]["input_neuron_count"].as_integer()) {
     NUMBER_INPUT_NEURONS =
         tbl["neuron"]["input_neuron_count"].as_integer()->get();
   } else {
-    lg.log_string(ERROR, "Failed to parse: %s", "input_neuron_count");
+    lg.string(ERROR, "Failed to parse: %s", "input_neuron_count");
   }
 
   if (tbl["runtime_vars"]["line_range"].as_string()) {
     STIMULUS_VEC =
         parse_line_range(tbl["runtime_vars"]["line_range"].as_string()->get());
   } else {
-    lg.log_string(ERROR, "Failed to parse: %s", "line_range");
+    lg.string(ERROR, "Failed to parse: %s", "line_range");
   }
 
   if (tbl["runtime_vars"]["runtime"].as_integer()) {
     RUN_TIME = 1e6 * tbl["runtime_vars"]["runtime"].as_integer()->get();
   } else {
-    lg.log_string(ERROR, "Failed to parse: %s", "runtime");
+    lg.string(ERROR, "Failed to parse: %s", "runtime");
   }
 
   if (tbl["random"]["seed"].as_string()) {
@@ -189,21 +189,21 @@ int RuntimConfig::setOptions() {
       RAND_SEED = tbl["random"]["seed"].as_integer()->get();
     }
   } else {
-    lg.log_string(ERROR, "Failed to parse: %s", "random seed");
+    lg.string(ERROR, "Failed to parse: %s", "random seed");
   }
 
   if (tbl["runtime_vars"]["input_file"].as_string()) {
     std::string file = tbl["runtime_vars"]["input_file"].as_string()->get();
     INPUT_FILE = file;
   } else {
-    lg.log_string(ERROR, "Failed to parse: %s", "input_file");
+    lg.string(ERROR, "Failed to parse: %s", "input_file");
   }
 
   if (tbl["debug"]["level"].as_string()) {
     std::string level = tbl["debug"]["level"].as_string()->get();
-    DEBUG_LEVEL = lg.get_level_from_string(level);
+    DEBUG_LEVEL = lg.debugLevelString(level);
   } else {
-    lg.log_string(ERROR, "Failed to parse: %s", "Debug level");
+    lg.string(ERROR, "Failed to parse: %s", "Debug level");
   }
 
   if (tbl["neuron"]["refractory_membrane_potential"].as_floating_point()) {
@@ -212,47 +212,46 @@ int RuntimConfig::setOptions() {
             .as_floating_point()
             ->get();
   } else {
-    lg.log_string(ERROR, "Failed to parse: %s",
-                  "refractory_membrane_potential");
+    lg.string(ERROR, "Failed to parse: %s", "refractory_membrane_potential");
   }
 
   if (tbl["neuron"]["activation_threshold"].as_floating_point()) {
     ACTIVATION_THRESHOLD =
         tbl["neuron"]["activation_threshold"].as_floating_point()->get();
   } else {
-    lg.log_string(ERROR, "Failed to parse: %s", "activation_threshold");
+    lg.string(ERROR, "Failed to parse: %s", "activation_threshold");
   }
 
   if (tbl["neuron"]["initial_membrane_potential"].as_floating_point()) {
     INITIAL_MEMBRANE_POTENTIAL =
         tbl["neuron"]["initial_membrane_potential"].as_floating_point()->get();
   } else {
-    lg.log_string(ERROR, "Failed to parse: %s", "initial_membrane_potential");
+    lg.string(ERROR, "Failed to parse: %s", "initial_membrane_potential");
   }
 
   if (tbl["neuron"]["group_count"].as_integer()) {
     NUMBER_GROUPS = tbl["neuron"]["group_count"].as_integer()->get();
   } else {
-    lg.log_string(ERROR, "Failed to parse: %s", "group_count");
+    lg.string(ERROR, "Failed to parse: %s", "group_count");
   }
 
   if (tbl["neuron"]["neuron_count"].as_integer()) {
     NUMBER_NEURONS = tbl["neuron"]["neuron_count"].as_integer()->get();
   } else {
-    lg.log_string(ERROR, "Failed to parse: %s", "neuron_count");
+    lg.string(ERROR, "Failed to parse: %s", "neuron_count");
   }
 
   if (tbl["neuron"]["edge_count"].as_string()) {
     std::string seed = tbl["neuron"]["edge_count"].as_string()->get();
     if (seed == "MAX") {
       NUMBER_EDGES = SNN::maximum_edges();
-      lg.log_string(INFO, "Maximum edges selected, setting to %s",
-                    std::to_string(NUMBER_EDGES).c_str());
+      lg.string(INFO, "Maximum edges selected, setting to %s",
+                std::to_string(NUMBER_EDGES).c_str());
     }
   } else if (tbl["neuron"]["edge_count"].as_integer()) {
     NUMBER_EDGES = tbl["neuron"]["edge_count"].as_integer()->get();
   } else {
-    lg.log_string(ERROR, "Failed to parse: %s", "edge_count");
+    lg.string(ERROR, "Failed to parse: %s", "edge_count");
   }
 
   num_stimulus = STIMULUS_VEC.size();
@@ -324,9 +323,9 @@ void RuntimConfig::checkStartCond() {
            "NUMBER_INPUT_NEURONS not divisible by NUMBER_GROUPS... quitting");
     error = true;
   } else if (NUMBER_EDGES > SNN::maximum_edges()) {
-    lg.log_string(ERROR,
-                  "Maximum number of possible edges (%s) exceeded .. quitting",
-                  std::to_string(SNN::maximum_edges()).c_str());
+    lg.string(ERROR,
+              "Maximum number of possible edges (%s) exceeded .. quitting",
+              std::to_string(SNN::maximum_edges()).c_str());
     error = true;
   }
   if (error) {

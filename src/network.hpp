@@ -6,6 +6,13 @@
 #include <vector>
 class Neuron;
 class NeuronGroup;
+
+/**
+ * @brief Spiking Neural Network.
+ *
+ * Runs all operations for the spiking neural network.
+ *
+ */
 class SNN {
 private:
   std::vector<NeuronGroup *> groups;
@@ -16,7 +23,7 @@ private:
 public:
   SNN(RuntimConfig *config);
   ~SNN();
-  double weight_function();
+  double generateSynapseWeight();
   void start();
   void join();
   void reset();

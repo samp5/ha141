@@ -85,7 +85,7 @@ public:
   int getID() { return id; }
 
   // log operations
-  void addData(LogData *data) { this->log_data.push_back(data); }
+  void addData(double time, Message_t message_type);
   void transferData();
 };
 
