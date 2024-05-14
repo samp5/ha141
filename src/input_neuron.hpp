@@ -17,11 +17,11 @@ public:
   InputNeuron(int _id, NeuronGroup *group);
 
   void reset();
-  void run_in_group();
+  void run();
   bool poisson_result();
   void set_input_value(double value);
   bool check_refractory_period();
-  void send_messages_in_group();
+  void sendMessages();
   double getInputValue() const { return this->input_value; }
 };
 

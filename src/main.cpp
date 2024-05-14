@@ -1,11 +1,8 @@
-#include "runtime.hpp"
-RuntimConfig cf;
-Mutex mx;
-
 #include "log.hpp"
 #include "network.hpp"
 #include "neuron.hpp"
 #include "neuron_group.hpp"
+#include "runtime.hpp"
 #include <pthread.h>
 #include <string>
 #include <unistd.h>
@@ -13,6 +10,8 @@ Mutex mx;
 using std::string;
 
 Log lg;
+RuntimConfig cf;
+Mutex mx;
 
 pthread_cond_t stimulus_switch_cond = PTHREAD_COND_INITIALIZER;
 

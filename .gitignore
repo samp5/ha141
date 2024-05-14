@@ -19,8 +19,8 @@ core*
 
 
 # doxygen output
-doxygen/html/*
-doxygen/latex/*
+doxygen/html
+doxygen/latex
 
 #ingore venv
 plotting/venv/*

@@ -55,13 +55,6 @@ public:
   void start_clock() { this->start = hr_clock::now(); }
   void write_data(const char *filesname = "./logs/%ld/%ld.log");
 
-  void add_data(int group_id, int curr_id, double curr_data);
-
-  void add_data(int group_id, int curr_id, double curr_data, double time);
-
-  void add_data(int group_id, int curr_id, double curr_data, double time,
-                int type, Message_t message_type);
-
   void add_data(int group_id, int curr_id, double curr_data, double time,
                 int type, Message_t message_type, Neuron *origin);
 
@@ -79,17 +72,10 @@ public:
   void set_offset(double value);
 
   // Neuron Logs
-  void log_neuron_state(LogLevel level, const char *message, int id);
-
   void log_neuron_interaction(LogLevel level, const char *message, int id1,
                               int id2);
-  void log_neuron_interaction(LogLevel level, const char *message, int id1,
-                              int id2, double value);
   void log_neuron_value(LogLevel level, const char *message, int id,
                         double accumulated);
-  void log_neuron_type(LogLevel level, const char *message, int id,
-                       const char *type);
-
   // Neuron Logs for Neurons in Groups
   void log_group_neuron_state(LogLevel level, const char *message, int group_id,
                               int id);
@@ -102,29 +88,20 @@ public:
   void log_group_neuron_interaction(LogLevel level, const char *message,
                                     int group_id1, int id1, int group_id2,
                                     int id2);
-
-  void log_group_neuron_interaction(LogLevel level, const char *message,
-                                    int group_id1, int id1, int group_id2,
-                                    int id2, double value);
-
   // Neuron Group Logs
   void log_group_state(LogLevel level, const char *message, int group_id);
-
-  void log_group_value(LogLevel level, const char *message, int group_id,
-                       int value);
 
   void log_string(LogLevel level, const char *message, const char *string);
 
   void print(const char *message, bool newline = true,
              std::ostream &os = std::cout);
 
-  void log_message(LogLevel level, const char *message, double timestamp,
-                   int group_id, int id, double value);
   void log_value(LogLevel level, const char *message, int value);
-  void log_value(LogLevel level, const char *message, int value, int value2);
 
   const char *get_active_status_string(bool active);
+
   LogLevel get_level_from_string(std::string level);
+
   std::string messageTypeToString(Message_t type);
 
 private:

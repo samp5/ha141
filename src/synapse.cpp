@@ -22,5 +22,5 @@ void Synapse::propagate() {
       new Message(message_value, this->getPostSynaptic(), From_Neighbor);
 
   this->getPostSynaptic()->activate();
-  this->getPostSynaptic()->add_message(message_to_send);
+  this->getPostSynaptic()->addMessage(message_to_send);
 }

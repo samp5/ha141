@@ -6,13 +6,22 @@
 extern Mutex mx;
 extern RuntimConfig cf;
 
+/**
+ * @brief Constructor for InputNeuron.
+ *
+ * Sets status as exciatory by default. Probability of success
+ * is set in RuntimConfig
+ *
+ * @param _id Neuron ID
+ * @param group NeuronGroup that this neuron belongs to
+ */
 InputNeuron::InputNeuron(int _id, NeuronGroup *group)
     : Neuron(_id, group, Input), probalility_of_success(cf.INPUT_PROB_SUCCESS) {
   this->excit_inhib_value = -1;
   this->activate();
 }
 
-void InputNeuron::run_in_group() {
+void InputNeuron::run() {
 
   if (::switching_stimulus) {
     // wait for all input neurons to switch to the new stimulus
@@ -32,17 +41,17 @@ void InputNeuron::run_in_group() {
   }
 
   double time = lg.get_time_stamp();
-  this->retroactive_decay(this->last_decay, time);
+  this->retroactiveDecay(this->last_decay, time);
 
   if (this->membrane_potential >= cf.ACTIVATION_THRESHOLD) {
-    this->send_messages_in_group();
+    this->sendMessages();
   }
 
   if (poisson_result()) {
 
     double time_rn = lg.get_time_stamp();
 
-    this->update_potential(this->input_value);
+    this->accumulatePotential(this->input_value);
 
     lg.add_data(this->getGroup()->get_id(), this->getID(),
                 this->membrane_potential, time_rn, this->getType(), Stimulus,
@@ -56,7 +65,7 @@ void InputNeuron::run_in_group() {
   }
 
   if (this->membrane_potential >= cf.ACTIVATION_THRESHOLD) {
-    this->send_messages_in_group();
+    this->sendMessages();
   }
 }
 
@@ -90,7 +99,7 @@ bool InputNeuron::check_refractory_period() {
   return true;
 }
 
-void InputNeuron::send_messages_in_group() {
+void InputNeuron::sendMessages() {
 
   for (const auto synapse : getSynapses()) {
     synapse->propagate();

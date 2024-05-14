@@ -12,14 +12,6 @@
 extern RuntimConfig cf;
 extern Mutex mx;
 
-// Constructor for Neuron class for Neurons in Groups
-//
-// Sets ID, inhibitory status, group pointer
-// and prints out a log message
-//
-// @param1: Neuron ID
-// @param2: excitatory/inhibitory value (1 or -1)
-// @param3: Pointer to the parent group
 Neuron::Neuron(int _id, NeuronGroup *group, Neuron_t type) {
   this->type = type;
   this->id = _id;
@@ -35,12 +27,7 @@ Neuron::Neuron(int _id, NeuronGroup *group, Neuron_t type) {
                            this->group->get_id(), _id, inhib);
 }
 
-// Destructor for the Neuron class
-//
-// Destroys pthread conditional
-//
 Neuron::~Neuron() {
-  pthread_cond_destroy(&cond);
   std::for_each(this->PostSynapticConnnections.begin(),
                 this->PostSynapticConnnections.end(),
                 [](Synapse *syn) { delete syn; });
@@ -49,7 +36,13 @@ Neuron::~Neuron() {
                 [](Synapse *syn) { delete syn; });
 }
 
-void Neuron::transfer_data() {
+/**
+ * @brief Transfer data to Log.
+ *
+ * Transfers data from thread local Neuron::log_data
+ * to global Log::log_data
+ */
+void Neuron::transferData() {
   for (auto data : this->log_data) {
     lg.add_data(*data);
     delete data;
@@ -99,18 +92,18 @@ void Neuron::addNeighbor(Neuron *neighbor, double weight) {
 // should only be called in `run_in_group()`
 //
 // @returns 0 if all messages recieved, 1 otherwise
-int Neuron::recieve_in_group() {
+int Neuron::recieveMessage() {
 
   // Get message
-  Message *incoming_message = this->get_message();
+  Message *incoming_message = this->retrieveMessage();
 
   if (incoming_message == NULL) {
     double time = lg.get_time_stamp();
-    this->retroactive_decay(this->last_decay, time);
+    this->retroactiveDecay(this->last_decay, time);
     return 0;
   }
 
-  this->retroactive_decay(this->last_decay, incoming_message->timestamp);
+  this->retroactiveDecay(this->last_decay, incoming_message->timestamp);
 
   if (incoming_message->timestamp <
       this->refractory_start + cf.REFRACTORY_DURATION) {
@@ -125,7 +118,7 @@ int Neuron::recieve_in_group() {
     return 1;
   }
 
-  this->update_potential(incoming_message->message);
+  this->accumulatePotential(incoming_message->message);
 
   lg.log_group_neuron_value(
       INFO, "(%d) Neuron %d recieved message, accumulated equal to %f",
@@ -142,7 +135,7 @@ int Neuron::recieve_in_group() {
   return 1;
 }
 
-void Neuron::send_messages_in_group() {
+void Neuron::sendMessages() {
 
   for (const auto synapse : getPostSynaptic()) {
     synapse->propagate();
@@ -157,10 +150,10 @@ void Neuron::send_messages_in_group() {
 }
 
 // Run cycle for a neuron in a group
-void Neuron::run_in_group() {
-  while (this->recieve_in_group()) {
+void Neuron::run() {
+  while (this->recieveMessage()) {
     if (this->membrane_potential >= cf.ACTIVATION_THRESHOLD) {
-      this->send_messages_in_group();
+      this->sendMessages();
     }
   }
   this->deactivate();
@@ -190,7 +183,8 @@ void Neuron::refractory() {
 
 bool Neuron::isActivated() const { return this->active; }
 NeuronGroup *Neuron::getGroup() { return this->group; }
-void Neuron::add_message(Message *message) {
+
+void Neuron::addMessage(Message *message) {
 
   if (this->messages.empty()) {
     pthread_mutex_lock(&mx.message);
@@ -212,7 +206,7 @@ void Neuron::add_message(Message *message) {
   }
 }
 
-Message *Neuron::get_message() {
+Message *Neuron::retrieveMessage() {
 
   pthread_mutex_lock(&mx.message);
   // Return if messages is empty
@@ -241,7 +235,7 @@ Message *Neuron::get_message() {
 // Logs the updated membrane_potential
 //
 // @returns new membrane_potential
-void Neuron::retroactive_decay(double from, double to) {
+void Neuron::retroactiveDecay(double from, double to) {
   double tau = cf.TAU;
   double v_rest = cf.REFRACTORY_MEMBRANE_POTENTIAL;
 
@@ -270,50 +264,13 @@ void Neuron::retroactive_decay(double from, double to) {
       continue;
     }
 
-    this->update_potential(-decay_value);
+    this->accumulatePotential(-decay_value);
 
     lg.add_data(this->getGroup()->get_id(), this->getID(),
                 this->membrane_potential, i, this->getType(),
                 message_decay_type, this);
   }
   this->last_decay = i;
-}
-
-// Decays a neuron based on DECAY_VALUE
-//
-// Logs the updated membrane_potential
-//
-// @returns new membrane_potential
-double Neuron::decay(double timestamp) {
-  double tau = cf.TAU;
-  double v_rest = cf.REFRACTORY_MEMBRANE_POTENTIAL;
-
-  // for a membrane potential of  -55, tau = 10, decay value is 1.5
-  double decay_value = (this->membrane_potential - v_rest) / tau;
-
-  // if we sitting at -70 no need to decay
-  if (std::abs(decay_value) < 0.01 || decay_value < 0) {
-    return 0;
-  }
-
-  Message_t decay_type = Decay;
-
-  this->update_potential(-decay_value);
-
-  double potential = this->membrane_potential;
-
-  lg.add_data(this->getGroup()->get_id(), this->getID(), potential, timestamp,
-              this->getType(), decay_type, this);
-
-  lg.log_group_neuron_value(
-      DEBUG2, "(%d) Neuron %d is decaying. Decay value is %f",
-      this->getGroup()->get_id(), this->getID(), decay_value);
-
-  lg.log_group_neuron_value(
-      DEBUG2, "(%d) Neuron %d decayed. Membrane potential now %f",
-      this->getGroup()->get_id(), this->getID(), potential);
-
-  return potential;
 }
 
 // Activates neuron
@@ -333,9 +290,9 @@ void Neuron::deactivate() {
 // Set type of neuron
 //
 // @param1: Neuron_t
-void Neuron::set_type(Neuron_t type) { this->type = type; }
+void Neuron::setType(Neuron_t type) { this->type = type; }
 
-void Neuron::update_potential(double value) {
+void Neuron::accumulatePotential(double value) {
   pthread_mutex_lock(&mx.potential);
   this->membrane_potential += value;
   pthread_mutex_unlock(&mx.potential);
@@ -376,4 +333,11 @@ int Neuron::generateInhibitoryStatus() {
     ret = 1;
   }
   return ret;
+}
+
+const vector<Synapse *> &Neuron::getPostSynaptic() const {
+  return this->PostSynapticConnnections;
+}
+const vector<Synapse *> &Neuron::getPresynaptic() const {
+  return this->PreSynapticConnections;
 }

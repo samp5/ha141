@@ -7,7 +7,6 @@
 #include "synapse.hpp"
 #include <iostream>
 #include <list>
-#include <map>
 #include <pthread.h>
 #include <unistd.h>
 
@@ -30,6 +29,7 @@ protected:
   int id;
   Neuron_t type;
   NeuronGroup *group;
+  bool active = false;
 
   // timestamp data
   double last_decay;
@@ -38,17 +38,6 @@ protected:
   // Edge values
   vector<Synapse *> PostSynapticConnnections;
   vector<Synapse *> PreSynapticConnections;
-  typedef std::map<Neuron *, double> weight_map;
-  weight_map _postsynaptic;
-  weight_map _presynaptic;
-
-  // pthread values
-  pthread_t thread;
-  pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
-
-  // Conditional execution values
-  bool active = false;
-  bool recieved = false;
 
   // message list
   list<Message *> messages;
@@ -62,50 +51,42 @@ public:
   void addPreSynapticConnection(Synapse *synapse);
 
   // Running and messaging
-  void *run();
-  virtual void run_in_group();
-  int recieve_in_group();
-  void add_message(Message *);
-  Message *get_message();
-  virtual void send_messages_in_group();
+  virtual void run();
+  virtual void sendMessages();
+
+  int recieveMessage();
+  void addMessage(Message *);
+  Message *retrieveMessage();
   vector<Synapse *> &getSynapses() { return this->PostSynapticConnnections; }
 
   // State operations
   virtual void reset();
   void refractory();
-  void set_type(Neuron_t type);
+  void setType(Neuron_t type);
   void activate();
   void deactivate();
-  double decay(double timestamp);
-  void retroactive_decay(double from, double to);
-  void update_potential(double value);
+  void retroactiveDecay(double from, double to);
+  void accumulatePotential(double value);
   int generateInhibitoryStatus();
 
-  // Thread operations
-  void start_thread();
-  void join_thread();
-
   // GETTERS
-  pthread_t getThreadID() { return thread; }
-  pthread_cond_t *getPthreadCond() { return &cond; }
-  double getLastDecay() { return this->last_decay; }
-  const vector<Synapse *> &getPostSynaptic() const {
-    return this->PostSynapticConnnections;
-  }
-  const vector<Synapse *> &getPresynaptic() const {
-    return this->PreSynapticConnections;
-  }
-  int getID() { return id; }
-  Neuron_t getType() { return this->type; }
-  double getPotential();
-  const list<Message *> &getMessageVector();
-  NeuronGroup *getGroup();
   bool isActivated() const;
+
+  double getPotential();
+  NeuronGroup *getGroup();
+
+  const list<Message *> &getMessageVector();
+  const vector<Synapse *> &getPostSynaptic() const;
+  const vector<Synapse *> &getPresynaptic() const;
+
+  double getLastDecay() { return this->last_decay; }
   int getBias() { return this->excit_inhib_value; }
+  Neuron_t getType() { return this->type; }
+  int getID() { return id; }
 
   // log operations
-  void push_back_data(LogData *data) { this->log_data.push_back(data); }
-  void transfer_data();
+  void addData(LogData *data) { this->log_data.push_back(data); }
+  void transferData();
 };
 
 #endif // !NEURON

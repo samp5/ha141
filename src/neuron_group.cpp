@@ -79,16 +79,16 @@ void *NeuronGroup::group_run() {
         neuron = neuron->getType() == Input
                      ? dynamic_cast<InputNeuron *>(neuron)
                      : neuron;
-        neuron->run_in_group();
+        neuron->run();
       } else {
         double time = lg.get_time_stamp();
-        neuron->retroactive_decay(neuron->getLastDecay(), time);
+        neuron->retroactiveDecay(neuron->getLastDecay(), time);
       }
     }
   }
 
   for (auto neuron : this->neurons) {
-    neuron->transfer_data();
+    neuron->transferData();
   }
 
   return NULL;
