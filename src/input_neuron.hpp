@@ -18,9 +18,9 @@ public:
 
   void reset();
   void run();
-  bool poisson_result();
-  void set_input_value(double value);
-  bool check_refractory_period();
+  bool poissonResult();
+  void setInputValue(double value);
+  bool checkRefractoryPeriod();
   void sendMessages();
   double getInputValue() const { return this->input_value; }
 };

@@ -26,20 +26,17 @@ public:
   NeuronGroup(int _id, int number_neurons, int number_input_neurons);
   ~NeuronGroup();
 
-  void *group_run();
+  void *run();
 
-  void start_thread() {
+  void startThread() {
     pthread_create(&thread, NULL, NeuronGroup::thread_helper, this);
   }
-  double get_id() const { return id; }
+  double getID() const { return id; }
 
-  pthread_t get_thread_id() { return thread; }
-  // not implemented
-  void print_group();
-  int neuron_count();
+  pthread_t getThreadID() { return thread; }
+  int neuronCount();
   void reset();
-  double get_message();
-  const vector<Neuron *> &get_neruon_vector();
+  const vector<Neuron *> &getNeuronVec();
 
   /*--------------------------------------------------------------*\
    *                  Thread helper:
@@ -47,9 +44,8 @@ public:
    *    This function allows us to use the run() member funciton
   \--------------------------------------------------------------*/
   static void *thread_helper(void *instance) {
-    return ((NeuronGroup *)instance)->group_run();
+    return ((NeuronGroup *)instance)->run();
   }
 };
 
 #endif // !NEURON_GROUP
-#define NEURON_GROUP

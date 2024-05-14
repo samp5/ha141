@@ -24,7 +24,7 @@ Neuron::Neuron(int _id, NeuronGroup *group, Neuron_t type) {
       this->excit_inhib_value == -1 ? "excitatory\0" : "inhibitory\0";
 
   lg.log_group_neuron_type(INFO, "(%d) Neuron %d added: %s",
-                           this->group->get_id(), _id, inhib);
+                           this->group->getID(), _id, inhib);
 }
 
 Neuron::~Neuron() {
@@ -78,8 +78,8 @@ void Neuron::addNeighbor(Neuron *neighbor, double weight) {
   } else {
     lg.log_group_neuron_interaction(
         INFO, "Edge from (%d) Neuron %d to (%d) Neuron %d added",
-        this->getGroup()->get_id(), this->getID(),
-        neighbor->getGroup()->get_id(), neighbor->getID());
+        this->getGroup()->getID(), this->getID(), neighbor->getGroup()->getID(),
+        neighbor->getID());
   }
 }
 
@@ -113,7 +113,7 @@ int Neuron::recieveMessage() {
 
     lg.log_group_neuron_state(
         INFO, "(%d) Neuron %d is still in refractory period, ignoring message",
-        this->getGroup()->get_id(), this->getID());
+        this->getGroup()->getID(), this->getID());
 
     return 1;
   }
@@ -122,10 +122,10 @@ int Neuron::recieveMessage() {
 
   lg.log_group_neuron_value(
       INFO, "(%d) Neuron %d recieved message, accumulated equal to %f",
-      this->group->get_id(), this->id, this->membrane_potential);
+      this->group->getID(), this->id, this->membrane_potential);
 
   // use message timestamp not current time
-  lg.add_data(this->group->get_id(), this->id, this->membrane_potential,
+  lg.add_data(this->group->getID(), this->id, this->membrane_potential,
               incoming_message->timestamp, this->getType(),
               incoming_message->message_type, this);
 
@@ -144,7 +144,7 @@ void Neuron::sendMessages() {
   lg.log_group_neuron_state(
       INFO,
       "(%d) Neuron %d reached activation threshold, entering refractory phase",
-      this->group->get_id(), this->id);
+      this->group->getID(), this->id);
 
   this->refractory();
 }
@@ -176,7 +176,7 @@ void Neuron::refractory() {
                       "Neuron %d in refractory state: potential set to %f",
                       this->id, this->membrane_potential);
 
-  lg.add_data(this->getGroup()->get_id(), this->getID(),
+  lg.add_data(this->getGroup()->getID(), this->getID(),
               cf.REFRACTORY_MEMBRANE_POTENTIAL, this->refractory_start,
               this->getType(), refractory_type, this);
 }
@@ -214,7 +214,7 @@ Message *Neuron::retrieveMessage() {
     pthread_mutex_unlock(&mx.message);
     lg.log_group_neuron_state(DEBUG,
                               "No additional messages for (%d) Neuron %d",
-                              this->getGroup()->get_id(), this->getID());
+                              this->getGroup()->getID(), this->getID());
     return NULL;
   }
   pthread_mutex_unlock(&mx.message);
@@ -266,7 +266,7 @@ void Neuron::retroactiveDecay(double from, double to) {
 
     this->accumulatePotential(-decay_value);
 
-    lg.add_data(this->getGroup()->get_id(), this->getID(),
+    lg.add_data(this->getGroup()->getID(), this->getID(),
                 this->membrane_potential, i, this->getType(),
                 message_decay_type, this);
   }

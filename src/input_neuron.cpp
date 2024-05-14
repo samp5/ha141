@@ -32,11 +32,11 @@ void InputNeuron::run() {
     pthread_mutex_unlock(&mx.stimulus);
   }
 
-  if (!this->check_refractory_period()) {
+  if (!this->checkRefractoryPeriod()) {
     lg.log_group_neuron_state(
         INFO,
         "INPUT: (%d) Neuron %d is still in refractory period, ignoring input",
-        this->getGroup()->get_id(), this->getID());
+        this->getGroup()->getID(), this->getID());
     return;
   }
 
@@ -47,13 +47,13 @@ void InputNeuron::run() {
     this->sendMessages();
   }
 
-  if (poisson_result()) {
+  if (poissonResult()) {
 
     double time_rn = lg.get_time_stamp();
 
     this->accumulatePotential(this->input_value);
 
-    lg.add_data(this->getGroup()->get_id(), this->getID(),
+    lg.add_data(this->getGroup()->getID(), this->getID(),
                 this->membrane_potential, time_rn, this->getType(), Stimulus,
                 this);
 
@@ -61,7 +61,7 @@ void InputNeuron::run() {
         INFO,
         "(Input) (%d) Neuron %d poisson success! Adding input value to "
         "membrane_potential. membrane_potential now %f",
-        this->getGroup()->get_id(), this->getID(), this->membrane_potential);
+        this->getGroup()->getID(), this->getID(), this->membrane_potential);
   }
 
   if (this->membrane_potential >= cf.ACTIVATION_THRESHOLD) {
@@ -69,7 +69,7 @@ void InputNeuron::run() {
   }
 }
 
-bool InputNeuron::poisson_result() {
+bool InputNeuron::poissonResult() {
 
   double roll = (double)rand() / RAND_MAX;
 
@@ -80,7 +80,7 @@ bool InputNeuron::poisson_result() {
   }
 }
 
-bool InputNeuron::check_refractory_period() {
+bool InputNeuron::checkRefractoryPeriod() {
 
   double timestamp = lg.get_time_stamp();
 
@@ -91,7 +91,7 @@ bool InputNeuron::check_refractory_period() {
 
     lg.log_group_neuron_state(
         INFO, "(%d) Neuron %d is still in refractory period, ignoring message",
-        this->getGroup()->get_id(), this->getID());
+        this->getGroup()->getID(), this->getID());
 
     return false;
   }
@@ -108,16 +108,16 @@ void InputNeuron::sendMessages() {
   lg.log_group_neuron_state(
       INFO,
       "(%d) Neuron %d reached activation threshold, entering refractory phase",
-      this->group->get_id(), this->id);
+      this->group->getID(), this->id);
 
   this->refractory();
 }
 
-void InputNeuron::set_input_value(double value) {
+void InputNeuron::setInputValue(double value) {
   this->input_value = value;
   lg.log_group_neuron_value(DEBUG3,
                             "(Input) (%d) Neuron %d input value set to %f",
-                            this->getGroup()->get_id(), this->getID(), value);
+                            this->getGroup()->getID(), this->getID(), value);
 }
 
 void InputNeuron::reset() {

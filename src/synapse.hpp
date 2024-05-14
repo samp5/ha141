@@ -21,4 +21,3 @@ private:
 };
 
 #endif // !SYNAPSE
-#define SYNAPSE

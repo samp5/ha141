@@ -1,4 +1,5 @@
 #ifndef GLOBALS
+#define GLOBALS
 #include "log.hpp"
 #include <vector>
 

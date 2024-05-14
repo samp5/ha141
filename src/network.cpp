@@ -40,7 +40,7 @@ void SNN::generateInputNeuronVec() {
   }
 
   for (const auto &group : groups) {
-    for (auto neuron : group->get_neruon_vector()) {
+    for (auto neuron : group->getNeuronVec()) {
       if (neuron->getType() != Input) {
         continue;
       }
@@ -51,7 +51,7 @@ void SNN::generateInputNeuronVec() {
 
 void SNN::generateNeuronVec() {
   for (auto group : groups) {
-    for (auto neuron : group->get_neruon_vector()) {
+    for (auto neuron : group->getNeuronVec()) {
       this->neurons.push_back(neuron);
     }
   }
@@ -129,7 +129,7 @@ double SNN::weight_function() { return ((double)rand() / RAND_MAX) * 0.1; }
 
 void SNN::join() {
   for (auto group : this->groups) {
-    pthread_join(group->get_thread_id(), NULL);
+    pthread_join(group->getThreadID(), NULL);
   }
 }
 void SNN::reset() {
@@ -142,7 +142,7 @@ void SNN::start() {
   this->setStimLineX(*config->STIMULUS);
 
   for (auto group : this->groups) {
-    group->start_thread();
+    group->startThread();
   }
 
   for (int i = 1; i < config->num_stimulus + 1; i++) {
@@ -189,7 +189,7 @@ void SNN::setStimLineX(int target) {
 
   for (InputNeuron *input_neuron : input_neurons) {
     s >> value;
-    input_neuron->set_input_value(value);
+    input_neuron->setInputValue(value);
   }
 }
 
@@ -253,7 +253,7 @@ void SNN::setNextStim() {
 
   for (InputNeuron *input_neuron : input_neurons) {
     s >> value;
-    input_neuron->set_input_value(value);
+    input_neuron->setInputValue(value);
   }
 }
 

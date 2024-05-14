@@ -4,8 +4,8 @@
 
 void Synapse::propagate() {
 
-  int preGroupID = this->getPreSynaptic()->getGroup()->get_id();
-  int postGroupID = this->getPostSynaptic()->getGroup()->get_id();
+  int preGroupID = this->getPreSynaptic()->getGroup()->getID();
+  int postGroupID = this->getPostSynaptic()->getGroup()->getID();
   int preID = this->getPreSynaptic()->getID();
   int postID = this->getPostSynaptic()->getID();
 

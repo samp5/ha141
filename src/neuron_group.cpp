@@ -55,10 +55,10 @@ NeuronGroup::~NeuronGroup() {
 // Run group
 //
 // runs through all neurons and checks their activation status
-void *NeuronGroup::group_run() {
+void *NeuronGroup::run() {
 
   // Log running status
-  lg.log_group_state(INFO, "Group %d running", this->get_id());
+  lg.log_group_state(INFO, "Group %d running", this->getID());
 
   // While the network is running...
   while (::active) {
@@ -69,13 +69,13 @@ void *NeuronGroup::group_run() {
       }
 
       lg.log_group_neuron_type(
-          DEBUG4, "Checking activation:(%d) Neuron %d is %s", this->get_id(),
+          DEBUG4, "Checking activation:(%d) Neuron %d is %s", this->getID(),
           neuron->getID(), lg.get_active_status_string(neuron->isActivated()));
 
       if (neuron->isActivated()) {
 
         lg.log_group_neuron_state(DEBUG2, "Running (%d) Neuron (%d)",
-                                  this->get_id(), neuron->getID());
+                                  this->getID(), neuron->getID());
         neuron = neuron->getType() == Input
                      ? dynamic_cast<InputNeuron *>(neuron)
                      : neuron;
@@ -94,15 +94,9 @@ void *NeuronGroup::group_run() {
   return NULL;
 }
 
-int NeuronGroup::neuron_count() { return (int)this->neurons.size(); }
+int NeuronGroup::neuronCount() { return (int)this->neurons.size(); }
 
-const vector<Neuron *> &NeuronGroup::get_neruon_vector() {
-  return this->neurons;
-}
-
-void NeuronGroup::print_group() {
-  cout << "NeuronGroup::print_group() not implemented\n";
-}
+const vector<Neuron *> &NeuronGroup::getNeuronVec() { return this->neurons; }
 
 void NeuronGroup::reset() {
   for (auto neuron : this->neurons) {

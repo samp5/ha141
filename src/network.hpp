@@ -1,3 +1,5 @@
+#ifndef NETWORK
+#define NETWORK
 #include "input_neuron.hpp"
 #include <list>
 #include <unordered_map>
@@ -31,3 +33,4 @@ public:
   }
   std::unordered_map<Neuron *, std::list<Neuron *>> generateNeighborOptions();
 };
+#endif // !NETWORK
