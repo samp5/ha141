@@ -113,8 +113,7 @@ def main():
             generate_graph(stim_num, x_values, y_values, opts)
 
     a = np.matrix(np_matrix)
-    print(a)
-
+    np.savetxt(f"{opts.log_title}.csv", a, delimiter = ",")
 
 if __name__ == "__main__":
     main()
