@@ -12,6 +12,18 @@
 extern RuntimConfig cf;
 extern Mutex mx;
 
+/**
+ * @brief Construct a Neuron.
+ *
+ * Neuron is created with a random inhibitory status based on
+ * Neuron::generateInhibitoryStatus
+ *
+ *
+ * @param _id Neuron ID
+ * @param group pointer to owning NeuronGroup
+ * @param type Neuron_t type
+ */
+
 Neuron::Neuron(int _id, NeuronGroup *group, Neuron_t type) {
   this->type = type;
   this->id = _id;
@@ -48,16 +60,15 @@ void Neuron::transferData() {
   }
 }
 
-// Adds neuron to the _postsynaptic map with weight
-//
-// Adds a neighbor neuron to the _postsynaptic map of the calling
-// instance. The calling instance is then added to the _presynaptic
-// map of the neighbor neuron via Neuron::add_previous(Neuron*, double);
-//
-// Prints log of edge added
-//
-// @param1: Pointer to neighbor neuron
-// @param2: Weight for that edge
+/**
+ * @brief adds a Synapse to Neuron::PostSynapticConnnections.
+ * Adds a Synapse to both the Presynaptic and Postsynapic Neuron respective
+ * Synapse vectors. Either Neuron::PostSynapticConnnections or
+ * Neuron::PreSynapticConnections
+ *
+ * @param neighbor Target connection
+ * @param weight Weight for this edge
+ */
 void Neuron::addNeighbor(Neuron *neighbor, double weight) {
 
   if (neighbor->getType() == Input) {
@@ -76,15 +87,14 @@ void Neuron::addNeighbor(Neuron *neighbor, double weight) {
                        neighbor->getGroup()->getID(), neighbor->getID());
 }
 
-// Recivee all messages for this neuron
-//
-// Gets message and updates membrane_potential
-// adds data to log and handles message memory
-// deallocation
-//
-// should only be called in `run_in_group()`
-//
-// @returns 0 if all messages recieved, 1 otherwise
+/**
+ * @brief Retrieve and process all messages in the queue.
+ *
+ * For all the messages in Neuron::messages, process the message contents,
+ * check membrane_potential status, and retroactively decay via
+ * Neuron::retroactiveDecay
+ *
+ */
 int Neuron::recieveMessage() {
 
   // Get message
@@ -125,6 +135,11 @@ int Neuron::recieveMessage() {
   return 1;
 }
 
+/**
+ * @brief send Messages to all elements of Neuron::PostSynapticConnnections.
+ *
+ * Enters a refractory phase after sending all messages
+ */
 void Neuron::sendMessages() {
 
   for (const auto synapse : getPostSynaptic()) {
@@ -139,7 +154,13 @@ void Neuron::sendMessages() {
   this->refractory();
 }
 
-// Run cycle for a neuron in a group
+/**
+ * @brief Main run cycle for a Neuron.
+ *
+ * Checks Neuron::membrane_potential and calls Neuron::sendMessages if over the
+ * RuntimConfig::ACTIVATION_THRESHOLD
+ *
+ */
 void Neuron::run() {
   while (this->recieveMessage()) {
     if (this->membrane_potential >= cf.ACTIVATION_THRESHOLD) {
@@ -148,10 +169,14 @@ void Neuron::run() {
   }
   this->deactivate();
 }
-// Runs a refractory period for a Neuron
-//
-// Neuron sleeps for 2 milliseconds and potential is reset to
-// value set by preprocessor directive REFRACTORY_MEMBRANE_POTENTIAL
+
+/**
+ * @brief Starts the refractory period for a Neuron.
+ *
+ * Sets the Neuron::membrane_potential to
+ * RuntimConfig::REFRACTORY_MEMBRANE_POTENTIAL and logs a refractory stage
+ *
+ */
 void Neuron::refractory() {
   this->refractory_start = lg.time();
 
@@ -166,9 +191,27 @@ void Neuron::refractory() {
   this->addData(refractory_start, Message_t::Refractory);
 }
 
+/**
+ * @brief Checks activation status of a Neuron.
+ *
+ * @return bool of activation status
+ */
 bool Neuron::isActivated() const { return this->active; }
+
+/**
+ * @brief Return a pointer to the owning group.
+ *
+ * @return Neuron::group
+ */
 NeuronGroup *Neuron::getGroup() { return this->group; }
 
+/**
+ * @brief Adds a message to the queue.
+ *
+ * Messages are added in a sorted order in order to ensure a FIFO model
+ *
+ * @param message pointer to a Message struct
+ */
 void Neuron::addMessage(Message *message) {
 
   if (this->messages.empty()) {
@@ -191,6 +234,11 @@ void Neuron::addMessage(Message *message) {
   }
 }
 
+/**
+ * @brief retrive the oldest Message from Neuron::messages.
+ *
+ * @return pointer to the Message struct
+ */
 Message *Neuron::retrieveMessage() {
 
   pthread_mutex_lock(&mx.message);
@@ -212,13 +260,14 @@ Message *Neuron::retrieveMessage() {
   return last;
 }
 
-// Decays a neuron based on DECAY_VALUE retroactively
-//
-// Adds data points at even intervals from `from` to `to`
-//
-// Logs the updated membrane_potential
-//
-// @returns new membrane_potential
+/**
+ * @brief retroactively decays a Neuron::membrane_potential.
+ *
+ * retroactively decays a Neuron with a timestep of 2e-3 seconds
+ *
+ * @param from The starting timestamp from which to decay
+ * @param to The ending timestamp to decay to
+ */
 void Neuron::retroactiveDecay(double from, double to) {
   double tau = cf.TAU;
   double v_rest = cf.REFRACTORY_MEMBRANE_POTENTIAL;
@@ -237,11 +286,6 @@ void Neuron::retroactiveDecay(double from, double to) {
 
   for (i = first_decay; i < to; i += decay_time_step) {
 
-    // #askpedram Decay happens regardles of refractory period
-    // if (i < this->refractory_start + REFRACTORY_DURATION) {
-    //   continue;
-    // }
-
     double decay_value = (this->membrane_potential - v_rest) / tau;
 
     if (decay_value < 0 || decay_value < 0.0001) {
@@ -254,30 +298,37 @@ void Neuron::retroactiveDecay(double from, double to) {
   this->last_decay = i;
 }
 
-// Activates neuron
 void Neuron::activate() {
   pthread_mutex_lock(&mx.activation);
   this->active = true;
   pthread_mutex_unlock(&mx.activation);
 }
 
-// deactivates neuron
 void Neuron::deactivate() {
   pthread_mutex_lock(&mx.activation);
   this->active = false;
   pthread_mutex_unlock(&mx.activation);
 }
 
-// Set type of neuron
-//
-// @param1: Neuron_t
+/**
+ * @brief Sets the type of a Neuron.
+ *
+ *
+ * @param type Neuron_t type
+ */
 void Neuron::setType(Neuron_t type) { this->type = type; }
 
+/**
+ * @brief adds to the Neuron::membrane_potential.
+ *
+ * @param value value to be added
+ */
 void Neuron::accumulatePotential(double value) {
   pthread_mutex_lock(&mx.potential);
   this->membrane_potential += value;
   pthread_mutex_unlock(&mx.potential);
 }
+
 const list<Message *> &Neuron::getMessageVector() { return this->messages; }
 
 double Neuron::getPotential() {
@@ -287,6 +338,7 @@ double Neuron::getPotential() {
 
   return potential;
 }
+
 void Neuron::addPostSynapticConnection(Synapse *synapse) {
   this->PostSynapticConnnections.push_back(synapse);
 }

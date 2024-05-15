@@ -24,7 +24,7 @@ protected:
   vector<LogData *> log_data;
 
   // Neuron vaules
-  double membrane_potential;
+  double membrane_potential; /**< Membrane potential of a Neuron */
   int excit_inhib_value;
   int id;
   Neuron_t type;
@@ -32,15 +32,20 @@ protected:
   bool active = false;
 
   // timestamp data
-  double last_decay;
-  double refractory_start = 0.0;
+  double last_decay; /**< The timestamp of the most recent decay */
+  double refractory_start =
+      0.0; /**< The timestamp of most recent refractory period start */
 
   // Edge values
-  vector<Synapse *> PostSynapticConnnections;
-  vector<Synapse *> PreSynapticConnections;
+  vector<Synapse *>
+      PostSynapticConnnections; /**< vector of Synapse pointers to which this
+                                   Neuron is connected */
+  vector<Synapse *>
+      PreSynapticConnections; /**< vector of Synapse pointers from which this
+                                 Neuron has Connections */
 
   // message list
-  list<Message *> messages;
+  list<Message *> messages; /**< list of Message pointers  */
 
 public:
   Neuron(int _id, NeuronGroup *group, Neuron_t type);
