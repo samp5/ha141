@@ -309,7 +309,6 @@ int RuntimConfig::parseArgs(char **argv, int argc) {
   }
 
   const char *path = "./run_config/%s";
-  std::cout << path << '\n';
   int length = snprintf(nullptr, 0, path, argv[1]);
   char *formatted_file_path = new char[length + 1];
   snprintf(formatted_file_path, length + 1, path, argv[1]);
