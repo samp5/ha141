@@ -64,8 +64,11 @@ struct LogData {
 using hr_clock = std::chrono::high_resolution_clock;
 using duration = std::chrono::duration<double>;
 
+/**
+ * \class Log
+ * @brief Logging class.
+ */
 class Log {
-
 private:
   hr_clock::time_point start;
   double offset; /**< Global offset accouting for stimulus switching time */

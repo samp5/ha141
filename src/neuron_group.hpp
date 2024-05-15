@@ -36,7 +36,7 @@ public:
   pthread_t getThreadID() { return thread; }
   int neuronCount();
   void reset();
-  const vector<Neuron *> &getNeuronVec();
+  const vector<Neuron *> &getMutNeuronVec();
 
   /*--------------------------------------------------------------*\
    *                  Thread helper:

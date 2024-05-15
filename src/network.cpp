@@ -19,6 +19,7 @@ SNN::~SNN() {
  * Allocate all `NeuronGroup`s which in turn allocate all `Neuron`s.
  *
  * @param config RuntimConfig MUST be generated before calling this constructor
+ * \sa RuntimConfig
  */
 SNN::SNN(RuntimConfig *config) : config(config) {
   int neuron_per_group = config->NUMBER_NEURONS / config->NUMBER_GROUPS;
@@ -38,6 +39,10 @@ SNN::SNN(RuntimConfig *config) : config(config) {
   this->generateInputNeuronVec();
 }
 
+/**
+ * @brief Generate a vector of all `InputNeuron`.
+ *
+ */
 void SNN::generateInputNeuronVec() {
   if (!input_neurons.empty()) {
     lg.log(ERROR,
@@ -48,7 +53,7 @@ void SNN::generateInputNeuronVec() {
   }
 
   for (const auto &group : groups) {
-    for (auto neuron : group->getNeuronVec()) {
+    for (auto neuron : group->getMutNeuronVec()) {
       if (neuron->getType() != Input) {
         continue;
       }
@@ -57,14 +62,30 @@ void SNN::generateInputNeuronVec() {
   }
 }
 
+/**
+ * @brief Generate a vector of all `Neuron`s.
+ *
+ */
 void SNN::generateNeuronVec() {
   for (auto group : groups) {
-    for (auto neuron : group->getNeuronVec()) {
+    for (auto neuron : group->getMutNeuronVec()) {
       this->neurons.push_back(neuron);
     }
   }
 }
 
+/**
+ * @brief Generate a map associating `Neuron`s with all possible connections.
+ *
+ * The following restrictions are applied to Synapse formation
+ * - `InputNeuron`s cannot have incoming connections
+ * - There are no reflextive or symmetric edges allowed
+ *    - i.e. No self-connections or connections between
+ *      Neurons for which a connection already exists
+ *
+ *
+ *
+ */
 std::unordered_map<Neuron *, std::list<Neuron *>>
 SNN::generateNeighborOptions() {
   std::unordered_map<Neuron *, std::list<Neuron *>> map;
@@ -84,6 +105,16 @@ SNN::generateNeighborOptions() {
   return map;
 }
 
+/**
+ * @brief generate Synapse connections between all `Neuron`s in SNN::groups.
+ *
+ * Add an amount of `Synapse`s consistent with RuntimConfig::NUMBER_EDGES
+ * according to restrictions placed upon viable connections in
+ * SNN::generateNeighborOptions
+ *
+ * \sa SNN::generateNeighborOptions
+ *
+ */
 void SNN::generateRandomSynapses() {
   auto start = lg.time();
   int synapses_formed = 0;
@@ -133,20 +164,42 @@ void SNN::generateRandomSynapses() {
   lg.log(ESSENTIAL, msg.c_str());
 }
 
+/**
+ * @brief Generate a random weight.
+ */
 double SNN::generateSynapseWeight() {
   return ((double)rand() / RAND_MAX) * 0.1;
 }
 
+/**
+ * @brief Join thread.
+ */
 void SNN::join() {
   for (auto group : this->groups) {
     pthread_join(group->getThreadID(), NULL);
   }
 }
+
+/**
+ * @brief Reset the Network.
+ *
+ * Calls NeuronGroup::reset which in turn calls Neuron::reset
+ *
+ */
 void SNN::reset() {
   for (auto group : this->groups) {
     group->reset();
   }
 }
+
+/**
+ * @brief Start network.
+ *
+ * Set stimulus values of all `InputNeuron`s and starts threads for
+ * each NeuronGroup. Cycle through each stimulus, reseting the NeuronGroup after
+ * stimulus.
+ *
+ */
 void SNN::start() {
 
   this->setStimLineX(*config->STIMULUS);
@@ -182,6 +235,11 @@ void SNN::start() {
   active = false;
 }
 
+/**
+ * @brief Set stimulus to line X of RuntimConfig::INPUT_FILE.
+ *
+ * @param target Line number (zero-indexed)
+ */
 void SNN::setStimLineX(int target) {
 
   lg.value(ESSENTIAL, "Set stimulus to line %d", *cf.STIMULUS);
@@ -203,6 +261,12 @@ void SNN::setStimLineX(int target) {
   }
 }
 
+/**
+ * @brief Get line X of RuntimConfig::INPUT_FILE.
+ *
+ * @param line string to store line
+ * @param target line number (zero-indexed)
+ */
 void SNN::getLineX(std::string &line, int target) {
   static std::string file_name = cf.INPUT_FILE;
   static std::ifstream file(file_name);
@@ -227,6 +291,11 @@ void SNN::getLineX(std::string &line, int target) {
   }
 }
 
+/**
+ * @brief Get next line of RuntimConfig::INPUT_FILE.
+ *
+ * @param line string to store line
+ */
 void SNN::getNextLine(std::string &line) {
   static std::string file_name = cf.INPUT_FILE;
   static std::ifstream file(file_name);
@@ -249,6 +318,10 @@ void SNN::getNextLine(std::string &line) {
   }
 }
 
+/**
+ * @brief Set stimulus to the next line of RuntimConfig::INPUT_FILE.
+ *
+ */
 void SNN::setNextStim() {
   if (input_neurons.empty()) {
     lg.log(ESSENTIAL, "set_next_line: passed empty input neuron vector?");
@@ -267,6 +340,14 @@ void SNN::setNextStim() {
   }
 }
 
+/**
+ * @brief  return maximum number of edges.
+ *
+ * Find the maximum possible edges in a graph with
+ * RuntimConfig::NUMBER_NEURONS and RuntimConfig::NUMBER_INPUT_NEURONS
+ *
+ * @return Number of edges
+ */
 int SNN::maximum_edges() {
   // for an undirected graph there are n(n-1) / 2 edges
   //

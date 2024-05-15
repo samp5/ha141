@@ -5,7 +5,13 @@
 #include <pthread.h>
 #include <unistd.h>
 
-// Constructor
+/**
+ * @brief NeuronGroup constructor.
+ *
+ * Construct a NeuronGroup. Allocates all `Neuron`s and `InputNeuron`s.
+ *
+ * @param _id NeuronGroup ID
+ */
 NeuronGroup::NeuronGroup(int _id, int number_neurons,
                          int number_input_neurons) {
   lg.state(DEBUG, "Adding Group %d", _id);
@@ -41,7 +47,13 @@ NeuronGroup::NeuronGroup(int _id, int number_neurons,
   }
 }
 
-// Destructor
+/**
+ * @brief Destructs NeuronGroup.
+ *
+ * NeuronGroup holds memory responsibility for `Neuron`s and deallocates them in
+ * its destructor
+ *
+ */
 NeuronGroup::~NeuronGroup() {
   for (auto neuron : this->neurons) {
 
@@ -52,9 +64,14 @@ NeuronGroup::~NeuronGroup() {
   }
 }
 
-// Run group
-//
-// runs through all neurons and checks their activation status
+/**
+ * @brief Main run cycle for a NeuronGroup.
+ *
+ * Checks the global bool ::active each cycle. Runs active neurons.
+ * Before joining the main thread, transfers data from Neuron::log_data to
+ * Log::log_data
+ *
+ */
 void *NeuronGroup::run() {
 
   // Log running status
@@ -94,10 +111,25 @@ void *NeuronGroup::run() {
   return NULL;
 }
 
+/**
+ * @brief Get Neuron count of the NeuronGroup.
+ *
+ * @return Neuron count
+ */
 int NeuronGroup::neuronCount() { return (int)this->neurons.size(); }
 
-const vector<Neuron *> &NeuronGroup::getNeuronVec() { return this->neurons; }
+/**
+ * @brief Get a mutable reference to the Neuron vector.
+ *
+ */
+const vector<Neuron *> &NeuronGroup::getMutNeuronVec() { return this->neurons; }
 
+/**
+ * @brief Reset NeuronGroup.
+ *
+ * Resets all `Neuron`s
+ *
+ */
 void NeuronGroup::reset() {
   for (auto neuron : this->neurons) {
     if (neuron->getType() == Input) {

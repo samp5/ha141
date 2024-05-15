@@ -2,6 +2,12 @@
 #include "message.hpp"
 #include "neuron.hpp"
 
+/**
+ * @brief Propagates a message.
+ *
+ * Activates the recieving neuron and calls Neuron::addMessage
+ *
+ */
 void Synapse::propagate() {
 
   int preGroupID = this->getPreSynaptic()->getGroup()->getID();

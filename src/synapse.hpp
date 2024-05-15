@@ -3,6 +3,13 @@
 #include "message.hpp"
 class Neuron;
 
+/**
+ * @brief Synapse class for managing connections.
+ * 
+ * All `Neuron`s hold a vector of PostSynaptic and Presynaptic Synapse pointers
+ * The Synapse manages edge weighs and propagation
+ * 
+ */
 class Synapse {
 public:
   Synapse(Neuron *from, Neuron *to, double w)

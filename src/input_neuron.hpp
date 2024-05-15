@@ -10,6 +10,10 @@ extern bool
 extern pthread_cond_t stimulus_switch_cond; /**< pthread_cond_t for halting
                                                threads on stimulus switch */
 
+/**
+ * Neuron subclass for recieving external stimulus
+ *
+ */
 class InputNeuron : public Neuron {
 protected:
   double input_value;            /**< Stimulus value */

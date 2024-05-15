@@ -270,7 +270,7 @@ void Log::print(const char *message, bool newline, std::ostream &os) {
 }
 
 /**
- * @brief Update the Log::off_set value
+ * @brief Update the Log::offset value
  *
  * @param value Value to be added
  *

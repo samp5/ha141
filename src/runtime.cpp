@@ -5,6 +5,9 @@
 
 extern Log lg;
 
+/**
+ * @brief Destroy all mutexes in use.
+ */
 void Mutex::destroy_mutexes() {
   pthread_mutex_destroy(&potential);
   pthread_mutex_destroy(&log);
@@ -13,6 +16,10 @@ void Mutex::destroy_mutexes() {
   pthread_mutex_destroy(&stimulus);
 }
 
+/**
+ * @brief Write a new config file to run_config/base_config.toml.
+ *
+ */
 void RuntimConfig::generateNewConfig() {
   const char *file_name = "./run_config/base_config.toml";
 
@@ -266,6 +273,10 @@ bool file_exists(const char *file_name) {
   return f.good();
 }
 
+/**
+ * @brief Use base_config.toml.
+ *
+ */
 void RuntimConfig::useBaseToml() {
   if (!file_exists("./run_config/base_config.toml")) {
     generateNewConfig();
@@ -276,6 +287,15 @@ void RuntimConfig::useBaseToml() {
   setOptions();
 }
 
+/**
+ * @brief Parse command line arguments.
+ *
+ * Valid command line arguments are
+ *    - <file_name>
+ *    - --help
+ *
+ * @return
+ */
 int RuntimConfig::parseArgs(char **argv, int argc) {
   if (argc == 1) {
     lg.log(ESSENTIAL,
@@ -325,6 +345,15 @@ int RuntimConfig::parseArgs(char **argv, int argc) {
   return 1;
 }
 
+/**
+ * @brief Checks various start conditions.
+ *
+ * The following conditions are checked
+ *    - NUMBER_INPUT_NEURONS >= NUMBER_NEURONS
+ *    - NUMBER_INPUT_NEURONS % NUMBER_GROUPS == 0
+ *    - NUMBER_NEURONS & NUMBER_GROUPS == 0
+ *    - NUMBER_EDGES <= SNN::maximum_edges()
+ */
 void RuntimConfig::checkStartCond() {
   bool error = false;
   if (NUMBER_INPUT_NEURONS >= NUMBER_NEURONS) {
