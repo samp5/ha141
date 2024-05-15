@@ -2,7 +2,6 @@
 Project for CS 141 Honors Supplement: Toy spiking neural network using a multithreaded approach.
 
 ### 📁 Folder Structure
-
 ```
 ├── src
 │   ├── functions.hpp

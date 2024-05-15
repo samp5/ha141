@@ -29,17 +29,17 @@ SOFTWARE.
 
 html {
     /* primary theme color. This will affect the entire websites color scheme: links, arrows, labels, ... */
-    --primary-color: #1779c4;
-    --primary-dark-color: #335c80;
-    --primary-light-color: #70b1e9;
+    --primary-color: #7E9CD8;
+    --primary-dark-color: #957fB8;
+    --primary-light-color: #7Fb4CA;
 
     /* page base colors */
-    --page-background-color: #ffffff;
-    --page-foreground-color: #2f4153;
-    --page-secondary-foreground-color: #6f7e8e;
+    --page-background-color: #1F1F28;
+    --page-foreground-color: #DCD7BA;
+    --page-secondary-foreground-color: #7AA89F;
 
     /* color for all separators on the website: hr, borders, ... */
-    --separator-color: #dedede;
+    --separator-color: #54546D;
 
     /* border radius for all rounded components. Will affect many components, like dropdowns, memitems, codeblocks, ... */
     --border-radius-large: 8px;
@@ -133,26 +133,26 @@ html {
     --searchbar-border-radius: var(--searchbar-height);
 
     /* code block colors */
-    --code-background: #f5f5f5;
+    --code-background: #2A2A37;
     --code-foreground: var(--page-foreground-color);
 
     /* fragment colors */
-    --fragment-background: #F8F9FA;
+    --fragment-background: #2A2A37;
     --fragment-foreground: #37474F;
-    --fragment-keyword: #bb6bb2;
-    --fragment-keywordtype: #8258b3;
-    --fragment-keywordflow: #d67c3b;
-    --fragment-token: #438a59;
-    --fragment-comment: #969696;
+    --fragment-keyword: #957FB8;
+    --fragment-keywordtype: #7AA89F;
+    --fragment-keywordflow: #957FB8;
+    --fragment-token: #98BB6C;
+    --fragment-comment: #727199;
     --fragment-link: #5383d6;
-    --fragment-preprocessor: #46aaa5;
+    --fragment-preprocessor: #FFA066;
     --fragment-linenumber-color: #797979;
     --fragment-linenumber-background: #f4f4f5;
     --fragment-linenumber-border: #e3e5e7;
     --fragment-lineheight: 20px;
 
     /* sidebar navigation (treeview) colors */
-    --side-nav-background: #fbfbfb;
+    --side-nav-background: #2A2A37;
     --side-nav-foreground: var(--page-foreground-color);
     --side-nav-arrow-opacity: 0;
     --side-nav-arrow-hover-opacity: 0.9;
@@ -167,30 +167,7 @@ html {
     --memtitle-font-size: 18px;
 
     --webkit-scrollbar-size: 7px;
-    --webkit-scrollbar-padding: 4px;
-    --webkit-scrollbar-color: var(--separator-color);
-
-    --animation-duration: .12s
-}
-
-@media screen and (max-width: 767px) {
-    html {
-        --page-font-size: 16px;
-        --navigation-font-size: 16px;
-        --toc-font-size: 15px;
-        --code-font-size: 15px; /* affects code, fragment */
-        --title-font-size: 22px;
-    }
-}
-
-@media (prefers-color-scheme: dark) {
-    html:not(.light-mode) {
-        color-scheme: dark;
-
-        --primary-color: #1982d2;
-        --primary-dark-color: #86a9c4;
-        --primary-light-color: #4779ac;
-
+    --webkit-scrollbar-padding: 4px
         --box-shadow: 0 2px 8px 0 rgba(0,0,0,.35);
 
         --odd-color: rgba(100,100,100,.06);

@@ -12,6 +12,14 @@ SNN::~SNN() {
     delete group;
   }
 }
+
+/**
+ * @brief Constructor for SNN.
+ *
+ * Allocate all `NeuronGroup`s which in turn allocate all `Neuron`s.
+ *
+ * @param config RuntimConfig MUST be generated before calling this constructor
+ */
 SNN::SNN(RuntimConfig *config) : config(config) {
   int neuron_per_group = config->NUMBER_NEURONS / config->NUMBER_GROUPS;
   int input_neurons_per_group =
