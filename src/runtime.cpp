@@ -305,8 +305,25 @@ int RuntimConfig::parseArgs(char **argv, int argc) {
       generateNewConfig();
       lg.print("See run_config/base_config.toml for configuration options");
     }
+    return 0;
   }
-  return 0;
+
+  const char *path = "./run_config/%s";
+  std::cout << path << '\n';
+  int length = snprintf(nullptr, 0, path, argv[1]);
+  char *formatted_file_path = new char[length + 1];
+  snprintf(formatted_file_path, length + 1, path, argv[1]);
+
+  if (!file_exists(formatted_file_path)) {
+    lg.string(ERROR, "File %s does not exists", formatted_file_path);
+    return 0;
+  }
+
+  CONFIG_FILE = formatted_file_path;
+  setOptions();
+  delete[] formatted_file_path;
+
+  return 1;
 }
 
 void RuntimConfig::checkStartCond() {

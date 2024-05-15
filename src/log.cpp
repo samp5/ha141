@@ -376,9 +376,6 @@ std::string Log::messageTypeToString(Message_t type) {
   case Decay:
     ret = "D";
     break;
-  case Checked:
-    ret = "C";
-    break;
   }
   return ret;
 }
