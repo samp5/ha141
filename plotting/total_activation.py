@@ -3,13 +3,11 @@ from pathlib import Path
 import numpy as np
 import argparse
 import os
-import math
 
 class DataPoint:
-    def __init__(self, timestamp: float, value: float, message_type: str, stimulus_number:int ):
+    def __init__(self, timestamp: float, value: float, stimulus_number:int ):
         self.time= timestamp
         self.value = value
-        self.message_type = message_type
         self.stimulus_number = stimulus_number
 
 class Options:
@@ -35,7 +33,7 @@ def parser():
 
 def get_most_recent_log():
     log_dir = ""
-    for root, dirs, files in os.walk("../logs/"):
+    for root, dirs, _ in os.walk("../logs/"):
         if root == "../logs/":
             log_dir = dirs;
             break;
@@ -62,58 +60,57 @@ def main():
     args = parser()
     opts = Options(args)
 
-    data = []
+    max_stim = 0;
+    min_stim = 0;
+    data = {}
     with open(opts.log_file, 'r') as file:
         for line in file:
+            print(line)
             parts = line.split()
             timestamp = float(parts[3])
             value = float(parts[4])
             message_type = parts[5]
             stimulus_number = int(parts[6])
 
+            max_stim = max(stimulus_number, max_stim)
+            min_stim = min(stimulus_number, min_stim)
+
             if message_type == "R":
-                data.append(DataPoint(timestamp, value, message_type, stimulus_number))
+                if stimulus_number in data:
+                    data[stimulus_number].append(DataPoint(timestamp, value, stimulus_number))
+                else:
+                    data[stimulus_number] = [DataPoint(timestamp, value, stimulus_number)]
 
 # sort the data
-    data = sorted(data, key = lambda x: x.time)
-
-#max stimulus_number 
-    max_stim = data[-1].stimulus_number
-    min_stim = data[0].stimulus_number
+    for stim_num in data:
+        data[stim_num] = sorted(data[stim_num], key = lambda x: x.time)
 
 # all stimuli
-    stimlus_set = []
-    for i in range(min_stim, max_stim + 1):
-        filter = [data_point for data_point in data if data_point.stimulus_number == i]
-        stimlus_set.append(filter)
-
     np_matrix = []
-    for data in stimlus_set:
-
-        # get the stimulus_number
-        stim_num = data[0].stimulus_number
-
+    for stim_num in data:
+        stim_data = data[stim_num]
         # timestep per bin
-        opts.timestep = (data[-1].time - data[0].time) / 300 if opts.timestep == -1 else opts.timestep
+        opts.timestep = (stim_data[-1].time - stim_data[0].time) / 300 
         bins = 300
         x_values = []
         y_values = []
-        lower = data[0].time;
+        lower = stim_data[0].time;
         absolute_lowest = lower
         upper = lower + opts.timestep;
 
-        for i in range(0, bins):
+        for _ in range(0, bins):
             x_values.append(lower - absolute_lowest)
-            y_values.append(sum( ((x.time >= lower) and (x.time < upper)) for x in data))
+            y_values.append(sum( ((x.time >= lower) and (x.time < upper)) for x in stim_data))
             lower = upper
             upper = upper + opts.timestep;
+
         np_matrix.append(y_values)
 
         if opts.graph:
             generate_graph(stim_num, x_values, y_values, opts)
 
     a = np.matrix(np_matrix)
-    np.savetxt(f"{opts.log_title}.csv", a, delimiter = ",")
+    np.savetxt(f"{opts.log_title}.csv", a, delimiter = ",", fmt='%d')
 
 if __name__ == "__main__":
     main()
