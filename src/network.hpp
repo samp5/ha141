@@ -26,7 +26,7 @@ private:
   std::vector<InputNeuron *>
       input_neurons;    /**< Holds pointers to all `InputNeuron`s */
   RuntimConfig *config; /**< Holds pointer to RuntimConfig */
-  Mutex *mutex;
+  Mutex *mutex;         /**< Holds pointer to Mutex structure */
 
 public:
   Log *lg;

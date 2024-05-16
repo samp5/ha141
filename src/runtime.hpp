@@ -26,23 +26,6 @@ public:
 /**
  * @brief Holds all configuration options.
  *
- * Many of the other structures rely on this struct being global and import it
- * as
- * ```
- * extern RuntimConfig cf;
- * ```
- *
- * Initialization of the struct should follow this pattern:
- *
- * ```
- * RuntimConfig cf;
- * Mutex mx;
- * if (!cf.parseArgs(argv, argc)) {
- *   mx.destroy_mutexes();
- *   return 0;
- * }
- * ```
- *
  * The RuntimConfig is based on a toml configuration file located in run_config/
  *
  * If no configuration file is specified and run_config/base_config.toml is not
