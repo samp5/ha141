@@ -128,6 +128,7 @@ struct RuntimConfig {
   int NUMBER_INPUT_NEURONS;
   std::vector<int> STIMULUS_VEC;
   std::vector<int>::const_iterator STIMULUS;
+  bool LIMIT_LOG_OUTPUT;
   double TAU;
   unsigned long RUN_TIME;
   double REFRACTORY_DURATION;

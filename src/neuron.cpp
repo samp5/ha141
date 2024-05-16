@@ -376,7 +376,13 @@ const vector<Synapse *> &Neuron::getPresynaptic() const {
 }
 
 void Neuron::addData(double time, Message_t message_type) {
-  LogData *d = new LogData(id, group->getID(), time, membrane_potential, type,
-                           message_type, *cf.STIMULUS);
-  log_data.push_back(d);
+  if (cf.LIMIT_LOG_OUTPUT && message_type == Message_t::Refractory) {
+    LogData *d = new LogData(id, group->getID(), time, membrane_potential, type,
+                             message_type, *cf.STIMULUS);
+    log_data.push_back(d);
+  } else if (!cf.LIMIT_LOG_OUTPUT) {
+    LogData *d = new LogData(id, group->getID(), time, membrane_potential, type,
+                             message_type, *cf.STIMULUS);
+    log_data.push_back(d);
+  }
 }

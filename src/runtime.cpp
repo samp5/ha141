@@ -84,6 +84,7 @@ void RuntimConfig::generateNewConfig() {
   file << "seed = \"time\"" << '\n';
   file << '\n';
   file << "[runtime_vars]" << '\n';
+  file << "limit_log_size = false" << '\n';
   file << "# in seconds" << '\n';
   file << "runtime = 1" << '\n';
   file << "# file to read input from" << '\n';
@@ -180,6 +181,15 @@ int RuntimConfig::setOptions() {
         parse_line_range(tbl["runtime_vars"]["line_range"].as_string()->get());
   } else {
     lg.string(ERROR, "Failed to parse: %s", "line_range");
+  }
+
+  if (tbl["runtime_vars"]["limit_log_size"].as_boolean()) {
+    LIMIT_LOG_OUTPUT =
+        tbl["runtime_vars"]["limit_log_size"].as_boolean()->get();
+  } else {
+    lg.string(ERROR, "Failed to parse: %s, using default option: true",
+              "limit_log_size");
+    LIMIT_LOG_OUTPUT = true;
   }
 
   if (tbl["runtime_vars"]["runtime"].as_integer()) {
