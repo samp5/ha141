@@ -3,6 +3,7 @@
 #include "log.hpp"
 #include "network.hpp"
 #include <algorithm>
+#include <vector>
 
 extern Log lg;
 
@@ -308,7 +309,8 @@ void RuntimConfig::useBaseToml() {
  *
  * @return
  */
-int RuntimConfig::parseArgs(char **argv, int argc) {
+int RuntimConfig::parseArgs(std::vector<std::string> args) {
+  std::vector<std::string>::size_type argc = args.size();
   if (argc == 1) {
     snn->lg->log(
         ESSENTIAL,
@@ -331,7 +333,7 @@ int RuntimConfig::parseArgs(char **argv, int argc) {
   }
 
   // check for help options
-  if (!strcmp(argv[1], "--help")) {
+  if (args.at(1) == "--help") {
     if (file_exists("./run_config/base_config.toml")) {
       snn->lg->print(
           "See run_config/base_config.toml for configuration options");
@@ -344,19 +346,15 @@ int RuntimConfig::parseArgs(char **argv, int argc) {
     exit(0);
   }
 
-  const char *path = "./run_config/%s";
-  int length = snprintf(nullptr, 0, path, argv[1]);
-  char *formatted_file_path = new char[length + 1];
-  snprintf(formatted_file_path, length + 1, path, argv[1]);
-
-  if (!file_exists(formatted_file_path)) {
-    snn->lg->string(ERROR, "File %s does not exists", formatted_file_path);
+  std::string formatted_file_path = std::string("./run_config/") + args.at(1);
+  if (!file_exists(formatted_file_path.c_str())) {
+    snn->lg->string(ERROR, "File %s does not exists",
+                    formatted_file_path.c_str());
     exit(1);
   }
 
   CONFIG_FILE = formatted_file_path;
   setOptions();
-  delete[] formatted_file_path;
 
   return 1;
 }

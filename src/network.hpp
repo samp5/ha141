@@ -30,7 +30,7 @@ private:
 
 public:
   Log *lg;
-  SNN(int argc, char **argv);
+  SNN(std::vector<std::string> args);
   ~SNN();
   double generateSynapseWeight();
   void start();

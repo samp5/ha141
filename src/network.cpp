@@ -7,6 +7,7 @@
 #include <fstream>
 #include <pthread.h>
 #include <sstream>
+#include <vector>
 
 SNN::~SNN() {
   for (auto group : groups) {
@@ -25,10 +26,10 @@ SNN::~SNN() {
  * @param config RuntimConfig MUST be generated before calling this constructor
  * \sa RuntimConfig
  */
-SNN::SNN(int argc, char **argv) : active(false) {
+SNN::SNN(std::vector<std::string> args) : active(false) {
   lg = new Log(this);
   config = new RuntimConfig(this);
-  config->parseArgs(argv, argc);
+  config->parseArgs(args);
   config->checkStartCond();
   srand(config->RAND_SEED);
   mutex = new Mutex;

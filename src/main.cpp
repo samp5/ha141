@@ -2,6 +2,7 @@
 #include <pthread.h>
 #include <string>
 #include <unistd.h>
+#include <vector>
 
 using std::string;
 
@@ -12,7 +13,8 @@ bool active = true;
 bool switching_stimulus = false;
 
 int main(int argc, char **argv) {
-  SNN snn = SNN(argc, argv);
+  std::vector<std::string> args(argv, argv + argc);
+  SNN snn = SNN(args);
   snn.lg->log(ESSENTIAL, "Assigning neuron groups...");
 
   snn.lg->log(ESSENTIAL, "Adding synapses...");

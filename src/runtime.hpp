@@ -129,7 +129,7 @@ public:
   int setOptions();
   void generateNewConfig();
   void useBaseToml();
-  int parseArgs(char **argv, int argc);
+  int parseArgs(std::vector<std::string>);
   void checkStartCond();
 
   RuntimConfig(SNN *snn) : snn(snn){};
