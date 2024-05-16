@@ -1,10 +1,9 @@
 #include "input_neuron.hpp"
 #include "message.hpp"
+#include "network.hpp"
 #include "neuron.hpp"
 #include "runtime.hpp"
 #include <pthread.h>
-extern Mutex mx;
-extern RuntimConfig cf;
 
 /**
  * @brief Constructor for InputNeuron.
@@ -16,7 +15,9 @@ extern RuntimConfig cf;
  * @param group NeuronGroup that this neuron belongs to
  */
 InputNeuron::InputNeuron(int _id, NeuronGroup *group)
-    : Neuron(_id, group, Input), probalility_of_success(cf.INPUT_PROB_SUCCESS) {
+    : Neuron(_id, group, Input),
+      probalility_of_success(
+          group->getNetwork()->getConfig()->INPUT_PROB_SUCCESS) {
   this->excit_inhib_value = -1;
   this->activate();
 }
@@ -34,43 +35,46 @@ void InputNeuron::run() {
 
   if (::switching_stimulus) {
     // wait for all input neurons to switch to the new stimulus
-    pthread_mutex_lock(&mx.stimulus);
+    pthread_mutex_lock(&group->getNetwork()->getMutex()->stimulus);
     while (::switching_stimulus) {
-      pthread_cond_wait(&::stimulus_switch_cond, &mx.stimulus);
+      pthread_cond_wait(&::stimulus_switch_cond,
+                        &group->getNetwork()->getMutex()->stimulus);
     }
-    pthread_mutex_unlock(&mx.stimulus);
+    pthread_mutex_unlock(&group->getNetwork()->getMutex()->stimulus);
   }
 
   if (this->inRefractory()) {
-    lg.groupNeuronState(
+    group->getNetwork()->lg->groupNeuronState(
         INFO,
         "INPUT: (%d) Neuron %d is still in refractory period, ignoring input",
         this->getGroup()->getID(), this->getID());
     return;
   }
 
-  double time = lg.time();
+  double time = group->getNetwork()->lg->time();
   this->retroactiveDecay(this->last_decay, time);
 
-  if (this->membrane_potential >= cf.ACTIVATION_THRESHOLD) {
+  if (this->membrane_potential >=
+      group->getNetwork()->getConfig()->ACTIVATION_THRESHOLD) {
     this->sendMessages();
   }
 
   if (poissonResult()) {
 
-    double time_rn = lg.time();
+    double time_rn = group->getNetwork()->lg->time();
 
     this->accumulatePotential(this->input_value);
     this->addData(time_rn, Message_t::Stimulus);
 
-    lg.neuronValue(
+    group->getNetwork()->lg->neuronValue(
         INFO,
         "(Input) (%d) Neuron %d poisson success! Adding input value to "
         "membrane_potential. membrane_potential now %f",
         this->getGroup()->getID(), this->getID(), this->membrane_potential);
   }
 
-  if (this->membrane_potential >= cf.ACTIVATION_THRESHOLD) {
+  if (this->membrane_potential >=
+      group->getNetwork()->getConfig()->ACTIVATION_THRESHOLD) {
     this->sendMessages();
   }
 }
@@ -103,14 +107,15 @@ bool InputNeuron::poissonResult() {
  */
 bool InputNeuron::inRefractory() {
 
-  double timestamp = lg.time();
+  double timestamp = group->getNetwork()->lg->time();
 
   // #askpedram
 
   // first check refractory status
-  if (timestamp < this->refractory_start + cf.REFRACTORY_DURATION) {
+  if (timestamp < this->refractory_start +
+                      group->getNetwork()->getConfig()->REFRACTORY_DURATION) {
 
-    lg.groupNeuronState(
+    group->getNetwork()->lg->groupNeuronState(
         INFO, "(%d) Neuron %d is still in refractory period, ignoring message",
         this->getGroup()->getID(), this->getID());
 
@@ -133,7 +138,7 @@ void InputNeuron::sendMessages() {
     synapse->propagate();
   }
 
-  lg.groupNeuronState(
+  group->getNetwork()->lg->groupNeuronState(
       INFO,
       "(%d) Neuron %d reached activation threshold, entering refractory phase",
       this->group->getID(), this->id);
@@ -151,8 +156,9 @@ void InputNeuron::sendMessages() {
  */
 void InputNeuron::setInputValue(double value) {
   this->input_value = value;
-  lg.neuronValue(DEBUG3, "(Input) (%d) Neuron %d input value set to %f",
-                 this->getGroup()->getID(), this->getID(), value);
+  group->getNetwork()->lg->neuronValue(
+      DEBUG3, "(Input) (%d) Neuron %d input value set to %f",
+      this->getGroup()->getID(), this->getID(), value);
 }
 
 /**
@@ -164,7 +170,8 @@ void InputNeuron::setInputValue(double value) {
  *
  */
 void InputNeuron::reset() {
-  this->membrane_potential = cf.INITIAL_MEMBRANE_POTENTIAL;
-  this->last_decay = lg.time();
+  this->membrane_potential =
+      group->getNetwork()->getConfig()->INITIAL_MEMBRANE_POTENTIAL;
+  this->last_decay = group->getNetwork()->lg->time();
   this->refractory_start = 0;
 }

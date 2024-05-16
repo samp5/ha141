@@ -13,8 +13,6 @@
 using std::cout;
 using std::list;
 
-extern Log lg;
-
 class NeuronGroup;
 
 enum Neuron_t { None = 0, Input = 1, Hidden = 2, Output = 3 };

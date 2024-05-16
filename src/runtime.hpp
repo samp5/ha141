@@ -148,6 +148,11 @@ public:
   void useBaseToml();
   int parseArgs(char **argv, int argc);
   void checkStartCond();
+
+  RuntimConfig(SNN *snn) : snn(snn){};
+
+private:
+  SNN *snn;
 };
 
 #endif // !GLOBALS

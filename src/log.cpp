@@ -1,5 +1,6 @@
 #include "log.hpp"
 #include "message.hpp"
+#include "network.hpp"
 #include "neuron.hpp"
 #include "runtime.hpp"
 #include <bits/types/struct_timeval.h>
@@ -12,8 +13,6 @@
 #include <stdio.h>
 #include <string>
 #include <sys/time.h>
-extern Mutex mx;
-extern RuntimConfig cf;
 
 pthread_mutex_t data_mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -56,7 +55,7 @@ std::string neuronTypeString(Neuron_t type) {
 void Log::log(LogLevel level, const char *message,
               std::ostream &os) { // default output stream is standard output
 
-  if (level > cf.DEBUG_LEVEL) {
+  if (level > network->getConfig()->DEBUG_LEVEL) {
     return;
   }
 
@@ -95,7 +94,7 @@ void Log::log(LogLevel level, const char *message,
     return;
   }
 
-  double time_rn = lg.time();
+  double time_rn = time();
   int length = snprintf(nullptr, 0, _level, time_rn);
   char *message_prefix = new char[length + 1];
 
@@ -326,7 +325,7 @@ void Log::string(LogLevel level, const char *message, const char *string) {
 void Log::logConfig(const std::string &name) {
 
   namespace fs = std::filesystem;
-  fs::path config_source = cf.CONFIG_FILE;
+  fs::path config_source = network->getConfig()->CONFIG_FILE;
 
   fs::path config_target = "./logs/" + name + "/" + name + ".toml";
 
@@ -356,8 +355,8 @@ LogLevel Log::debugLevelString(std::string level) {
     return DEBUG3;
   if (level == "DEBUG4")
     return DEBUG4;
-  lg.log(WARNING, "\"level\" does not match any available options: setting "
-                  "LogLevel to INFO");
+  log(WARNING, "\"level\" does not match any available options: setting "
+               "LogLevel to INFO");
   return INFO;
 }
 

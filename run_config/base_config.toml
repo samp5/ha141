@@ -40,7 +40,7 @@ poisson_prob_of_success = 0.0001
 # DEBUG2
 # DEBUG3
 # DEBUG4
-level = "INFO"
+level = "NONE"
 
 [random]
 # options are 'time' for using the current time, or an integer (as a string e.g. "1")
@@ -53,4 +53,4 @@ runtime = 1
 # file to read input from
 input_file = "./input_files/test"
 # format should be "x..y" for reading lines x to y (inclusive) or just x for a single line
-line_range = "1"
+line_range = "1..10"

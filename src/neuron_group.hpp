@@ -7,8 +7,8 @@
 #include <pthread.h>
 
 class Neuron;
+class SNN;
 
-extern Log lg;
 extern bool active;
 using std::list;
 
@@ -16,14 +16,15 @@ using std::list;
 // All neurons will still be allocated on the heap
 
 class NeuronGroup {
-  // NOT COMPLETE
 private:
   vector<Neuron *> neurons;
   int id;
   pthread_t thread;
+  SNN *network;
 
 public:
-  NeuronGroup(int _id, int number_neurons, int number_input_neurons);
+  NeuronGroup(int _id, int number_neurons, int number_input_neurons,
+              SNN *network);
   ~NeuronGroup();
 
   void *run();
@@ -34,6 +35,7 @@ public:
   double getID() const { return id; }
 
   pthread_t getThreadID() { return thread; }
+  SNN *getNetwork() { return network; }
   int neuronCount();
   void reset();
   const vector<Neuron *> &getMutNeuronVec();

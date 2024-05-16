@@ -1,5 +1,6 @@
 #include "input_neuron.hpp"
 #include "log.hpp"
+#include "network.hpp"
 #include "neuron.hpp"
 #include <cstdlib>
 #include <pthread.h>
@@ -12,13 +13,14 @@
  *
  * @param _id NeuronGroup ID
  */
-NeuronGroup::NeuronGroup(int _id, int number_neurons,
-                         int number_input_neurons) {
-  lg.state(DEBUG, "Adding Group %d", _id);
+NeuronGroup::NeuronGroup(int _id, int number_neurons, int number_input_neurons,
+                         SNN *network)
+    : network(network) {
+  getNetwork()->lg->state(DEBUG, "Adding Group %d", _id);
 
   this->id = _id;
 
-  lg.state(INFO, "Group %d", this->id);
+  getNetwork()->lg->state(INFO, "Group %d", this->id);
 
   // we only need this many of "regular neurons"
   number_neurons -= number_input_neurons;
@@ -57,8 +59,8 @@ NeuronGroup::NeuronGroup(int _id, int number_neurons,
 NeuronGroup::~NeuronGroup() {
   for (auto neuron : this->neurons) {
 
-    lg.groupNeuronState(DEBUG, "Deleteing Group %d Neuron %d", this->id,
-                        neuron->getID());
+    getNetwork()->lg->groupNeuronState(DEBUG, "Deleteing Group %d Neuron %d",
+                                       this->id, neuron->getID());
 
     delete neuron;
   }
@@ -75,30 +77,31 @@ NeuronGroup::~NeuronGroup() {
 void *NeuronGroup::run() {
 
   // Log running status
-  lg.state(INFO, "Group %d running", this->getID());
+  getNetwork()->lg->state(INFO, "Group %d running", this->getID());
 
   // While the network is running...
-  while (::active) {
+  while (getNetwork()->isActive()) {
 
     for (Neuron *neuron : this->neurons) {
-      if (!::active) {
+      if (!getNetwork()->isActive()) {
         break;
       }
 
-      lg.neuronType(DEBUG4, "Checking activation:(%d) Neuron %d is %s",
-                    this->getID(), neuron->getID(),
-                    lg.activeStatusString(neuron->isActivated()));
+      getNetwork()->lg->neuronType(
+          DEBUG4, "Checking activation:(%d) Neuron %d is %s", this->getID(),
+          neuron->getID(),
+          getNetwork()->lg->activeStatusString(neuron->isActivated()));
 
       if (neuron->isActivated()) {
 
-        lg.groupNeuronState(DEBUG2, "Running (%d) Neuron (%d)", this->getID(),
-                            neuron->getID());
+        getNetwork()->lg->groupNeuronState(DEBUG2, "Running (%d) Neuron (%d)",
+                                           this->getID(), neuron->getID());
         neuron = neuron->getType() == Input
                      ? dynamic_cast<InputNeuron *>(neuron)
                      : neuron;
         neuron->run();
       } else {
-        double time = lg.time();
+        double time = getNetwork()->lg->time();
         neuron->retroactiveDecay(neuron->getLastDecay(), time);
       }
     }

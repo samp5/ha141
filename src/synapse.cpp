@@ -1,5 +1,6 @@
 #include "synapse.hpp"
 #include "message.hpp"
+#include "network.hpp"
 #include "neuron.hpp"
 
 /**
@@ -18,7 +19,7 @@ void Synapse::propagate() {
   double message_value = this->getPreSynaptic()->getPotential() *
                          this->getWeight() * this->getPreSynaptic()->getBias();
 
-  lg.neuronInteraction(
+  _origin->getGroup()->getNetwork()->lg->neuronInteraction(
       INFO, "Group %d: Neuron %d is sending a mesage to Group %d: Neuron %d",
       preGroupID, preID, postGroupID, postID);
 

@@ -1,5 +1,6 @@
 #include "runtime.hpp"
 #include "../run_config/toml.hpp"
+#include "log.hpp"
 #include "network.hpp"
 #include <algorithm>
 
@@ -27,7 +28,7 @@ void RuntimConfig::generateNewConfig() {
   file.open(file_name);
 
   if (!file.is_open()) {
-    lg.log(ERROR, "create_base_toml: Unable to open file");
+    snn->lg->log(ERROR, "create_base_toml: Unable to open file");
     return;
   }
 
@@ -117,7 +118,7 @@ vector<int> RuntimConfig::parse_line_range(const std::string &in) {
     auto pos1 = in.find_first_of('.');
     auto pos2 = in.find_last_of('.');
     if (pos1 == std::string::npos || pos2 == std::string::npos) {
-      lg.log(ERROR, "Cannot parse configuratio file. Not a valid range");
+      snn->lg->log(ERROR, "Cannot parse configuratio file. Not a valid range");
       return ret;
     }
     int start = std::stoi(in.substr(0, pos1));
@@ -143,7 +144,7 @@ int RuntimConfig::setOptions() {
   try {
     tbl = toml::parse_file(file_name);
   } catch (const toml::parse_error &err) {
-    lg.string(ERROR, "Parsing failed:", err.what());
+    snn->lg->string(ERROR, "Parsing failed:", err.what());
     return 0;
   }
 
@@ -151,7 +152,7 @@ int RuntimConfig::setOptions() {
     INPUT_PROB_SUCCESS =
         tbl["neuron"]["poisson_prob_of_success"].as_floating_point()->get();
   } else {
-    lg.string(ERROR, "Failed to parse: %s", "poisson_prob_of_success");
+    snn->lg->string(ERROR, "Failed to parse: %s", "poisson_prob_of_success");
   }
 
   if (tbl["neuron"]["refractory_duration"].as_floating_point()) {
@@ -160,42 +161,42 @@ int RuntimConfig::setOptions() {
         tbl["neuron"]["refractory_duration"].as_floating_point()->get() /
         1000.0f;
   } else {
-    lg.string(ERROR, "Failed to parse: %s", "refractory_duration");
+    snn->lg->string(ERROR, "Failed to parse: %s", "refractory_duration");
   }
 
   if (tbl["neuron"]["tau"].as_floating_point()) {
     TAU = tbl["neuron"]["tau"].as_floating_point()->get();
   } else {
-    lg.string(ERROR, "Failed to parse: %s", "tau");
+    snn->lg->string(ERROR, "Failed to parse: %s", "tau");
   }
 
   if (tbl["neuron"]["input_neuron_count"].as_integer()) {
     NUMBER_INPUT_NEURONS =
         tbl["neuron"]["input_neuron_count"].as_integer()->get();
   } else {
-    lg.string(ERROR, "Failed to parse: %s", "input_neuron_count");
+    snn->lg->string(ERROR, "Failed to parse: %s", "input_neuron_count");
   }
 
   if (tbl["runtime_vars"]["line_range"].as_string()) {
     STIMULUS_VEC =
         parse_line_range(tbl["runtime_vars"]["line_range"].as_string()->get());
   } else {
-    lg.string(ERROR, "Failed to parse: %s", "line_range");
+    snn->lg->string(ERROR, "Failed to parse: %s", "line_range");
   }
 
   if (tbl["runtime_vars"]["limit_log_size"].as_boolean()) {
     LIMIT_LOG_OUTPUT =
         tbl["runtime_vars"]["limit_log_size"].as_boolean()->get();
   } else {
-    lg.string(ERROR, "Failed to parse: %s, using default option: true",
-              "limit_log_size");
+    snn->lg->string(ERROR, "Failed to parse: %s, using default option: true",
+                    "limit_log_size");
     LIMIT_LOG_OUTPUT = true;
   }
 
   if (tbl["runtime_vars"]["runtime"].as_integer()) {
     RUN_TIME = 1e6 * tbl["runtime_vars"]["runtime"].as_integer()->get();
   } else {
-    lg.string(ERROR, "Failed to parse: %s", "runtime");
+    snn->lg->string(ERROR, "Failed to parse: %s", "runtime");
   }
 
   if (tbl["random"]["seed"].as_string()) {
@@ -206,21 +207,21 @@ int RuntimConfig::setOptions() {
       RAND_SEED = tbl["random"]["seed"].as_integer()->get();
     }
   } else {
-    lg.string(ERROR, "Failed to parse: %s", "random seed");
+    snn->lg->string(ERROR, "Failed to parse: %s", "random seed");
   }
 
   if (tbl["runtime_vars"]["input_file"].as_string()) {
     std::string file = tbl["runtime_vars"]["input_file"].as_string()->get();
     INPUT_FILE = file;
   } else {
-    lg.string(ERROR, "Failed to parse: %s", "input_file");
+    snn->lg->string(ERROR, "Failed to parse: %s", "input_file");
   }
 
   if (tbl["debug"]["level"].as_string()) {
     std::string level = tbl["debug"]["level"].as_string()->get();
-    DEBUG_LEVEL = lg.debugLevelString(level);
+    DEBUG_LEVEL = snn->lg->debugLevelString(level);
   } else {
-    lg.string(ERROR, "Failed to parse: %s", "Debug level");
+    snn->lg->string(ERROR, "Failed to parse: %s", "Debug level");
   }
 
   if (tbl["neuron"]["refractory_membrane_potential"].as_floating_point()) {
@@ -229,50 +230,51 @@ int RuntimConfig::setOptions() {
             .as_floating_point()
             ->get();
   } else {
-    lg.string(ERROR, "Failed to parse: %s", "refractory_membrane_potential");
+    snn->lg->string(ERROR, "Failed to parse: %s",
+                    "refractory_membrane_potential");
   }
 
   if (tbl["neuron"]["activation_threshold"].as_floating_point()) {
     ACTIVATION_THRESHOLD =
         tbl["neuron"]["activation_threshold"].as_floating_point()->get();
   } else {
-    lg.string(ERROR, "Failed to parse: %s", "activation_threshold");
+    snn->lg->string(ERROR, "Failed to parse: %s", "activation_threshold");
   }
 
   if (tbl["neuron"]["initial_membrane_potential"].as_floating_point()) {
     INITIAL_MEMBRANE_POTENTIAL =
         tbl["neuron"]["initial_membrane_potential"].as_floating_point()->get();
   } else {
-    lg.string(ERROR, "Failed to parse: %s", "initial_membrane_potential");
+    snn->lg->string(ERROR, "Failed to parse: %s", "initial_membrane_potential");
   }
 
   if (tbl["neuron"]["group_count"].as_integer()) {
     NUMBER_GROUPS = tbl["neuron"]["group_count"].as_integer()->get();
   } else {
-    lg.string(ERROR, "Failed to parse: %s", "group_count");
+    snn->lg->string(ERROR, "Failed to parse: %s", "group_count");
   }
 
   if (tbl["neuron"]["neuron_count"].as_integer()) {
     NUMBER_NEURONS = tbl["neuron"]["neuron_count"].as_integer()->get();
   } else {
-    lg.string(ERROR, "Failed to parse: %s", "neuron_count");
+    snn->lg->string(ERROR, "Failed to parse: %s", "neuron_count");
   }
 
   if (tbl["neuron"]["edge_count"].as_string()) {
     std::string seed = tbl["neuron"]["edge_count"].as_string()->get();
     if (seed == "MAX") {
-      NUMBER_EDGES = SNN::maximum_edges();
-      lg.string(INFO, "Maximum edges selected, setting to %s",
-                std::to_string(NUMBER_EDGES).c_str());
+      NUMBER_EDGES = SNN::maximum_edges(NUMBER_INPUT_NEURONS, NUMBER_NEURONS);
+      snn->lg->string(INFO, "Maximum edges selected, setting to %s",
+                      std::to_string(NUMBER_EDGES).c_str());
     }
   } else if (tbl["neuron"]["edge_count"].as_integer()) {
     NUMBER_EDGES = tbl["neuron"]["edge_count"].as_integer()->get();
   } else {
-    lg.string(ERROR, "Failed to parse: %s", "edge_count");
+    snn->lg->string(ERROR, "Failed to parse: %s", "edge_count");
   }
 
   num_stimulus = STIMULUS_VEC.size();
-  time_per_stimulus = (double)cf.RUN_TIME / num_stimulus;
+  time_per_stimulus = (double)RUN_TIME / num_stimulus;
   STIMULUS = STIMULUS_VEC.begin();
 
   return 1;
@@ -291,7 +293,7 @@ void RuntimConfig::useBaseToml() {
   if (!file_exists("./run_config/base_config.toml")) {
     generateNewConfig();
   } else {
-    lg.log(DEBUG, "base_config.toml exists, using base_config.toml");
+    snn->lg->log(ESSENTIAL, "base_config.toml exists, using base_config.toml");
   }
   CONFIG_FILE = "./run_config/base_config.toml";
   setOptions();
@@ -308,19 +310,21 @@ void RuntimConfig::useBaseToml() {
  */
 int RuntimConfig::parseArgs(char **argv, int argc) {
   if (argc == 1) {
-    lg.log(ESSENTIAL,
-           "No command line arguements detected: Using base_config.toml:");
-    lg.log(ESSENTIAL,
-           "Usage: build/ex2 <filename> run build/ex2 --help for file format");
+    snn->lg->log(
+        ESSENTIAL,
+        "No command line arguements detected: Using base_config.toml:");
+    snn->lg->log(
+        ESSENTIAL,
+        "Usage: build/ex2 <filename> run build/ex2 --help for file format");
     useBaseToml();
     return 1;
-
   } else if (argc > 2) {
-    lg.log(
+    snn->lg->log(
         ESSENTIAL,
         "Too many command line arguements detected: Using base_config.toml:");
-    lg.log(ESSENTIAL,
-           "Usage: build/ex2 <filename> run build/ex2 --help for more info");
+    snn->lg->log(
+        ESSENTIAL,
+        "Usage: build/ex2 <filename> run build/ex2 --help for more info");
 
     useBaseToml();
     return 1;
@@ -329,13 +333,15 @@ int RuntimConfig::parseArgs(char **argv, int argc) {
   // check for help options
   if (!strcmp(argv[1], "--help")) {
     if (file_exists("./run_config/base_config.toml")) {
-      lg.print("See run_config/base_config.toml for configuration options");
+      snn->lg->print(
+          "See run_config/base_config.toml for configuration options");
     } else {
-      lg.print("Creating run_config/base_config.toml...");
+      snn->lg->print("Creating run_config/base_config.toml...");
       generateNewConfig();
-      lg.print("See run_config/base_config.toml for configuration options");
+      snn->lg->print(
+          "See run_config/base_config.toml for configuration options");
     }
-    return 0;
+    exit(0);
   }
 
   const char *path = "./run_config/%s";
@@ -344,8 +350,8 @@ int RuntimConfig::parseArgs(char **argv, int argc) {
   snprintf(formatted_file_path, length + 1, path, argv[1]);
 
   if (!file_exists(formatted_file_path)) {
-    lg.string(ERROR, "File %s does not exists", formatted_file_path);
-    return 0;
+    snn->lg->string(ERROR, "File %s does not exists", formatted_file_path);
+    exit(1);
   }
 
   CONFIG_FILE = formatted_file_path;
@@ -367,24 +373,28 @@ int RuntimConfig::parseArgs(char **argv, int argc) {
 void RuntimConfig::checkStartCond() {
   bool error = false;
   if (NUMBER_INPUT_NEURONS >= NUMBER_NEURONS) {
-    lg.log(ERROR, "NUMBER_INPUT_NEURONS greater than or equal to "
-                  "NUMBER_NEURONS... quitting");
+    snn->lg->log(ERROR, "NUMBER_INPUT_NEURONS greater than or equal to "
+                        "NUMBER_NEURONS... quitting");
     error = true;
   } else if (NUMBER_NEURONS % NUMBER_GROUPS != 0) {
-    lg.log(ERROR, "NUMBER_NEURONS not divisible by NUMBER_GROUPS... quitting");
+    snn->lg->log(ERROR,
+                 "NUMBER_NEURONS not divisible by NUMBER_GROUPS... quitting");
     error = true;
   } else if (NUMBER_INPUT_NEURONS % NUMBER_GROUPS != 0) {
-    lg.log(ERROR,
-           "NUMBER_INPUT_NEURONS not divisible by NUMBER_GROUPS... quitting");
+    snn->lg->log(
+        ERROR,
+        "NUMBER_INPUT_NEURONS not divisible by NUMBER_GROUPS... quitting");
     error = true;
-  } else if (NUMBER_EDGES > SNN::maximum_edges()) {
-    lg.string(ERROR,
-              "Maximum number of possible edges (%s) exceeded .. quitting",
-              std::to_string(SNN::maximum_edges()).c_str());
+  } else if (NUMBER_EDGES >
+             SNN::maximum_edges(NUMBER_INPUT_NEURONS, NUMBER_NEURONS)) {
+    snn->lg->string(
+        ERROR, "Maximum number of possible edges (%s) exceeded .. quitting",
+        std::to_string(SNN::maximum_edges(NUMBER_INPUT_NEURONS, NUMBER_NEURONS))
+            .c_str());
     error = true;
   }
   if (error) {
-    mx.destroy_mutexes();
+    snn->getMutex()->destroy_mutexes();
     exit(0);
   } else {
     return;

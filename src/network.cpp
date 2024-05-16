@@ -1,4 +1,5 @@
 #include "network.hpp"
+#include "log.hpp"
 #include "neuron.hpp"
 #include "neuron_group.hpp"
 #include "runtime.hpp"
@@ -11,6 +12,9 @@ SNN::~SNN() {
   for (auto group : groups) {
     delete group;
   }
+
+  mutex->destroy_mutexes();
+  pthread_cond_destroy(&stimulus_switch_cond);
 }
 
 /**
@@ -21,7 +25,14 @@ SNN::~SNN() {
  * @param config RuntimConfig MUST be generated before calling this constructor
  * \sa RuntimConfig
  */
-SNN::SNN(RuntimConfig *config) : config(config) {
+SNN::SNN(int argc, char **argv) : active(false) {
+  lg = new Log(this);
+  config = new RuntimConfig(this);
+  config->parseArgs(argv, argc);
+  config->checkStartCond();
+  srand(config->RAND_SEED);
+  mutex = new Mutex;
+
   int neuron_per_group = config->NUMBER_NEURONS / config->NUMBER_GROUPS;
   int input_neurons_per_group =
       config->NUMBER_INPUT_NEURONS / config->NUMBER_GROUPS;
@@ -30,7 +41,7 @@ SNN::SNN(RuntimConfig *config) : config(config) {
 
     // allocate for this group
     NeuronGroup *this_group =
-        new NeuronGroup(i + 1, neuron_per_group, input_neurons_per_group);
+        new NeuronGroup(i + 1, neuron_per_group, input_neurons_per_group, this);
 
     // add to vector
     this->groups.push_back(this_group);
@@ -45,10 +56,10 @@ SNN::SNN(RuntimConfig *config) : config(config) {
  */
 void SNN::generateInputNeuronVec() {
   if (!input_neurons.empty()) {
-    lg.log(ERROR,
-           "get_input_neuron_vector: this constructs a new vector! "
-           "emptying vector that was passed...\n If Neurons in this vector "
-           "were dynamically allocated, that memory has NOT been freed");
+    lg->log(ERROR,
+            "get_input_neuron_vector: this constructs a new vector! "
+            "emptying vector that was passed...\n If Neurons in this vector "
+            "were dynamically allocated, that memory has NOT been freed");
     input_neurons.clear();
   }
 
@@ -116,7 +127,7 @@ SNN::generateNeighborOptions() {
  *
  */
 void SNN::generateRandomSynapses() {
-  auto start = lg.time();
+  auto start = lg->time();
   int synapses_formed = 0;
   if (this->neurons.empty()) {
     generateNeuronVec();
@@ -154,14 +165,14 @@ void SNN::generateRandomSynapses() {
     synapses_formed += 1;
 
     // check to make sure we still need edges
-    if (synapses_formed >= cf.NUMBER_EDGES) {
+    if (synapses_formed >= config->NUMBER_EDGES) {
       break;
     }
   }
-  auto end = lg.time();
+  auto end = lg->time();
   std::string msg = "Adding random synapses done: took " +
                     std::to_string(end - start) + " seconds";
-  lg.log(ESSENTIAL, msg.c_str());
+  lg->log(ESSENTIAL, msg.c_str());
 }
 
 /**
@@ -201,8 +212,8 @@ void SNN::reset() {
  *
  */
 void SNN::start() {
-
-  this->setStimLineX(*config->STIMULUS);
+  active = true;
+  setStimLineX(*config->STIMULUS);
 
   for (auto group : this->groups) {
     group->startThread();
@@ -218,18 +229,18 @@ void SNN::start() {
 
       config->STIMULUS++;
       this->setNextStim();
-      lg.value(ESSENTIAL, "Set stimulus to line %d", *cf.STIMULUS);
+      lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
 
       this->reset();
 
-      pthread_mutex_lock(&mx.stimulus);
+      pthread_mutex_lock(&mutex->stimulus);
       switching_stimulus = false;
       pthread_cond_broadcast(&stimulus_switch_cond);
       auto end = std::chrono::high_resolution_clock::now();
       auto duration = std::chrono::duration_cast<std::chrono::duration<double>>(
           end - start);
-      lg.addOffset(duration.count());
-      pthread_mutex_unlock(&mx.stimulus);
+      lg->addOffset(duration.count());
+      pthread_mutex_unlock(&mutex->stimulus);
     }
   }
   active = false;
@@ -242,10 +253,10 @@ void SNN::start() {
  */
 void SNN::setStimLineX(int target) {
 
-  lg.value(ESSENTIAL, "Set stimulus to line %d", *cf.STIMULUS);
+  lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
 
   if (input_neurons.empty()) {
-    lg.log(ESSENTIAL, "set_line_x: passed empty input neuron vector?");
+    lg->log(ESSENTIAL, "set_line_x: passed empty input neuron vector?");
     return;
   }
 
@@ -268,11 +279,11 @@ void SNN::setStimLineX(int target) {
  * @param target line number (zero-indexed)
  */
 void SNN::getLineX(std::string &line, int target) {
-  static std::string file_name = cf.INPUT_FILE;
+  static std::string file_name = config->INPUT_FILE;
   static std::ifstream file(file_name);
   std::string temp;
   if (!file.is_open()) {
-    lg.log(ERROR, "get_next_line: Unable to open file");
+    lg->log(ERROR, "get_next_line: Unable to open file");
     return;
   }
 
@@ -297,12 +308,12 @@ void SNN::getLineX(std::string &line, int target) {
  * @param line string to store line
  */
 void SNN::getNextLine(std::string &line) {
-  static std::string file_name = cf.INPUT_FILE;
+  static std::string file_name = config->INPUT_FILE;
   static std::ifstream file(file_name);
   std::string temp;
 
   if (!file.is_open()) {
-    lg.log(ERROR, "get_next_line: Unable to open file");
+    lg->log(ERROR, "get_next_line: Unable to open file");
     return;
   }
 
@@ -324,7 +335,7 @@ void SNN::getNextLine(std::string &line) {
  */
 void SNN::setNextStim() {
   if (input_neurons.empty()) {
-    lg.log(ESSENTIAL, "set_next_line: passed empty input neuron vector?");
+    lg->log(ESSENTIAL, "set_next_line: passed empty input neuron vector?");
     return;
   }
 
@@ -348,7 +359,7 @@ void SNN::setNextStim() {
  *
  * @return Number of edges
  */
-int SNN::maximum_edges() {
+int SNN::maximum_edges(int num_input, int num_n) {
   // for an undirected graph there are n(n-1) / 2 edges
   //
   // Since our connections are only allowed to go one way, the network is
@@ -363,8 +374,8 @@ int SNN::maximum_edges() {
   // edges that would be possible in a undirected graph of only the input
   // neurons maximum_edges = n_t(n_t) / 2 - n_i(n_i-1) / 2
 
-  int n_i = cf.NUMBER_INPUT_NEURONS;
-  int n_t = cf.NUMBER_NEURONS;
+  int n_i = num_input;
+  int n_t = num_n;
 
   // always even so division is fine
   int edges_lost_to_input = n_i * (n_i - 1) / 2;

@@ -7,11 +7,7 @@
 #include <iostream>
 #include <vector>
 
-struct Mutex;
-struct RuntimConfig;
-extern Mutex mx;
-extern RuntimConfig cf;
-
+class SNN;
 using std::cout;
 using std::ostream;
 using std::vector;
@@ -72,9 +68,11 @@ class Log {
 private:
   hr_clock::time_point start;
   double offset; /**< Global offset accouting for stimulus switching time */
+  SNN *network;
 
 public:
-  Log() : start(hr_clock::now()), offset(0.0f) {}
+  Log(SNN *network) : start(hr_clock::now()), offset(0.0f), network(network) {}
+  Log();
   void startClock() { this->start = hr_clock::now(); }
   void writeData(const char *filesname = "./logs/%ld/%ld.log");
   void addData(LogData *data);
