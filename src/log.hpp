@@ -74,7 +74,7 @@ public:
   Log(SNN *network) : start(hr_clock::now()), offset(0.0f), network(network) {}
   Log();
   void startClock() { this->start = hr_clock::now(); }
-  void writeData(const char *filesname = "./logs/%ld/%ld.log");
+  void writeData();
   void addData(LogData *data);
   void logConfig(const std::string &name);
   void log(LogLevel level, const char *message, ostream &os = std::cout);

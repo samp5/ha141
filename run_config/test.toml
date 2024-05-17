@@ -31,7 +31,7 @@ refractory_membrane_potential = -70.0
 tau = 100.0
 
 #  poisson_prob_of_success
-poisson_prob_of_success = 0.0001
+poisson_prob_of_success = 0.5
 [debug]
 # Options are
 # NONE

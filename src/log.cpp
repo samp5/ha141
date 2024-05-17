@@ -124,30 +124,30 @@ void Log::addData(LogData *data) {
  *
  * @param filename Name of file
  */
-void Log::writeData(const char *filename) {
+void Log::writeData() {
 
   namespace fs = std::filesystem;
 
   struct timeval tv;
   gettimeofday(&tv, NULL);
-  int name = tv.tv_sec - 1'710'000'000;
 
-  fs::path parent = "./logs/" + std::to_string(name);
+  fs::path parent;
+  std::string name;
+  if (network->getConfig()->OUTPUT_FILE == "") {
+    name = std::to_string(tv.tv_sec - 1'710'000'000);
+  } else {
+    name = network->getConfig()->OUTPUT_FILE;
+  }
+
+  parent = "./logs/" + name;
   fs::create_directory(parent);
-
-  // length
-  int length = snprintf(nullptr, 0, filename, name, name);
-  // allocate
-  char *file_name = new char[length + 1];
-  // format
-  snprintf(file_name, length + 1, filename, name, name);
+  std::string file_name = "./logs/" + name + "/" + name + ".log";
 
   std::ofstream file;
   file.open(file_name);
 
   if (!file.is_open()) {
     this->log(ERROR, "write_data: Unable to open file");
-    delete[] file_name;
     return;
   }
 
@@ -161,10 +161,7 @@ void Log::writeData(const char *filename) {
   }
 
   file.close();
-
-  // deallocate
-  delete[] file_name;
-  this->logConfig(std::to_string(name));
+  this->logConfig(name);
 }
 
 /**

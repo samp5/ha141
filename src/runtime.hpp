@@ -120,6 +120,7 @@ struct RuntimConfig {
   LogLevel DEBUG_LEVEL;
   std::string INPUT_FILE;
   std::string CONFIG_FILE;
+  std::string OUTPUT_FILE;
   ostream &STREAM = std::cout;
   int num_stimulus;
   int time_per_stimulus;

@@ -86,9 +86,13 @@ void RuntimConfig::generateNewConfig() {
   file << "seed = \"time\"" << '\n';
   file << '\n';
   file << "[runtime_vars]" << '\n';
+  file << "# Limit the log output to only Refractory events to limit log size"
+       << '\n';
   file << "limit_log_size = false" << '\n';
   file << "# in seconds" << '\n';
   file << "runtime = 1" << '\n';
+  file << "# name of output file (if left blank, a timestamp is used" << '\n';
+  file << "output_file = \"\"" << '\n';
   file << "# file to read input from" << '\n';
   file << "input_file = \"./input_files/test\"" << '\n';
   file << "# format should be \"x..y\" for reading lines x to y (inclusive) or "
@@ -216,6 +220,14 @@ int RuntimConfig::setOptions() {
     INPUT_FILE = file;
   } else {
     snn->lg->string(ERROR, "Failed to parse: %s", "input_file");
+  }
+
+  if (tbl["runtime_vars"]["output_file"].as_string()) {
+    std::string file = tbl["runtime_vars"]["output_file"].as_string()->get();
+    OUTPUT_FILE = file;
+  } else {
+    snn->lg->string(ERROR, "Failed to parse: %s", "output_file");
+    OUTPUT_FILE = "";
   }
 
   if (tbl["debug"]["level"].as_string()) {

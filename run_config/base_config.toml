@@ -40,17 +40,20 @@ poisson_prob_of_success = 0.0001
 # DEBUG2
 # DEBUG3
 # DEBUG4
-level = "NONE"
+level = "INFO"
 
 [random]
 # options are 'time' for using the current time, or an integer (as a string e.g. "1")
 seed = "time"
 
 [runtime_vars]
-limit_log_size = true
+# Limit the log output to only Refractory events to limit log size
+limit_log_size = false
 # in seconds
 runtime = 1
+# name of output file (if left blank, a timestamp is used
+output_file = "sambam"
 # file to read input from
 input_file = "./input_files/test"
 # format should be "x..y" for reading lines x to y (inclusive) or just x for a single line
-line_range = "1..10"
+line_range = "1"
