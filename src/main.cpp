@@ -6,12 +6,6 @@
 
 using std::string;
 
-pthread_cond_t stimulus_switch_cond = PTHREAD_COND_INITIALIZER;
-
-// This is for group runs
-bool active = true;
-bool switching_stimulus = false;
-
 int main(int argc, char **argv) {
   std::vector<std::string> args(argv, argv + argc);
   SNN snn = SNN(args);

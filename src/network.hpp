@@ -17,9 +17,9 @@ struct Mutex;
  */
 class SNN {
 private:
+  bool switching_stimulus;
   pthread_cond_t stimulus_switch_cond = PTHREAD_COND_INITIALIZER;
   bool active;
-  bool switching_stimulus;
   std::vector<NeuronGroup *>
       groups;                    /**< Holds pointers to all `NeuronGroup`s */
   std::vector<Neuron *> neurons; /**< Holds pointers to all `Neuron`s */
@@ -44,6 +44,8 @@ public:
   void getNextLine(std::string &line);
   void setNextStim();
   bool isActive() { return active; }
+  bool switchingStimulus() { return switching_stimulus; }
+  pthread_cond_t *switchCond() { return &stimulus_switch_cond; }
   static int maximum_edges(int num_i, int num_n);
   std::vector<InputNeuron *> &getMutInputNeurons() {
     return this->input_neurons;
