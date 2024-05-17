@@ -79,7 +79,7 @@ def main():
     psr, args = parser()
     opts = Options(args)
 
-    if not any([opts.graph, opts.graphs != [], opts.csv, opts.log_title == ""]):
+    if not any([opts.graph, opts.graphs != [], opts.csv, opts.log_title != ""]):
         print("-> No output format indicated, not processing file")
         print()
         psr.print_help()
