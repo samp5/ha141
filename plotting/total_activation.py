@@ -34,6 +34,7 @@ class Options:
         self.graph = args.graph
         self.graphs = args.graphfor
         self.csv = args.csv
+        self.output = args.output_file
 
 def parser():
     parser = argparse.ArgumentParser(
@@ -45,6 +46,7 @@ def parser():
     parser.add_argument("-g", "--graph", action='store_true', help="Generate png results")
     parser.add_argument("-G", "--graphfor", nargs='*', dest="graphfor", default=[], help="Specify the stimulus number(s) for which to generate graphs")
     parser.add_argument("-s", "--step", type=float, dest="timestep", default=-1, help="Specify the timestep to be used in data processing")
+    parser.add_argument("-o","--output", default="", dest="output_file", help = "Output file name")
 
     return parser, parser.parse_args()
 
@@ -141,9 +143,10 @@ def main():
             generate_graph(stim_num, x_values, y_values, opts)
 
     if opts.csv:
+        opts.output = opts.output if opts.output != "" else opts.log_title + "csv"
         print(f"-> Generating CSV...")
         a = np.matrix(np_matrix)
-        np.savetxt(f"{opts.log_title}.csv", a, delimiter = ",", fmt='%d')
+        np.savetxt(f"{opts.output}", a, delimiter = ",", fmt='%d')
 
 if __name__ == "__main__":
     main()
