@@ -350,17 +350,6 @@ void SNN::setStimLineX(int target) {
   }
 }
 
-void SNN::setStim(int target) {
-  // lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
-  // if (input_neurons.empty()) {
-  //   lg->log(ESSENTIAL, "set_line_x: passed empty input neuron vector?");
-  //   return;
-  // }
-  // if (input_data.has_value()) {
-  //   std::cout << input_data.value().data(1);
-  // }
-}
-
 /**
  * @brief Get line X of RuntimConfig::INPUT_FILE.
  *
@@ -474,5 +463,3 @@ int SNN::maximum_edges(int num_input, int num_n) {
 
   return max_edges;
 }
-
-void SNN::pyWrite() { lg->writeData(); }
