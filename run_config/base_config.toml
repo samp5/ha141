@@ -3,17 +3,17 @@
 #       must be divisible by the number of groups
 
 # number of neurons
-neuron_count = 10
+neuron_count = 650
 
 # number of input type neurons
-input_neuron_count = 2
+input_neuron_count = 600
 
 # number of groups
-group_count = 2
+group_count = 5
 
 # number of connections
 # option can be "MAX" for maximum edges
-edge_count = 1
+edge_count = "MAX"
 
 # refractory_duration
 refractory_duration = 0.5
@@ -40,7 +40,7 @@ poisson_prob_of_success = 0.0001
 # DEBUG2
 # DEBUG3
 # DEBUG4
-level = "INFO"
+level = "NONE"
 
 [random]
 # options are 'time' for using the current time, or an integer (as a string e.g. "1")
@@ -48,12 +48,12 @@ seed = "time"
 
 [runtime_vars]
 # Limit the log output to only Refractory events to limit log size
-limit_log_size = false
+limit_log_size = true
 # in seconds
-runtime = 1
+runtime = 2.5
 # name of output file (if left blank, a timestamp is used
-output_file = "sambam"
+output_file = ""
 # file to read input from
-input_file = "./input_files/test"
+input_file = "./input_files/mnist2.txt"
 # format should be "x..y" for reading lines x to y (inclusive) or just x for a single line
-line_range = "1"
+line_range = "1..10"

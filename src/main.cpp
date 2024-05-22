@@ -20,7 +20,6 @@ int main(int argc, char **argv) {
   snn.lg->log(ESSENTIAL, "Transfering data from Neurons to Log...");
   snn.join();
 
-  snn.lg->log(ESSENTIAL, "Writing data to file...");
   snn.lg->writeData();
 
   snn.lg->log(ESSENTIAL, "Done writing, exiting");

@@ -2,8 +2,10 @@
 #define NETWORK
 #include "input_neuron.hpp"
 #include <list>
+#include <optional>
 #include <unordered_map>
 #include <vector>
+
 class Neuron;
 class NeuronGroup;
 struct RuntimConfig;
@@ -27,6 +29,7 @@ private:
       input_neurons;    /**< Holds pointers to all `InputNeuron`s */
   RuntimConfig *config; /**< Holds pointer to RuntimConfig */
   Mutex *mutex;         /**< Holds pointer to Mutex structure */
+  // std::optional<py::array_t<double>> input_data;
 
 public:
   Log *lg;
@@ -34,15 +37,18 @@ public:
   ~SNN();
   double generateSynapseWeight();
   void start();
+  void pyStart();
   void join();
   void reset();
   void generateRandomSynapses();
   void generateNeuronVec();
   void generateInputNeuronVec();
   void setStimLineX(int target);
+  void setStim(int target);
   void getLineX(std::string &line, int target);
   void getNextLine(std::string &line);
   void setNextStim();
+  void pyWrite();
   bool isActive() { return active; }
   bool switchingStimulus() { return switching_stimulus; }
   pthread_cond_t *switchCond() { return &stimulus_switch_cond; }

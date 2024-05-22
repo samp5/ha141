@@ -32,7 +32,6 @@ InputNeuron::InputNeuron(int _id, NeuronGroup *group)
  * - Sends messages through all synapses
  */
 void InputNeuron::run() {
-
   if (group->getNetwork()->switchingStimulus()) {
     // wait for all input neurons to switch to the new stimulus
     pthread_mutex_lock(&group->getNetwork()->getMutex()->stimulus);
@@ -42,7 +41,6 @@ void InputNeuron::run() {
     }
     pthread_mutex_unlock(&group->getNetwork()->getMutex()->stimulus);
   }
-
   if (this->inRefractory()) {
     group->getNetwork()->lg->groupNeuronState(
         INFO,

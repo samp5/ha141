@@ -4,6 +4,8 @@ todo.md
 testoutput
 
 
+extern/*
+
 # ignore log files
 logs/*
 input_files/*.txt

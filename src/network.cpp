@@ -30,6 +30,7 @@ SNN::SNN(std::vector<std::string> args) : active(false) {
   lg = new Log(this);
   config = new RuntimConfig(this);
   config->parseArgs(args);
+  // input_data = std::nullopt;
   config->checkStartCond();
   srand(config->RAND_SEED);
   mutex = new Mutex;
@@ -50,6 +51,43 @@ SNN::SNN(std::vector<std::string> args) : active(false) {
   this->generateNeuronVec();
   this->generateInputNeuronVec();
 }
+
+/**
+ * @brief Constructor for SNN.
+ *
+ * Allocate all `NeuronGroup`s which in turn allocate all `Neuron`s.
+ *
+ * @param config RuntimConfig MUST be generated before calling this constructor
+ * \sa RuntimConfig
+ */
+// SNN::SNN(std::vector<std::string> args, py::array_t<double> arr)
+//     : active(false) {
+//   lg = new Log(this);
+//   config = new RuntimConfig(this);
+//   config->parseArgs(args);
+//   config->INPUT_FILE = "";
+//   // input_data = arr;
+//   config->checkStartCond();
+//   srand(config->RAND_SEED);
+//   mutex = new Mutex;
+//
+//   int neuron_per_group = config->NUMBER_NEURONS / config->NUMBER_GROUPS;
+//   int input_neurons_per_group =
+//       config->NUMBER_INPUT_NEURONS / config->NUMBER_GROUPS;
+//
+//   for (int i = 0; i < config->NUMBER_GROUPS; i++) {
+//
+//     // allocate for this group
+//     NeuronGroup *this_group =
+//         new NeuronGroup(i + 1, neuron_per_group, input_neurons_per_group,
+//         this);
+//
+//     // add to vector
+//     this->groups.push_back(this_group);
+//   }
+//   this->generateNeuronVec();
+//   this->generateInputNeuronVec();
+// }
 
 /**
  * @brief Generate a vector of all `InputNeuron`.
@@ -234,14 +272,53 @@ void SNN::start() {
 
       this->reset();
 
-      pthread_mutex_lock(&mutex->stimulus);
       switching_stimulus = false;
       pthread_cond_broadcast(&stimulus_switch_cond);
       auto end = std::chrono::high_resolution_clock::now();
       auto duration = std::chrono::duration_cast<std::chrono::duration<double>>(
           end - start);
       lg->addOffset(duration.count());
-      pthread_mutex_unlock(&mutex->stimulus);
+    }
+  }
+  active = false;
+}
+
+/**
+ * @brief Start network.
+ *
+ * Set stimulus values of all `InputNeuron`s and starts threads for
+ * each NeuronGroup. Cycle through each stimulus, reseting the NeuronGroup after
+ * stimulus.
+ *
+ */
+void SNN::pyStart() {
+  active = true;
+  setStimLineX(*config->STIMULUS);
+
+  for (auto group : this->groups) {
+    group->startThread();
+  }
+
+  for (int i = 1; i < config->num_stimulus + 1; i++) {
+
+    usleep(config->time_per_stimulus);
+
+    if (i < config->num_stimulus) {
+      auto start = std::chrono::high_resolution_clock::now();
+      switching_stimulus = true;
+
+      config->STIMULUS++;
+      this->setNextStim();
+      lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
+
+      this->reset();
+
+      switching_stimulus = false;
+      pthread_cond_broadcast(&stimulus_switch_cond);
+      auto end = std::chrono::high_resolution_clock::now();
+      auto duration = std::chrono::duration_cast<std::chrono::duration<double>>(
+          end - start);
+      lg->addOffset(duration.count());
     }
   }
   active = false;
@@ -271,6 +348,17 @@ void SNN::setStimLineX(int target) {
     s >> value;
     input_neuron->setInputValue(value);
   }
+}
+
+void SNN::setStim(int target) {
+  // lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
+  // if (input_neurons.empty()) {
+  //   lg->log(ESSENTIAL, "set_line_x: passed empty input neuron vector?");
+  //   return;
+  // }
+  // if (input_data.has_value()) {
+  //   std::cout << input_data.value().data(1);
+  // }
 }
 
 /**
@@ -323,9 +411,9 @@ void SNN::getNextLine(std::string &line) {
 
   for (char ch : temp) {
     if (ch == ',') {
+      line += ' ';
       continue;
     }
-    line += ' ';
     line += ch;
   }
 }
@@ -386,3 +474,5 @@ int SNN::maximum_edges(int num_input, int num_n) {
 
   return max_edges;
 }
+
+void SNN::pyWrite() { lg->writeData(); }

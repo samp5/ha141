@@ -92,6 +92,9 @@ void Log::log(LogLevel level, const char *message,
   case LogLevel::NONE:
     this->log(ERROR, "NONE passed to Log Function?");
     return;
+  default:
+    _level = "";
+    return;
   }
 
   double time_rn = time();
@@ -126,6 +129,7 @@ void Log::addData(LogData *data) {
  */
 void Log::writeData() {
 
+  log(ESSENTIAL, "Writing data to file...");
   namespace fs = std::filesystem;
 
   struct timeval tv;
