@@ -143,7 +143,7 @@ def main():
             generate_graph(stim_num, x_values, y_values, opts)
 
     if opts.csv:
-        opts.output = opts.output if opts.output != "" else opts.log_title + "csv"
+        opts.output = opts.output if opts.output != "" else opts.log_title + ".csv"
         print(f"-> Generating CSV...")
         a = np.matrix(np_matrix)
         np.savetxt(f"{opts.output}", a, delimiter = ",", fmt='%d')

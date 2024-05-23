@@ -161,7 +161,6 @@ void Log::writeData() {
          << log_data->timestamp << " " << log_data->potential << " "
          << messageTypeToString(log_data->message_type) << " "
          << log_data->stimulus_number << '\n';
-    delete log_data;
   }
 
   file.close();
@@ -378,4 +377,10 @@ std::string Log::messageTypeToString(Message_t type) {
     break;
   }
   return ret;
+}
+
+Log::~Log() {
+  for (auto d : log_data) {
+    delete d;
+  }
 }

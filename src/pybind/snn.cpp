@@ -1,10 +1,38 @@
 #include "snn.hpp"
-#include "../../extern/pybind/include/pybind11/pybind11.h"
 #include "../../extern/pybind/include/pybind11/stl.h"
 #include "../runtime.hpp"
-#include <sstream>
+#include <algorithm>
+#include <climits>
+#include <unordered_map>
+#include <vector>
 
 int add(int i, int j) { return i + j; }
+
+pySNN::pySNN(std::vector<std::string> args) : SNN() {
+  lg = new Log(this);
+  config = new RuntimConfig(this);
+  config->parseArgs(args);
+  // input_data = std::nullopt;
+  config->checkStartCond();
+  srand(config->RAND_SEED);
+  mutex = new Mutex;
+
+  int neuron_per_group = config->NUMBER_NEURONS / config->NUMBER_GROUPS;
+  int input_neurons_per_group =
+      config->NUMBER_INPUT_NEURONS / config->NUMBER_GROUPS;
+
+  for (int i = 0; i < config->NUMBER_GROUPS; i++) {
+
+    // allocate for this group
+    NeuronGroup *this_group =
+        new NeuronGroup(i + 1, neuron_per_group, input_neurons_per_group, this);
+
+    // add to vector
+    this->groups.push_back(this_group);
+  }
+  this->generateNeuronVec();
+  this->generateInputNeuronVec();
+}
 
 void pySNN::pyStart(py::buffer buff) {
 
@@ -66,7 +94,8 @@ void pySNN::pySetStimLineX(int target) {
     return;
   }
 
-  for (int i = 0; i < input_neurons.size(); i++) {
+  for (std::vector<InputNeuron *>::size_type i = 0; i < input_neurons.size();
+       i++) {
     input_neurons.at(i)->setInputValue(data.at(target).at(i));
   }
 }
@@ -99,9 +128,62 @@ void pySNN::pySetNextStim() {
     lg->log(ESSENTIAL, "set_next_line: passed empty input neuron vector?");
     return;
   }
-  for (int i = 0; i < input_neurons.size(); i++) {
+  for (std::vector<InputNeuron *>::size_type i = 0; i < input_neurons.size();
+       i++) {
     input_neurons.at(i)->setInputValue(data.at(*config->STIMULUS).at(i));
   }
 };
+
+py::array_t<int> pySNN::pyOutput() {
+
+  int max_stim = -1;
+  int min_stim = INT_MAX;
+
+  std::unordered_map<int, std::vector<LogData *>> stim_data;
+  std::vector<LogData *> lg_data = lg->getLogData();
+  for (std::vector<LogData *>::size_type i = 0; i < lg_data.size(); i++) {
+    LogData *td = lg_data.at(i);
+    if (td->message_type == Message_t::Refractory) {
+      max_stim = std::max(max_stim, td->stimulus_number);
+      min_stim = std::min(min_stim, td->stimulus_number);
+
+      if (stim_data.find(td->stimulus_number) != stim_data.end()) {
+        stim_data[td->stimulus_number].push_back(td);
+      } else {
+        stim_data[td->stimulus_number] = {td};
+      }
+    }
+  }
+
+  int bins = 300;
+  auto ret =
+      py::array_t<int, py::array::c_style>((max_stim - min_stim + 1) * bins);
+
+  auto info = ret.request();
+  int *pRet = reinterpret_cast<int *>(info.ptr);
+
+  for (int s = min_stim; s <= max_stim; s++) {
+    std::vector<LogData *> &sd = stim_data[s];
+
+    std::sort(sd.begin(), sd.end(), [](LogData *a, LogData *b) {
+      return a->timestamp < b->timestamp;
+    });
+
+    double timestep = (sd.back()->timestamp - sd.front()->timestamp) / bins;
+    double l = sd.front()->timestamp;
+    double u = l + timestep;
+
+    for (int i = 0; i < bins; i++) {
+      ssize_t index = ((s - min_stim) * bins + i);
+      pRet[index] = std::count_if(sd.begin(), sd.end(), [l, u](LogData *ld) {
+        return (ld->timestamp < u) && (ld->timestamp >= l);
+      });
+      l = u;
+      u = u + timestep;
+    }
+  }
+  ret.resize({(max_stim - min_stim + 1), bins});
+  return ret;
+}
 
 void pySNN::pyWrite() { lg->writeData(); };

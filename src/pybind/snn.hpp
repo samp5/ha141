@@ -1,3 +1,4 @@
+#include "../../extern/pybind/include/pybind11/numpy.h"
 #include "../../extern/pybind/include/pybind11/pybind11.h"
 #include "../network.hpp"
 #include <vector>
@@ -9,15 +10,17 @@ private:
   std::vector<std::vector<double>> data;
 
 public:
-  pySNN(std::vector<std::string> args) : SNN(args){};
+  pySNN(std::vector<std::string> args);
   void pyStart(py::buffer);
   void pySetStimLineX(int target);
   void pySetStim(int target);
   void pySetNextStim();
   void pyWrite();
+  py::array_t<int> pyOutput();
 };
 
 PYBIND11_MODULE(snn, m) {
+  m.doc() = "Python API for a Spiking Neural network implemented in C++";
   py::class_<SNN>(m, "SNN")
       .def(py::init<std::vector<std::string>>())
       .def("generateSynapses", &SNN::generateRandomSynapses)
@@ -25,10 +28,14 @@ PYBIND11_MODULE(snn, m) {
       .def("join", &SNN::join);
   py::class_<pySNN>(m, "pySNN")
       .def(py::init<std::vector<std::string>>())
-      .def("generateSynapses", &pySNN::generateRandomSynapses)
-      .def("start", &pySNN::pyStart)
-      .def("join", &SNN::join)
-      .def("writeData", &pySNN::pyWrite);
+      .def("generateSynapses", &pySNN::generateRandomSynapses,
+           "Generate random neural connections")
+      .def("start", &pySNN::pyStart, "Start the neural network")
+      .def("join", &SNN::join, "Wait for all threads to join")
+      .def("writeData", &pySNN::pyWrite,
+           "Write activation data to a file in ./logs")
+      .def("getActivation", &pySNN::pyOutput,
+           "Get the activation data in the form of a numpy array");
 }
 
 int add(int i, int j);

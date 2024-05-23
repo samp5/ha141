@@ -69,13 +69,16 @@ private:
   hr_clock::time_point start;
   double offset; /**< Global offset accouting for stimulus switching time */
   SNN *network;
+  vector<LogData *> log_data;
 
 public:
   Log(SNN *network) : start(hr_clock::now()), offset(0.0f), network(network) {}
   Log();
+  ~Log();
   void startClock() { this->start = hr_clock::now(); }
   void writeData();
   void addData(LogData *data);
+  const vector<LogData *> &getLogData() const { return log_data; }
   void logConfig(const std::string &name);
   void log(LogLevel level, const char *message, ostream &os = std::cout);
   double time();
@@ -96,9 +99,6 @@ public:
   const char *activeStatusString(bool active);
   LogLevel debugLevelString(std::string level);
   std::string messageTypeToString(Message_t type);
-
-private:
-  vector<LogData *> log_data;
 };
 
 #endif // !LOG
