@@ -4,8 +4,6 @@ todo.md
 testoutput
 
 
-extern/*
-
 # ignore log files
 logs/*
 input_files/*.txt
@@ -27,3 +25,8 @@ doxygen/latex
 #ingore venv
 plotting/venv/*
 plotting/*.png
+
+*.csv
+*.toml
+*.so
+*.txt
