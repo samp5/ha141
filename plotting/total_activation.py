@@ -65,7 +65,6 @@ def get_most_recent_log():
 
 def generate_graph(stim_num: int,x_values: list[float], y_values: list[float], opts: Options):
         plt.figure(dpi=300)
-        plt.ylim(0, 30)
         plt.plot(x_values, y_values, linewidth = 0.5 )
         plt.xlabel("Time")
         plt.ylabel("Activation")
