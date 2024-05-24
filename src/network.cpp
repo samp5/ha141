@@ -172,41 +172,45 @@ void SNN::generateRandomSynapses() {
   if (this->neurons.empty()) {
     generateNeuronVec();
   }
+
   auto map = generateNeighborOptions();
 
-  for (auto neuron : this->neurons) {
+  while (synapses_formed < config->NUMBER_EDGES) {
+    for (auto neuron : this->neurons) {
 
-    // get the neighbor_options for this neuron from the map
-    std::list<Neuron *> &neighbor_options = map.at(neuron);
-    if (neighbor_options.empty()) {
-      continue;
-    }
+      // get the neighbor_options for this neuron from the map
+      std::list<Neuron *> &neighbor_options = map.at(neuron);
+      if (neighbor_options.empty()) {
+        continue;
+      }
 
-    // get a random neuron in this list
-    auto target = neighbor_options.begin();
-    std::advance(target, rand() % neighbor_options.size());
+      // get a random neuron in this list
+      auto target = neighbor_options.begin();
+      std::advance(target, rand() % neighbor_options.size());
 
-    // get the neighbor_options for the postsynaptic neuron and an iter to
-    // this neuron
-    std::list<Neuron *> &post_opts = map.at(*target);
-    auto this_neuron = std::find(post_opts.begin(), post_opts.end(), neuron);
+      // get the neighbor_options for the postsynaptic neuron and an iter to
+      // this neuron
+      std::list<Neuron *> &post_opts = map.at(*target);
+      auto this_neuron = std::find(post_opts.begin(), post_opts.end(), neuron);
 
-    // add postsynaptic neuron as a neighbor
-    neuron->addNeighbor(*target, this->generateSynapseWeight());
+      // add postsynaptic neuron as a neighbor
+      neuron->addNeighbor(*target, this->generateSynapseWeight());
 
-    // erase the postsynaptic neuron from the list and this neuron from the
-    // postsynaptic list
-    neighbor_options.erase(target);
-    if (this_neuron != post_opts.end()) {
-      post_opts.erase(this_neuron);
-    }
+      // erase the postsynaptic neuron from the list and this neuron from the
+      // postsynaptic list
+      neighbor_options.erase(target);
+      if (this_neuron != post_opts.end()) {
+        post_opts.erase(this_neuron);
+      }
 
-    // increment the synapses
-    synapses_formed += 1;
+      // increment the synapses
+      synapses_formed += 1;
 
-    // check to make sure we still need edges
-    if (synapses_formed >= config->NUMBER_EDGES) {
-      break;
+      std::cout << config->NUMBER_EDGES;
+      // check to make sure we still need edges
+      if (synapses_formed >= config->NUMBER_EDGES) {
+        break;
+      }
     }
   }
   auto end = lg->time();
