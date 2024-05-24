@@ -1,4 +1,5 @@
 #include "network.hpp"
+#include "file_reader.hpp"
 #include "log.hpp"
 #include "neuron.hpp"
 #include "neuron_group.hpp"
@@ -252,159 +253,37 @@ void SNN::reset() {
  */
 void SNN::start() {
   active = true;
-  setStimLineX(*config->STIMULUS);
 
-  for (auto group : this->groups) {
-    group->startThread();
-  }
-
-  for (int i = 1; i < config->num_stimulus + 1; i++) {
-
-    usleep(config->time_per_stimulus);
-
-    if (i < config->num_stimulus) {
-      auto start = std::chrono::high_resolution_clock::now();
-      switching_stimulus = true;
-
-      config->STIMULUS++;
-      this->setNextStim();
-      lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
-
-      this->reset();
-
-      switching_stimulus = false;
-      pthread_cond_broadcast(&stimulus_switch_cond);
-      auto end = std::chrono::high_resolution_clock::now();
-      auto duration = std::chrono::duration_cast<std::chrono::duration<double>>(
-          end - start);
-      lg->addOffset(duration.count());
-    }
-  }
-  active = false;
-}
-
-/**
- * @brief Start network.
- *
- * Set stimulus values of all `InputNeuron`s and starts threads for
- * each NeuronGroup. Cycle through each stimulus, reseting the NeuronGroup after
- * stimulus.
- *
- */
-void SNN::pyStart() {
-  active = true;
-  setStimLineX(*config->STIMULUS);
-
-  for (auto group : this->groups) {
-    group->startThread();
-  }
-
-  for (int i = 1; i < config->num_stimulus + 1; i++) {
-
-    usleep(config->time_per_stimulus);
-
-    if (i < config->num_stimulus) {
-      auto start = std::chrono::high_resolution_clock::now();
-      switching_stimulus = true;
-
-      config->STIMULUS++;
-      this->setNextStim();
-      lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
-
-      this->reset();
-
-      switching_stimulus = false;
-      pthread_cond_broadcast(&stimulus_switch_cond);
-      auto end = std::chrono::high_resolution_clock::now();
-      auto duration = std::chrono::duration_cast<std::chrono::duration<double>>(
-          end - start);
-      lg->addOffset(duration.count());
-    }
-  }
-  active = false;
-}
-
-/**
- * @brief Set stimulus to line X of RuntimConfig::INPUT_FILE.
- *
- * @param target Line number (zero-indexed)
- */
-void SNN::setStimLineX(int target) {
-
+  setNextStim();
   lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
 
-  if (input_neurons.empty()) {
-    lg->log(ESSENTIAL, "set_line_x: passed empty input neuron vector?");
-    return;
+  for (auto group : this->groups) {
+    group->startThread();
   }
 
-  std::string line;
-  getLineX(line, target);
+  for (int i = 1; i < config->num_stimulus + 1; i++) {
 
-  std::stringstream s(line);
-  double value;
+    usleep(config->time_per_stimulus);
 
-  for (InputNeuron *input_neuron : input_neurons) {
-    s >> value;
-    input_neuron->setInputValue(value);
-  }
-}
+    if (i < config->num_stimulus) {
+      auto start = std::chrono::high_resolution_clock::now();
+      switching_stimulus = true;
 
-/**
- * @brief Get line X of RuntimConfig::INPUT_FILE.
- *
- * @param line string to store line
- * @param target line number (zero-indexed)
- */
-void SNN::getLineX(std::string &line, int target) {
-  static std::string file_name = config->INPUT_FILE;
-  static std::ifstream file(file_name);
-  std::string temp;
-  if (!file.is_open()) {
-    lg->log(ERROR, "get_next_line: Unable to open file");
-    return;
-  }
+      setNextStim();
+      config->STIMULUS++;
+      lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
 
-  file.seekg(std::ios::beg);
-  for (int i = 1; i < target; i++) {
-    file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-  }
+      this->reset();
 
-  std::getline(file, temp);
-  for (char ch : temp) {
-    if (ch == ',') {
-      continue;
+      switching_stimulus = false;
+      pthread_cond_broadcast(&stimulus_switch_cond);
+      auto end = std::chrono::high_resolution_clock::now();
+      auto duration = std::chrono::duration_cast<std::chrono::duration<double>>(
+          end - start);
+      lg->addOffset(duration.count());
     }
-    line += ' ';
-    line += ch;
   }
-}
-
-/**
- * @brief Get next line of RuntimConfig::INPUT_FILE.
- *
- * @param line string to store line
- */
-void SNN::getNextLine(std::string &line) {
-  static std::string file_name = config->INPUT_FILE;
-  static std::ifstream file(file_name);
-  std::string temp;
-
-  if (!file.is_open()) {
-    lg->log(ERROR, "get_next_line: Unable to open file");
-    return;
-  }
-
-  // Any previous contents of @a \_\_str are erased.
-  std::getline(file, temp);
-
-  for (char ch : temp) {
-    if (ch == ',') {
-      line += ' ';
-      continue;
-    }
-    line += ch;
-  }
+  active = false;
 }
 
 /**
@@ -412,13 +291,16 @@ void SNN::getNextLine(std::string &line) {
  *
  */
 void SNN::setNextStim() {
+  static FileReader reader =
+      FileReader(config->INPUT_FILE, config->STIMULUS_VEC.front());
+
   if (input_neurons.empty()) {
     lg->log(ESSENTIAL, "set_next_line: passed empty input neuron vector?");
     return;
   }
 
-  std::string line;
-  getNextLine(line);
+  std::string line = reader.nextLine();
+  std::cout << line << '\n';
 
   std::stringstream s(line);
   double value;

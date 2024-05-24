@@ -21,10 +21,10 @@ using std::vector;
  *
  */
 enum LogLevel {
+  ERROR,
   ESSENTIAL,
   NONE,
   DATA,
-  ERROR,
   WARNING,
   INFO,
   DEBUG,

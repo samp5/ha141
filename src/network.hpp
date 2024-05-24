@@ -36,16 +36,11 @@ public:
   ~SNN();
   double generateSynapseWeight();
   void start();
-  void pyStart();
   void join();
   void reset();
   void generateRandomSynapses();
   void generateNeuronVec();
   void generateInputNeuronVec();
-  void setStimLineX(int target);
-  void setStim(int target);
-  void getLineX(std::string &line, int target);
-  void getNextLine(std::string &line);
   void setNextStim();
   bool isActive() { return active; }
   bool switchingStimulus() { return switching_stimulus; }
