@@ -8,7 +8,7 @@
 /**
  * @brief Constructor for InputNeuron.
  *
- * Sets status as exciatory by default. Probability of success
+ * Sets status as excitatory by default. Probability of success
  * is set in RuntimConfig
  *
  * @param _id Neuron ID
@@ -28,7 +28,7 @@ InputNeuron::InputNeuron(int _id, NeuronGroup *group)
  * - Waits on stimulus switch halting thread.
  * - Ignores message during refractory period.
  * - Updates potential based on InputNeuron::input_value on
- * - poisson success
+ * - Poisson success
  * - Sends messages through all synapses
  */
 void InputNeuron::run() {
@@ -78,9 +78,9 @@ void InputNeuron::run() {
 }
 
 /**
- * @brief Calculates poisson result.
+ * @brief Calculates Poisson result.
  *
- * Based on InputNeuron::probalility_of_success.
+ * Based on InputNeuron::probability.
  * This value is set in RuntimConfig
  *
  * @return `true` for success `false` for failure
@@ -148,7 +148,7 @@ void InputNeuron::sendMessages() {
  *
  * Set the input value of the neuron.
  * This value is added to the membrane potential of
- * the neuron on each poisson sucess
+ * the neuron on each Poisson success
  *
  * @param value The new value of the InputNeuron
  */
