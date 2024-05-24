@@ -113,6 +113,7 @@ def main():
 
 # all stimuli
     update_index = (max_stim - min_stim) / 10
+    update_index = update_index if update_index != 0 else 1
     np_matrix = []
     for stim_num in range(min_stim, max_stim + 1):
         if stim_num % update_index == 0:
