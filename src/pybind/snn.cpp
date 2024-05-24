@@ -3,6 +3,7 @@
 #include "../runtime.hpp"
 #include <algorithm>
 #include <climits>
+#include <stdexcept>
 #include <unordered_map>
 #include <vector>
 
@@ -38,6 +39,14 @@ void pySNN::pyStart(py::buffer buff) {
 
   py::buffer_info info = buff.request();
 
+  if (info.format != py::format_descriptor<double>::format()) {
+    lg->string(ERROR,
+               "Invalid datatype in numpy array: expected double, got python "
+               "format: %s",
+               info.format.c_str());
+    throw std::runtime_error("");
+  }
+
   for (auto i = 0; i < info.shape.at(0); i++) {
     const double *row_ptr =
         (double *)info.ptr + i * info.strides.at(0) / sizeof(double);
@@ -50,6 +59,7 @@ void pySNN::pyStart(py::buffer buff) {
 
   active = true;
   pySetStimLineX(*config->STIMULUS);
+  lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
 
   for (auto group : this->groups) {
     group->startThread();
@@ -86,8 +96,6 @@ void pySNN::pyStart(py::buffer buff) {
  * @param target Line number (zero-indexed)
  */
 void pySNN::pySetStimLineX(int target) {
-
-  lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
 
   if (input_neurons.empty()) {
     lg->log(ESSENTIAL, "set_line_x: passed empty input neuron vector?");
@@ -136,17 +144,15 @@ void pySNN::pySetNextStim() {
 
 py::array_t<int> pySNN::pyOutput() {
 
-  int max_stim = -1;
-  int min_stim = INT_MAX;
+  int max_stim = config->STIMULUS_VEC.back();
+  int min_stim = config->STIMULUS_VEC.front();
 
   std::unordered_map<int, std::vector<LogData *>> stim_data;
-  std::vector<LogData *> lg_data = lg->getLogData();
+  const std::vector<LogData *> &lg_data = lg->getLogData();
+
   for (std::vector<LogData *>::size_type i = 0; i < lg_data.size(); i++) {
     LogData *td = lg_data.at(i);
     if (td->message_type == Message_t::Refractory) {
-      max_stim = std::max(max_stim, td->stimulus_number);
-      min_stim = std::min(min_stim, td->stimulus_number);
-
       if (stim_data.find(td->stimulus_number) != stim_data.end()) {
         stim_data[td->stimulus_number].push_back(td);
       } else {
@@ -163,6 +169,14 @@ py::array_t<int> pySNN::pyOutput() {
   int *pRet = reinterpret_cast<int *>(info.ptr);
 
   for (int s = min_stim; s <= max_stim; s++) {
+    // if the key does not exist (there were no activations for this stimulus)
+    if (stim_data.find(s) == stim_data.end()) {
+      for (int i = 0; i < bins; i++) {
+        ssize_t index = ((s - min_stim) * bins + i);
+        pRet[index] = 0.0;
+      }
+      continue;
+    }
     std::vector<LogData *> &sd = stim_data[s];
 
     std::sort(sd.begin(), sd.end(), [](LogData *a, LogData *b) {
