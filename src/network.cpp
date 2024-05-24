@@ -300,7 +300,6 @@ void SNN::setNextStim() {
   }
 
   std::string line = reader.nextLine();
-  std::cout << line << '\n';
 
   std::stringstream s(line);
   double value;
