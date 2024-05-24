@@ -113,8 +113,11 @@ int Neuron::recieveMessage() {
       this->refractory_start +
           group->getNetwork()->getConfig()->REFRACTORY_DURATION) {
 
-    delete incoming_message;
-    incoming_message = nullptr;
+    // Deallocate this message
+    if (incoming_message) {
+      delete incoming_message;
+      incoming_message = nullptr;
+    }
 
     group->getNetwork()->lg->groupNeuronState(
         INFO, "(%d) Neuron %d is still in refractory period, ignoring message",
@@ -132,8 +135,10 @@ int Neuron::recieveMessage() {
   this->addData(incoming_message->timestamp, incoming_message->message_type);
 
   // Deallocate this message
-  delete incoming_message;
-  incoming_message = nullptr;
+  if (incoming_message) {
+    delete incoming_message;
+    incoming_message = nullptr;
+  }
   return 1;
 }
 
@@ -353,14 +358,24 @@ void Neuron::addPreSynapticConnection(Synapse *synapse) {
 }
 
 void Neuron::reset() {
+
+  pthread_mutex_lock(&getGroup()->getNetwork()->getMutex()->potential);
   this->membrane_potential =
       group->getNetwork()->getConfig()->INITIAL_MEMBRANE_POTENTIAL;
+  pthread_mutex_unlock(&getGroup()->getNetwork()->getMutex()->potential);
+
+  pthread_mutex_lock(&getGroup()->getNetwork()->getMutex()->message);
   for (auto message : this->messages) {
-    delete message;
+    if (message) {
+      delete message;
+      message = nullptr;
+    }
   }
+  this->messages.clear();
+  pthread_mutex_unlock(&getGroup()->getNetwork()->getMutex()->message);
+
   this->last_decay = group->getNetwork()->lg->time();
   this->refractory_start = 0;
-  this->messages.clear();
   this->deactivate();
 }
 

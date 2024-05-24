@@ -25,6 +25,9 @@ public:
   NeuronGroup *target_neuron_group;
   double timestamp;
   Message_t message_type;
+  bool operator>(const Message &other) const {
+    return this->timestamp > other.timestamp;
+  }
 };
 
 #endif // !MESSAGE

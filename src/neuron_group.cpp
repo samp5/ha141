@@ -62,7 +62,10 @@ NeuronGroup::~NeuronGroup() {
     getNetwork()->lg->groupNeuronState(DEBUG, "Deleteing Group %d Neuron %d",
                                        this->id, neuron->getID());
 
-    delete neuron;
+    if (neuron) {
+      delete neuron;
+      neuron = nullptr;
+    }
   }
 }
 

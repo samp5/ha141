@@ -5,6 +5,7 @@
 #include "neuron_group.hpp"
 #include "runtime.hpp"
 #include <algorithm>
+#include <cmath>
 #include <fstream>
 #include <pthread.h>
 #include <sstream>
@@ -12,7 +13,10 @@
 
 SNN::~SNN() {
   for (auto group : groups) {
-    delete group;
+    if (group) {
+      delete group;
+      group = nullptr;
+    }
   }
 
   mutex->destroy_mutexes();
@@ -206,7 +210,6 @@ void SNN::generateRandomSynapses() {
       // increment the synapses
       synapses_formed += 1;
 
-      std::cout << config->NUMBER_EDGES;
       // check to make sure we still need edges
       if (synapses_formed >= config->NUMBER_EDGES) {
         break;
@@ -346,7 +349,7 @@ int SNN::maximum_edges(int num_input, int num_n) {
   // maximum possible edges
   int max_edges = (n_t * (n_t - 1) / 2) - edges_lost_to_input;
 
-  return max_edges;
+  return std::floor(max_edges / 4);
 }
 
 std::string generate_neuron_string(Neuron *n) {

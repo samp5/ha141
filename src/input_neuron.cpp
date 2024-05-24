@@ -168,8 +168,10 @@ void InputNeuron::setInputValue(double value) {
  *
  */
 void InputNeuron::reset() {
+  pthread_mutex_lock(&group->getNetwork()->getMutex()->potential);
   this->membrane_potential =
       group->getNetwork()->getConfig()->INITIAL_MEMBRANE_POTENTIAL;
+  pthread_mutex_unlock(&group->getNetwork()->getMutex()->potential);
   this->last_decay = group->getNetwork()->lg->time();
   this->refractory_start = 0;
 }
