@@ -42,6 +42,7 @@ public:
   void generateNeuronVec();
   void generateInputNeuronVec();
   void setNextStim();
+  void generateGraphiz();
   bool isActive() { return active; }
   bool switchingStimulus() { return switching_stimulus; }
   pthread_cond_t *switchCond() { return &stimulus_switch_cond; }

@@ -348,3 +348,37 @@ int SNN::maximum_edges(int num_input, int num_n) {
 
   return max_edges;
 }
+
+std::string generate_neuron_string(Neuron *n) {
+  std::string str =
+      std::to_string(n->getGroup()->getID()) + "_" + std::to_string(n->getID());
+  if (n->getType() == Neuron_t::Input) {
+    str = "I" + str;
+  } else {
+    str = "n" + str;
+  }
+  return str;
+}
+
+void SNN::generateGraphiz() {
+  std::ofstream file("network.dot");
+  file << "digraph {\n";
+  for (auto n : neurons) {
+    std::string fstr = generate_neuron_string(n);
+    std::vector<std::string> to;
+    for (auto s : n->getPostSynaptic()) {
+      to.push_back(generate_neuron_string(s->getPostSynaptic()));
+    }
+
+    if (n->getType() == Neuron_t::Input) {
+      file << fstr << " [fontcolor=green]\n";
+    }
+
+    file << fstr << " -> { ";
+    for (auto s : to) {
+      file << s << " ";
+    }
+    file << "}\n";
+  }
+  file << "}";
+}

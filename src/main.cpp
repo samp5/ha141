@@ -19,6 +19,7 @@ int main(int argc, char **argv) {
 
   snn.lg->log(ESSENTIAL, "Transfering data from Neurons to Log...");
   snn.join();
+  snn.generateGraphiz();
 
   snn.lg->writeData();
 

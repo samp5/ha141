@@ -32,7 +32,7 @@ public:
   void startThread() {
     pthread_create(&thread, NULL, NeuronGroup::thread_helper, this);
   }
-  double getID() const { return id; }
+  int getID() const { return id; }
 
   pthread_t getThreadID() { return thread; }
   SNN *getNetwork() { return network; }
