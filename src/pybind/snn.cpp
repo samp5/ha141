@@ -3,6 +3,7 @@
 #include "../runtime.hpp"
 #include <algorithm>
 #include <climits>
+#include <pthread.h>
 #include <stdexcept>
 #include <unordered_map>
 #include <vector>
@@ -10,13 +11,14 @@
 int add(int i, int j) { return i + j; }
 
 pySNN::pySNN(std::vector<std::string> args) : SNN() {
+  active = false;
   lg = new Log(this);
   config = new RuntimConfig(this);
   config->parseArgs(args);
-  // input_data = std::nullopt;
   config->checkStartCond();
   srand(config->RAND_SEED);
   mutex = new Mutex;
+  barrier = new Barrier(config->NUMBER_GROUPS + 1);
 
   int neuron_per_group = config->NUMBER_NEURONS / config->NUMBER_GROUPS;
   int input_neurons_per_group =
@@ -37,6 +39,7 @@ pySNN::pySNN(std::vector<std::string> args) : SNN() {
 
 void pySNN::pyStart(py::buffer buff) {
 
+  // get buffer
   py::buffer_info info = buff.request();
 
   if (info.format != py::format_descriptor<double>::format()) {
@@ -74,6 +77,8 @@ void pySNN::pyStart(py::buffer buff) {
       switching_stimulus = true;
 
       config->STIMULUS++;
+      pthread_barrier_wait(&getBarrier()->barrier);
+
       this->pySetNextStim();
       lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
 
