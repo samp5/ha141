@@ -12,7 +12,6 @@ v = 1
 mnist = fetch_openml(dataset, version=v)
 images, labels = mnist["data"], mnist["target"] # type: ignore
 images = images.map(div).to_numpy()
-print(f"shape of images is: {images.shape}")
 
 list = ["dummy", "base_config.toml"]
 net = snn.pySNN(list)

@@ -21,6 +21,7 @@ SNN::~SNN() {
 
   mutex->destroy_mutexes();
   pthread_cond_destroy(&stimulus_switch_cond);
+  pthread_barrier_destroy(&barrier->barrier);
 }
 
 /**
@@ -180,9 +181,27 @@ void SNN::generateRandomSynapses() {
 
   auto map = generateNeighborOptions();
 
+  float progress = 0.0;
+  int pos = 0;
   while (synapses_formed < config->NUMBER_EDGES) {
-    for (auto neuron : this->neurons) {
+    int bar_width = 50;
+    progress = (float)synapses_formed / config->NUMBER_EDGES;
+    if (int(progress * bar_width) > pos + 5) {
+      std::cout << "[";
+      pos = progress * bar_width;
+      for (int i = 0; i < bar_width; i++) {
+        if (i < pos) {
+          std::cout << "=";
+        } else if (i == pos) {
+          std::cout << ">";
+        } else {
+          std::cout << " ";
+        }
+      }
+      std::cout << "]" << int(progress * 100.0) << "%\n";
+    }
 
+    for (auto neuron : this->neurons) {
       // get the neighbor_options for this neuron from the map
       std::list<Neuron *> &neighbor_options = map.at(neuron);
       if (neighbor_options.empty()) {

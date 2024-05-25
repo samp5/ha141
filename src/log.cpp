@@ -63,7 +63,7 @@ void Log::log(LogLevel level, const char *message,
 
   switch (level) {
   case LogLevel::ESSENTIAL:
-    _level = " -> ";
+    _level = "-> ";
     break;
   case LogLevel::INFO:
     _level = "[%f] ⓘ  ";
