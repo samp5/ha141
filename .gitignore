@@ -30,3 +30,4 @@ plotting/*.png
 *.toml
 *.so
 *.txt
+*.dot
