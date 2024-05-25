@@ -14,10 +14,11 @@
  * @param _id Neuron ID
  * @param group NeuronGroup that this neuron belongs to
  */
-InputNeuron::InputNeuron(int _id, NeuronGroup *group)
+InputNeuron::InputNeuron(int _id, NeuronGroup *group, double latency)
     : Neuron(_id, group, Input),
       probalility_of_success(
-          group->getNetwork()->getConfig()->INPUT_PROB_SUCCESS) {
+          group->getNetwork()->getConfig()->INPUT_PROB_SUCCESS),
+      latency(latency) {
   this->excit_inhib_value = -1;
   this->activate();
 }
@@ -32,6 +33,8 @@ InputNeuron::InputNeuron(int _id, NeuronGroup *group)
  * - Sends messages through all synapses
  */
 void InputNeuron::run() {
+
+  // check for stimulus switch
   if (group->getNetwork()->switchingStimulus()) {
     // wait for all input neurons to switch to the new stimulus
     pthread_mutex_lock(&group->getNetwork()->getMutex()->stimulus);
@@ -41,6 +44,8 @@ void InputNeuron::run() {
     }
     pthread_mutex_unlock(&group->getNetwork()->getMutex()->stimulus);
   }
+
+  // Check for refractory period
   if (this->inRefractory()) {
     group->getNetwork()->lg->groupNeuronState(
         INFO,
@@ -49,20 +54,28 @@ void InputNeuron::run() {
     return;
   }
 
+  // Grab the time and decay
   double time = group->getNetwork()->lg->time();
   this->retroactiveDecay(this->last_decay, time);
 
+  // Check to see if we need to send messages
   if (this->membrane_potential >=
       group->getNetwork()->getConfig()->ACTIVATION_THRESHOLD) {
     this->sendMessages();
   }
 
+  // Check latency
+  if (time < group->getNetwork()->getStimulusStart() + this->latency) {
+    return;
+  }
+
+  // Add stimulus for poisson succeses
   if (poissonResult()) {
 
-    double time_rn = group->getNetwork()->lg->time();
+    double time = group->getNetwork()->lg->time();
 
     this->accumulatePotential(this->input_value);
-    this->addData(time_rn, Message_t::Stimulus);
+    this->addData(time, Message_t::Stimulus);
 
     group->getNetwork()->lg->neuronValue(
         INFO,
@@ -71,6 +84,7 @@ void InputNeuron::run() {
         this->getGroup()->getID(), this->getID(), this->membrane_potential);
   }
 
+  // Check to see if we need to send messages
   if (this->membrane_potential >=
       group->getNetwork()->getConfig()->ACTIVATION_THRESHOLD) {
     this->sendMessages();
@@ -158,6 +172,8 @@ void InputNeuron::setInputValue(double value) {
       DEBUG3, "(Input) (%d) Neuron %d input value set to %f",
       this->getGroup()->getID(), this->getID(), value);
 }
+
+void InputNeuron::setLatency(double latency) { this->latency = latency; }
 
 /**
  * @brief Resets the InputNeuron.

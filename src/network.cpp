@@ -42,6 +42,19 @@ SNN::SNN(std::vector<std::string> args) : active(false) {
   // number of group threads plus the main thread
   barrier = new Barrier(config->NUMBER_GROUPS + 1);
 
+  if (Image::isSquare(config->NUMBER_INPUT_NEURONS)) {
+    lg->log(ESSENTIAL, "Assuming square input image");
+    image = new Image(config->NUMBER_INPUT_NEURONS);
+  } else {
+    lg->log(ESSENTIAL,
+            "Input image not square, using smallest perimeter rectangle");
+
+    auto dimensions = Image::bestRectangle(config->NUMBER_INPUT_NEURONS);
+    int x = dimensions.first;
+    int y = dimensions.second;
+    image = new Image(x, y);
+  }
+
   int neuron_per_group = config->NUMBER_NEURONS / config->NUMBER_GROUPS;
   int input_neurons_per_group =
       config->NUMBER_INPUT_NEURONS / config->NUMBER_GROUPS;
@@ -57,6 +70,7 @@ SNN::SNN(std::vector<std::string> args) : active(false) {
   }
   this->generateNeuronVec();
   this->generateInputNeuronVec();
+  this->setInputNeuronLatency();
 }
 
 /**
@@ -116,6 +130,14 @@ void SNN::generateInputNeuronVec() {
       }
       input_neurons.push_back(dynamic_cast<InputNeuron *>(neuron));
     }
+  }
+}
+
+void SNN::setInputNeuronLatency() {
+  for (std::vector<InputNeuron *>::size_type i = 0; i < input_neurons.size();
+       i++) {
+    double latency = image->getLatency(i);
+    input_neurons.at(i)->setLatency(latency);
   }
 }
 
@@ -304,12 +326,14 @@ void SNN::start() {
 
       this->reset();
 
-      switching_stimulus = false;
-      pthread_cond_broadcast(&stimulus_switch_cond);
       auto end = std::chrono::high_resolution_clock::now();
       auto duration = std::chrono::duration_cast<std::chrono::duration<double>>(
           end - start);
       lg->addOffset(duration.count());
+
+      stimlus_start = lg->time();
+      switching_stimulus = false;
+      pthread_cond_broadcast(&stimulus_switch_cond);
     }
   }
   active = false;
