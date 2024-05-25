@@ -2,6 +2,7 @@
 #include "log.hpp"
 #include "network.hpp"
 #include "neuron.hpp"
+#include "runtime.hpp"
 #include <cstdlib>
 #include <pthread.h>
 #include <unistd.h>
@@ -88,6 +89,17 @@ void *NeuronGroup::run() {
     for (Neuron *neuron : this->neurons) {
       if (!getNetwork()->isActive()) {
         break;
+      }
+
+      if (getNetwork()->switchingStimulus()) {
+        pthread_barrier_wait(&(network->getBarrier()->barrier));
+
+        pthread_mutex_lock(&getNetwork()->getMutex()->stimulus);
+        while (getNetwork()->switchingStimulus()) {
+          pthread_cond_wait(getNetwork()->switchCond(),
+                            &getNetwork()->getMutex()->stimulus);
+        }
+        pthread_mutex_unlock(&getNetwork()->getMutex()->stimulus);
       }
 
       getNetwork()->lg->neuronType(

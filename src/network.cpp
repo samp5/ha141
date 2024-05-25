@@ -35,10 +35,11 @@ SNN::SNN(std::vector<std::string> args) : active(false) {
   lg = new Log(this);
   config = new RuntimConfig(this);
   config->parseArgs(args);
-  // input_data = std::nullopt;
   config->checkStartCond();
   srand(config->RAND_SEED);
   mutex = new Mutex;
+  // number of group threads plus the main thread
+  barrier = new Barrier(config->NUMBER_GROUPS + 1);
 
   int neuron_per_group = config->NUMBER_NEURONS / config->NUMBER_GROUPS;
   int input_neurons_per_group =
@@ -275,6 +276,8 @@ void SNN::start() {
     if (i < config->num_stimulus) {
       auto start = std::chrono::high_resolution_clock::now();
       switching_stimulus = true;
+
+      pthread_barrier_wait(&getBarrier()->barrier);
 
       setNextStim();
       config->STIMULUS++;

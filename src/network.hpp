@@ -2,6 +2,7 @@
 #define NETWORK
 #include "input_neuron.hpp"
 #include <list>
+#include <stdexcept>
 #include <unordered_map>
 #include <vector>
 
@@ -9,6 +10,18 @@ class Neuron;
 class NeuronGroup;
 struct RuntimConfig;
 struct Mutex;
+
+struct Barrier {
+  pthread_barrier_t barrier;
+  unsigned int count;
+
+  Barrier(unsigned int count) : count(count) {
+    int ret = pthread_barrier_init(&barrier, NULL, this->count);
+    if (ret) {
+      throw std::runtime_error("Error initializing pthread barrier");
+    }
+  }
+};
 
 /**
  * @brief Spiking Neural Network.
@@ -28,6 +41,7 @@ protected:
       input_neurons;    /**< Holds pointers to all `InputNeuron`s */
   RuntimConfig *config; /**< Holds pointer to RuntimConfig */
   Mutex *mutex;         /**< Holds pointer to Mutex structure */
+  Barrier *barrier;
 
 public:
   Log *lg;
@@ -53,5 +67,6 @@ public:
   std::unordered_map<Neuron *, std::list<Neuron *>> generateNeighborOptions();
   RuntimConfig *getConfig() { return config; }
   Mutex *getMutex() { return mutex; }
+  Barrier *getBarrier() { return barrier; }
 };
 #endif // !NETWORK
