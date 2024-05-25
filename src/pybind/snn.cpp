@@ -20,6 +20,19 @@ pySNN::pySNN(std::vector<std::string> args) : SNN() {
   mutex = new Mutex;
   barrier = new Barrier(config->NUMBER_GROUPS + 1);
 
+  if (Image::isSquare(config->NUMBER_INPUT_NEURONS)) {
+    lg->log(ESSENTIAL, "Assuming square input image");
+    image = new Image(config->NUMBER_INPUT_NEURONS);
+  } else {
+    lg->log(ESSENTIAL,
+            "Input image not square, using smallest perimeter rectangle");
+
+    auto dimensions = Image::bestRectangle(config->NUMBER_INPUT_NEURONS);
+    int x = dimensions.first;
+    int y = dimensions.second;
+    image = new Image(x, y);
+  }
+
   int neuron_per_group = config->NUMBER_NEURONS / config->NUMBER_GROUPS;
   int input_neurons_per_group =
       config->NUMBER_INPUT_NEURONS / config->NUMBER_GROUPS;
@@ -35,6 +48,7 @@ pySNN::pySNN(std::vector<std::string> args) : SNN() {
   }
   this->generateNeuronVec();
   this->generateInputNeuronVec();
+  this->setInputNeuronLatency();
 }
 
 void pySNN::pyStart(py::buffer buff) {
@@ -61,7 +75,8 @@ void pySNN::pyStart(py::buffer buff) {
   }
 
   active = true;
-  pySetStimLineX(*config->STIMULUS);
+
+  pySetNextStim();
   lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
 
   for (auto group : this->groups) {
@@ -76,41 +91,25 @@ void pySNN::pyStart(py::buffer buff) {
       auto start = std::chrono::high_resolution_clock::now();
       switching_stimulus = true;
 
-      config->STIMULUS++;
       pthread_barrier_wait(&getBarrier()->barrier);
 
+      config->STIMULUS++;
       this->pySetNextStim();
       lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
 
       this->reset();
 
-      switching_stimulus = false;
-      pthread_cond_broadcast(&stimulus_switch_cond);
       auto end = std::chrono::high_resolution_clock::now();
       auto duration = std::chrono::duration_cast<std::chrono::duration<double>>(
           end - start);
       lg->addOffset(duration.count());
+
+      stimlus_start = lg->time();
+      switching_stimulus = false;
+      pthread_cond_broadcast(&stimulus_switch_cond);
     }
   }
   active = false;
-}
-
-/**
- * @brief Set stimulus to line X of RuntimConfig::INPUT_FILE.
- *
- * @param target Line number (zero-indexed)
- */
-void pySNN::pySetStimLineX(int target) {
-
-  if (input_neurons.empty()) {
-    lg->log(ESSENTIAL, "set_line_x: passed empty input neuron vector?");
-    return;
-  }
-
-  for (std::vector<InputNeuron *>::size_type i = 0; i < input_neurons.size();
-       i++) {
-    input_neurons.at(i)->setInputValue(data.at(target).at(i));
-  }
 }
 
 template <typename T> void test(py::buffer buff) {

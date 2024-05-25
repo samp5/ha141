@@ -12,8 +12,6 @@ private:
 public:
   pySNN(std::vector<std::string> args);
   void pyStart(py::buffer);
-  void pySetStimLineX(int target);
-  void pySetStim(int target);
   void pySetNextStim();
   void pyWrite();
   py::array_t<int> pyOutput();
