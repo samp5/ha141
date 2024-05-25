@@ -34,17 +34,6 @@ InputNeuron::InputNeuron(int _id, NeuronGroup *group, double latency)
  */
 void InputNeuron::run() {
 
-  // check for stimulus switch
-  if (group->getNetwork()->switchingStimulus()) {
-    // wait for all input neurons to switch to the new stimulus
-    pthread_mutex_lock(&group->getNetwork()->getMutex()->stimulus);
-    while (group->getNetwork()->switchingStimulus()) {
-      pthread_cond_wait(group->getNetwork()->switchCond(),
-                        &group->getNetwork()->getMutex()->stimulus);
-    }
-    pthread_mutex_unlock(&group->getNetwork()->getMutex()->stimulus);
-  }
-
   // Check for refractory period
   if (this->inRefractory()) {
     group->getNetwork()->lg->groupNeuronState(
