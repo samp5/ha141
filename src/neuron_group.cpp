@@ -41,8 +41,7 @@ NeuronGroup::NeuronGroup(int _id, int number_neurons, int number_input_neurons,
       id++;
 
     } else if (!roll && number_input_neurons) {
-
-      InputNeuron *neuron = new InputNeuron(id, this);
+      InputNeuron *neuron = new InputNeuron(id, this, 0.0);
       this->neurons.push_back(neuron);
       number_input_neurons--;
       id++;
