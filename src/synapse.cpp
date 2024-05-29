@@ -31,3 +31,5 @@ void Synapse::propagate() {
   this->getPostSynaptic()->activate();
   this->getPostSynaptic()->addMessage(message_to_send);
 }
+
+double Synapse::randomDelay() { return (double)rand() / RAND_MAX * 0.01; }
