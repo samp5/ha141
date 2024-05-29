@@ -88,7 +88,7 @@ void InputNeuron::run() {
  *
  * @return `true` for success `false` for failure
  */
-bool InputNeuron::poissonResult() {
+bool InputNeuron::poissonResult() const {
 
   double roll = (double)rand() / RAND_MAX;
 
@@ -106,7 +106,7 @@ bool InputNeuron::poissonResult() {
  *
  * @return `true` for in refractory, `false` otherwise
  */
-bool InputNeuron::inRefractory() {
+bool InputNeuron::inRefractory() const {
 
   double timestamp = group->getNetwork()->lg->time();
 

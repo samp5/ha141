@@ -212,7 +212,7 @@ bool Neuron::isActivated() const { return this->active; }
  *
  * @return Neuron::group
  */
-NeuronGroup *Neuron::getGroup() { return this->group; }
+NeuronGroup *Neuron::getGroup() const { return this->group; }
 
 /**
  * @brief Adds a message to the queue.
@@ -340,9 +340,11 @@ void Neuron::accumulatePotential(double value) {
   pthread_mutex_unlock(&group->getNetwork()->getMutex()->potential);
 }
 
-const list<Message *> &Neuron::getMessageVector() { return this->messages; }
+const list<Message *> &Neuron::getMessageVector() const {
+  return this->messages;
+}
 
-double Neuron::getPotential() {
+double Neuron::getPotential() const {
   pthread_mutex_lock(&group->getNetwork()->getMutex()->potential);
   double potential = membrane_potential;
   pthread_mutex_unlock(&group->getNetwork()->getMutex()->potential);

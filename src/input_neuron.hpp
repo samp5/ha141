@@ -19,10 +19,10 @@ public:
   InputNeuron(int _id, NeuronGroup *group, double latency);
   void reset();
   void run();
-  bool poissonResult();
+  bool poissonResult() const;
   void setInputValue(double value);
   void setLatency(double latency);
-  bool inRefractory();
+  bool inRefractory() const;
   void sendMessages();
   double getInputValue() const { return this->input_value; }
   double getLatency() const { return this->latency; }

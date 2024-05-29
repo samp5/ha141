@@ -9,7 +9,6 @@
 class Neuron;
 class SNN;
 
-extern bool active;
 using std::list;
 
 // This class is so that many neurons can run on one thread
@@ -32,11 +31,12 @@ public:
   void startThread() {
     pthread_create(&thread, NULL, NeuronGroup::thread_helper, this);
   }
+
   int getID() const { return id; }
 
-  pthread_t getThreadID() { return thread; }
-  SNN *getNetwork() { return network; }
-  int neuronCount();
+  pthread_t getThreadID() const { return thread; }
+  SNN *getNetwork() const { return network; }
+  int neuronCount() const;
   void reset();
   const vector<Neuron *> &getMutNeuronVec();
 

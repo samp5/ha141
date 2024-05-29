@@ -133,7 +133,7 @@ void *NeuronGroup::run() {
  *
  * @return Neuron count
  */
-int NeuronGroup::neuronCount() { return (int)this->neurons.size(); }
+int NeuronGroup::neuronCount() const { return (int)this->neurons.size(); }
 
 /**
  * @brief Get a mutable reference to the Neuron vector.

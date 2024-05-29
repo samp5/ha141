@@ -60,7 +60,9 @@ public:
   int recieveMessage();
   void addMessage(Message *);
   Message *retrieveMessage();
-  vector<Synapse *> &getSynapses() { return this->PostSynapticConnnections; }
+  const vector<Synapse *> &getSynapses() const {
+    return this->PostSynapticConnnections;
+  }
 
   // State operations
   virtual void reset();
@@ -75,17 +77,17 @@ public:
   // GETTERS
   bool isActivated() const;
 
-  double getPotential();
-  NeuronGroup *getGroup();
+  double getPotential() const;
+  NeuronGroup *getGroup() const;
 
-  const list<Message *> &getMessageVector();
+  const list<Message *> &getMessageVector() const;
   const vector<Synapse *> &getPostSynaptic() const;
   const vector<Synapse *> &getPresynaptic() const;
 
-  double getLastDecay() { return this->last_decay; }
-  int getBias() { return this->excit_inhib_value; }
-  Neuron_t getType() { return this->type; }
-  int getID() { return id; }
+  double getLastDecay() const { return this->last_decay; }
+  int getBias() const { return this->excit_inhib_value; }
+  Neuron_t getType() const { return this->type; }
+  int getID() const { return id; }
 
   // log operations
   void addData(double time, Message_t message_type);
