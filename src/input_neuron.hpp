@@ -24,8 +24,8 @@ public:
   void setLatency(double latency);
   bool inRefractory() const;
   void sendMessages();
-  double getInputValue() const { return this->input_value; }
-  double getLatency() const { return this->latency; }
+  double getInputValue() const { return input_value; }
+  double getLatency() const { return latency; }
 };
 
 #endif // !INPUT_NEURON

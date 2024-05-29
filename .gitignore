@@ -22,6 +22,8 @@ core*
 doxygen/html
 doxygen/latex
 
+extern/logs/
+
 #ingore venv
 plotting/venv/*
 plotting/*.png
@@ -32,3 +34,4 @@ plotting/*.png
 *.txt
 *.dot
 *.svg
+

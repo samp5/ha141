@@ -274,14 +274,14 @@ void Log::print(const char *message, bool newline, std::ostream &os) {
  * @param value Value to be added
  *
  */
-void Log::addOffset(double value) { this->offset += value; }
+void Log::addOffset(double value) { offset += value; }
 
 double Log::time() {
 
   hr_clock::time_point now = hr_clock::now();
 
-  duration time_span = std::chrono::duration_cast<duration>(now - this->start);
-  return time_span.count() - this->offset;
+  duration time_span = std::chrono::duration_cast<duration>(now - start);
+  return time_span.count() - offset;
 }
 
 /**

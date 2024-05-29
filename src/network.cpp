@@ -72,11 +72,11 @@ SNN::SNN(std::vector<std::string> args) : active(false) {
         new NeuronGroup(i + 1, neuron_per_group, input_neurons_per_group, this);
 
     // add to vector
-    this->groups.push_back(this_group);
+    groups.push_back(this_group);
   }
-  this->generateNeuronVec();
-  this->generateInputNeuronVec();
-  this->setInputNeuronLatency();
+  generateNeuronVec();
+  generateInputNeuronVec();
+  setInputNeuronLatency();
 }
 
 /**
@@ -125,7 +125,7 @@ void SNN::setInputNeuronLatency() {
 void SNN::generateNeuronVec() {
   for (auto group : groups) {
     for (auto neuron : group->getMutNeuronVec()) {
-      this->neurons.push_back(neuron);
+      neurons.push_back(neuron);
     }
   }
 }
@@ -145,9 +145,9 @@ void SNN::generateNeuronVec() {
 std::unordered_map<Neuron *, std::list<Neuron *>>
 SNN::generateNeighborOptions() {
   std::unordered_map<Neuron *, std::list<Neuron *>> map;
-  for (auto neuron_origin : this->neurons) {
+  for (auto neuron_origin : neurons) {
     std::list<Neuron *> origin_list;
-    for (auto neuron_destination : this->neurons) {
+    for (auto neuron_destination : neurons) {
       if (neuron_origin == neuron_destination) {
         continue;
       }
@@ -174,7 +174,7 @@ SNN::generateNeighborOptions() {
 void SNN::generateRandomSynapses() {
   auto start = lg->time();
   int synapses_formed = 0;
-  if (this->neurons.empty()) {
+  if (neurons.empty()) {
     generateNeuronVec();
   }
 
@@ -200,7 +200,7 @@ void SNN::generateRandomSynapses() {
       std::cout << "]" << int(progress * 100.0) << "%\n";
     }
 
-    for (auto neuron : this->neurons) {
+    for (auto neuron : neurons) {
       // get the neighbor_options for this neuron from the map
       std::list<Neuron *> &neighbor_options = map.at(neuron);
       if (neighbor_options.empty()) {
@@ -217,7 +217,7 @@ void SNN::generateRandomSynapses() {
       auto this_neuron = std::find(post_opts.begin(), post_opts.end(), neuron);
 
       // add postsynaptic neuron as a neighbor
-      neuron->addNeighbor(*target, this->generateSynapseWeight());
+      neuron->addNeighbor(*target, generateSynapseWeight());
 
       // erase the postsynaptic neuron from the list and this neuron from the
       // postsynaptic list
@@ -252,7 +252,7 @@ double SNN::generateSynapseWeight() {
  * @brief Join thread.
  */
 void SNN::join() {
-  for (auto group : this->groups) {
+  for (auto group : groups) {
     pthread_join(group->getThreadID(), NULL);
   }
 }
@@ -264,7 +264,7 @@ void SNN::join() {
  *
  */
 void SNN::reset() {
-  for (auto group : this->groups) {
+  for (auto group : groups) {
     group->reset();
   }
 }
@@ -283,7 +283,7 @@ void SNN::start() {
   setNextStim();
   lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
 
-  for (auto group : this->groups) {
+  for (auto group : groups) {
     group->startThread();
   }
 
@@ -301,7 +301,7 @@ void SNN::start() {
       config->STIMULUS++;
       lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
 
-      this->reset();
+      reset();
 
       auto end = std::chrono::high_resolution_clock::now();
       auto duration = std::chrono::duration_cast<std::chrono::duration<double>>(

@@ -142,7 +142,7 @@ vector<int> RuntimConfig::parse_line_range(const std::string &in) {
  * @param file_name Name of confguration file
  */
 int RuntimConfig::setOptions() {
-  std::string file_name = this->CONFIG_FILE;
+  std::string file_name = CONFIG_FILE;
 
   toml::table tbl;
 

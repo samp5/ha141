@@ -26,7 +26,7 @@ public:
   double timestamp;
   Message_t message_type;
   bool operator>(const Message &other) const {
-    return this->timestamp > other.timestamp;
+    return timestamp > other.timestamp;
   }
 };
 

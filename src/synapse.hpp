@@ -15,12 +15,12 @@ public:
   Synapse(Neuron *from, Neuron *to, double w, double delay = -1)
       : _origin(from), _destination(to), _weight(w),
         delay(delay == -1 ? randomDelay() : delay){};
-  Neuron *getPostSynaptic() { return this->_destination; }
-  Neuron *getPreSynaptic() { return this->_origin; }
+  Neuron *getPostSynaptic() { return _destination; }
+  Neuron *getPreSynaptic() { return _origin; }
   void propagate();
   double randomDelay();
   void alterWeight(double weight);
-  double getWeight() { return this->_weight; }
+  double getWeight() { return _weight; }
 
 private:
   Neuron *_origin = nullptr;

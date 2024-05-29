@@ -19,8 +19,8 @@ InputNeuron::InputNeuron(int _id, NeuronGroup *group, double latency)
       probalility_of_success(
           group->getNetwork()->getConfig()->INPUT_PROB_SUCCESS),
       latency(latency) {
-  this->excit_inhib_value = -1;
-  this->activate();
+  excit_inhib_value = -1;
+  activate();
 }
 
 /**
@@ -35,26 +35,26 @@ InputNeuron::InputNeuron(int _id, NeuronGroup *group, double latency)
 void InputNeuron::run() {
 
   // Check for refractory period
-  if (this->inRefractory()) {
+  if (inRefractory()) {
     group->getNetwork()->lg->groupNeuronState(
         INFO,
         "INPUT: (%d) Neuron %d is still in refractory period, ignoring input",
-        this->getGroup()->getID(), this->getID());
+        getGroup()->getID(), getID());
     return;
   }
 
   // Grab the time and decay
   double time = group->getNetwork()->lg->time();
-  this->retroactiveDecay(this->last_decay, time);
+  retroactiveDecay(last_decay, time);
 
   // Check to see if we need to send messages
-  if (this->membrane_potential >=
+  if (membrane_potential >=
       group->getNetwork()->getConfig()->ACTIVATION_THRESHOLD) {
-    this->sendMessages();
+    sendMessages();
   }
 
   // Check latency
-  if (time < group->getNetwork()->getStimulusStart() + this->latency) {
+  if (time < group->getNetwork()->getStimulusStart() + latency) {
     return;
   }
 
@@ -63,20 +63,20 @@ void InputNeuron::run() {
 
     double time = group->getNetwork()->lg->time();
 
-    this->accumulatePotential(this->input_value);
-    this->addData(time, Message_t::Stimulus);
+    accumulatePotential(input_value);
+    addData(time, Message_t::Stimulus);
 
     group->getNetwork()->lg->neuronValue(
         INFO,
         "(Input) (%d) Neuron %d poisson success! Adding input value to "
         "membrane_potential. membrane_potential now %f",
-        this->getGroup()->getID(), this->getID(), this->membrane_potential);
+        getGroup()->getID(), getID(), membrane_potential);
   }
 
   // Check to see if we need to send messages
-  if (this->membrane_potential >=
+  if (membrane_potential >=
       group->getNetwork()->getConfig()->ACTIVATION_THRESHOLD) {
-    this->sendMessages();
+    sendMessages();
   }
 }
 
@@ -92,7 +92,7 @@ bool InputNeuron::poissonResult() const {
 
   double roll = (double)rand() / RAND_MAX;
 
-  if (roll <= this->probalility_of_success) {
+  if (roll <= probalility_of_success) {
     return true;
   } else {
     return false;
@@ -113,12 +113,12 @@ bool InputNeuron::inRefractory() const {
   // #askpedram
 
   // first check refractory status
-  if (timestamp < this->refractory_start +
+  if (timestamp < refractory_start +
                       group->getNetwork()->getConfig()->REFRACTORY_DURATION) {
 
     group->getNetwork()->lg->groupNeuronState(
         INFO, "(%d) Neuron %d is still in refractory period, ignoring message",
-        this->getGroup()->getID(), this->getID());
+        getGroup()->getID(), getID());
 
     return true;
   }
@@ -142,9 +142,9 @@ void InputNeuron::sendMessages() {
   group->getNetwork()->lg->groupNeuronState(
       INFO,
       "(%d) Neuron %d reached activation threshold, entering refractory phase",
-      this->group->getID(), this->id);
+      group->getID(), id);
 
-  this->refractory();
+  refractory();
 }
 /**
  * @brief Sets input value (stimulus).
@@ -156,13 +156,13 @@ void InputNeuron::sendMessages() {
  * @param value The new value of the InputNeuron
  */
 void InputNeuron::setInputValue(double value) {
-  this->input_value = value;
+  input_value = value;
   group->getNetwork()->lg->neuronValue(
       DEBUG3, "(Input) (%d) Neuron %d input value set to %f",
-      this->getGroup()->getID(), this->getID(), value);
+      getGroup()->getID(), getID(), value);
 }
 
-void InputNeuron::setLatency(double latency) { this->latency = latency; }
+void InputNeuron::setLatency(double _l) { latency = _l; }
 
 /**
  * @brief Resets the InputNeuron.
@@ -174,9 +174,9 @@ void InputNeuron::setLatency(double latency) { this->latency = latency; }
  */
 void InputNeuron::reset() {
   pthread_mutex_lock(&group->getNetwork()->getMutex()->potential);
-  this->membrane_potential =
+  membrane_potential =
       group->getNetwork()->getConfig()->INITIAL_MEMBRANE_POTENTIAL;
   pthread_mutex_unlock(&group->getNetwork()->getMutex()->potential);
-  this->last_decay = group->getNetwork()->lg->time();
-  this->refractory_start = 0;
+  last_decay = group->getNetwork()->lg->time();
+  refractory_start = 0;
 }

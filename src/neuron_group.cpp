@@ -19,9 +19,9 @@ NeuronGroup::NeuronGroup(int _id, int number_neurons, int number_input_neurons,
     : network(network) {
   getNetwork()->lg->state(DEBUG, "Adding Group %d", _id);
 
-  this->id = _id;
+  id = _id;
 
-  getNetwork()->lg->state(INFO, "Group %d", this->id);
+  getNetwork()->lg->state(INFO, "Group %d", id);
 
   // we only need this many of "regular neurons"
   number_neurons -= number_input_neurons;
@@ -36,13 +36,13 @@ NeuronGroup::NeuronGroup(int _id, int number_neurons, int number_input_neurons,
     if (roll && number_neurons) {
 
       Neuron *neuron = new Neuron(id, this, Neuron_t::None);
-      this->neurons.push_back(neuron);
+      neurons.push_back(neuron);
       number_neurons--;
       id++;
 
     } else if (!roll && number_input_neurons) {
       InputNeuron *neuron = new InputNeuron(id, this, 0.0);
-      this->neurons.push_back(neuron);
+      neurons.push_back(neuron);
       number_input_neurons--;
       id++;
     }
@@ -57,10 +57,10 @@ NeuronGroup::NeuronGroup(int _id, int number_neurons, int number_input_neurons,
  *
  */
 NeuronGroup::~NeuronGroup() {
-  for (auto neuron : this->neurons) {
+  for (auto neuron : neurons) {
 
     getNetwork()->lg->groupNeuronState(DEBUG, "Deleteing Group %d Neuron %d",
-                                       this->id, neuron->getID());
+                                       id, neuron->getID());
 
     if (neuron) {
       delete neuron;
@@ -80,12 +80,12 @@ NeuronGroup::~NeuronGroup() {
 void *NeuronGroup::run() {
 
   // Log running status
-  getNetwork()->lg->state(INFO, "Group %d running", this->getID());
+  getNetwork()->lg->state(INFO, "Group %d running", getID());
 
   // While the network is running...
   while (getNetwork()->isActive()) {
 
-    for (Neuron *neuron : this->neurons) {
+    for (Neuron *neuron : neurons) {
       if (!getNetwork()->isActive()) {
         break;
       }
@@ -102,14 +102,14 @@ void *NeuronGroup::run() {
       }
 
       getNetwork()->lg->neuronType(
-          DEBUG4, "Checking activation:(%d) Neuron %d is %s", this->getID(),
+          DEBUG4, "Checking activation:(%d) Neuron %d is %s", getID(),
           neuron->getID(),
           getNetwork()->lg->activeStatusString(neuron->isActivated()));
 
       if (neuron->isActivated()) {
 
         getNetwork()->lg->groupNeuronState(DEBUG2, "Running (%d) Neuron (%d)",
-                                           this->getID(), neuron->getID());
+                                           getID(), neuron->getID());
         neuron = neuron->getType() == Input
                      ? dynamic_cast<InputNeuron *>(neuron)
                      : neuron;
@@ -121,7 +121,7 @@ void *NeuronGroup::run() {
     }
   }
 
-  for (auto neuron : this->neurons) {
+  for (auto neuron : neurons) {
     neuron->transferData();
   }
 
@@ -133,13 +133,13 @@ void *NeuronGroup::run() {
  *
  * @return Neuron count
  */
-int NeuronGroup::neuronCount() const { return (int)this->neurons.size(); }
+int NeuronGroup::neuronCount() const { return (int)neurons.size(); }
 
 /**
  * @brief Get a mutable reference to the Neuron vector.
  *
  */
-const vector<Neuron *> &NeuronGroup::getMutNeuronVec() { return this->neurons; }
+const vector<Neuron *> &NeuronGroup::getMutNeuronVec() { return neurons; }
 
 /**
  * @brief Reset NeuronGroup.
@@ -148,7 +148,7 @@ const vector<Neuron *> &NeuronGroup::getMutNeuronVec() { return this->neurons; }
  *
  */
 void NeuronGroup::reset() {
-  for (auto neuron : this->neurons) {
+  for (auto neuron : neurons) {
     if (neuron->getType() == Input) {
       neuron = dynamic_cast<InputNeuron *>(neuron);
     }

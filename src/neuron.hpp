@@ -60,9 +60,7 @@ public:
   int recieveMessage();
   void addMessage(Message *);
   Message *retrieveMessage();
-  const vector<Synapse *> &getSynapses() const {
-    return this->PostSynapticConnnections;
-  }
+  const vector<Synapse *> &getSynapses() const;
 
   // State operations
   virtual void reset();
@@ -84,10 +82,10 @@ public:
   const vector<Synapse *> &getPostSynaptic() const;
   const vector<Synapse *> &getPresynaptic() const;
 
-  double getLastDecay() const { return this->last_decay; }
-  int getBias() const { return this->excit_inhib_value; }
-  Neuron_t getType() const { return this->type; }
-  int getID() const { return id; }
+  double getLastDecay() const;
+  int getBias() const;
+  Neuron_t getType() const;
+  int getID() const;
 
   // log operations
   void addData(double time, Message_t message_type);

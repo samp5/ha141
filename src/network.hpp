@@ -18,8 +18,8 @@ struct Barrier {
   pthread_barrier_t barrier;
   unsigned int count;
 
-  Barrier(unsigned int count) : count(count) {
-    int ret = pthread_barrier_init(&barrier, NULL, this->count);
+  Barrier(unsigned int _c) : count(_c) {
+    int ret = pthread_barrier_init(&barrier, NULL, count);
     if (ret) {
       throw std::runtime_error("Error initializing pthread barrier");
     }
@@ -68,9 +68,7 @@ public:
   bool switchingStimulus() { return switching_stimulus; }
   pthread_cond_t *switchCond() { return &stimulus_switch_cond; }
   static int maximum_edges(int num_i, int num_n);
-  std::vector<InputNeuron *> &getMutInputNeurons() {
-    return this->input_neurons;
-  }
+  std::vector<InputNeuron *> &getMutInputNeurons() { return input_neurons; }
   std::unordered_map<Neuron *, std::list<Neuron *>> generateNeighborOptions();
   RuntimConfig *getConfig() { return config; }
   Mutex *getMutex() { return mutex; }

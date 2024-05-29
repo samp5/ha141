@@ -11,13 +11,13 @@
  */
 void Synapse::propagate() {
 
-  int preGroupID = this->getPreSynaptic()->getGroup()->getID();
-  int postGroupID = this->getPostSynaptic()->getGroup()->getID();
-  int preID = this->getPreSynaptic()->getID();
-  int postID = this->getPostSynaptic()->getID();
+  int preGroupID = getPreSynaptic()->getGroup()->getID();
+  int postGroupID = getPostSynaptic()->getGroup()->getID();
+  int preID = getPreSynaptic()->getID();
+  int postID = getPostSynaptic()->getID();
 
-  double message_value = this->getPreSynaptic()->getPotential() *
-                         this->getWeight() * this->getPreSynaptic()->getBias();
+  double message_value = getPreSynaptic()->getPotential() *
+                         getWeight() * getPreSynaptic()->getBias();
 
   _origin->getGroup()->getNetwork()->lg->neuronInteraction(
       INFO, "Group %d: Neuron %d is sending a mesage to Group %d: Neuron %d",
@@ -26,10 +26,10 @@ void Synapse::propagate() {
   // TODO:
   // add delay to synapse (some random value around 1 millisecond)
   Message *message_to_send =
-      new Message(message_value, this->getPostSynaptic(), From_Neighbor);
+      new Message(message_value, getPostSynaptic(), From_Neighbor);
 
-  this->getPostSynaptic()->activate();
-  this->getPostSynaptic()->addMessage(message_to_send);
+  getPostSynaptic()->activate();
+  getPostSynaptic()->addMessage(message_to_send);
 }
 
 double Synapse::randomDelay() { return (double)rand() / RAND_MAX * 0.01; }
