@@ -31,3 +31,4 @@ plotting/*.png
 *.so
 *.txt
 *.dot
+*.svg
