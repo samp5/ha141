@@ -11,6 +11,12 @@
 #include <sstream>
 #include <vector>
 
+/**
+ * @brief Destructor for SNN.
+ *
+ * Deletes each group and destroys pthread objects
+ *
+ */
 SNN::~SNN() {
   for (auto group : groups) {
     if (group) {
@@ -74,43 +80,6 @@ SNN::SNN(std::vector<std::string> args) : active(false) {
 }
 
 /**
- * @brief Constructor for SNN.
- *
- * Allocate all `NeuronGroup`s which in turn allocate all `Neuron`s.
- *
- * @param config RuntimConfig MUST be generated before calling this constructor
- * \sa RuntimConfig
- */
-// SNN::SNN(std::vector<std::string> args, py::array_t<double> arr)
-//     : active(false) {
-//   lg = new Log(this);
-//   config = new RuntimConfig(this);
-//   config->parseArgs(args);
-//   config->INPUT_FILE = "";
-//   // input_data = arr;
-//   config->checkStartCond();
-//   srand(config->RAND_SEED);
-//   mutex = new Mutex;
-//
-//   int neuron_per_group = config->NUMBER_NEURONS / config->NUMBER_GROUPS;
-//   int input_neurons_per_group =
-//       config->NUMBER_INPUT_NEURONS / config->NUMBER_GROUPS;
-//
-//   for (int i = 0; i < config->NUMBER_GROUPS; i++) {
-//
-//     // allocate for this group
-//     NeuronGroup *this_group =
-//         new NeuronGroup(i + 1, neuron_per_group, input_neurons_per_group,
-//         this);
-//
-//     // add to vector
-//     this->groups.push_back(this_group);
-//   }
-//   this->generateNeuronVec();
-//   this->generateInputNeuronVec();
-// }
-
-/**
  * @brief Generate a vector of all `InputNeuron`.
  *
  */
@@ -133,6 +102,14 @@ void SNN::generateInputNeuronVec() {
   }
 }
 
+/**
+ * @brief Sets the latency for all input neurons.
+ *
+ * The latency for an input neuron is based on its position in the
+ * SNN::input_neurons reinterpretted as a 2D array.
+ *
+ * \sa Image::calculateCoords
+ */
 void SNN::setInputNeuronLatency() {
   for (std::vector<InputNeuron *>::size_type i = 0; i < input_neurons.size();
        i++) {
@@ -398,6 +375,15 @@ int SNN::maximum_edges(int num_input, int num_n) {
   return std::floor(max_edges / 4);
 }
 
+/**
+ * @brief Generate a neuron string for SNN::generateGraphiz.
+ *
+ * Input neurons get I{groupID}_{neuronID}
+ * Regular neurons get n{groupID}_{neuronID}
+ *
+ * @param n pointer to neuron
+ * @return Formatted string
+ */
 std::string generate_neuron_string(Neuron *n) {
   std::string str =
       std::to_string(n->getGroup()->getID()) + "_" + std::to_string(n->getID());
@@ -409,6 +395,10 @@ std::string generate_neuron_string(Neuron *n) {
   return str;
 }
 
+/**
+ * @brief Genearte a graphiz formatted file to display network.
+ *
+ */
 void SNN::generateGraphiz() {
   std::ofstream file("network.dot");
   file << "digraph {\n";
