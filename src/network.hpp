@@ -63,7 +63,7 @@ public:
   void setInputNeuronLatency();
   void setNextStim();
   double getStimulusStart() { return stimlus_start; }
-  void generateGraphiz();
+  void generateGraphiz(bool weights = false);
   bool isActive() { return active; }
   bool switchingStimulus() { return switching_stimulus; }
   pthread_cond_t *switchCond() { return &stimulus_switch_cond; }

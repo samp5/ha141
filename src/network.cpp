@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <cmath>
 #include <fstream>
+#include <iomanip>
+#include <ios>
 #include <pthread.h>
 #include <sstream>
 #include <vector>
@@ -399,25 +401,41 @@ std::string generate_neuron_string(Neuron *n) {
  * @brief Genearte a graphiz formatted file to display network.
  *
  */
-void SNN::generateGraphiz() {
+void SNN::generateGraphiz(bool weights) {
   std::ofstream file("network.dot");
   file << "digraph {\n";
-  for (auto n : neurons) {
-    std::string fstr = generate_neuron_string(n);
-    std::vector<std::string> to;
-    for (auto s : n->getPostSynaptic()) {
-      to.push_back(generate_neuron_string(s->getPostSynaptic()));
+  if (!weights) {
+    for (auto n : neurons) {
+      std::string fstr = generate_neuron_string(n);
+      std::vector<std::string> to;
+      for (auto s : n->getPostSynaptic()) {
+        to.push_back(generate_neuron_string(s->getPostSynaptic()));
+      }
+
+      if (n->getType() == Neuron_t::Input) {
+        file << fstr << " [fontcolor=green]\n";
+      }
+
+      file << fstr << " -> { ";
+      for (auto s : to) {
+        file << s << " ";
+      }
+      file << "}\n";
     }
 
-    if (n->getType() == Neuron_t::Input) {
-      file << fstr << " [fontcolor=green]\n";
-    }
+  } else {
+    for (auto n : neurons) {
+      std::string fstr = generate_neuron_string(n);
+      if (n->getType() == Neuron_t::Input) {
+        file << fstr << " [fontcolor=green]\n";
+      }
 
-    file << fstr << " -> { ";
-    for (auto s : to) {
-      file << s << " ";
+      for (auto t : n->getPostSynaptic()) {
+        std::string tstr = generate_neuron_string(t->getPostSynaptic());
+        file << fstr << " -> " << tstr << " [label= " << std::setprecision(3)
+             << t->getWeight() << " ]\n";
+      }
     }
-    file << "}\n";
   }
   file << "}";
 }
