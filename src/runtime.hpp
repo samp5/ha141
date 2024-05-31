@@ -113,7 +113,6 @@ struct RuntimConfig {
   std::vector<int>::const_iterator STIMULUS;
   bool LIMIT_LOG_OUTPUT;
   double TAU;
-  unsigned long RUN_TIME;
   int REFRACTORY_DURATION;
   double DECAY_VALUE;
   double INPUT_PROB_SUCCESS;
@@ -124,6 +123,7 @@ struct RuntimConfig {
   ostream &STREAM = std::cout;
   int num_stimulus;
   int time_per_stimulus;
+  int max_latency;
 
 public:
   vector<int> parse_line_range(const std::string &in);

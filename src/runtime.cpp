@@ -66,6 +66,9 @@ void RuntimConfig::generateNewConfig() {
   file << "#  tau for the linearlization of the decay function\n";
   file << "tau = 100.0\n";
   file << '\n';
+  file << "#  Maximum latency for input neurons\n";
+  file << "max_latency = 5\n";
+  file << '\n';
   file << "#  poisson_prob_of_success\n";
   file << "poisson_prob_of_success = 0.0001";
   file << '\n';
@@ -88,9 +91,9 @@ void RuntimConfig::generateNewConfig() {
   file << "[runtime_vars]" << '\n';
   file << "# Limit the log output to only Refractory events to limit log size"
        << '\n';
-  file << "limit_log_size = false" << '\n';
-  file << "# in seconds" << '\n';
-  file << "runtime = 1" << '\n';
+  file << "limit_log_size = true" << '\n';
+  file << "# simulated time per stimulus in \"ms\"" << '\n';
+  file << "time_per_stimulus = 250" << '\n';
   file << "# name of output file (if left blank, a timestamp is used" << '\n';
   file << "output_file = \"\"" << '\n';
   file << "# file to read input from" << '\n';
@@ -180,6 +183,12 @@ int RuntimConfig::setOptions() {
     snn->lg->string(ERROR, "Failed to parse: %s", "input_neuron_count");
   }
 
+  if (tbl["neuron"]["max_latency"].as_integer()) {
+    max_latency = tbl["neuron"]["max_latency"].as_integer()->get();
+  } else {
+    snn->lg->string(ERROR, "Failed to parse: %s", "max latency");
+  }
+
   if (tbl["runtime_vars"]["line_range"].as_string()) {
     STIMULUS_VEC =
         parse_line_range(tbl["runtime_vars"]["line_range"].as_string()->get());
@@ -196,10 +205,11 @@ int RuntimConfig::setOptions() {
     LIMIT_LOG_OUTPUT = true;
   }
 
-  if (tbl["runtime_vars"]["runtime"].as_integer()) {
-    RUN_TIME = 1e6 * tbl["runtime_vars"]["runtime"].as_integer()->get();
+  if (tbl["runtime_vars"]["time_per_stimulus"].as_integer()) {
+    time_per_stimulus =
+        tbl["runtime_vars"]["time_per_stimulus"].as_integer()->get();
   } else {
-    snn->lg->string(ERROR, "Failed to parse: %s", "runtime");
+    snn->lg->string(ERROR, "Failed to parse: %s", "time_per_stimulus");
   }
 
   if (tbl["random"]["seed"].as_string()) {
@@ -285,7 +295,7 @@ int RuntimConfig::setOptions() {
   }
 
   num_stimulus = STIMULUS_VEC.size();
-  time_per_stimulus = 1000;
+  time_per_stimulus = 100;
   STIMULUS = STIMULUS_VEC.begin();
 
   return 1;

@@ -40,7 +40,7 @@ SNN::~SNN() {
  * @param config RuntimConfig MUST be generated before calling this constructor
  * \sa RuntimConfig
  */
-SNN::SNN(std::vector<std::string> args) : active(false) {
+SNN::SNN(std::vector<std::string> args) {
   lg = new Log(this);
   config = new RuntimConfig(this);
   config->parseArgs(args);
@@ -52,7 +52,7 @@ SNN::SNN(std::vector<std::string> args) : active(false) {
 
   if (Image::isSquare(config->NUMBER_INPUT_NEURONS)) {
     lg->log(ESSENTIAL, "Assuming square input image");
-    image = new Image(config->NUMBER_INPUT_NEURONS);
+    image = new Image(config->NUMBER_INPUT_NEURONS, config->max_latency);
   } else {
     lg->log(ESSENTIAL,
             "Input image not square, using smallest perimeter rectangle");
@@ -60,7 +60,7 @@ SNN::SNN(std::vector<std::string> args) : active(false) {
     auto dimensions = Image::bestRectangle(config->NUMBER_INPUT_NEURONS);
     int x = dimensions.first;
     int y = dimensions.second;
-    image = new Image(x, y);
+    image = new Image(x, y, config->max_latency);
   }
 
   int neuron_per_group = config->NUMBER_NEURONS / config->NUMBER_GROUPS;
@@ -354,7 +354,6 @@ void SNN::reset() {
  *
  */
 void SNN::start() {
-  active = true;
 
   setNextStim();
   generateInputNeuronEvents();
@@ -364,8 +363,9 @@ void SNN::start() {
     for (auto group : groups) {
       group->startThread();
     }
-    join();
-
+    for (auto group : groups) {
+      pthread_join(group->getThreadID(), NULL);
+    }
     if (i < config->num_stimulus) {
       setNextStim();
       generateInputNeuronEvents();
@@ -374,7 +374,6 @@ void SNN::start() {
       reset();
     }
   }
-  active = false;
   for (auto group : groups) {
     for (auto n : group->getMutNeuronVec()) {
       n->transferData();

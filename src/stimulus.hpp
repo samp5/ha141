@@ -18,12 +18,12 @@ struct Image {
 
   double max_distance;
 
-  Image(int w, int h, double max_latency = 25)
+  Image(int w, int h, double max_latency)
       : width(w), height(h), max_latency(max_latency),
         center(float(w - 1) / 2, float(h - 1) / 2),
         max_distance(getDistance(0, 0)){};
 
-  Image(int pixels, double max_latency = 25)
+  Image(int pixels, double max_latency)
       : width(std::sqrt(pixels)), height(std::sqrt(pixels)),
         max_latency(max_latency), center(float(width) / 2, float(height) / 2),
         max_distance(getDistance(0, 0)) {
