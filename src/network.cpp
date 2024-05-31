@@ -144,9 +144,8 @@ void SNN::generateNeuronVec() {
  *
  *
  */
-std::unordered_map<Neuron *, std::list<Neuron *>>
-SNN::generateNeighborOptions() {
-  std::unordered_map<Neuron *, std::list<Neuron *>> map;
+void SNN::generateNeighborOptions(
+    std::unordered_map<Neuron *, std::list<Neuron *>> &map) {
   for (auto neuron_origin : neurons) {
     std::list<Neuron *> origin_list;
     for (auto neuron_destination : neurons) {
@@ -160,7 +159,81 @@ SNN::generateNeighborOptions() {
     }
     map.insert({neuron_origin, origin_list});
   }
-  return map;
+}
+
+/**
+ * @brief generate Synapse connections between all `Neuron`s in SNN::groups.
+ *
+ * Add an amount of `Synapse`s consistent with RuntimConfig::NUMBER_EDGES
+ * according to restrictions placed upon viable connections
+ *
+ *
+ */
+void SNN::generateRandomSynapsesAdjMatrix() {
+  auto start = lg->time();
+  if (neurons.empty()) {
+    generateNeuronVec();
+  }
+
+  // find non input neurons
+  std::vector<Neuron *> nonInput(config->NUMBER_NEURONS -
+                                 config->NUMBER_INPUT_NEURONS);
+  std::vector<Neuron *>::size_type i = 0;
+  for (auto n : neurons) {
+    if (n->getType() != Neuron_t::Input) {
+      nonInput.at(i) = n;
+      i++;
+    }
+  }
+
+  std::size_t non_input_count =
+      config->NUMBER_NEURONS - config->NUMBER_INPUT_NEURONS;
+
+  // Initialize adjacency matrix
+  typedef std::vector<std::vector<int>> Matrix;
+  Matrix mat(config->NUMBER_NEURONS);
+  for (Matrix::size_type i = 0; i < config->NUMBER_NEURONS; i++) {
+    mat.at(i) = std::vector<int>(non_input_count);
+  }
+
+  int number_connections = 0;
+  while (number_connections < config->NUMBER_EDGES) {
+    Matrix::size_type row = rand() % config->NUMBER_NEURONS;
+    Matrix::size_type col = rand() % non_input_count;
+
+    if (mat.at(row).at(col) || row == col) {
+      continue;
+    } else {
+      mat.at(row).at(col) = 1;
+      if (row < non_input_count) {
+        mat.at(col).at(row) = -1;
+      }
+      number_connections += 1;
+    }
+  }
+
+  // Add normal neurons
+  for (std::size_t r = 0; r < non_input_count; r++) {
+    Neuron *origin = nonInput.at(r);
+    for (std::size_t c = 0; c < non_input_count; c++) {
+      if (mat.at(r).at(c) == 1) {
+        origin->addNeighbor(nonInput.at(c), generateSynapseWeight());
+      }
+    }
+  }
+  // Add connections for input neurons
+  for (std::size_t r = non_input_count; r < config->NUMBER_NEURONS; r++) {
+    InputNeuron *origin = input_neurons.at(r - non_input_count);
+    for (std::size_t c = 0; c < non_input_count; c++) {
+      if (mat.at(r - non_input_count).at(c) == 1) {
+        origin->addNeighbor(nonInput.at(c), generateSynapseWeight());
+      }
+    }
+  }
+  auto end = lg->time();
+  std::string msg = "Adding random synapses done: took " +
+                    std::to_string(end - start) + " seconds";
+  lg->log(ESSENTIAL, msg.c_str());
 }
 
 /**
@@ -179,8 +252,8 @@ void SNN::generateRandomSynapses() {
   if (neurons.empty()) {
     generateNeuronVec();
   }
-
-  auto map = generateNeighborOptions();
+  std::unordered_map<Neuron *, std::list<Neuron *>> map;
+  generateNeighborOptions(map);
 
   float progress = 0.0;
   int pos = 0;

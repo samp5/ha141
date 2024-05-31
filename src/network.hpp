@@ -58,6 +58,7 @@ public:
   void join();
   void reset();
   void generateRandomSynapses();
+  void generateRandomSynapsesAdjMatrix();
   void generateNeuronVec();
   void generateInputNeuronVec();
   void setInputNeuronLatency();
@@ -69,7 +70,8 @@ public:
   pthread_cond_t *switchCond() { return &stimulus_switch_cond; }
   static int maximum_edges(int num_i, int num_n);
   std::vector<InputNeuron *> &getMutInputNeurons() { return input_neurons; }
-  std::unordered_map<Neuron *, std::list<Neuron *>> generateNeighborOptions();
+  void generateNeighborOptions(
+      std::unordered_map<Neuron *, std::list<Neuron *>> &map);
   RuntimConfig *getConfig() { return config; }
   Mutex *getMutex() { return mutex; }
   Barrier *getBarrier() { return barrier; }
