@@ -31,12 +31,6 @@ std::string neuronTypeString(Neuron_t type) {
   case Input:
     ret = "Input";
     break;
-  case Hidden:
-    ret = "Hidden";
-    break;
-  case Output:
-    ret = "Output";
-    break;
   }
   return ret;
 }

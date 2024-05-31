@@ -61,6 +61,7 @@ public:
   void generateRandomSynapsesAdjMatrix();
   void generateNeuronVec();
   void generateInputNeuronVec();
+  void generateInputNeuronEvents();
   void setInputNeuronLatency();
   void setNextStim();
   double getStimulusStart() { return stimlus_start; }

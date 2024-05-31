@@ -30,6 +30,7 @@ Neuron::Neuron(int _id, NeuronGroup *_g, Neuron_t _t) {
       _g->getNetwork()->getConfig()->INITIAL_MEMBRANE_POTENTIAL;
   excit_inhib_value = generateInhibitoryStatus();
   last_decay = -1;
+  refractory_duration = _g->getNetwork()->getConfig()->REFRACTORY_DURATION;
 
   const char *inhib = excit_inhib_value == -1 ? "excitatory\0" : "inhibitory\0";
 
@@ -166,13 +167,32 @@ void Neuron::sendMessages() {
  * RuntimConfig::ACTIVATION_THRESHOLD
  *
  */
-void Neuron::run() {
-  while (recieveMessage()) {
-    if (membrane_potential >=
-        group->getNetwork()->getConfig()->ACTIVATION_THRESHOLD) {
-      sendMessages();
-    }
+void Neuron::run(Message *message) {
+
+  // check refractory
+  if (message->timestamp < refractory_start + refractory_duration) {
+    group->getNetwork()->lg->groupNeuronState(
+        INFO, "(%d) Neuron %d is still in refractory period, ignoring message",
+        getGroup()->getID(), getID());
+    deactivate();
+    return;
   }
+
+  retroactiveDecay(last_decay, message->timestamp);
+
+  accumulatePotential(message->message);
+
+  if (membrane_potential >=
+      group->getNetwork()->getConfig()->ACTIVATION_THRESHOLD) {
+    last_fire = message->timestamp;
+    sendMessages();
+  }
+
+  if (message) {
+    delete message;
+    message = nullptr;
+  }
+
   deactivate();
 }
 
@@ -275,7 +295,7 @@ Message *Neuron::retrieveMessage() {
  * @param from The starting timestamp from which to decay
  * @param to The ending timestamp to decay to
  */
-void Neuron::retroactiveDecay(double from, double to) {
+void Neuron::retroactiveDecay(int from, int to) {
   double tau = group->getNetwork()->getConfig()->TAU;
   double v_rest =
       group->getNetwork()->getConfig()->REFRACTORY_MEMBRANE_POTENTIAL;
@@ -285,13 +305,11 @@ void Neuron::retroactiveDecay(double from, double to) {
     return;
   }
 
-  double decay_time_step = 2e-3;
+  int decay_time_step = 3;
+  int first_decay = from;
+  int i;
 
-  Message_t message_decay_type = Decay;
-
-  double first_decay = from;
-  double i;
-
+  // TODO maybe we can make this more efficient
   for (i = first_decay; i < to; i += decay_time_step) {
 
     double decay_value = (membrane_potential - v_rest) / tau;
@@ -301,7 +319,6 @@ void Neuron::retroactiveDecay(double from, double to) {
     }
 
     accumulatePotential(-decay_value);
-    addData(i, message_decay_type);
   }
   last_decay = i;
 }
@@ -410,6 +427,7 @@ void Neuron::addData(double time, Message_t message_type) {
 }
 
 double Neuron::getLastDecay() const { return last_decay; }
+double Neuron::getLastFire() const { return last_fire; };
 int Neuron::getBias() const { return excit_inhib_value; }
 Neuron_t Neuron::getType() const { return type; }
 int Neuron::getID() const { return id; }

@@ -51,8 +51,8 @@ void RuntimConfig::generateNewConfig() {
   file << "# option can be \"MAX\" for maximum edges" << '\n';
   file << "edge_count = 1" << '\n';
   file << '\n';
-  file << "# refractory_duration" << '\n';
-  file << "refractory_duration = 0.5" << '\n';
+  file << "# refractory_duration in ms" << '\n';
+  file << "refractory_duration = 5" << '\n';
   file << '\n';
   file << "# value each neuron is initialized with" << '\n';
   file << "initial_membrane_potential = -55.0" << '\n';
@@ -160,11 +160,9 @@ int RuntimConfig::setOptions() {
     snn->lg->string(ERROR, "Failed to parse: %s", "poisson_prob_of_success");
   }
 
-  if (tbl["neuron"]["refractory_duration"].as_floating_point()) {
-    // convert to seconds
+  if (tbl["neuron"]["refractory_duration"].as_integer()) {
     REFRACTORY_DURATION =
-        tbl["neuron"]["refractory_duration"].as_floating_point()->get() /
-        1000.0f;
+        tbl["neuron"]["refractory_duration"].as_integer()->get();
   } else {
     snn->lg->string(ERROR, "Failed to parse: %s", "refractory_duration");
   }
@@ -287,7 +285,7 @@ int RuntimConfig::setOptions() {
   }
 
   num_stimulus = STIMULUS_VEC.size();
-  time_per_stimulus = (double)RUN_TIME / num_stimulus;
+  time_per_stimulus = 1000;
   STIMULUS = STIMULUS_VEC.begin();
 
   return 1;

@@ -16,20 +16,19 @@ void Synapse::propagate() {
   int preID = getPreSynaptic()->getID();
   int postID = getPostSynaptic()->getID();
 
-  double message_value = getPreSynaptic()->getPotential() *
-                         getWeight() * getPreSynaptic()->getBias();
+  double message_value = getPreSynaptic()->getPotential() * getWeight() *
+                         getPreSynaptic()->getBias();
 
   _origin->getGroup()->getNetwork()->lg->neuronInteraction(
       INFO, "Group %d: Neuron %d is sending a mesage to Group %d: Neuron %d",
       preGroupID, preID, postGroupID, postID);
 
-  // TODO:
-  // add delay to synapse (some random value around 1 millisecond)
   Message *message_to_send =
-      new Message(message_value, getPostSynaptic(), From_Neighbor);
+      new Message(message_value, getPostSynaptic(), From_Neighbor,
+                  getPreSynaptic()->getLastFire() + delay);
 
   getPostSynaptic()->activate();
-  getPostSynaptic()->addMessage(message_to_send);
+  getPostSynaptic()->getGroup()->addToMessageQ(message_to_send);
 }
 
-double Synapse::randomDelay() { return (double)rand() / RAND_MAX * 0.01; }
+double Synapse::randomDelay() { return rand() % 10; }

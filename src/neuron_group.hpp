@@ -21,7 +21,7 @@ private:
   int id;
   pthread_t thread;
   SNN *network;
-  std::set<Message *> message_q;
+  std::multiset<Message *, MessageComp> message_q;
   pthread_mutex_t message_q_tex = PTHREAD_MUTEX_INITIALIZER;
 
 public:
@@ -40,6 +40,9 @@ public:
   pthread_t getThreadID() const { return thread; }
   SNN *getNetwork() const { return network; }
   int neuronCount() const;
+  Message *getMessage();
+  void addToMessageQ(Message *message);
+  pthread_mutex_t &getMessageQtex() { return message_q_tex; }
   void reset();
   const vector<Neuron *> &getMutNeuronVec();
 

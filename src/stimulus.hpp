@@ -6,7 +6,7 @@
 struct Image {
   int width;
   int height;
-  double max_latency;
+  int max_latency;
 
   struct Point {
     float x;
@@ -18,12 +18,12 @@ struct Image {
 
   double max_distance;
 
-  Image(int w, int h, double max_latency = 0.025)
+  Image(int w, int h, double max_latency = 25)
       : width(w), height(h), max_latency(max_latency),
         center(float(w - 1) / 2, float(h - 1) / 2),
         max_distance(getDistance(0, 0)){};
 
-  Image(int pixels, double max_latency = 0.025)
+  Image(int pixels, double max_latency = 25)
       : width(std::sqrt(pixels)), height(std::sqrt(pixels)),
         max_latency(max_latency), center(float(width) / 2, float(height) / 2),
         max_distance(getDistance(0, 0)) {
@@ -40,10 +40,10 @@ struct Image {
     return distance;
   };
 
-  double getLatency(int index) {
+  int getLatency(int index) {
     Point pos = calculateCoords(index);
     double distance = getDistance(pos.x, pos.y);
-    double latency = distance / max_distance * max_latency;
+    int latency = (distance / max_distance) * max_latency;
     return latency;
   }
 

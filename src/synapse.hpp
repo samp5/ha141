@@ -26,7 +26,7 @@ private:
   Neuron *_origin = nullptr;
   Neuron *_destination = nullptr;
   double _weight = 0.0;
-  double delay = -1;
+  int delay = -1;
 };
 
 #endif // !SYNAPSE

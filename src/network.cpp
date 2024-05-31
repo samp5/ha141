@@ -115,7 +115,7 @@ void SNN::generateInputNeuronVec() {
 void SNN::setInputNeuronLatency() {
   for (std::vector<InputNeuron *>::size_type i = 0; i < input_neurons.size();
        i++) {
-    double latency = image->getLatency(i);
+    int latency = image->getLatency(i);
     input_neurons.at(i)->setLatency(latency);
   }
 }
@@ -357,39 +357,29 @@ void SNN::start() {
   active = true;
 
   setNextStim();
+  generateInputNeuronEvents();
   lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
 
-  for (auto group : groups) {
-    group->startThread();
-  }
-
   for (int i = 1; i < config->num_stimulus + 1; i++) {
-
-    usleep(config->time_per_stimulus);
+    for (auto group : groups) {
+      group->startThread();
+    }
+    join();
 
     if (i < config->num_stimulus) {
-      auto start = std::chrono::high_resolution_clock::now();
-      switching_stimulus = true;
-
-      pthread_barrier_wait(&getBarrier()->barrier);
-
       setNextStim();
+      generateInputNeuronEvents();
       config->STIMULUS++;
       lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
-
       reset();
-
-      auto end = std::chrono::high_resolution_clock::now();
-      auto duration = std::chrono::duration_cast<std::chrono::duration<double>>(
-          end - start);
-      lg->addOffset(duration.count());
-
-      stimlus_start = lg->time();
-      switching_stimulus = false;
-      pthread_cond_broadcast(&stimulus_switch_cond);
     }
   }
   active = false;
+  for (auto group : groups) {
+    for (auto n : group->getMutNeuronVec()) {
+      n->transferData();
+    }
+  }
 }
 
 /**
@@ -512,4 +502,10 @@ void SNN::generateGraphiz(bool weights) {
     }
   }
   file << "}";
+}
+
+void SNN::generateInputNeuronEvents() {
+  for (auto in : input_neurons) {
+    in->generateEvents();
+  }
 }

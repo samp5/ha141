@@ -4,6 +4,7 @@
 #include "neuron.hpp"
 #include "runtime.hpp"
 #include <pthread.h>
+#include <random>
 
 /**
  * @brief Constructor for InputNeuron.
@@ -14,7 +15,7 @@
  * @param _id Neuron ID
  * @param group NeuronGroup that this neuron belongs to
  */
-InputNeuron::InputNeuron(int _id, NeuronGroup *group, double latency)
+InputNeuron::InputNeuron(int _id, NeuronGroup *group, int latency)
     : Neuron(_id, group, Input),
       probalility_of_success(
           group->getNetwork()->getConfig()->INPUT_PROB_SUCCESS),
@@ -32,10 +33,9 @@ InputNeuron::InputNeuron(int _id, NeuronGroup *group, double latency)
  * - Poisson success
  * - Sends messages through all synapses
  */
-void InputNeuron::run() {
+void InputNeuron::run(Message *message) {
 
-  // Check for refractory period
-  if (inRefractory()) {
+  if (message->timestamp < refractory_start + refractory_duration) {
     group->getNetwork()->lg->groupNeuronState(
         INFO,
         "INPUT: (%d) Neuron %d is still in refractory period, ignoring input",
@@ -44,39 +44,20 @@ void InputNeuron::run() {
   }
 
   // Grab the time and decay
-  double time = group->getNetwork()->lg->time();
-  retroactiveDecay(last_decay, time);
+  retroactiveDecay(last_decay, message->timestamp);
+
+  accumulatePotential(message->message);
 
   // Check to see if we need to send messages
   if (membrane_potential >=
       group->getNetwork()->getConfig()->ACTIVATION_THRESHOLD) {
+    last_fire = message->timestamp;
     sendMessages();
   }
 
-  // Check latency
-  if (time < group->getNetwork()->getStimulusStart() + latency) {
-    return;
-  }
-
-  // Add stimulus for poisson succeses
-  if (poissonResult()) {
-
-    double time = group->getNetwork()->lg->time();
-
-    accumulatePotential(input_value);
-    addData(time, Message_t::Stimulus);
-
-    group->getNetwork()->lg->neuronValue(
-        INFO,
-        "(Input) (%d) Neuron %d poisson success! Adding input value to "
-        "membrane_potential. membrane_potential now %f",
-        getGroup()->getID(), getID(), membrane_potential);
-  }
-
-  // Check to see if we need to send messages
-  if (membrane_potential >=
-      group->getNetwork()->getConfig()->ACTIVATION_THRESHOLD) {
-    sendMessages();
+  if (message) {
+    delete message;
+    message = nullptr;
   }
 }
 
@@ -125,27 +106,6 @@ bool InputNeuron::inRefractory() const {
 
   return false;
 }
-
-/**
- * @brief Sends messages to all connections.
- *
- * Propagates messages across all synapses then enters a
- * refractory phase
- *
- */
-void InputNeuron::sendMessages() {
-
-  for (const auto synapse : getSynapses()) {
-    synapse->propagate();
-  }
-
-  group->getNetwork()->lg->groupNeuronState(
-      INFO,
-      "(%d) Neuron %d reached activation threshold, entering refractory phase",
-      group->getID(), id);
-
-  refractory();
-}
 /**
  * @brief Sets input value (stimulus).
  *
@@ -162,7 +122,7 @@ void InputNeuron::setInputValue(double value) {
       getGroup()->getID(), getID(), value);
 }
 
-void InputNeuron::setLatency(double _l) { latency = _l; }
+void InputNeuron::setLatency(int _l) { latency = _l; }
 
 /**
  * @brief Resets the InputNeuron.
@@ -179,4 +139,39 @@ void InputNeuron::reset() {
   pthread_mutex_unlock(&group->getNetwork()->getMutex()->potential);
   last_decay = group->getNetwork()->lg->time();
   refractory_start = 0;
+}
+
+void InputNeuron::generateEvents() {
+
+  // see https://en.cppreference.com/w/cpp/numeric/random/poisson_distribution
+  static bool first = true;
+  static std::random_device rd;
+  static std::mt19937 gen(rd());
+  if (first) {
+    gen.seed(group->getNetwork()->getConfig()->RAND_SEED);
+    first = false;
+  }
+
+  // poisson_distribution with n = time_per_stim and p = probalility_of_success
+  static std::poisson_distribution<> d(
+      probalility_of_success *
+      group->getNetwork()->getConfig()->time_per_stimulus);
+
+  int number_events = d(gen);
+  int created_events = 0;
+
+  while (created_events < number_events) {
+    int timestamp =
+        gen() % (group->getNetwork()->getConfig()->time_per_stimulus + 1);
+
+    if (timestamp < latency) {
+      created_events++;
+      continue;
+    }
+
+    Message *message =
+        new Message(input_value, this, Message_t::Stimulus, timestamp);
+    group->addToMessageQ(message);
+    created_events++;
+  }
 }

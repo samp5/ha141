@@ -15,7 +15,7 @@ using std::list;
 
 class NeuronGroup;
 
-enum Neuron_t { None = 0, Input = 1, Hidden = 2, Output = 3 };
+enum Neuron_t { None = 0, Input = 1 };
 
 class Neuron {
 protected:
@@ -28,11 +28,13 @@ protected:
   Neuron_t type;
   NeuronGroup *group;
   bool active = false;
+  int refractory_duration;
 
   // timestamp data
-  double last_decay; /**< The timestamp of the most recent decay */
-  double refractory_start =
-      0.0; /**< The timestamp of most recent refractory period start */
+  int last_decay = -1; /**< The timestamp of the most recent decay */
+  int refractory_start =
+      0; /**< The timestamp of most recent refractory period start */
+  int last_fire = 0;
 
   // Edge values
   vector<Synapse *>
@@ -54,7 +56,7 @@ public:
   void addPreSynapticConnection(Synapse *synapse);
 
   // Running and messaging
-  virtual void run();
+  virtual void run(Message *message);
   virtual void sendMessages();
 
   int recieveMessage();
@@ -68,7 +70,7 @@ public:
   void setType(Neuron_t type);
   void activate();
   void deactivate();
-  void retroactiveDecay(double from, double to);
+  void retroactiveDecay(int from, int to);
   void accumulatePotential(double value);
   int generateInhibitoryStatus();
 
@@ -83,6 +85,7 @@ public:
   const vector<Synapse *> &getPresynaptic() const;
 
   double getLastDecay() const;
+  double getLastFire() const;
   int getBias() const;
   Neuron_t getType() const;
   int getID() const;

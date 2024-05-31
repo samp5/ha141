@@ -114,7 +114,7 @@ struct RuntimConfig {
   bool LIMIT_LOG_OUTPUT;
   double TAU;
   unsigned long RUN_TIME;
-  double REFRACTORY_DURATION;
+  int REFRACTORY_DURATION;
   double DECAY_VALUE;
   double INPUT_PROB_SUCCESS;
   LogLevel DEBUG_LEVEL;

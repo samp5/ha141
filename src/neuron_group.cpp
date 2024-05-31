@@ -41,7 +41,7 @@ NeuronGroup::NeuronGroup(int _id, int number_neurons, int number_input_neurons,
       id++;
 
     } else if (!roll && number_input_neurons) {
-      InputNeuron *neuron = new InputNeuron(id, this, 0.0);
+      InputNeuron *neuron = new InputNeuron(id, this, 0);
       neurons.push_back(neuron);
       number_input_neurons--;
       id++;
@@ -82,47 +82,35 @@ void *NeuronGroup::run() {
   // Log running status
   getNetwork()->lg->state(INFO, "Group %d running", getID());
 
-  // While the network is running...
-  while (getNetwork()->isActive()) {
+  pthread_mutex_lock(&message_q_tex);
+  bool empty = message_q.empty();
+  pthread_mutex_unlock(&message_q_tex);
 
-    for (Neuron *neuron : neurons) {
-      if (!getNetwork()->isActive()) {
-        break;
-      }
+  while (!empty) {
+    Message *message = getMessage();
 
-      if (getNetwork()->switchingStimulus()) {
-        pthread_barrier_wait(&(network->getBarrier()->barrier));
-
-        pthread_mutex_lock(&getNetwork()->getMutex()->stimulus);
-        while (getNetwork()->switchingStimulus()) {
-          pthread_cond_wait(getNetwork()->switchCond(),
-                            &getNetwork()->getMutex()->stimulus);
-        }
-        pthread_mutex_unlock(&getNetwork()->getMutex()->stimulus);
-      }
-
-      getNetwork()->lg->neuronType(
-          DEBUG4, "Checking activation:(%d) Neuron %d is %s", getID(),
-          neuron->getID(),
-          getNetwork()->lg->activeStatusString(neuron->isActivated()));
-
-      if (neuron->isActivated()) {
-
-        getNetwork()->lg->groupNeuronState(DEBUG2, "Running (%d) Neuron (%d)",
-                                           getID(), neuron->getID());
-        neuron = neuron->getType() == Input
-                     ? dynamic_cast<InputNeuron *>(neuron)
-                     : neuron;
-        neuron->run();
-      } else {
-        double time = getNetwork()->lg->time();
-        neuron->retroactiveDecay(neuron->getLastDecay(), time);
-      }
+    switch (message->post_synaptic_neuron->getType()) {
+    case Neuron_t::Input: {
+      InputNeuron *in =
+          dynamic_cast<InputNeuron *>(message->post_synaptic_neuron);
+      in->run(message);
+      break;
     }
-  }
+    case Neuron_t::None: {
+      Neuron *n = message->post_synaptic_neuron;
+      n->run(message);
+      break;
+    }
+    }
 
-  for (auto neuron : neurons) {
-    neuron->transferData();
+    pthread_mutex_lock(&message_q_tex);
+    empty = message_q.empty();
+    std::cout << "Message Q: ";
+    for (auto m : message_q) {
+      std::cout << m->timestamp << " ";
+    }
+    std::cout << "\n";
+    pthread_mutex_unlock(&message_q_tex);
   }
 
   return NULL;
@@ -152,6 +140,27 @@ void NeuronGroup::reset() {
     if (neuron->getType() == Input) {
       neuron = dynamic_cast<InputNeuron *>(neuron);
     }
+    pthread_mutex_lock(&message_q_tex);
+    bool empty = message_q.empty();
+    pthread_mutex_unlock(&message_q_tex);
+    if (empty) {
+      network->lg->log(ERROR, "Message queue not empty at time of reset");
+      message_q.clear();
+    }
     neuron->reset();
   }
+}
+
+Message *NeuronGroup::getMessage() {
+  pthread_mutex_lock(&message_q_tex);
+  Message *ret = *message_q.begin();
+  message_q.erase(message_q.begin());
+  pthread_mutex_unlock(&message_q_tex);
+  return ret;
+}
+
+void NeuronGroup::addToMessageQ(Message *message) {
+  pthread_mutex_lock(&message_q_tex);
+  message_q.insert(message);
+  pthread_mutex_unlock(&message_q_tex);
 }
