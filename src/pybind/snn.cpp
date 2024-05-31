@@ -77,6 +77,7 @@ void pySNN::pyStart(py::buffer buff) {
   active = true;
 
   pySetNextStim();
+  generateInputNeuronEvents();
   lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
 
   for (auto group : this->groups) {

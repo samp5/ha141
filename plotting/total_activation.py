@@ -92,7 +92,7 @@ def main():
     with open(opts.log_file, 'r') as file:
         for line in file:
             parts = line.split()
-            timestamp = float(parts[3])
+            timestamp = int(parts[3])
             value = float(parts[4])
             message_type = parts[5]
             stimulus_number = int(parts[6])
@@ -103,9 +103,10 @@ def main():
             if message_type == "R":
                 if stimulus_number in data:
                     data[stimulus_number].append(DataPoint(timestamp, value, stimulus_number))
+                    print(f"timestamp: {timestamp} value: {value} stimulus_number: {stimulus_number}")
                 else:
                     data[stimulus_number] = [DataPoint(timestamp, value, stimulus_number)]
-
+                    print(f"timestamp: {timestamp} value: {value} stimulus_number: {stimulus_number}")
 # sort the data
     print("-> Sorting data...")
     for stim_num in data:
@@ -121,6 +122,7 @@ def main():
         stim_data = data[stim_num]
         # timestep per bin
         opts.timestep = (stim_data[-1].time - stim_data[0].time) / 300 
+        print(opts.timestep)
         bins = 300
         x_values = []
         y_values = []

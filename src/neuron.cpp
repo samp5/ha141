@@ -34,7 +34,7 @@ Neuron::Neuron(int _id, NeuronGroup *_g, Neuron_t _t) {
 
   const char *inhib = excit_inhib_value == -1 ? "excitatory\0" : "inhibitory\0";
 
-  _g->getNetwork()->lg->neuronType(INFO, "(%d) Neuron %d added: %s",
+  _g->getNetwork()->lg->neuronType(INFO, "Regular (%d) Neuron %d added: %s",
                                    group->getID(), _id, inhib);
 }
 
@@ -204,7 +204,7 @@ void Neuron::run(Message *message) {
  *
  */
 void Neuron::refractory() {
-  refractory_start = group->getNetwork()->lg->time();
+  refractory_start = last_fire;
 
   pthread_mutex_lock(&group->getNetwork()->getMutex()->potential);
   membrane_potential =
@@ -411,7 +411,7 @@ const vector<Synapse *> &Neuron::getPresynaptic() const {
   return PreSynapticConnections;
 }
 
-void Neuron::addData(double time, Message_t message_type) {
+void Neuron::addData(int time, Message_t message_type) {
   if (group->getNetwork()->getConfig()->LIMIT_LOG_OUTPUT &&
       message_type == Message_t::Refractory) {
     LogData *d =

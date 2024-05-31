@@ -46,7 +46,7 @@ enum LogLevel {
 struct LogData {
   int neuron_id;
   int group_id;
-  double timestamp;
+  int timestamp;
   double potential;
   int neuron_type = 0;
   Message_t message_type;

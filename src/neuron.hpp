@@ -91,7 +91,7 @@ public:
   int getID() const;
 
   // log operations
-  void addData(double time, Message_t message_type);
+  void addData(int time, Message_t message_type);
   void transferData();
 };
 

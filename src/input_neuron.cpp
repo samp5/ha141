@@ -21,6 +21,11 @@ InputNeuron::InputNeuron(int _id, NeuronGroup *group, int latency)
           group->getNetwork()->getConfig()->INPUT_PROB_SUCCESS),
       latency(latency) {
   excit_inhib_value = -1;
+  const char *inhib = excit_inhib_value == -1 ? "excitatory\0" : "inhibitory\0";
+
+  group->getNetwork()->lg->neuronType(INFO, "INPUT (%d) Neuron %d added: %s",
+                                      group->getID(), _id, inhib);
+
   activate();
 }
 
@@ -144,13 +149,11 @@ void InputNeuron::reset() {
 void InputNeuron::generateEvents() {
 
   // see https://en.cppreference.com/w/cpp/numeric/random/poisson_distribution
-  static bool first = true;
   static std::random_device rd;
   static std::mt19937 gen(rd());
-  if (first) {
-    gen.seed(group->getNetwork()->getConfig()->RAND_SEED);
-    first = false;
-  }
+
+  // seed every time since we want the same thing for each stimulus
+  gen.seed(group->getNetwork()->getConfig()->RAND_SEED);
 
   // poisson_distribution with n = time_per_stim and p = probalility_of_success
   static std::poisson_distribution<> d(

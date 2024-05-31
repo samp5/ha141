@@ -150,7 +150,7 @@ void Log::writeData() {
   }
 
   for (LogData *log_data : this->log_data) {
-    file << std::fixed << log_data->group_id << " " << log_data->neuron_id
+    file << std::setw(5) << log_data->group_id << " " << log_data->neuron_id
          << " " << neuronTypeString((Neuron_t)log_data->neuron_type) << " "
          << log_data->timestamp << " " << log_data->potential << " "
          << messageTypeToString(log_data->message_type) << " "

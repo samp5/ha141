@@ -105,11 +105,6 @@ void *NeuronGroup::run() {
 
     pthread_mutex_lock(&message_q_tex);
     empty = message_q.empty();
-    std::cout << "Message Q: ";
-    for (auto m : message_q) {
-      std::cout << m->timestamp << " ";
-    }
-    std::cout << "\n";
     pthread_mutex_unlock(&message_q_tex);
   }
 
