@@ -112,6 +112,7 @@ struct RuntimConfig {
   std::vector<int> STIMULUS_VEC;
   std::vector<int>::const_iterator STIMULUS;
   bool LIMIT_LOG_OUTPUT;
+  bool show_stimulus;
   double TAU;
   int REFRACTORY_DURATION;
   double DECAY_VALUE;

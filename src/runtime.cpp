@@ -92,6 +92,8 @@ void RuntimConfig::generateNewConfig() {
   file << "# Limit the log output to only Refractory events to limit log size"
        << '\n';
   file << "limit_log_size = true" << '\n';
+  file << "# Show the current stimlus number" << '\n';
+  file << "show_stimulus = true" << '\n';
   file << "# simulated time per stimulus in \"ms\"" << '\n';
   file << "time_per_stimulus = 250" << '\n';
   file << "# name of output file (if left blank, a timestamp is used" << '\n';
@@ -203,6 +205,14 @@ int RuntimConfig::setOptions() {
     snn->lg->string(ERROR, "Failed to parse: %s, using default option: true",
                     "limit_log_size");
     LIMIT_LOG_OUTPUT = true;
+  }
+
+  if (tbl["runtime_vars"]["show_stimulus"].as_boolean()) {
+    show_stimulus = tbl["runtime_vars"]["show_stimulus"].as_boolean()->get();
+  } else {
+    snn->lg->string(ERROR, "Failed to parse: %s, using default option: true",
+                    "show_stimulus");
+    show_stimulus = true;
   }
 
   if (tbl["runtime_vars"]["time_per_stimulus"].as_integer()) {

@@ -357,27 +357,31 @@ void SNN::start() {
 
   setNextStim();
   generateInputNeuronEvents();
+  if (config->show_stimulus) {
+    lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
+  }
 
   float progress = 0.0;
   int pos = 0;
 
   for (int i = 1; i < config->num_stimulus + 1; i++) {
-
-    int bar_width = 50;
-    progress = (float)i / config->num_stimulus;
-    if (int(progress * bar_width) > pos + 5) {
-      std::cout << "[";
-      pos = progress * bar_width;
-      for (int i = 0; i < bar_width; i++) {
-        if (i < pos) {
-          std::cout << "=";
-        } else if (i == pos) {
-          std::cout << ">";
-        } else {
-          std::cout << " ";
+    if (!config->show_stimulus) {
+      int bar_width = 50;
+      progress = (float)i / config->num_stimulus;
+      if (int(progress * bar_width) > pos + 5) {
+        std::cout << "[";
+        pos = progress * bar_width;
+        for (int i = 0; i < bar_width; i++) {
+          if (i < pos) {
+            std::cout << "=";
+          } else if (i == pos) {
+            std::cout << ">";
+          } else {
+            std::cout << " ";
+          }
         }
+        std::cout << "]" << int(progress * 100.0) << "%\n";
       }
-      std::cout << "]" << int(progress * 100.0) << "%\n";
     }
 
     for (auto group : groups) {
@@ -388,6 +392,9 @@ void SNN::start() {
     }
     if (i < config->num_stimulus) {
       setNextStim();
+      if (config->show_stimulus) {
+        lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
+      }
       generateInputNeuronEvents();
       config->STIMULUS++;
       reset();
