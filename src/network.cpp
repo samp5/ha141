@@ -174,6 +174,7 @@ void SNN::generateRandomSynapsesAdjMatrix() {
   if (neurons.empty()) {
     generateNeuronVec();
   }
+  auto num_n = neurons.size();
 
   // find non input neurons
   std::vector<Neuron *> nonInput(config->NUMBER_NEURONS -
@@ -191,8 +192,8 @@ void SNN::generateRandomSynapsesAdjMatrix() {
 
   // Initialize adjacency matrix
   typedef std::vector<std::vector<int>> Matrix;
-  Matrix mat(config->NUMBER_NEURONS);
-  for (Matrix::size_type i = 0; i < config->NUMBER_NEURONS; i++) {
+  Matrix mat(num_n);
+  for (Matrix::size_type i = 0; i < num_n; i++) {
     mat.at(i) = std::vector<int>(non_input_count);
   }
 
@@ -222,7 +223,7 @@ void SNN::generateRandomSynapsesAdjMatrix() {
     }
   }
   // Add connections for input neurons
-  for (std::size_t r = non_input_count; r < config->NUMBER_NEURONS; r++) {
+  for (std::size_t r = non_input_count; r < num_n; r++) {
     InputNeuron *origin = input_neurons.at(r - non_input_count);
     for (std::size_t c = 0; c < non_input_count; c++) {
       if (mat.at(r - non_input_count).at(c) == 1) {

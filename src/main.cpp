@@ -12,17 +12,17 @@ int main(int argc, char **argv) {
   snn.lg->log(ESSENTIAL, "Assigning neuron groups...");
 
   snn.lg->log(ESSENTIAL, "Adding synapses...");
-  snn.generateRandomSynapses();
+  snn.generateRandomSynapsesAdjMatrix();
 
-  snn.lg->startClock();
-  snn.start();
-
-  snn.lg->log(ESSENTIAL, "Transfering data from Neurons to Log...");
-  snn.join();
+  // snn.lg->startClock();
+  // snn.start();
+  //
+  // snn.lg->log(ESSENTIAL, "Transfering data from Neurons to Log...");
+  // snn.join();
   snn.generateGraphiz(true);
-
-  snn.lg->writeData();
-
-  snn.lg->log(ESSENTIAL, "Done writing, exiting");
+  //
+  // snn.lg->writeData();
+  //
+  // snn.lg->log(ESSENTIAL, "Done writing, exiting");
   return 0;
 }

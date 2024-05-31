@@ -5,6 +5,7 @@
 #include "message.hpp"
 #include <list>
 #include <pthread.h>
+#include <set>
 
 class Neuron;
 class SNN;
@@ -20,6 +21,8 @@ private:
   int id;
   pthread_t thread;
   SNN *network;
+  std::set<Message *> message_q;
+  pthread_mutex_t message_q_tex = PTHREAD_MUTEX_INITIALIZER;
 
 public:
   NeuronGroup(int _id, int number_neurons, int number_input_neurons,
