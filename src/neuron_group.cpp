@@ -195,3 +195,71 @@ void NeuronGroup::addToMessageQ(Message *message) {
   message_q.insert(message);
   pthread_mutex_unlock(&message_q_tex);
 }
+
+void NeuronGroup::generateRandomSynapses(int number_edges) {
+  // find non input neurons
+  std::cout << "Group ID: " << id << " Running generateRandomSynapses\n";
+  std::vector<Neuron *> nI_neurons;
+  std::vector<InputNeuron *> input_neurons;
+  for (auto n : neurons) {
+    if (n->getType() != Neuron_t::Input) {
+      nI_neurons.push_back(n);
+    } else {
+      input_neurons.push_back(dynamic_cast<InputNeuron *>(n));
+    }
+  }
+
+  auto n_neurons = neurons.size();
+  auto n_non_input = nI_neurons.size();
+  if (number_edges > SNN::maximum_edges(input_neurons.size(), n_neurons)) {
+    network->lg->log(
+        LogLevel::DEBUG2,
+        "Edges are intragroup only, adjusting edge count accordingly");
+    number_edges = SNN::maximum_edges(input_neurons.size(), n_neurons);
+  }
+
+  // Initialize adjacency matrix
+  typedef std::vector<std::vector<int>> Matrix;
+  Matrix mat(n_neurons);
+  for (Matrix::size_type i = 0; i < n_neurons; i++) {
+    mat.at(i) = std::vector<int>(n_non_input);
+  }
+
+  int number_connections = 0;
+  while (number_connections < number_edges) {
+    Matrix::size_type row = rand() % n_neurons;
+    Matrix::size_type col = rand() % n_non_input;
+
+    if (mat.at(row).at(col) || row == col) {
+      continue;
+    } else {
+      mat.at(row).at(col) = 1;
+      if (row < n_non_input) {
+        mat.at(col).at(row) = -1;
+      }
+      number_connections += 1;
+    }
+  }
+  std::cout << "Group ID: " << id << " finished matrix generation\n";
+  // Add normal neurons
+  for (std::size_t r = 0; r < n_non_input; r++) {
+    Neuron *origin = nI_neurons.at(r);
+    for (std::size_t c = 0; c < n_non_input; c++) {
+      if (mat.at(r).at(c) == 1) {
+        origin->addNeighbor(nI_neurons.at(c), SNN::generateSynapseWeight());
+      }
+    }
+  }
+  std::cout << "Group ID: " << id << " finished normal neuron connection\n";
+  // Add connections for input neurons
+  for (std::size_t r = n_non_input; r < n_neurons; r++) {
+    InputNeuron *origin = input_neurons.at(r - n_non_input);
+    for (std::size_t c = 0; c < n_non_input; c++) {
+      if (mat.at(r - n_non_input).at(c) == 1) {
+        origin->addNeighbor(nI_neurons.at(c), SNN::generateSynapseWeight());
+      }
+    }
+  }
+  std::cout << "Group ID: " << id << " finished generateRandomSynapses\n";
+  return;
+}

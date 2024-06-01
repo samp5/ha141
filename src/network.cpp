@@ -161,6 +161,54 @@ void SNN::generateNeighborOptions(
   }
 }
 
+struct gRSAMGS_ThreadArgs {
+  SNN *snn;
+  std::vector<NeuronGroup *>::size_type index;
+  int edges;
+  gRSAMGS_ThreadArgs(SNN *n, std::vector<NeuronGroup *>::size_type i, int e)
+      : snn(n), index(i), edges(e) {}
+};
+
+void *SNN::generateRandomSynapsesAdjMatrixGS_Helper(void *arg) {
+  gRSAMGS_ThreadArgs *args = static_cast<gRSAMGS_ThreadArgs *>(arg);
+  args->snn->groups.at(args->index)->generateRandomSynapses(args->edges);
+  delete args;
+  return nullptr;
+}
+/**
+ * @brief generate Synapse connections between all `Neuron`s in SNN::groups.
+ *
+ * Add an amount of `Synapse`s consistent with RuntimConfig::NUMBER_EDGES
+ * according to restrictions placed upon viable connections
+ *
+ *
+ */
+void SNN::generateRandomSynapsesAdjMatrixGS() {
+  auto start = lg->time();
+  int edges_per_group = config->NUMBER_EDGES / config->NUMBER_GROUPS;
+  int rem = config->NUMBER_EDGES % config->NUMBER_GROUPS;
+
+  typedef std::vector<NeuronGroup *>::size_type sz;
+  pthread_t *threads = new pthread_t[config->NUMBER_GROUPS];
+  for (sz i = 0; i < groups.size(); i++) {
+    int edges = rem ? edges_per_group + 1 : edges_per_group;
+    if (rem > 0)
+      rem--;
+    gRSAMGS_ThreadArgs *arg = new gRSAMGS_ThreadArgs(this, i, edges);
+    pthread_create(&threads[i], nullptr,
+                   SNN::generateRandomSynapsesAdjMatrixGS_Helper,
+                   static_cast<void *>(arg));
+  }
+
+  for (sz i = 0; i < groups.size(); i++) {
+    pthread_join(threads[i], nullptr);
+  }
+  delete[] threads;
+  auto end = lg->time();
+  std::string msg = "Adding random synapses done: took " +
+                    std::to_string(end - start) + " seconds";
+  lg->log(ESSENTIAL, msg.c_str());
+}
 /**
  * @brief generate Synapse connections between all `Neuron`s in SNN::groups.
  *

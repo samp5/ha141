@@ -52,12 +52,14 @@ public:
   SNN(std::vector<std::string> args);
   SNN(){};
   ~SNN();
-  double generateSynapseWeight();
+  static double generateSynapseWeight();
   void start();
   void join();
   void reset();
   void generateRandomSynapses();
   void generateRandomSynapsesAdjMatrix();
+  void generateRandomSynapsesAdjMatrixGS();
+  static void *generateRandomSynapsesAdjMatrixGS_Helper(void *arg);
   void generateNeuronVec();
   void generateInputNeuronVec();
   void generateInputNeuronEvents();

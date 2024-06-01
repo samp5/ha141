@@ -8,6 +8,7 @@
 #include <set>
 
 class Neuron;
+class InputNeuron;
 class SNN;
 
 using std::list;
@@ -42,6 +43,7 @@ public:
   int neuronCount() const;
   Message *getMessage();
   void addToMessageQ(Message *message);
+  void generateRandomSynapses(int n_edges);
   pthread_mutex_t &getMessageQtex() { return message_q_tex; }
   void reset();
   const vector<Neuron *> &getMutNeuronVec();

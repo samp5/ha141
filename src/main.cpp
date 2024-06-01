@@ -12,7 +12,8 @@ int main(int argc, char **argv) {
   snn.lg->log(ESSENTIAL, "Assigning neuron groups...");
 
   snn.lg->log(ESSENTIAL, "Adding synapses...");
-  snn.generateRandomSynapsesAdjMatrix();
+  //  snn.generateRandomSynapsesAdjMatrix();
+  snn.generateRandomSynapsesAdjMatrixGS();
 
   snn.lg->startClock();
   snn.start();
