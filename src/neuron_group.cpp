@@ -93,9 +93,12 @@ void *NeuronGroup::run() {
     if (message->timestamp > network->getConfig()->time_per_stimulus) {
       delete message;
       pthread_mutex_lock(&message_q_tex);
-      empty = message_q.empty();
+      while (!message_q.empty()) {
+        delete *message_q.begin();
+        message_q.erase(message_q.begin());
+      }
       pthread_mutex_unlock(&message_q_tex);
-      continue;
+      break;
     }
 
     if (message->timestamp < last_timestamp) {
