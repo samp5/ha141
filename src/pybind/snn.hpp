@@ -14,6 +14,7 @@ public:
   void pyStart(py::buffer);
   void pySetNextStim();
   void pyWrite();
+  void processPyBuff(py::buffer &buff);
   py::array_t<int> pyOutput();
 };
 
@@ -26,7 +27,7 @@ PYBIND11_MODULE(snn, m) {
       .def("join", &SNN::join);
   py::class_<pySNN>(m, "pySNN")
       .def(py::init<std::vector<std::string>>())
-      .def("generateSynapses", &pySNN::generateRandomSynapses,
+      .def("generateSynapses", &pySNN::generateRandomSynapsesAdjMatrixGS,
            "Generate random neural connections")
       .def("start", &pySNN::pyStart, "Start the neural network")
       .def("join", &SNN::join, "Wait for all threads to join")

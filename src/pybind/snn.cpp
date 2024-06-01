@@ -11,7 +11,6 @@
 int add(int i, int j) { return i + j; }
 
 pySNN::pySNN(std::vector<std::string> args) : SNN() {
-  active = false;
   lg = new Log(this);
   config = new RuntimConfig(this);
   config->parseArgs(args);
@@ -22,7 +21,7 @@ pySNN::pySNN(std::vector<std::string> args) : SNN() {
 
   if (Image::isSquare(config->NUMBER_INPUT_NEURONS)) {
     lg->log(ESSENTIAL, "Assuming square input image");
-    image = new Image(config->NUMBER_INPUT_NEURONS);
+    image = new Image(config->NUMBER_INPUT_NEURONS, config->max_latency);
   } else {
     lg->log(ESSENTIAL,
             "Input image not square, using smallest perimeter rectangle");
@@ -30,7 +29,7 @@ pySNN::pySNN(std::vector<std::string> args) : SNN() {
     auto dimensions = Image::bestRectangle(config->NUMBER_INPUT_NEURONS);
     int x = dimensions.first;
     int y = dimensions.second;
-    image = new Image(x, y);
+    image = new Image(x, y, config->max_latency);
   }
 
   int neuron_per_group = config->NUMBER_NEURONS / config->NUMBER_GROUPS;
@@ -44,15 +43,14 @@ pySNN::pySNN(std::vector<std::string> args) : SNN() {
         new NeuronGroup(i + 1, neuron_per_group, input_neurons_per_group, this);
 
     // add to vector
-    this->groups.push_back(this_group);
+    groups.push_back(this_group);
   }
-  this->generateNeuronVec();
-  this->generateInputNeuronVec();
-  this->setInputNeuronLatency();
+  generateNeuronVec();
+  generateInputNeuronVec();
+  setInputNeuronLatency();
 }
 
-void pySNN::pyStart(py::buffer buff) {
-
+void pySNN::processPyBuff(py::buffer &buff) {
   // get buffer
   py::buffer_info info = buff.request();
 
@@ -73,44 +71,58 @@ void pySNN::pyStart(py::buffer buff) {
     }
     data.push_back(row);
   }
+}
+void pySNN::pyStart(py::buffer buff) {
 
-  active = true;
+  processPyBuff(buff);
 
   pySetNextStim();
   generateInputNeuronEvents();
   lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
 
-  for (auto group : this->groups) {
-    group->startThread();
-  }
-
+  float progress = 0.0;
+  int pos = 0;
   for (int i = 1; i < config->num_stimulus + 1; i++) {
+    if (!config->show_stimulus) {
+      int bar_width = 50;
+      progress = (float)i / config->num_stimulus;
+      if (int(progress * bar_width) > pos + 5) {
+        std::cout << "[";
+        pos = progress * bar_width;
+        for (int i = 0; i < bar_width; i++) {
+          if (i < pos) {
+            std::cout << "=";
+          } else if (i == pos) {
+            std::cout << ">";
+          } else {
+            std::cout << " ";
+          }
+        }
+        std::cout << "]" << int(progress * 100.0) << "%\n";
+      }
+    }
 
-    usleep(config->time_per_stimulus);
-
+    for (auto group : groups) {
+      group->startThread();
+    }
+    for (auto group : groups) {
+      pthread_join(group->getThreadID(), NULL);
+    }
     if (i < config->num_stimulus) {
-      auto start = std::chrono::high_resolution_clock::now();
-      switching_stimulus = true;
-
-      pthread_barrier_wait(&getBarrier()->barrier);
-
       config->STIMULUS++;
-      this->pySetNextStim();
-      lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
-
-      this->reset();
-
-      auto end = std::chrono::high_resolution_clock::now();
-      auto duration = std::chrono::duration_cast<std::chrono::duration<double>>(
-          end - start);
-      lg->addOffset(duration.count());
-
-      stimlus_start = lg->time();
-      switching_stimulus = false;
-      pthread_cond_broadcast(&stimulus_switch_cond);
+      pySetNextStim();
+      if (config->show_stimulus) {
+        lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
+      }
+      generateInputNeuronEvents();
+      reset();
     }
   }
-  active = false;
+  for (auto group : groups) {
+    for (auto n : group->getMutNeuronVec()) {
+      n->transferData();
+    }
+  }
 }
 
 template <typename T> void test(py::buffer buff) {
@@ -166,7 +178,7 @@ py::array_t<int> pySNN::pyOutput() {
     }
   }
 
-  int bins = 300;
+  int bins = config->time_per_stimulus;
   auto ret =
       py::array_t<int, py::array::c_style>((max_stim - min_stim + 1) * bins);
 
@@ -188,7 +200,8 @@ py::array_t<int> pySNN::pyOutput() {
       return a->timestamp < b->timestamp;
     });
 
-    double timestep = (sd.back()->timestamp - sd.front()->timestamp) / bins;
+    double timestep =
+        double(sd.back()->timestamp - sd.front()->timestamp) / bins;
     double l = sd.front()->timestamp;
     double u = l + timestep;
 

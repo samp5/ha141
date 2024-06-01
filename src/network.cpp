@@ -590,7 +590,6 @@ void SNN::generateCSV() {
 
   std::unordered_map<int, std::vector<LogData *>> stim_data;
   const std::vector<LogData *> &lg_data = lg->getLogData();
-  std::cout << "Logdata size: " << lg_data.size() << '\n';
 
   for (std::vector<LogData *>::size_type i = 0; i < lg_data.size(); i++) {
     LogData *td = lg_data.at(i);
