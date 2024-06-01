@@ -9,6 +9,8 @@ using std::string;
 int main(int argc, char **argv) {
   std::vector<std::string> args(argv, argv + argc);
   SNN snn = SNN(args);
+
+  auto start = snn.lg->time();
   snn.lg->log(ESSENTIAL, "Assigning neuron groups...");
 
   snn.lg->log(ESSENTIAL, "Adding synapses...");
@@ -25,5 +27,8 @@ int main(int argc, char **argv) {
   snn.lg->writeData();
 
   snn.lg->log(ESSENTIAL, "Done writing, exiting");
+  auto end = snn.lg->time();
+  std::string msg = "Program took" + std::to_string(end - start) + " seconds";
+  snn.lg->log(ESSENTIAL, msg.c_str());
   return 0;
 }
