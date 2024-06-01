@@ -18,7 +18,8 @@ enum Message_t { Decay, Stimulus, From_Neighbor, Refractory };
  */
 struct Message {
 public:
-  Message(double value, Neuron *target, Message_t type, double timestamp);
+  Message(double value, Neuron *origin, Neuron *target, Message_t type,
+          double timestamp);
   double message;
   Neuron *presynaptic_neuron;
   Neuron *post_synaptic_neuron;

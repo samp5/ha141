@@ -173,7 +173,7 @@ void InputNeuron::generateEvents() {
     }
 
     Message *message =
-        new Message(input_value, this, Message_t::Stimulus, timestamp);
+        new Message(input_value, nullptr, this, Message_t::Stimulus, timestamp);
     group->addToMessageQ(message);
     created_events++;
   }

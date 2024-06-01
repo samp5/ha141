@@ -24,8 +24,8 @@ void Synapse::propagate() {
       preGroupID, preID, postGroupID, postID);
 
   Message *message_to_send =
-      new Message(message_value, getPostSynaptic(), From_Neighbor,
-                  getPreSynaptic()->getLastFire() + delay);
+      new Message(message_value, _origin, _destination, From_Neighbor,
+                  _origin->getLastFire() + delay);
 
   getPostSynaptic()->activate();
   getPostSynaptic()->getGroup()->addToMessageQ(message_to_send);
