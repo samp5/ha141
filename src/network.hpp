@@ -63,6 +63,7 @@ public:
   void generateNeuronVec();
   void generateInputNeuronVec();
   void generateInputNeuronEvents();
+  void generateCSV();
   void setInputNeuronLatency();
   void setNextStim();
   double getStimulusStart() { return stimlus_start; }

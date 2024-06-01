@@ -77,6 +77,7 @@ public:
   ~Log();
   void startClock() { this->start = hr_clock::now(); }
   void writeData();
+  void writeCSV(const std::vector<std::vector<int>> &mat);
   void addData(LogData *data);
   const vector<LogData *> &getLogData() const { return log_data; }
   void logConfig(const std::string &name);

@@ -582,3 +582,56 @@ void SNN::generateInputNeuronEvents() {
     in->generateEvents();
   }
 }
+
+void SNN::generateCSV() {
+
+  int max_stim = config->STIMULUS_VEC.back();
+  int min_stim = config->STIMULUS_VEC.front();
+
+  std::unordered_map<int, std::vector<LogData *>> stim_data;
+  const std::vector<LogData *> &lg_data = lg->getLogData();
+  std::cout << "Logdata size: " << lg_data.size() << '\n';
+
+  for (std::vector<LogData *>::size_type i = 0; i < lg_data.size(); i++) {
+    LogData *td = lg_data.at(i);
+    if (td->message_type == Message_t::Refractory) {
+      if (stim_data.find(td->stimulus_number) != stim_data.end()) {
+        stim_data[td->stimulus_number].push_back(td);
+      } else {
+        stim_data[td->stimulus_number] = {td};
+      }
+    }
+  }
+
+  int bins = config->time_per_stimulus;
+  std::vector<std::vector<int>> ret(max_stim - min_stim + 1);
+
+  for (int s = min_stim; s <= max_stim; s++) {
+    // if the key does not exist (there were no activations for this stimulus)
+    if (stim_data.find(s) == stim_data.end()) {
+      ret.at(s - min_stim) = std::vector<int>(bins, 0);
+      continue;
+    }
+    std::vector<LogData *> &sd = stim_data[s];
+
+    std::sort(sd.begin(), sd.end(), [](LogData *a, LogData *b) {
+      return a->timestamp < b->timestamp;
+    });
+
+    double timestep =
+        (double)(sd.back()->timestamp - sd.front()->timestamp) / bins;
+    double l = sd.front()->timestamp;
+    double u = l + timestep;
+
+    std::vector<int> row(bins);
+    for (int i = 0; i < bins; i++) {
+      row.at(i) = std::count_if(sd.begin(), sd.end(), [l, u](LogData *ld) {
+        return (ld->timestamp < u) && (ld->timestamp >= l);
+      });
+      l = u;
+      u = u + timestep;
+    }
+    ret.at(s - min_stim) = row;
+  }
+  lg->writeCSV(ret);
+}

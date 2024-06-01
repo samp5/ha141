@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
   snn.lg->log(ESSENTIAL, "Assigning neuron groups...");
 
   snn.lg->log(ESSENTIAL, "Adding synapses...");
-  //  snn.generateRandomSynapsesAdjMatrix();
+
   snn.generateRandomSynapsesAdjMatrixGS();
 
   snn.lg->startClock();
@@ -21,6 +21,7 @@ int main(int argc, char **argv) {
   snn.lg->log(ESSENTIAL, "Transfering data from Neurons to Log...");
   snn.generateGraphiz(true);
 
+  snn.generateCSV();
   snn.lg->writeData();
 
   snn.lg->log(ESSENTIAL, "Done writing, exiting");

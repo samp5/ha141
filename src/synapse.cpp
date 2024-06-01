@@ -31,4 +31,4 @@ void Synapse::propagate() {
   getPostSynaptic()->getGroup()->addToMessageQ(message_to_send);
 }
 
-double Synapse::randomDelay() { return rand() % 10; }
+double Synapse::randomDelay() { return rand() % 10 + 1; }

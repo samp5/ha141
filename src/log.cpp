@@ -114,6 +114,45 @@ void Log::addData(LogData *data) {
   pthread_mutex_unlock(&data_mutex);
 }
 
+void Log::writeCSV(const std::vector<std::vector<int>> &mat) {
+
+  log(ESSENTIAL, "Writing data to file...");
+  namespace fs = std::filesystem;
+
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+
+  fs::path parent;
+  std::string name;
+  if (network->getConfig()->OUTPUT_FILE == "") {
+    name = std::to_string(tv.tv_sec - 1'710'000'000);
+  } else {
+    name = network->getConfig()->OUTPUT_FILE;
+  }
+
+  parent = "./logs/" + name;
+  fs::create_directory(parent);
+  std::string file_name = "./logs/" + name + "/" + name + ".csv";
+
+  std::ofstream file;
+  file.open(file_name);
+
+  if (!file.is_open()) {
+    this->log(ERROR, "write_data: Unable to open file");
+    return;
+  }
+  typedef std::vector<int>::size_type sz;
+  for (auto row : mat) {
+    for (sz i = 0; i < row.size(); i++) {
+      file << row.at(i);
+      if (i < row.size() - 1) {
+        file << ", ";
+      }
+    }
+    file << "\n";
+  }
+  file.close();
+}
 /**
  * @brief Write data to a log file.
  *
