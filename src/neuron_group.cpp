@@ -142,6 +142,11 @@ void *NeuronGroup::run() {
       break;
     }
     }
+    // std::cout << "Message Q: ";
+    // for (auto m : message_q) {
+    //   std::cout << m->timestamp << " ";
+    // }
+    // std::cout << std::endl;
 
     pthread_mutex_lock(&message_q_tex);
     empty = message_q.empty();
@@ -247,7 +252,7 @@ void NeuronGroup::generateRandomSynapses(int number_edges) {
     Neuron *origin = nI_neurons.at(r);
     for (std::size_t c = 0; c < n_non_input; c++) {
       if (mat.at(r).at(c) == 1) {
-        origin->addNeighbor(nI_neurons.at(c), SNN::generateSynapseWeight());
+        origin->addNeighbor(nI_neurons.at(c));
       }
     }
   }
@@ -256,7 +261,7 @@ void NeuronGroup::generateRandomSynapses(int number_edges) {
     InputNeuron *origin = input_neurons.at(r - n_non_input);
     for (std::size_t c = 0; c < n_non_input; c++) {
       if (mat.at(r - n_non_input).at(c) == 1) {
-        origin->addNeighbor(nI_neurons.at(c), SNN::generateSynapseWeight());
+        origin->addNeighbor(nI_neurons.at(c));
       }
     }
   }

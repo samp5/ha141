@@ -51,7 +51,7 @@ public:
   Neuron(int _id, NeuronGroup *group, Neuron_t type);
   virtual ~Neuron();
 
-  void addNeighbor(Neuron *neighbor, double weight);
+  void addNeighbor(Neuron *neighbor);
   void addPostSynapticConnection(Synapse *synapse);
   void addPreSynapticConnection(Synapse *synapse);
 
