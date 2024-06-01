@@ -15,6 +15,7 @@ public:
   void pySetNextStim();
   void pyWrite();
   void processPyBuff(py::buffer &buff);
+  void overrideConfigValues();
   py::array_t<int> pyOutput();
 };
 

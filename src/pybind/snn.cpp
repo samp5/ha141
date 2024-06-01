@@ -3,6 +3,7 @@
 #include "../runtime.hpp"
 #include <algorithm>
 #include <climits>
+#include <numeric>
 #include <pthread.h>
 #include <stdexcept>
 #include <unordered_map>
@@ -18,6 +19,9 @@ pySNN::pySNN(std::vector<std::string> args) : SNN() {
   srand(config->RAND_SEED);
   mutex = new Mutex;
   barrier = new Barrier(config->NUMBER_GROUPS + 1);
+
+  gen = std::mt19937(rd());
+  gen.seed(config->RAND_SEED);
 
   if (Image::isSquare(config->NUMBER_INPUT_NEURONS)) {
     lg->log(ESSENTIAL, "Assuming square input image");
@@ -72,13 +76,34 @@ void pySNN::processPyBuff(py::buffer &buff) {
     data.push_back(row);
   }
 }
+
+void pySNN::overrideConfigValues() {
+
+  // override stimulus
+  config->STIMULUS_VEC.clear();
+  std::vector<int>::size_type number_lines = data.size();
+  for (std::vector<int>::size_type i = 0; i < number_lines; i++) {
+    config->STIMULUS_VEC.push_back(i);
+  }
+  config->STIMULUS = config->STIMULUS_VEC.begin();
+  config->num_stimulus = config->STIMULUS_VEC.size();
+
+  if (config->NUMBER_INPUT_NEURONS != data.front().size()) {
+    lg->log(WARNING, "Number of input neurons does not equal the number of "
+                     "elements per stimulus");
+  }
+}
+
 void pySNN::pyStart(py::buffer buff) {
 
   processPyBuff(buff);
+  overrideConfigValues();
 
   pySetNextStim();
   generateInputNeuronEvents();
-  lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
+  if (config->show_stimulus) {
+    lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
+  }
 
   float progress = 0.0;
   int pos = 0;
