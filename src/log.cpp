@@ -150,8 +150,8 @@ void Log::writeData() {
   }
 
   for (LogData *log_data : this->log_data) {
-    file << std::setw(5) << log_data->group_id << " " << log_data->neuron_id
-         << " " << neuronTypeString((Neuron_t)log_data->neuron_type) << " "
+    file << log_data->group_id << " " << log_data->neuron_id << " "
+         << neuronTypeString((Neuron_t)log_data->neuron_type) << " "
          << log_data->timestamp << " " << log_data->potential << " "
          << messageTypeToString(log_data->message_type) << " "
          << log_data->stimulus_number << '\n';
@@ -209,6 +209,36 @@ void Log::neuronInteraction(LogLevel level, const char *message, int group_id1,
   char *formatted_msg = new char[length + 1];
   // format
   snprintf(formatted_msg, length + 1, message, group_id1, id1, group_id2, id2);
+  // log
+  this->log(level, formatted_msg);
+  // deallocate
+  delete[] formatted_msg;
+}
+void Log::message(LogLevel level, const char *message, int group_id1,
+                  int timestamp1, Message_t mt, int group_id2, int timestamp2) {
+  // length
+  int length = snprintf(nullptr, 0, message, group_id1, timestamp1,
+                        messageTypeToString(mt).c_str(), group_id2, timestamp2);
+  // allocate
+  char *formatted_msg = new char[length + 1];
+  // format
+  snprintf(formatted_msg, length + 1, message, group_id1, timestamp1,
+           messageTypeToString(mt).c_str(), group_id2, timestamp2);
+  // log
+  this->log(level, formatted_msg);
+  // deallocate
+  delete[] formatted_msg;
+}
+void Log::message(LogLevel level, const char *message, int group_id1,
+                  int timestamp1, Message_t mt, int timestamp2) {
+  // length
+  int length = snprintf(nullptr, 0, message, group_id1, timestamp1,
+                        messageTypeToString(mt).c_str(), timestamp2);
+  // allocate
+  char *formatted_msg = new char[length + 1];
+  // format
+  snprintf(formatted_msg, length + 1, message, group_id1, timestamp1,
+           messageTypeToString(mt).c_str(), timestamp2);
   // log
   this->log(level, formatted_msg);
   // deallocate

@@ -91,6 +91,10 @@ public:
                   const char *type);
   void neuronInteraction(LogLevel level, const char *message, int group_id1,
                          int id1, int group_id2, int id2);
+  void message(LogLevel level, const char *message, int group_id1,
+               int timestamp1, Message_t mt, int group_id2, int timestamp2);
+  void message(LogLevel level, const char *message, int group_id1,
+               int timestamp1, Message_t mt, int timestamp2);
   void state(LogLevel level, const char *message, int group_id);
   void string(LogLevel level, const char *message, const char *string);
   void print(const char *message, bool newline = true,
