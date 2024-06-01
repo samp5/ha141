@@ -2,6 +2,7 @@
 #define SYNAPSE
 #include "message.hpp"
 class Neuron;
+class SNN;
 
 /**
  * @brief Synapse class for managing connections.
@@ -12,19 +13,19 @@ class Neuron;
  */
 class Synapse {
 public:
-  Synapse(Neuron *from, Neuron *to, double w, double delay = -1)
-      : _origin(from), _destination(to), _weight(w),
-        delay(delay == -1 ? randomDelay() : delay){};
+  Synapse(Neuron *from, Neuron *to, double w = -1, double delay = -1);
   Neuron *getPostSynaptic() { return _destination; }
   Neuron *getPreSynaptic() { return _origin; }
   void propagate();
-  double randomDelay();
+  int randomDelay();
+  double randomWeight();
   void alterWeight(double weight);
   double getWeight() { return _weight; }
 
 private:
   Neuron *_origin = nullptr;
   Neuron *_destination = nullptr;
+  SNN *network = nullptr;
   double _weight = 0.0;
   int delay = -1;
 };

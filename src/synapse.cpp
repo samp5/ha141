@@ -2,6 +2,14 @@
 #include "message.hpp"
 #include "network.hpp"
 #include "neuron.hpp"
+#include "runtime.hpp"
+#include <cstdlib>
+
+Synapse::Synapse(Neuron *from, Neuron *to, double w, double delay)
+    : _origin(from), _destination(to),
+      network(_origin->getGroup()->getNetwork()),
+      _weight(w == -1 ? randomWeight() : delay),
+      delay(delay == -1 ? randomDelay() : delay){};
 
 /**
  * @brief Propagates a message.
@@ -31,4 +39,14 @@ void Synapse::propagate() {
   getPostSynaptic()->getGroup()->addToMessageQ(message_to_send);
 }
 
-double Synapse::randomDelay() { return rand() % 10 + 1; }
+int Synapse::randomDelay() {
+  int delay = rand() % network->getConfig()->max_synapse_delay +
+              network->getConfig()->min_synapse_delay;
+  return delay;
+}
+double Synapse::randomWeight() {
+  double weight =
+      (static_cast<double>(rand()) / static_cast<double>(RAND_MAX)) *
+      network->getConfig()->max_weight;
+  return weight;
+}

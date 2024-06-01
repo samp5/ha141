@@ -52,7 +52,6 @@ public:
   SNN(std::vector<std::string> args);
   SNN(){};
   ~SNN();
-  static double generateSynapseWeight();
   void start();
   void join();
   void reset();
