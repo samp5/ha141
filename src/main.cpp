@@ -18,6 +18,7 @@ int main(int argc, char **argv) {
   snn.generateRandomSynapsesAdjMatrixGS();
 
   snn.lg->startClock();
+  snn.lg->log(ESSENTIAL, "Starting network...");
   snn.start();
 
   snn.lg->log(ESSENTIAL, "Transfering data from Neurons to Log...");
@@ -28,7 +29,7 @@ int main(int argc, char **argv) {
 
   snn.lg->log(ESSENTIAL, "Done writing, exiting");
   auto end = snn.lg->time();
-  std::string msg = "Program took" + std::to_string(end - start) + " seconds";
+  std::string msg = "Program took " + std::to_string(end - start) + " seconds";
   snn.lg->log(ESSENTIAL, msg.c_str());
   return 0;
 }
