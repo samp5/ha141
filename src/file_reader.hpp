@@ -1,8 +1,7 @@
 #ifndef FILEREADER
 #define FILEREADER
-#include <filesystem>
 #include <fstream>
-#include <iostream>
+#include <limits>
 
 class FileReader {
 public:
