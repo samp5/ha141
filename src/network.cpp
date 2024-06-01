@@ -369,7 +369,7 @@ void SNN::generateRandomSynapses() {
  * @brief Generate a random weight.
  */
 double SNN::generateSynapseWeight() {
-  return ((double)rand() / RAND_MAX) * 0.1;
+  return ((double)rand() / RAND_MAX) * 0.6;
 }
 
 /**
