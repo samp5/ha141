@@ -8,8 +8,8 @@
 #include <cmath>
 #include <fstream>
 #include <iomanip>
-#include <ios>
 #include <pthread.h>
+#include <random>
 #include <sstream>
 #include <vector>
 
@@ -49,6 +49,9 @@ SNN::SNN(std::vector<std::string> args) {
   mutex = new Mutex;
   // number of group threads plus the main thread
   barrier = new Barrier(config->NUMBER_GROUPS + 1);
+
+  gen = std::mt19937(rd());
+  gen.seed(config->RAND_SEED);
 
   if (Image::isSquare(config->NUMBER_INPUT_NEURONS)) {
     lg->log(ESSENTIAL, "Assuming square input image");
@@ -266,7 +269,7 @@ void SNN::generateRandomSynapsesAdjMatrix() {
     Neuron *origin = nonInput.at(r);
     for (std::size_t c = 0; c < non_input_count; c++) {
       if (mat.at(r).at(c) == 1) {
-        origin->addNeighbor(nonInput.at(c), generateSynapseWeight());
+        origin->addNeighbor(nonInput.at(c));
       }
     }
   }
@@ -275,7 +278,7 @@ void SNN::generateRandomSynapsesAdjMatrix() {
     InputNeuron *origin = input_neurons.at(r - non_input_count);
     for (std::size_t c = 0; c < non_input_count; c++) {
       if (mat.at(r - non_input_count).at(c) == 1) {
-        origin->addNeighbor(nonInput.at(c), generateSynapseWeight());
+        origin->addNeighbor(nonInput.at(c));
       }
     }
   }
@@ -341,7 +344,7 @@ void SNN::generateRandomSynapses() {
       auto this_neuron = std::find(post_opts.begin(), post_opts.end(), neuron);
 
       // add postsynaptic neuron as a neighbor
-      neuron->addNeighbor(*target, generateSynapseWeight());
+      neuron->addNeighbor(*target);
 
       // erase the postsynaptic neuron from the list and this neuron from the
       // postsynaptic list
@@ -366,13 +369,6 @@ void SNN::generateRandomSynapses() {
 }
 
 /**
- * @brief Generate a random weight.
- */
-double SNN::generateSynapseWeight() {
-  return ((double)rand() / RAND_MAX) * 0.6;
-}
-
-/**
  * @brief Join thread.
  */
 void SNN::join() {
@@ -391,6 +387,7 @@ void SNN::reset() {
   for (auto group : groups) {
     group->reset();
   }
+  gen.seed(config->RAND_SEED);
 }
 
 /**

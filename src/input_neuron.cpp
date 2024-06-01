@@ -147,25 +147,18 @@ void InputNeuron::reset() {
 }
 
 void InputNeuron::generateEvents() {
-
-  // see https://en.cppreference.com/w/cpp/numeric/random/poisson_distribution
-  static std::random_device rd;
-  static std::mt19937 gen(rd());
-
-  // seed every time since we want the same thing for each stimulus
-  gen.seed(group->getNetwork()->getConfig()->RAND_SEED);
-
+  SNN *network = group->getNetwork();
   // poisson_distribution with n = time_per_stim and p = probalility_of_success
   static std::poisson_distribution<> d(
       probalility_of_success *
       group->getNetwork()->getConfig()->time_per_stimulus);
 
-  int number_events = d(gen);
+  int number_events = d(network->getGen());
   int created_events = 0;
 
   while (created_events < number_events) {
     int timestamp =
-        gen() % (group->getNetwork()->getConfig()->time_per_stimulus + 1);
+        network->getRandom() % (network->getConfig()->time_per_stimulus + 1);
 
     if (timestamp < latency) {
       created_events++;

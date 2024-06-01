@@ -5,6 +5,7 @@
 #include <climits>
 #include <cmath>
 #include <list>
+#include <random>
 #include <stdexcept>
 #include <unordered_map>
 #include <vector>
@@ -46,6 +47,8 @@ protected:
   Mutex *mutex;         /**< Holds pointer to Mutex structure */
   Barrier *barrier;
   Image *image;
+  std::mt19937 gen;
+  std::random_device rd;
 
 public:
   Log *lg;
@@ -77,5 +80,7 @@ public:
   Mutex *getMutex() { return mutex; }
   Barrier *getBarrier() { return barrier; }
   Image *getImage() { return image; }
+  int getRandom() { return gen(); }
+  std::mt19937 &getGen() { return gen; }
 };
 #endif // !NETWORK

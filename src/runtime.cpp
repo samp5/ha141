@@ -39,7 +39,7 @@ void RuntimConfig::generateNewConfig() {
   file << "#       must be divisible by the number of groups" << '\n';
   file << '\n';
   file << "# number of neurons" << '\n';
-  file << "neuron_count = 10" << '\n';
+  file << "neuron_count = 20" << '\n';
   file << '\n';
   file << "# number of input type neurons" << '\n';
   file << "input_neuron_count = 2" << '\n';
@@ -49,13 +49,13 @@ void RuntimConfig::generateNewConfig() {
   file << '\n';
   file << "# number of connections" << '\n';
   file << "# option can be \"MAX\" for maximum edges" << '\n';
-  file << "edge_count = 1" << '\n';
+  file << "edge_count = \"MAX\"" << '\n';
   file << '\n';
   file << "# refractory_duration in ms" << '\n';
-  file << "refractory_duration = 5" << '\n';
+  file << "refractory_duration = 10" << '\n';
   file << '\n';
   file << "# value each neuron is initialized with" << '\n';
-  file << "initial_membrane_potential = -55.0" << '\n';
+  file << "initial_membrane_potential = -60.0" << '\n';
   file << '\n';
   file << "# minimum potential at which a neuron will fire" << '\n';
   file << "activation_threshold = -55.0" << '\n';
@@ -69,8 +69,17 @@ void RuntimConfig::generateNewConfig() {
   file << "#  Maximum latency for input neurons\n";
   file << "max_latency = 5\n";
   file << '\n';
+  file << "#  Maximum synapse delay for edges\n";
+  file << "max_synapse_delay = 8\n";
+  file << '\n';
+  file << "#  Minimum synapse delay for edges\n";
+  file << "min_synapse_delay = 1\n";
+  file << '\n';
+  file << "#  Maximum weight for an edge \n";
+  file << "max_weight = 0.2\n";
+  file << '\n';
   file << "#  poisson_prob_of_success\n";
-  file << "poisson_prob_of_success = 0.0001";
+  file << "poisson_prob_of_success = 0.1";
   file << '\n';
   file << "[debug]" << '\n';
   file << "# Options are" << '\n';
@@ -80,30 +89,35 @@ void RuntimConfig::generateNewConfig() {
   file << "# DEBUG2" << '\n';
   file << "# DEBUG3" << '\n';
   file << "# DEBUG4" << '\n';
-  file << "level = \"INFO\"" << '\n';
+  file << "level = \"NONE\"" << '\n';
   file << '\n';
   file << "[random]" << '\n';
   file << "# options are 'time' for using the current time, or an integer (as "
           "a string e.g. \"1\")"
        << '\n';
-  file << "seed = \"time\"" << '\n';
+  file << "seed = \"1\"" << '\n';
   file << '\n';
   file << "[runtime_vars]" << '\n';
   file << "# Limit the log output to only Refractory events to limit log size"
        << '\n';
   file << "limit_log_size = true" << '\n';
+  file << '\n';
   file << "# Show the current stimlus number" << '\n';
   file << "show_stimulus = true" << '\n';
+  file << '\n';
   file << "# simulated time per stimulus in \"ms\"" << '\n';
   file << "time_per_stimulus = 250" << '\n';
+  file << '\n';
   file << "# name of output file (if left blank, a timestamp is used" << '\n';
   file << "output_file = \"\"" << '\n';
+  file << '\n';
   file << "# file to read input from" << '\n';
   file << "input_file = \"./input_files/test\"" << '\n';
+  file << '\n';
   file << "# format should be \"x..y\" for reading lines x to y (inclusive) or "
           "just x for a single line"
        << '\n';
-  file << "line_range = \"1\"" << '\n';
+  file << "line_range = \"0\"" << '\n';
 
   file.close();
 }
@@ -184,11 +198,33 @@ int RuntimConfig::setOptions() {
   } else {
     snn->lg->string(ERROR, "Failed to parse: %s", "input_neuron_count");
   }
+  if (tbl["neuron"]["max_synapse_delay"].as_integer()) {
+    max_synapse_delay = tbl["neuron"]["max_synapse_delay"].as_integer()->get();
+  } else {
+    snn->lg->string(ERROR, "Failed to parse: %s, using default 10",
+                    "max_synapse_delay");
+    max_synapse_delay = 10;
+  }
+
+  if (tbl["neuron"]["min_synapse_delay"].as_integer()) {
+    min_synapse_delay = tbl["neuron"]["min_synapse_delay"].as_integer()->get();
+  } else {
+    snn->lg->string(ERROR, "Failed to parse: %s, using default 1",
+                    "min_synapse_delay");
+    min_synapse_delay = 1;
+  }
 
   if (tbl["neuron"]["max_latency"].as_integer()) {
     max_latency = tbl["neuron"]["max_latency"].as_integer()->get();
   } else {
     snn->lg->string(ERROR, "Failed to parse: %s", "max latency");
+  }
+  if (tbl["neuron"]["max_weight"].as_floating_point()) {
+    max_weight = tbl["neuron"]["max_weight"].as_floating_point()->get();
+  } else {
+    snn->lg->string(ERROR, "Failed to parse: %s, using default 0.5",
+                    "max_weight");
+    max_weight = 0.5;
   }
 
   if (tbl["runtime_vars"]["line_range"].as_string()) {

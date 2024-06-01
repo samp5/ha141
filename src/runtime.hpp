@@ -125,6 +125,9 @@ struct RuntimConfig {
   int num_stimulus;
   int time_per_stimulus;
   int max_latency;
+  int max_synapse_delay;
+  int min_synapse_delay;
+  double max_weight;
 
 public:
   vector<int> parse_line_range(const std::string &in);
