@@ -391,12 +391,12 @@ void SNN::start() {
       pthread_join(group->getThreadID(), NULL);
     }
     if (i < config->num_stimulus) {
+      config->STIMULUS++;
       setNextStim();
       if (config->show_stimulus) {
         lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
       }
       generateInputNeuronEvents();
-      config->STIMULUS++;
       reset();
     }
   }

@@ -86,8 +86,45 @@ void *NeuronGroup::run() {
   bool empty = message_q.empty();
   pthread_mutex_unlock(&message_q_tex);
 
+  int last_timestamp = 0;
   while (!empty) {
     Message *message = getMessage();
+
+    if (message->timestamp > network->getConfig()->time_per_stimulus) {
+      delete message;
+      pthread_mutex_lock(&message_q_tex);
+      empty = message_q.empty();
+      pthread_mutex_unlock(&message_q_tex);
+      continue;
+    }
+
+    if (message->timestamp < last_timestamp) {
+      switch (message->message_type) {
+      case Message_t::From_Neighbor: {
+        network->lg->message(
+            ERROR,
+            "\n\tGroup %d\n\tLast timestamp: %d \n\tMessage_t: "
+            "%s \n\tFrom Group: %d \n\tTimestamp: %d",
+            id, last_timestamp, message->message_type,
+            message->presynaptic_neuron->getGroup()->getID(),
+            message->timestamp);
+        break;
+      }
+      case Message_t::Stimulus: {
+        network->lg->message(
+            ERROR,
+            "\n\tGroup %d\n\tLast timestamp: %d \n\tMessage_t: "
+            "%s \n\tTimestamp: %d",
+            id, last_timestamp, message->message_type, message->timestamp);
+        break;
+      }
+      case Message_t::Refractory:
+      case Message_t::Decay:
+        break;
+      }
+    }
+
+    last_timestamp = message->timestamp;
 
     switch (message->post_synaptic_neuron->getType()) {
     case Neuron_t::Input: {
@@ -107,7 +144,6 @@ void *NeuronGroup::run() {
     empty = message_q.empty();
     pthread_mutex_unlock(&message_q_tex);
   }
-
   return NULL;
 }
 

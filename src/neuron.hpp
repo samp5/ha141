@@ -84,8 +84,8 @@ public:
   const vector<Synapse *> &getPostSynaptic() const;
   const vector<Synapse *> &getPresynaptic() const;
 
-  double getLastDecay() const;
-  double getLastFire() const;
+  int getLastDecay() const;
+  int getLastFire() const;
   int getBias() const;
   Neuron_t getType() const;
   int getID() const;
