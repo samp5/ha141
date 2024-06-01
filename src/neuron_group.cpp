@@ -198,7 +198,6 @@ void NeuronGroup::addToMessageQ(Message *message) {
 
 void NeuronGroup::generateRandomSynapses(int number_edges) {
   // find non input neurons
-  std::cout << "Group ID: " << id << " Running generateRandomSynapses\n";
   std::vector<Neuron *> nI_neurons;
   std::vector<InputNeuron *> input_neurons;
   for (auto n : neurons) {
@@ -240,7 +239,6 @@ void NeuronGroup::generateRandomSynapses(int number_edges) {
       number_connections += 1;
     }
   }
-  std::cout << "Group ID: " << id << " finished matrix generation\n";
   // Add normal neurons
   for (std::size_t r = 0; r < n_non_input; r++) {
     Neuron *origin = nI_neurons.at(r);
@@ -250,7 +248,6 @@ void NeuronGroup::generateRandomSynapses(int number_edges) {
       }
     }
   }
-  std::cout << "Group ID: " << id << " finished normal neuron connection\n";
   // Add connections for input neurons
   for (std::size_t r = n_non_input; r < n_neurons; r++) {
     InputNeuron *origin = input_neurons.at(r - n_non_input);
@@ -260,6 +257,5 @@ void NeuronGroup::generateRandomSynapses(int number_edges) {
       }
     }
   }
-  std::cout << "Group ID: " << id << " finished generateRandomSynapses\n";
   return;
 }
