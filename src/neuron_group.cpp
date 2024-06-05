@@ -5,6 +5,7 @@
 #include "runtime.hpp"
 #include <cstdlib>
 #include <pthread.h>
+#include <random>
 #include <unistd.h>
 
 /**
@@ -227,32 +228,35 @@ void NeuronGroup::generateRandomSynapses(int number_edges) {
 
   // Initialize adjacency matrix
   typedef std::vector<std::vector<int>> Matrix;
-  Matrix mat(n_neurons);
-  for (Matrix::size_type i = 0; i < n_neurons; i++) {
-    mat.at(i) = std::vector<int>(n_non_input);
-  }
+  Matrix mat(n_neurons, std::vector<int>(n_non_input, 0));
+  // for (Matrix::size_type i = 0; i < n_neurons; i++) {
+  //   mat.at(i) = std::vector<int>(n_non_input);
+  // }
+  auto gen = network->getGen();
+  std::uniform_int_distribution<> rows(0, n_neurons - 1);
+  std::uniform_int_distribution<> cols(0, n_non_input - 1);
 
   int number_connections = 0;
   while (number_connections < number_edges) {
-    Matrix::size_type row = rand() % n_neurons;
-    Matrix::size_type col = rand() % n_non_input;
+    auto row = static_cast<Matrix::size_type>(rows(gen));
+    auto col = static_cast<Matrix::size_type>(cols(gen));
 
-    if (mat.at(row).at(col) || row == col) {
+    if (mat[row][col] || row == col) {
       continue;
     } else {
-      mat.at(row).at(col) = 1;
+      mat[row][col] = 1;
       if (row < n_non_input) {
-        mat.at(col).at(row) = -1;
+        mat[col][row] = -1;
       }
       number_connections += 1;
     }
   }
   // Add normal neurons
   for (std::size_t r = 0; r < n_non_input; r++) {
-    Neuron *origin = nI_neurons.at(r);
+    Neuron *origin = nI_neurons[r];
     for (std::size_t c = 0; c < n_non_input; c++) {
-      if (mat.at(r).at(c) == 1) {
-        origin->addNeighbor(nI_neurons.at(c));
+      if (mat[r][c] == 1) {
+        origin->addNeighbor(nI_neurons[c]);
       }
     }
   }
