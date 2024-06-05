@@ -174,9 +174,10 @@ struct gRSAMGS_ThreadArgs {
 
 void *SNN::generateRandomSynapsesAdjMatrixGS_Helper(void *arg) {
   gRSAMGS_ThreadArgs *args = static_cast<gRSAMGS_ThreadArgs *>(arg);
-  args->snn->groups.at(args->index)->generateRandomSynapses(args->edges);
+  long edges =
+      args->snn->groups.at(args->index)->generateRandomSynapses(args->edges);
   delete args;
-  return nullptr;
+  pthread_exit((void *)edges);
 }
 /**
  * @brief generate Synapse connections between all `Neuron`s in SNN::groups.
@@ -191,9 +192,10 @@ void SNN::generateRandomSynapsesAdjMatrixGS() {
   int edges_per_group = config->NUMBER_EDGES / config->NUMBER_GROUPS;
   int rem = config->NUMBER_EDGES % config->NUMBER_GROUPS;
 
-  typedef std::vector<NeuronGroup *>::size_type sz;
+  // Generate intraGroup connections
+  typedef std::vector<NeuronGroup *>::size_type vecSz;
   pthread_t *threads = new pthread_t[config->NUMBER_GROUPS];
-  for (sz i = 0; i < groups.size(); i++) {
+  for (vecSz i = 0; i < groups.size(); i++) {
     int edges = rem ? edges_per_group + 1 : edges_per_group;
     if (rem > 0)
       rem--;
@@ -203,10 +205,38 @@ void SNN::generateRandomSynapsesAdjMatrixGS() {
                    static_cast<void *>(arg));
   }
 
-  for (sz i = 0; i < groups.size(); i++) {
-    pthread_join(threads[i], nullptr);
+  // Calculate how many edges were formed total
+  void *ret = NULL;
+  int intragroup_formed = 0;
+  for (vecSz i = 0; i < groups.size(); i++) {
+    pthread_join(threads[i], &ret);
+    intragroup_formed += (long)ret;
   }
   delete[] threads;
+
+  // To be formed
+  // We want to minmize this so we divide by intragroup_formed
+  int intergroup_edges = std::floor((config->NUMBER_EDGES - intragroup_formed) /
+                                    intragroup_formed);
+
+  if (intergroup_edges > 0) {
+    std::uniform_int_distribution<> group(0, groups.size() - 1);
+    int intergroup_formed = 0;
+    while (intergroup_formed < intergroup_edges) {
+      vecSz from = group(gen);
+      vecSz to = group(gen);
+      if (from == to) {
+        continue;
+      }
+      auto origin = groups[from]->getRandNeuron();
+      auto destination = groups[to]->getNonInputNeuron();
+      origin->addIGNeighbor(destination);
+
+      // increment intergroup edges
+      intergroup_formed += 1;
+    }
+  }
+
   auto end = lg->time();
   std::string msg = "Adding random synapses done: took " +
                     std::to_string(end - start) + " seconds";
@@ -508,7 +538,7 @@ int SNN::maximum_edges(int num_input, int num_n) {
   // maximum possible edges
   int max_edges = (n_t * (n_t - 1) / 2) - edges_lost_to_input;
 
-  return std::floor(max_edges / 4);
+  return std::floor(max_edges / 2);
 }
 
 /**

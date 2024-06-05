@@ -10,6 +10,7 @@
 class Neuron;
 class InputNeuron;
 class SNN;
+struct IGlimit;
 
 using std::list;
 
@@ -18,12 +19,20 @@ using std::list;
 
 class NeuronGroup {
 private:
-  vector<Neuron *> neurons;
+  vector<Neuron *> all_neurons;
+  vector<Neuron *> nI_neurons;
+  vector<InputNeuron *> input_neurons;
   int id;
+
+  int most_recent_timestamp;
+  pthread_mutex_t time_stamp_tex = PTHREAD_MUTEX_INITIALIZER;
+  pthread_cond_t time_cond;
+
   pthread_t thread;
   SNN *network;
   std::multiset<Message *, MessageComp> message_q;
   pthread_mutex_t message_q_tex = PTHREAD_MUTEX_INITIALIZER;
+  std::vector<NeuronGroup *> interGroupConnections;
 
 public:
   NeuronGroup(int _id, int number_neurons, int number_input_neurons,
@@ -43,10 +52,18 @@ public:
   int neuronCount() const;
   Message *getMessage();
   void addToMessageQ(Message *message);
-  void generateRandomSynapses(int n_edges);
+  int generateRandomSynapses(int n_edges);
+  void addInterGroupConnections(NeuronGroup *group);
   pthread_mutex_t &getMessageQtex() { return message_q_tex; }
   void reset();
-  const vector<Neuron *> &getMutNeuronVec();
+  vector<Neuron *> &getMutNeuronVec();
+  Neuron *getNonInputNeuron() const;
+  Neuron *getRandNeuron() const;
+  const vector<Neuron *> &getNeuronVec() const;
+  void updateTimestamp(int mr);
+  int getTimestamp();
+  IGlimit findLimitingGroup();
+  pthread_cond_t &getLimitCond() { return time_cond; }
 
   /*--------------------------------------------------------------*\
    *                  Thread helper:
@@ -56,6 +73,13 @@ public:
   static void *thread_helper(void *instance) {
     return ((NeuronGroup *)instance)->run();
   }
+};
+struct IGlimit {
+  NeuronGroup *limitingGroup;
+  int timestamp;
+  IGlimit(NeuronGroup *_g, int _t) : limitingGroup(_g), timestamp(_t){};
+  pthread_cond_t &getLimitCond() { return limitingGroup->getLimitCond(); }
+  pthread_mutex_t &getLimit() { return limitingGroup->getLimitCond(); }
 };
 
 #endif // !NEURON_GROUP

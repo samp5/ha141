@@ -32,6 +32,8 @@ public:
   bool operator<(const Message &other) const {
     return timestamp < other.timestamp;
   }
+
+  bool isInterGroup();
 };
 
 struct MessageComp {

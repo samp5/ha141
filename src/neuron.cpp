@@ -88,6 +88,37 @@ void Neuron::addNeighbor(Neuron *neighbor) {
 }
 
 /**
+ * @brief adds a Synapse to Neuron::PostSynapticConnnections.
+ * Adds a Synapse to both the Presynaptic and Postsynapic Neuron respective
+ * Synapse vectors. Either Neuron::PostSynapticConnnections or
+ * Neuron::PreSynapticConnections
+ *
+ * @param neighbor Target connection
+ * @param weight Weight for this edge
+ */
+void Neuron::addIGNeighbor(Neuron *neighbor) {
+
+  if (neighbor->getType() == Input) {
+    group->getNetwork()->lg->log(ERROR,
+                                 "Connection to Input type Neuron... quitting");
+    exit(1);
+  }
+
+  Synapse *new_connection = new Synapse(this, neighbor);
+  Synapse *return_record = new Synapse(neighbor, this);
+
+  addPostSynapticConnection(new_connection);
+  addPreSynapticConnection(return_record);
+
+  group->getNetwork()->lg->neuronInteraction(
+      INFO, "Intergroup Edge from (%d) Neuron %d to (%d) Neuron %d added",
+      getGroup()->getID(), getID(), neighbor->getGroup()->getID(),
+      neighbor->getID());
+
+  neighbor->getGroup()->addInterGroupConnections(group);
+}
+
+/**
  * @brief Retrieve and process all messages in the queue.
  *
  * For all the messages in Neuron::messages, process the message contents,

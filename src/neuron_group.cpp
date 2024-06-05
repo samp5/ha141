@@ -3,6 +3,7 @@
 #include "network.hpp"
 #include "neuron.hpp"
 #include "runtime.hpp"
+#include <algorithm>
 #include <cstdlib>
 #include <pthread.h>
 #include <random>
@@ -38,13 +39,15 @@ NeuronGroup::NeuronGroup(int _id, int number_neurons, int number_input_neurons,
     if (roll && number_neurons) {
 
       Neuron *neuron = new Neuron(id, this, Neuron_t::None);
-      neurons.push_back(neuron);
+      all_neurons.push_back(neuron);
+      nI_neurons.push_back(neuron);
       number_neurons--;
       id++;
 
     } else if (!roll && number_input_neurons) {
       InputNeuron *neuron = new InputNeuron(id, this, 0);
-      neurons.push_back(neuron);
+      all_neurons.push_back(neuron);
+      input_neurons.push_back(neuron);
       number_input_neurons--;
       id++;
     }
@@ -59,7 +62,7 @@ NeuronGroup::NeuronGroup(int _id, int number_neurons, int number_input_neurons,
  *
  */
 NeuronGroup::~NeuronGroup() {
-  for (auto neuron : neurons) {
+  for (auto neuron : all_neurons) {
 
     getNetwork()->lg->groupNeuronState(DEBUG, "Deleteing Group %d Neuron %d",
                                        id, neuron->getID());
@@ -92,6 +95,7 @@ void *NeuronGroup::run() {
   while (!empty) {
     Message *message = getMessage();
 
+    // Check to see if we are done with this stimulus
     if (message->timestamp > network->getConfig()->time_per_stimulus) {
       delete message;
       pthread_mutex_lock(&message_q_tex);
@@ -103,6 +107,7 @@ void *NeuronGroup::run() {
       break;
     }
 
+    // check for errors
     if (message->timestamp < last_timestamp) {
       switch (message->message_type) {
       case Message_t::From_Neighbor: {
@@ -128,9 +133,16 @@ void *NeuronGroup::run() {
         break;
       }
     }
-
     last_timestamp = message->timestamp;
 
+    if (!interGroupConnections.empty()) {
+      auto limiter = findLimitingGroup();
+      while (limiter.timestamp < message->timestamp) {
+        pthread_cond_wait(limiter.getLimitCond(), )
+      }
+    }
+
+    // run neuron on message
     switch (message->post_synaptic_neuron->getType()) {
     case Neuron_t::Input: {
       InputNeuron *in =
@@ -162,13 +174,21 @@ void *NeuronGroup::run() {
  *
  * @return Neuron count
  */
-int NeuronGroup::neuronCount() const { return (int)neurons.size(); }
+int NeuronGroup::neuronCount() const { return (int)all_neurons.size(); }
 
 /**
  * @brief Get a mutable reference to the Neuron vector.
  *
  */
-const vector<Neuron *> &NeuronGroup::getMutNeuronVec() { return neurons; }
+vector<Neuron *> &NeuronGroup::getMutNeuronVec() { return all_neurons; }
+
+/**
+ * @brief Get a mutable reference to the Neuron vector.
+ *
+ */
+const vector<Neuron *> &NeuronGroup::getNeuronVec() const {
+  return all_neurons;
+}
 
 /**
  * @brief Reset NeuronGroup.
@@ -177,7 +197,7 @@ const vector<Neuron *> &NeuronGroup::getMutNeuronVec() { return neurons; }
  *
  */
 void NeuronGroup::reset() {
-  for (auto neuron : neurons) {
+  for (auto neuron : all_neurons) {
     if (neuron->getType() == Input) {
       neuron = dynamic_cast<InputNeuron *>(neuron);
     }
@@ -206,11 +226,11 @@ void NeuronGroup::addToMessageQ(Message *message) {
   pthread_mutex_unlock(&message_q_tex);
 }
 
-void NeuronGroup::generateRandomSynapses(int number_edges) {
+int NeuronGroup::generateRandomSynapses(int number_edges) {
   // find non input neurons
   std::vector<Neuron *> nI_neurons;
   std::vector<InputNeuron *> input_neurons;
-  for (auto n : neurons) {
+  for (auto n : all_neurons) {
     if (n->getType() != Neuron_t::Input) {
       nI_neurons.push_back(n);
     } else {
@@ -218,7 +238,7 @@ void NeuronGroup::generateRandomSynapses(int number_edges) {
     }
   }
 
-  auto n_neurons = neurons.size();
+  auto n_neurons = all_neurons.size();
   auto n_non_input = nI_neurons.size();
   if (number_edges > SNN::maximum_edges(input_neurons.size(), n_neurons)) {
     network->lg->log(
@@ -270,5 +290,42 @@ void NeuronGroup::generateRandomSynapses(int number_edges) {
       }
     }
   }
-  return;
+  return number_edges;
+}
+void NeuronGroup::addInterGroupConnections(NeuronGroup *group) {
+  interGroupConnections.push_back(group);
+}
+Neuron *NeuronGroup::getNonInputNeuron() const {
+  static std::uniform_int_distribution<> index(0, nI_neurons.size() - 1);
+  return nI_neurons[index(network->getGen())];
+}
+Neuron *NeuronGroup::getRandNeuron() const {
+  static std::uniform_int_distribution<> index(0, all_neurons.size() - 1);
+  return all_neurons[index(network->getGen())];
+}
+
+void NeuronGroup::updateTimestamp(int mr) {
+  pthread_mutex_lock(&time_stamp_tex);
+  most_recent_timestamp = mr;
+  pthread_mutex_unlock(&time_stamp_tex);
+}
+int NeuronGroup::getTimestamp() {
+  pthread_mutex_lock(&time_stamp_tex);
+  int mr = most_recent_timestamp;
+  pthread_mutex_unlock(&time_stamp_tex);
+
+  return mr;
+}
+IGlimit NeuronGroup::findLimitingGroup() {
+  int min = INT_MAX;
+  NeuronGroup *limiter = nullptr;
+  IGlimit ret(limiter, min);
+  for (auto g : interGroupConnections) {
+    int t = g->getTimestamp();
+    if (t < min) {
+      ret.timestamp = t;
+      ret.limitingGroup = g;
+    }
+  }
+  return ret;
 }

@@ -52,6 +52,7 @@ public:
   virtual ~Neuron();
 
   void addNeighbor(Neuron *neighbor);
+  void addIGNeighbor(Neuron *neighbor);
   void addPostSynapticConnection(Synapse *synapse);
   void addPreSynapticConnection(Synapse *synapse);
 
