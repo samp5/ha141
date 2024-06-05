@@ -87,28 +87,34 @@ void *NeuronGroup::run() {
   // Log running status
   getNetwork()->lg->state(INFO, "Group %d running", getID());
 
+  // std::cout << id << " locked message_q_tex\n";
   pthread_mutex_lock(&message_q_tex);
   bool empty = message_q.empty();
   pthread_mutex_unlock(&message_q_tex);
+  // std::cout << id << " unlocked message_q_tex\n";
 
   int last_timestamp = 0;
   while (!empty) {
     Message *message = getMessage();
+    updateTimestamp(message->timestamp);
 
     // Check to see if we are done with this stimulus
     if (message->timestamp > network->getConfig()->time_per_stimulus) {
       delete message;
+      // std::cout << id << " locked message_q_tex\n";
       pthread_mutex_lock(&message_q_tex);
       while (!message_q.empty()) {
         delete *message_q.begin();
         message_q.erase(message_q.begin());
       }
+      message_q.clear();
       pthread_mutex_unlock(&message_q_tex);
+      // std::cout << id << " unlocked message_q_tex\n";
       break;
     }
 
-    // check for errors
-    if (message->timestamp < last_timestamp) {
+    // check for out of place messages
+    if (message->timestamp < getTimestamp()) {
       switch (message->message_type) {
       case Message_t::From_Neighbor: {
         network->lg->message(
@@ -133,12 +139,40 @@ void *NeuronGroup::run() {
         break;
       }
     }
-    last_timestamp = message->timestamp;
 
+    // if we have an incoming intergroup connection
     if (!interGroupConnections.empty()) {
-      auto limiter = findLimitingGroup();
-      while (limiter.timestamp < message->timestamp) {
-        pthread_cond_wait(limiter.getLimitCond(), )
+      IGlimit limiter = findLimitingGroup();
+      while (limiter.timestamp < message->timestamp && limiter.limitingGroup) {
+        // std::cout << id << " locked limit_tex for Group "
+        //<< limiter.limitingGroup->getID() << "\n";
+
+        if (limiter.limitingGroup->isFinished()) {
+          break;
+        }
+
+        pthread_mutex_lock(&limiter.limitingGroup->getLimitTex());
+        while (limiter.timestamp < message->timestamp) {
+          // std::cout << id << " wating on limit_cond for Group "
+          // << limiter.limitingGroup->getID()
+          //<< "; limiting time: " << limiter.timestamp
+          // << " message time: " << message->timestamp << "\n";
+          if (limiter.limitingGroup->isFinished()) {
+            break;
+          }
+          pthread_cond_wait(&limiter.getLimitCond(), &limiter.getLimitTex());
+          limiter.updateTimestamp();
+        }
+        // std::cout << id << " finished waiting on limit_cond for Group "
+        // << limiter.limitingGroup->getID() << "\n";
+        pthread_mutex_unlock(&limiter.limitingGroup->getLimitTex());
+        // std::cout << id << " unlocked limit_tex for Group "
+        //<< limiter.limitingGroup->getID() << "\n";
+
+        limiter = findLimitingGroup();
+        if (!limiter.limitingGroup) {
+          break;
+        }
       }
     }
 
@@ -156,17 +190,20 @@ void *NeuronGroup::run() {
       break;
     }
     }
-    // std::cout << "Message Q: ";
-    // for (auto m : message_q) {
-    //   std::cout << m->timestamp << " ";
-    // }
-    // std::cout << std::endl;
 
+    // std::cout << id << " locked message_q_tex\n";
     pthread_mutex_lock(&message_q_tex);
     empty = message_q.empty();
     pthread_mutex_unlock(&message_q_tex);
+    // std::cout << id << " unlocked message_q_tex\n";
+
+    // std::cout << id << " broadcasting its limit_cond\n";
+    pthread_cond_broadcast(&limit_cond);
   }
-  return NULL;
+  // std::cout << id << " finished its message q\n";
+  finished = true;
+  updateTimestamp(network->getConfig()->time_per_stimulus + 1);
+  return nullptr;
 }
 
 /**
@@ -201,29 +238,41 @@ void NeuronGroup::reset() {
     if (neuron->getType() == Input) {
       neuron = dynamic_cast<InputNeuron *>(neuron);
     }
+    // std::cout << id << " locked message_q_tex\n";
     pthread_mutex_lock(&message_q_tex);
     bool empty = message_q.empty();
     pthread_mutex_unlock(&message_q_tex);
-    if (empty) {
+    // std::cout << id << " unlocked message_q_tex\n";
+    if (!empty) {
       network->lg->log(ERROR, "Message queue not empty at time of reset");
-      message_q.clear();
+      for (auto m : message_q) {
+        std::cout << "from " << m->presynaptic_neuron->getGroup()->getID()
+                  << " \n";
+      }
     }
     neuron->reset();
   }
+  pthread_mutex_lock(&time_stamp_tex);
+  most_recent_timestamp = 0;
+  pthread_mutex_unlock(&time_stamp_tex);
 }
 
 Message *NeuronGroup::getMessage() {
   pthread_mutex_lock(&message_q_tex);
+  // std::cout << id << " locked message_q_tex\n";
   Message *ret = *message_q.begin();
   message_q.erase(message_q.begin());
   pthread_mutex_unlock(&message_q_tex);
+  // std::cout << id << " unlocked message_q_tex\n";
   return ret;
 }
 
 void NeuronGroup::addToMessageQ(Message *message) {
   pthread_mutex_lock(&message_q_tex);
+  // std::cout << id << " locked message_q_tex\n";
   message_q.insert(message);
   pthread_mutex_unlock(&message_q_tex);
+  // std::cout << id << " unlocked message_q_tex\n";
 }
 
 int NeuronGroup::generateRandomSynapses(int number_edges) {
@@ -306,13 +355,17 @@ Neuron *NeuronGroup::getRandNeuron() const {
 
 void NeuronGroup::updateTimestamp(int mr) {
   pthread_mutex_lock(&time_stamp_tex);
+  // std::cout << id << " locked its time_stamp_tex\n";
   most_recent_timestamp = mr;
   pthread_mutex_unlock(&time_stamp_tex);
+  // std::cout << id << " unlocked its time_stamp_tex\n";
 }
 int NeuronGroup::getTimestamp() {
   pthread_mutex_lock(&time_stamp_tex);
+  // std::cout << id << " locked its time_stamp_tex\n";
   int mr = most_recent_timestamp;
   pthread_mutex_unlock(&time_stamp_tex);
+  // std::cout << id << " unlocked its time_stamp_tex\n";
 
   return mr;
 }
@@ -321,8 +374,11 @@ IGlimit NeuronGroup::findLimitingGroup() {
   NeuronGroup *limiter = nullptr;
   IGlimit ret(limiter, min);
   for (auto g : interGroupConnections) {
+    if (g->isFinished()) {
+      continue;
+    }
     int t = g->getTimestamp();
-    if (t < min) {
+    if (t < ret.timestamp) {
       ret.timestamp = t;
       ret.limitingGroup = g;
     }

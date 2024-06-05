@@ -26,7 +26,9 @@ private:
 
   int most_recent_timestamp;
   pthread_mutex_t time_stamp_tex = PTHREAD_MUTEX_INITIALIZER;
-  pthread_cond_t time_cond;
+  pthread_mutex_t limit_tex = PTHREAD_MUTEX_INITIALIZER;
+  pthread_cond_t limit_cond = PTHREAD_COND_INITIALIZER;
+  bool finished = false;
 
   pthread_t thread;
   SNN *network;
@@ -61,9 +63,11 @@ public:
   Neuron *getRandNeuron() const;
   const vector<Neuron *> &getNeuronVec() const;
   void updateTimestamp(int mr);
+  bool isFinished() { return finished; }
   int getTimestamp();
   IGlimit findLimitingGroup();
-  pthread_cond_t &getLimitCond() { return time_cond; }
+  pthread_cond_t &getLimitCond() { return limit_cond; }
+  pthread_mutex_t &getLimitTex() { return limit_tex; }
 
   /*--------------------------------------------------------------*\
    *                  Thread helper:
@@ -79,7 +83,11 @@ struct IGlimit {
   int timestamp;
   IGlimit(NeuronGroup *_g, int _t) : limitingGroup(_g), timestamp(_t){};
   pthread_cond_t &getLimitCond() { return limitingGroup->getLimitCond(); }
-  pthread_mutex_t &getLimit() { return limitingGroup->getLimitCond(); }
+  pthread_mutex_t &getLimitTex() { return limitingGroup->getLimitTex(); }
+  void updateTimestamp() {
+    // update timestamp
+    timestamp = limitingGroup->getTimestamp();
+  }
 };
 
 #endif // !NEURON_GROUP

@@ -471,8 +471,8 @@ void SNN::start() {
       if (config->show_stimulus) {
         lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
       }
-      generateInputNeuronEvents();
       reset();
+      generateInputNeuronEvents();
     }
   }
   for (auto group : groups) {

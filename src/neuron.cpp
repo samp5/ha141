@@ -111,7 +111,7 @@ void Neuron::addIGNeighbor(Neuron *neighbor) {
   addPreSynapticConnection(return_record);
 
   group->getNetwork()->lg->neuronInteraction(
-      INFO, "Intergroup Edge from (%d) Neuron %d to (%d) Neuron %d added",
+      INFO, "INTERGROUP Edge from (%d) Neuron %d to (%d) Neuron %d added",
       getGroup()->getID(), getID(), neighbor->getGroup()->getID(),
       neighbor->getID());
 
@@ -422,7 +422,7 @@ void Neuron::reset() {
   pthread_mutex_unlock(&getGroup()->getNetwork()->getMutex()->message);
 
   last_decay = 0;
-  refractory_start = 0;
+  refractory_start = -INT_MAX;
   deactivate();
 }
 

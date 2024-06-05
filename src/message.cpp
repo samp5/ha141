@@ -2,6 +2,7 @@
 #include "log.hpp"
 #include "network.hpp"
 #include "neuron.hpp"
+#include <string>
 
 Message::Message(double value, Neuron *origin, Neuron *target, Message_t type,
                  double timestamp)
@@ -20,3 +21,4 @@ bool Message::isInterGroup() {
     return false;
   }
 }
+

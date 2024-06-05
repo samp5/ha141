@@ -143,7 +143,7 @@ void InputNeuron::reset() {
       group->getNetwork()->getConfig()->INITIAL_MEMBRANE_POTENTIAL;
   pthread_mutex_unlock(&group->getNetwork()->getMutex()->potential);
   last_decay = group->getNetwork()->lg->time();
-  refractory_start = 0;
+  refractory_start = -INT_MAX;
 }
 
 void InputNeuron::generateEvents() {
