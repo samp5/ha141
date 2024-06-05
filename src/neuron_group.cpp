@@ -7,6 +7,7 @@
 #include <pthread.h>
 #include <random>
 #include <unistd.h>
+#include <utility>
 
 /**
  * @brief NeuronGroup constructor.
@@ -228,18 +229,18 @@ void NeuronGroup::generateRandomSynapses(int number_edges) {
 
   // Initialize adjacency matrix
   typedef std::vector<std::vector<int>> Matrix;
+  typedef std::vector<std::vector<int>>::size_type MatrixSz;
+
   Matrix mat(n_neurons, std::vector<int>(n_non_input, 0));
-  // for (Matrix::size_type i = 0; i < n_neurons; i++) {
-  //   mat.at(i) = std::vector<int>(n_non_input);
-  // }
+
   auto gen = network->getGen();
   std::uniform_int_distribution<> rows(0, n_neurons - 1);
   std::uniform_int_distribution<> cols(0, n_non_input - 1);
 
   int number_connections = 0;
   while (number_connections < number_edges) {
-    auto row = static_cast<Matrix::size_type>(rows(gen));
-    auto col = static_cast<Matrix::size_type>(cols(gen));
+    auto row = static_cast<MatrixSz>(rows(gen));
+    auto col = static_cast<MatrixSz>(cols(gen));
 
     if (mat[row][col] || row == col) {
       continue;
