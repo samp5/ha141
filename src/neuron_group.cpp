@@ -106,6 +106,11 @@ void *NeuronGroup::run() {
       while (limiter.timestamp < message->timestamp) {
         pthread_mutex_lock(&limiter.limitingGroup->getLimitTex());
         while (limiter.timestamp < message->timestamp) {
+          // network->lg->neuronInteraction(
+          //     ESSENTIAL, "%d @ t-%d waiting on %d @ t-%d, ", id,
+          //     message->timestamp, limiter.limitingGroup->getID(),
+          //     limiter.timestamp);
+          pthread_cond_broadcast(&limit_cond);
           pthread_cond_wait(&limiter.getLimitCond(), &limiter.getLimitTex());
           limiter.updateTimestamp();
         }
@@ -137,6 +142,7 @@ void *NeuronGroup::run() {
   }
   updateTimestamp(network->getConfig()->time_per_stimulus +
                   network->getConfig()->max_synapse_delay);
+  pthread_cond_broadcast(&limit_cond);
 
   return nullptr;
 }
@@ -308,8 +314,7 @@ int NeuronGroup::getTimestamp() {
   return mr;
 }
 IGlimit NeuronGroup::findLimitingGroup() {
-  static RuntimConfig *config = network->getConfig();
-  int min = config->time_per_stimulus;
+  int min = getTimestamp();
   NeuronGroup *limiter = nullptr;
   IGlimit ret(limiter, min);
   for (auto g : interGroupConnections) {
