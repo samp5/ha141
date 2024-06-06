@@ -3,12 +3,10 @@
 #include "network.hpp"
 #include "neuron.hpp"
 #include "runtime.hpp"
-#include <algorithm>
 #include <cstdlib>
 #include <pthread.h>
 #include <random>
 #include <unistd.h>
-#include <utility>
 
 /**
  * @brief NeuronGroup constructor.
