@@ -9,7 +9,7 @@ git clone -b event https://github.com/samp5/ha141.git
 
 - Create the following directories in the root folder of the repo
 ```bash
-mkdir build input_files logs
+mkdir build logs
 ```
 
 - Build the executable
