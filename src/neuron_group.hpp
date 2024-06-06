@@ -26,9 +26,6 @@ private:
   pthread_mutex_t limit_tex = PTHREAD_MUTEX_INITIALIZER;
   pthread_cond_t limit_cond = PTHREAD_COND_INITIALIZER;
 
-  pthread_mutex_t finised_tex = PTHREAD_MUTEX_INITIALIZER;
-  bool finished = false;
-
   pthread_t thread;
   SNN *network;
   std::multiset<Message *, MessageComp> message_q;
@@ -62,7 +59,6 @@ public:
   Neuron *getRandNeuron() const;
   const vector<Neuron *> &getNeuronVec() const;
   void updateTimestamp(int mr);
-  bool isFinished();
   int getTimestamp();
   IGlimit findLimitingGroup();
   pthread_cond_t &getLimitCond() { return limit_cond; }

@@ -341,7 +341,6 @@ int RuntimConfig::setOptions() {
   }
 
   num_stimulus = STIMULUS_VEC.size();
-  time_per_stimulus = 100;
   STIMULUS = STIMULUS_VEC.begin();
 
   return 1;

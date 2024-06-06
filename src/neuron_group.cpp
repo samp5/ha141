@@ -17,7 +17,7 @@
  */
 NeuronGroup::NeuronGroup(int _id, int number_neurons, int number_input_neurons,
                          SNN *network)
-    : id(_id), most_recent_timestamp(0), finished(false), network(network) {
+    : id(_id), most_recent_timestamp(0), network(network) {
   getNetwork()->lg->state(DEBUG, "Adding Group %d", _id);
   getNetwork()->lg->state(INFO, "Group %d", id);
 
@@ -65,7 +65,6 @@ NeuronGroup::~NeuronGroup() {
     }
 
     pthread_mutex_destroy(&limit_tex);
-    pthread_mutex_destroy(&finised_tex);
     pthread_mutex_destroy(&time_stamp_tex);
     pthread_cond_destroy(&limit_cond);
   }
@@ -90,41 +89,28 @@ void *NeuronGroup::run() {
   bool empty = message_q.empty();
   pthread_mutex_unlock(&message_q_tex);
 
-  int last_timestamp = 0;
   while (!empty) {
 
     Message *message = getMessage();
-    updateTimestamp(message->timestamp);
 
     if (message->timestamp < getTimestamp()) {
-      logUnseqMessage(message, last_timestamp);
+      logUnseqMessage(message, getTimestamp());
     }
+
+    updateTimestamp(message->timestamp);
 
     if (hasInterGroup) {
 
       IGlimit limiter = findLimitingGroup();
 
-      while (limiter.timestamp < message->timestamp && limiter.limitingGroup) {
-
-        if (limiter.limitingGroup->isFinished()) {
-          break;
-        }
-
+      while (limiter.timestamp < message->timestamp) {
         pthread_mutex_lock(&limiter.limitingGroup->getLimitTex());
         while (limiter.timestamp < message->timestamp) {
-          if (limiter.limitingGroup->isFinished()) {
-            break;
-          }
-          pthread_cond_broadcast(&limit_cond);
           pthread_cond_wait(&limiter.getLimitCond(), &limiter.getLimitTex());
           limiter.updateTimestamp();
         }
         pthread_mutex_unlock(&limiter.limitingGroup->getLimitTex());
-
         limiter = findLimitingGroup();
-        if (!limiter.limitingGroup) {
-          break;
-        }
       }
     }
 
@@ -149,12 +135,9 @@ void *NeuronGroup::run() {
 
     pthread_cond_broadcast(&limit_cond);
   }
+  updateTimestamp(network->getConfig()->time_per_stimulus +
+                  network->getConfig()->max_synapse_delay);
 
-  pthread_mutex_lock(&finised_tex);
-  finished = true;
-  pthread_mutex_unlock(&finised_tex);
-
-  updateTimestamp(network->getConfig()->time_per_stimulus + 1);
   return nullptr;
 }
 
@@ -190,11 +173,10 @@ void NeuronGroup::reset() {
     if (neuron->getType() == Input) {
       neuron = dynamic_cast<InputNeuron *>(neuron);
     }
-    // std::cout << id << " locked message_q_tex\n";
     pthread_mutex_lock(&message_q_tex);
     bool empty = message_q.empty();
     pthread_mutex_unlock(&message_q_tex);
-    // std::cout << id << " unlocked message_q_tex\n";
+
     if (!empty) {
       network->lg->log(WARNING, "Message queue not empty at time of reset");
       network->lg->groupNeuronState(WARNING, "Group %d intergroup connections",
@@ -202,12 +184,12 @@ void NeuronGroup::reset() {
       for (auto g : interGroupConnections) {
         network->lg->state(WARNING, "\tGroup %d", g->getID());
       }
-      network->lg->groupNeuronState(WARNING, "Group %d intergroup connections",
-                                    id, 0);
+      network->lg->groupNeuronState(WARNING, "Group %d remaining messages", id,
+                                    0);
       for (auto m : message_q) {
-        network->lg->groupNeuronState(WARNING, "\tFrom: %d Time: %d",
-                                      m->target_neuron_group->getID(),
-                                      m->timestamp);
+        network->lg->groupNeuronState(
+            WARNING, "\tFrom: %d Time: %d",
+            m->presynaptic_neuron->getGroup()->getID(), m->timestamp);
       }
     }
     neuron->reset();
@@ -326,13 +308,11 @@ int NeuronGroup::getTimestamp() {
   return mr;
 }
 IGlimit NeuronGroup::findLimitingGroup() {
-  int min = INT_MAX;
+  static RuntimConfig *config = network->getConfig();
+  int min = config->time_per_stimulus;
   NeuronGroup *limiter = nullptr;
   IGlimit ret(limiter, min);
   for (auto g : interGroupConnections) {
-    if (g->isFinished()) {
-      continue;
-    }
     int t = g->getTimestamp();
     if (t < ret.timestamp) {
       ret.timestamp = t;
@@ -341,6 +321,7 @@ IGlimit NeuronGroup::findLimitingGroup() {
   }
   return ret;
 }
+
 void NeuronGroup::logUnseqMessage(Message *message, int last_timestamp) {
   switch (message->message_type) {
   case Message_t::From_Neighbor: {
@@ -364,10 +345,4 @@ void NeuronGroup::logUnseqMessage(Message *message, int last_timestamp) {
   case Message_t::Decay:
     break;
   }
-}
-bool NeuronGroup::isFinished() {
-  pthread_mutex_lock(&finised_tex);
-  bool fin = finished;
-  pthread_mutex_unlock(&finised_tex);
-  return fin;
 }

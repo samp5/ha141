@@ -148,6 +148,7 @@ void InputNeuron::reset() {
 
 void InputNeuron::generateEvents() {
   SNN *network = group->getNetwork();
+
   // poisson_distribution with n = time_per_stim and p = probalility_of_success
   static std::poisson_distribution<> d(
       probalility_of_success *
