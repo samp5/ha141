@@ -1,0 +1,72 @@
+[neuron]
+# NOTE: both the number of neurons and the number of input neurons
+#       must be divisible by the number of groups
+
+# number of neurons
+neuron_count = 400
+
+# number of input type neurons
+input_neuron_count = 200
+
+# number of groups
+group_count = 10
+
+# number of connections
+# option can be "MAX" for maximum edges
+edge_count = "MAX"
+
+# refractory_duration in ms
+refractory_duration = 20
+
+# value each neuron is initialized with
+initial_membrane_potential = -6.0
+
+# minimum potential at which a neuron will fire
+activation_threshold = -5.0
+
+# value that each neuron is set to after firing
+refractory_membrane_potential = -7.0
+
+#  tau for the linearlization of the decay function
+tau = 150.0
+
+#  Maximum latency for input neurons
+max_latency = 20
+
+#  Maximum synapse delay for edges
+max_synapse_delay = 10
+
+#  Minimum synapse delay for edges
+min_synapse_delay = 2
+
+#  Maximum weight for an edge 
+max_weight = 20.0
+
+#  poisson_prob_of_success
+poisson_prob_of_success = 0.99
+[debug]
+# Options are
+# NONE
+# INFO
+# DEBUG
+# DEBUG2
+# DEBUG3
+# DEBUG4
+level = "NONE"
+
+[random]
+# options are 'time' for using the current time, or an integer (as a string e.g. "1")
+seed = "10"
+
+[runtime_vars]
+# Limit the log output to only Refractory events to limit log size
+limit_log_size = true
+show_stimulus = true
+# simulated time per stimulus in "ms"
+time_per_stimulus = 1000
+# name of output file (if left blank, a timestamp is used
+output_file = ""
+# file to read input from
+input_file = "./input_files/mnist.txt"
+# format should be "x..y" for reading lines x to y (inclusive) or just x for a single line
+line_range = "0..10"
