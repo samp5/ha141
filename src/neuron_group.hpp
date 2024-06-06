@@ -14,9 +14,6 @@ struct IGlimit;
 
 using std::list;
 
-// This class is so that many neurons can run on one thread
-// All neurons will still be allocated on the heap
-
 class NeuronGroup {
 private:
   vector<Neuron *> all_neurons;
@@ -28,6 +25,8 @@ private:
   pthread_mutex_t time_stamp_tex = PTHREAD_MUTEX_INITIALIZER;
   pthread_mutex_t limit_tex = PTHREAD_MUTEX_INITIALIZER;
   pthread_cond_t limit_cond = PTHREAD_COND_INITIALIZER;
+
+  pthread_mutex_t finised_tex = PTHREAD_MUTEX_INITIALIZER;
   bool finished = false;
 
   pthread_t thread;
@@ -63,11 +62,12 @@ public:
   Neuron *getRandNeuron() const;
   const vector<Neuron *> &getNeuronVec() const;
   void updateTimestamp(int mr);
-  bool isFinished() { return finished; }
+  bool isFinished();
   int getTimestamp();
   IGlimit findLimitingGroup();
   pthread_cond_t &getLimitCond() { return limit_cond; }
   pthread_mutex_t &getLimitTex() { return limit_tex; }
+  void logUnseqMessage(Message *message, int last_timestamp);
 
   /*--------------------------------------------------------------*\
    *                  Thread helper:
@@ -84,10 +84,7 @@ struct IGlimit {
   IGlimit(NeuronGroup *_g, int _t) : limitingGroup(_g), timestamp(_t){};
   pthread_cond_t &getLimitCond() { return limitingGroup->getLimitCond(); }
   pthread_mutex_t &getLimitTex() { return limitingGroup->getLimitTex(); }
-  void updateTimestamp() {
-    // update timestamp
-    timestamp = limitingGroup->getTimestamp();
-  }
+  void updateTimestamp() { timestamp = limitingGroup->getTimestamp(); }
 };
 
 #endif // !NEURON_GROUP
