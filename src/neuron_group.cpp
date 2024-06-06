@@ -89,32 +89,61 @@ void *NeuronGroup::run() {
   bool empty = message_q.empty();
   pthread_mutex_unlock(&message_q_tex);
 
+  // Loop through all events in the message q
   while (!empty) {
 
+    // retrieve the top message in priority q
     Message *message = getMessage();
 
+    // Error check for out of order events
     if (message->timestamp < getTimestamp()) {
       logUnseqMessage(message, getTimestamp());
     }
 
+    // Update the timestamp to reflect the time this group is processing
     updateTimestamp(message->timestamp);
 
+    // broadcast our condtion for any threads waiting on this
+    pthread_cond_broadcast(&limit_cond);
+
+    // Enter this loop if we have intergroup connections and therefore need to
+    // consider limiting groups
     if (hasInterGroup) {
 
+      // Find the limiting group (out of all our incoming connections, who has
+      // the smallest timestamp)
       IGlimit limiter = findLimitingGroup();
 
+      // Update the limiter and wait for their timestamp to equal to or larger
+      // than ours
       while (limiter.timestamp < message->timestamp) {
+
+        // lock the mutex for the pthread_cond
         pthread_mutex_lock(&limiter.limitingGroup->getLimitTex());
+
+        // Wrap the condition in a boolean while loop as suggested here:
+        // https://docs.oracle.com/cd/E19455-01/806-5257/6je9h032r/index.html
         while (limiter.timestamp < message->timestamp) {
-          // network->lg->neuronInteraction(
-          //     ESSENTIAL, "%d @ t-%d waiting on %d @ t-%d, ", id,
-          //     message->timestamp, limiter.limitingGroup->getID(),
-          //     limiter.timestamp);
+          // DEBUG
+          network->lg->neuronInteraction(
+              ESSENTIAL, "%d @ t-%d waiting on %d @ t-%d, ", id,
+              message->timestamp, limiter.limitingGroup->getID(),
+              limiter.timestamp);
+
+          // POTENTIALLY INCORRECT Broadcast our condition first to prevent
+          // groups waiting on eachother
           pthread_cond_broadcast(&limit_cond);
+
+          // Wait on the limter's condition
           pthread_cond_wait(&limiter.getLimitCond(), &limiter.getLimitTex());
+
+          // update the limiters timestamp and recheck our timestamps, entering
+          // this loop again if necessary
           limiter.updateTimestamp();
         }
         pthread_mutex_unlock(&limiter.limitingGroup->getLimitTex());
+
+        // find the next limting group (potentially the same group)
         limiter = findLimitingGroup();
       }
     }
@@ -134,14 +163,18 @@ void *NeuronGroup::run() {
     }
     }
 
+    // Update our empty bool
     pthread_mutex_lock(&message_q_tex);
     empty = message_q.empty();
     pthread_mutex_unlock(&message_q_tex);
-
-    pthread_cond_broadcast(&limit_cond);
   }
+
+  // Update our timestamp to the maximum possible time to reflect that this
+  // group is finished
   updateTimestamp(network->getConfig()->time_per_stimulus +
                   network->getConfig()->max_synapse_delay);
+
+  // POTENTIALLY UNNECESSARY Broadcast our condition just in case
   pthread_cond_broadcast(&limit_cond);
 
   return nullptr;
