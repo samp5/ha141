@@ -19,18 +19,12 @@
  */
 NeuronGroup::NeuronGroup(int _id, int number_neurons, int number_input_neurons,
                          SNN *network)
-    : network(network) {
+    : id(_id), most_recent_timestamp(0), finished(false), network(network) {
   getNetwork()->lg->state(DEBUG, "Adding Group %d", _id);
-
-  id = _id;
-
   getNetwork()->lg->state(INFO, "Group %d", id);
 
-  // we only need this many of "regular neurons"
   number_neurons -= number_input_neurons;
-
   int id = 1;
-
   while (number_neurons || number_input_neurons) {
 
     // 1 is regular, 0 is input
