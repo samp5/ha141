@@ -18,14 +18,19 @@ Synapse::Synapse(Neuron *from, Neuron *to, double w, double delay)
  *
  */
 void Synapse::propagate() {
+  static RuntimConfig *config = _origin->getGroup()->getNetwork()->getConfig();
 
-  int preGroupID = getPreSynaptic()->getGroup()->getID();
-  int postGroupID = getPostSynaptic()->getGroup()->getID();
-  int preID = getPreSynaptic()->getID();
-  int postID = getPostSynaptic()->getID();
+  if (_origin->getLastFire() + delay > config->time_per_stimulus) {
+    return;
+  }
 
-  double message_value = getPreSynaptic()->getPotential() * getWeight() *
-                         getPreSynaptic()->getBias();
+  int preGroupID = _origin->getGroup()->getID();
+  int postGroupID = _destination->getGroup()->getID();
+  int preID = _origin->getID();
+  int postID = _destination->getID();
+
+  double message_value =
+      _origin->getPotential() * getWeight() * _origin->getBias();
 
   _origin->getGroup()->getNetwork()->lg->neuronInteraction(
       INFO, "Group %d: Neuron %d is sending a mesage to Group %d: Neuron %d",
@@ -35,8 +40,8 @@ void Synapse::propagate() {
       new Message(message_value, _origin, _destination, From_Neighbor,
                   _origin->getLastFire() + delay);
 
-  getPostSynaptic()->activate();
-  getPostSynaptic()->getGroup()->addToMessageQ(message_to_send);
+  _destination->activate();
+  _destination->getGroup()->addToMessageQ(message_to_send);
 }
 
 int Synapse::randomDelay() {
