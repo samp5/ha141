@@ -65,6 +65,11 @@ NeuronGroup::~NeuronGroup() {
       delete neuron;
       neuron = nullptr;
     }
+
+    pthread_mutex_destroy(&limit_tex);
+    pthread_mutex_destroy(&finised_tex);
+    pthread_mutex_destroy(&time_stamp_tex);
+    pthread_cond_destroy(&limit_cond);
   }
 }
 
