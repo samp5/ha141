@@ -18,14 +18,12 @@ make build
 ```
 
 - Run the network
-```
+```bash
 make run
 ```
 
-This will create a base_config.toml file in run_config/. If you want to run the network on a different config use `build/snn <filename>.toml`
+If it doesn't already exist this will create a `base_config.toml` file in `run_config/`. If you want to run the network on a different config use `build/snn <filename>.toml`
 ```bash
 build/snn my_custom_config.toml
-
 ```
 All other options are specified in config file
-
