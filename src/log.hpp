@@ -23,9 +23,9 @@ using std::vector;
 enum LogLevel {
   ERROR,
   ESSENTIAL,
+  WARNING,
   NONE,
   DATA,
-  WARNING,
   INFO,
   DEBUG,
   DEBUG2,
