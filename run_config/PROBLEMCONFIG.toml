@@ -67,6 +67,6 @@ time_per_stimulus = 1000
 # name of output file (if left blank, a timestamp is used
 output_file = ""
 # file to read input from
-input_file = "./input_files/mnist.txt"
+input_file = "./input_files/test.txt"
 # format should be "x..y" for reading lines x to y (inclusive) or just x for a single line
 line_range = "0..10"
