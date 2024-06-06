@@ -27,4 +27,5 @@ This will create a base_config.toml file in run_config/. If you want to run the 
 build/snn my_custom_config.toml
 
 ```
+All other options are specified in config file
 
