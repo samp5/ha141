@@ -86,65 +86,27 @@ void *NeuronGroup::run() {
   // Log running status
   getNetwork()->lg->state(INFO, "Group %d running", getID());
 
-  // std::cout << id << " locked message_q_tex\n";
+  bool hasInterGroup = !interGroupConnections.empty();
+
   pthread_mutex_lock(&message_q_tex);
   bool empty = message_q.empty();
   pthread_mutex_unlock(&message_q_tex);
-  // std::cout << id << " unlocked message_q_tex\n";
 
   int last_timestamp = 0;
   while (!empty) {
+
     Message *message = getMessage();
     updateTimestamp(message->timestamp);
 
-    // Check to see if we are done with this stimulus
-    if (message->timestamp > network->getConfig()->time_per_stimulus) {
-      delete message;
-      // std::cout << id << " locked message_q_tex\n";
-      pthread_mutex_lock(&message_q_tex);
-      while (!message_q.empty()) {
-        delete *message_q.begin();
-        message_q.erase(message_q.begin());
-      }
-      message_q.clear();
-      pthread_mutex_unlock(&message_q_tex);
-      // std::cout << id << " unlocked message_q_tex\n";
-      break;
-    }
-
-    // check for out of place messages
     if (message->timestamp < getTimestamp()) {
-      switch (message->message_type) {
-      case Message_t::From_Neighbor: {
-        network->lg->message(
-            ERROR,
-            "\n\tGroup %d\n\tLast timestamp: %d \n\tMessage_t: "
-            "%s \n\tFrom Group: %d \n\tTimestamp: %d",
-            id, last_timestamp, message->message_type,
-            message->presynaptic_neuron->getGroup()->getID(),
-            message->timestamp);
-        break;
-      }
-      case Message_t::Stimulus: {
-        network->lg->message(
-            ERROR,
-            "\n\tGroup %d\n\tLast timestamp: %d \n\tMessage_t: "
-            "%s \n\tTimestamp: %d",
-            id, last_timestamp, message->message_type, message->timestamp);
-        break;
-      }
-      case Message_t::Refractory:
-      case Message_t::Decay:
-        break;
-      }
+      logUnseqMessage(message, last_timestamp);
     }
 
-    // if we have an incoming intergroup connection
-    if (!interGroupConnections.empty()) {
+    if (hasInterGroup) {
+
       IGlimit limiter = findLimitingGroup();
+
       while (limiter.timestamp < message->timestamp && limiter.limitingGroup) {
-        // std::cout << id << " locked limit_tex for Group "
-        //<< limiter.limitingGroup->getID() << "\n";
 
         if (limiter.limitingGroup->isFinished()) {
           break;
@@ -152,21 +114,14 @@ void *NeuronGroup::run() {
 
         pthread_mutex_lock(&limiter.limitingGroup->getLimitTex());
         while (limiter.timestamp < message->timestamp) {
-          // std::cout << id << " wating on limit_cond for Group "
-          // << limiter.limitingGroup->getID()
-          //<< "; limiting time: " << limiter.timestamp
-          // << " message time: " << message->timestamp << "\n";
           if (limiter.limitingGroup->isFinished()) {
             break;
           }
+          pthread_cond_broadcast(&limit_cond);
           pthread_cond_wait(&limiter.getLimitCond(), &limiter.getLimitTex());
           limiter.updateTimestamp();
         }
-        // std::cout << id << " finished waiting on limit_cond for Group "
-        // << limiter.limitingGroup->getID() << "\n";
         pthread_mutex_unlock(&limiter.limitingGroup->getLimitTex());
-        // std::cout << id << " unlocked limit_tex for Group "
-        //<< limiter.limitingGroup->getID() << "\n";
 
         limiter = findLimitingGroup();
         if (!limiter.limitingGroup) {
@@ -190,17 +145,17 @@ void *NeuronGroup::run() {
     }
     }
 
-    // std::cout << id << " locked message_q_tex\n";
     pthread_mutex_lock(&message_q_tex);
     empty = message_q.empty();
     pthread_mutex_unlock(&message_q_tex);
-    // std::cout << id << " unlocked message_q_tex\n";
 
-    // std::cout << id << " broadcasting its limit_cond\n";
     pthread_cond_broadcast(&limit_cond);
   }
-  // std::cout << id << " finished its message q\n";
+
+  pthread_mutex_lock(&finised_tex);
   finished = true;
+  pthread_mutex_unlock(&finised_tex);
+
   updateTimestamp(network->getConfig()->time_per_stimulus + 1);
   return nullptr;
 }
@@ -243,10 +198,18 @@ void NeuronGroup::reset() {
     pthread_mutex_unlock(&message_q_tex);
     // std::cout << id << " unlocked message_q_tex\n";
     if (!empty) {
-      network->lg->log(ERROR, "Message queue not empty at time of reset");
+      network->lg->log(WARNING, "Message queue not empty at time of reset");
+      network->lg->groupNeuronState(WARNING, "Group %d intergroup connections",
+                                    id, 0);
+      for (auto g : interGroupConnections) {
+        network->lg->state(WARNING, "\tGroup %d", g->getID());
+      }
+      network->lg->groupNeuronState(WARNING, "Group %d intergroup connections",
+                                    id, 0);
       for (auto m : message_q) {
-        std::cout << "from " << m->presynaptic_neuron->getGroup()->getID()
-                  << " \n";
+        network->lg->groupNeuronState(WARNING, "\tFrom: %d Time: %d",
+                                      m->target_neuron_group->getID(),
+                                      m->timestamp);
       }
     }
     neuron->reset();
@@ -354,17 +317,13 @@ Neuron *NeuronGroup::getRandNeuron() const {
 
 void NeuronGroup::updateTimestamp(int mr) {
   pthread_mutex_lock(&time_stamp_tex);
-  // std::cout << id << " locked its time_stamp_tex\n";
   most_recent_timestamp = mr;
   pthread_mutex_unlock(&time_stamp_tex);
-  // std::cout << id << " unlocked its time_stamp_tex\n";
 }
 int NeuronGroup::getTimestamp() {
   pthread_mutex_lock(&time_stamp_tex);
-  // std::cout << id << " locked its time_stamp_tex\n";
   int mr = most_recent_timestamp;
   pthread_mutex_unlock(&time_stamp_tex);
-  // std::cout << id << " unlocked its time_stamp_tex\n";
 
   return mr;
 }
@@ -383,4 +342,34 @@ IGlimit NeuronGroup::findLimitingGroup() {
     }
   }
   return ret;
+}
+void NeuronGroup::logUnseqMessage(Message *message, int last_timestamp) {
+  switch (message->message_type) {
+  case Message_t::From_Neighbor: {
+    network->lg->message(ERROR,
+                         "\n\tGroup %d\n\tLast timestamp: %d \n\tMessage_t: "
+                         "%s \n\tFrom Group: %d \n\tTimestamp: %d",
+                         id, last_timestamp, message->message_type,
+                         message->presynaptic_neuron->getGroup()->getID(),
+                         message->timestamp);
+    break;
+  }
+  case Message_t::Stimulus: {
+    network->lg->message(ERROR,
+                         "\n\tGroup %d\n\tLast timestamp: %d \n\tMessage_t: "
+                         "%s \n\tTimestamp: %d",
+                         id, last_timestamp, message->message_type,
+                         message->timestamp);
+    break;
+  }
+  case Message_t::Refractory:
+  case Message_t::Decay:
+    break;
+  }
+}
+bool NeuronGroup::isFinished() {
+  pthread_mutex_lock(&finised_tex);
+  bool fin = finished;
+  pthread_mutex_unlock(&finised_tex);
+  return fin;
 }
