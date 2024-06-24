@@ -1,4 +1,5 @@
 #include "synapse.hpp"
+#include "log.hpp"
 #include "message.hpp"
 #include "network.hpp"
 #include "neuron.hpp"
