@@ -27,10 +27,17 @@ SNN::~SNN() {
       group = nullptr;
     }
   }
+  delete lg;
+  delete config;
+  delete image;
 
   mutex->destroy_mutexes();
-  pthread_cond_destroy(&stimulus_switch_cond);
+  delete mutex;
+
   pthread_barrier_destroy(&barrier->barrier);
+  delete barrier;
+
+  pthread_cond_destroy(&stimulus_switch_cond);
 }
 
 /**
