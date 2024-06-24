@@ -205,6 +205,7 @@ void Neuron::run(Message *message) {
     group->getNetwork()->lg->groupNeuronState(
         DEBUG, "(%d) Neuron %d is still in refractory period, ignoring message",
         getGroup()->getID(), getID());
+    delete message;
     deactivate();
     return;
   }
