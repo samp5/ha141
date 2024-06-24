@@ -186,7 +186,70 @@ void *NeuronGroup::run() {
 
   // POTENTIALLY UNNECESSARY Broadcast our condition just in case
   pthread_cond_broadcast(&limit_cond);
+}
 
+void NeuronGroup::runSingleThread() {
+  // Log running status
+  getNetwork()->lg->state(DEBUG, "Group %d running", getID());
+
+  bool empty = message_q.empty();
+
+  // !DEBUG
+  size_t max = 0;
+
+  // Loop through all events in the message q
+  while (!empty) {
+
+    // !DEBUG
+    if (message_q.size() > max) {
+      max = message_q.size();
+    }
+
+    // retrieve the top message in priority q
+    Message *message = getMessage();
+
+    // run neuron on message
+    switch (message->post_synaptic_neuron->getType()) {
+    case Neuron_t::Input: {
+      InputNeuron *in =
+          dynamic_cast<InputNeuron *>(message->post_synaptic_neuron);
+      in->run(message);
+      break;
+    }
+    case Neuron_t::None: {
+      Neuron *n = message->post_synaptic_neuron;
+      n->run(message);
+      break;
+    }
+    }
+
+    // Update our empty bool
+    empty = message_q.empty();
+  }
+  // !DEBUG
+  std::cout << "Max message_q size was: " << max << "\n";
+}
+
+
+
+
+
+/**
+ * @brief Main run cycle for a NeuronGroup.
+ *
+ * Checks the global bool ::active each cycle. Runs active neurons.
+ * Before joining the main thread, transfers data from Neuron::log_data to
+ * Log::log_data
+ *
+ */
+void *NeuronGroup::run() {
+
+  if (network->getConfig()->NUMBER_GROUPS == 1) {
+
+    runSingleThread();
+  } else {
+    runMultithread();
+  }
   return nullptr;
 }
 

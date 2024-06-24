@@ -39,6 +39,8 @@ public:
 
   void *run();
 
+  void runSingleThread();
+  void runMultithread();
   void startThread() {
     pthread_create(&thread, NULL, NeuronGroup::thread_helper, this);
   }
