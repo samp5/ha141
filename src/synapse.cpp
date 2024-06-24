@@ -33,7 +33,7 @@ void Synapse::propagate() {
       _origin->getPotential() * getWeight() * _origin->getBias();
 
   _origin->getGroup()->getNetwork()->lg->neuronInteraction(
-      INFO, "Group %d: Neuron %d is sending a mesage to Group %d: Neuron %d",
+      DEBUG, "Group %d: Neuron %d is sending a mesage to Group %d: Neuron %d",
       preGroupID, preID, postGroupID, postID);
 
   Message *message_to_send =

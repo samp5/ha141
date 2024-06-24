@@ -19,7 +19,7 @@ NeuronGroup::NeuronGroup(int _id, int number_neurons, int number_input_neurons,
                          SNN *network)
     : id(_id), most_recent_timestamp(0), network(network) {
   getNetwork()->lg->state(DEBUG, "Adding Group %d", _id);
-  getNetwork()->lg->state(INFO, "Group %d", id);
+  getNetwork()->lg->state(DEBUG, "Group %d", id);
 
   number_neurons -= number_input_neurons;
   int id = 1;
@@ -81,7 +81,7 @@ NeuronGroup::~NeuronGroup() {
 void *NeuronGroup::run() {
 
   // Log running status
-  getNetwork()->lg->state(INFO, "Group %d running", getID());
+  getNetwork()->lg->state(DEBUG, "Group %d running", getID());
 
   bool hasInterGroup = !interGroupConnections.empty();
 
@@ -134,9 +134,8 @@ void *NeuronGroup::run() {
         while (limiter.timestamp < message->timestamp) {
           // DEBUG
           network->lg->neuronInteraction(
-              ESSENTIAL, "%d @ t-%d waiting on %d @ t-%d, ", id,
-              message->timestamp, limiter.limitingGroup->getID(),
-              limiter.timestamp);
+              INFO, "%d @ t-%d waiting on %d @ t-%d, ", id, message->timestamp,
+              limiter.limitingGroup->getID(), limiter.timestamp);
 
           // POTENTIALLY INCORRECT Broadcast our condition first to prevent
           // groups waiting on eachother

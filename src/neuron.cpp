@@ -34,7 +34,7 @@ Neuron::Neuron(int _id, NeuronGroup *_g, Neuron_t _t) {
 
   const char *inhib = excit_inhib_value == -1 ? "excitatory\0" : "inhibitory\0";
 
-  _g->getNetwork()->lg->neuronType(INFO, "Regular (%d) Neuron %d added: %s",
+  _g->getNetwork()->lg->neuronType(DEBUG, "Regular (%d) Neuron %d added: %s",
                                    group->getID(), _id, inhib);
 }
 
@@ -82,7 +82,7 @@ void Neuron::addNeighbor(Neuron *neighbor) {
   addPreSynapticConnection(return_record);
 
   group->getNetwork()->lg->neuronInteraction(
-      INFO, "Edge from (%d) Neuron %d to (%d) Neuron %d added",
+      DEBUG, "Edge from (%d) Neuron %d to (%d) Neuron %d added",
       getGroup()->getID(), getID(), neighbor->getGroup()->getID(),
       neighbor->getID());
 }
@@ -111,7 +111,7 @@ void Neuron::addIGNeighbor(Neuron *neighbor) {
   addPreSynapticConnection(return_record);
 
   group->getNetwork()->lg->neuronInteraction(
-      INFO, "INTERGROUP Edge from (%d) Neuron %d to (%d) Neuron %d added",
+      DEBUG, "INTERGROUP Edge from (%d) Neuron %d to (%d) Neuron %d added",
       getGroup()->getID(), getID(), neighbor->getGroup()->getID(),
       neighbor->getID());
 
@@ -150,7 +150,7 @@ int Neuron::recieveMessage() {
     }
 
     group->getNetwork()->lg->groupNeuronState(
-        INFO, "(%d) Neuron %d is still in refractory period, ignoring message",
+        DEBUG, "(%d) Neuron %d is still in refractory period, ignoring message",
         getGroup()->getID(), getID());
 
     return 1;
@@ -159,7 +159,7 @@ int Neuron::recieveMessage() {
   accumulatePotential(incoming_message->message);
 
   group->getNetwork()->lg->neuronValue(
-      INFO, "(%d) Neuron %d recieved message, accumulated equal to %f",
+      DEBUG, "(%d) Neuron %d recieved message, accumulated equal to %f",
       group->getID(), id, membrane_potential);
 
   addData(incoming_message->timestamp, incoming_message->message_type);
@@ -184,7 +184,7 @@ void Neuron::sendMessages() {
   }
 
   group->getNetwork()->lg->groupNeuronState(
-      INFO,
+      DEBUG,
       "(%d) Neuron %d reached activation threshold, entering refractory phase",
       group->getID(), id);
 
@@ -203,7 +203,7 @@ void Neuron::run(Message *message) {
   // check refractory
   if (message->timestamp < refractory_start + refractory_duration) {
     group->getNetwork()->lg->groupNeuronState(
-        INFO, "(%d) Neuron %d is still in refractory period, ignoring message",
+        DEBUG, "(%d) Neuron %d is still in refractory period, ignoring message",
         getGroup()->getID(), getID());
     deactivate();
     return;
@@ -243,7 +243,7 @@ void Neuron::refractory() {
   pthread_mutex_unlock(&group->getNetwork()->getMutex()->potential);
 
   group->getNetwork()->lg->neuronValue(
-      INFO, "(%d) Neuron %d in refractory state: potential set to %f",
+      DEBUG, "(%d) Neuron %d in refractory state: potential set to %f",
       group->getID(), id, membrane_potential);
 
   addData(refractory_start, Message_t::Refractory);

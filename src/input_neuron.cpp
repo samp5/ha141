@@ -23,7 +23,7 @@ InputNeuron::InputNeuron(int _id, NeuronGroup *group, int latency)
   excit_inhib_value = -1;
   const char *inhib = excit_inhib_value == -1 ? "excitatory\0" : "inhibitory\0";
 
-  group->getNetwork()->lg->neuronType(INFO, "INPUT (%d) Neuron %d added: %s",
+  group->getNetwork()->lg->neuronType(DEBUG, "INPUT (%d) Neuron %d added: %s",
                                       group->getID(), _id, inhib);
 
   activate();
@@ -103,7 +103,7 @@ bool InputNeuron::inRefractory() const {
                       group->getNetwork()->getConfig()->REFRACTORY_DURATION) {
 
     group->getNetwork()->lg->groupNeuronState(
-        INFO, "(%d) Neuron %d is still in refractory period, ignoring message",
+        DEBUG, "(%d) Neuron %d is still in refractory period, ignoring message",
         getGroup()->getID(), getID());
 
     return true;
