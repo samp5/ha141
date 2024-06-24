@@ -13,6 +13,13 @@ build:  $(files) $(deps)
 	@$(CXX) $(CXXFLAGS) $(files) -o ./build/snn
 	@echo Done!
 
+buildp:  $(files) $(deps)
+	@echo Target $@
+	@echo New Prerequsites: $? 
+	@echo Compiling with profiling information...
+	@$(CXX) $(CXXFLAGS) $(files) -pg -o ./build/profile_snn
+	@echo Done!
+
 pybind: $(files) $(deps) ./src/pybind/snn.hpp ./src/pybind/snn.cpp
 	@echo Target $@
 	@echo New Prerequsites: $? 
