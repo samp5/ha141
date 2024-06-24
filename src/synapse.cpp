@@ -51,8 +51,8 @@ int Synapse::randomDelay() {
   return delay;
 }
 double Synapse::randomWeight() {
-  double weight =
-      (static_cast<double>(rand()) / static_cast<double>(RAND_MAX)) *
-      network->getConfig()->max_weight;
+  double weight = (std::abs(static_cast<double>(network->getRandom())) /
+                   static_cast<double>(RAND_MAX)) *
+                  network->getConfig()->max_weight;
   return weight;
 }
