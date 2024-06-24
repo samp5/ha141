@@ -42,7 +42,7 @@ void InputNeuron::run(Message *message) {
 
   if (message->timestamp < refractory_start + refractory_duration) {
     group->getNetwork()->lg->groupNeuronState(
-        INFO,
+        DEBUG,
         "INPUT: (%d) Neuron %d is still in refractory period, ignoring input",
         getGroup()->getID(), getID());
     return;
@@ -146,9 +146,37 @@ void InputNeuron::reset() {
   refractory_start = -INT_MAX;
 }
 
+/**
+ * @brief Generate Neuron Events.
+ *
+ * Generate neuron events from a vector of success timestamps
+ * passed from the calling SNN::generateInputNeuoneEvents
+ *
+ * @param timestamps vector of timestamps
+ */
+void InputNeuron::generateEvents(const std::vector<int> &timestamps) {
+  for (auto i : timestamps) {
+
+    if (i < latency) {
+      continue;
+    }
+
+    Message *message =
+        new Message(input_value, nullptr, this, Message_t::Stimulus, i);
+    group->addToMessageQ(message);
+  }
+}
+
+/**
+ * @brief Generate Neuron Events bad way.
+ *
+ */
 void InputNeuron::generateEvents() {
   SNN *network = group->getNetwork();
 
+  // !TODO repeat digit x number of times (with time_per_stim *
+  // probalility_of_success events per stimulus)
+  //
   // poisson_distribution with n = time_per_stim and p = probalility_of_success
   static std::poisson_distribution<> d(
       probalility_of_success *

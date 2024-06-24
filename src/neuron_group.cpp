@@ -89,8 +89,16 @@ void *NeuronGroup::run() {
   bool empty = message_q.empty();
   pthread_mutex_unlock(&message_q_tex);
 
+  // !DEBUG
+  // size_t max = 0;
+
   // Loop through all events in the message q
   while (!empty) {
+
+    // !DEBUG
+    // if (message_q.size() > max) {
+    //   max = message_q.size();
+    // }
 
     // retrieve the top message in priority q
     Message *message = getMessage();
@@ -168,6 +176,9 @@ void *NeuronGroup::run() {
     empty = message_q.empty();
     pthread_mutex_unlock(&message_q_tex);
   }
+
+  // !DEBUG
+  // std::cout << "Max message_q size was: " << max << "\n";
 
   // Update our timestamp to the maximum possible time to reflect that this
   // group is finished

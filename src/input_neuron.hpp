@@ -23,6 +23,7 @@ public:
   void setInputValue(double value);
   void setLatency(int latency);
   void generateEvents();
+  void generateEvents(const std::vector<int> &timestamps);
   bool inRefractory() const;
   double getInputValue() const { return input_value; }
   int getLatency() const { return latency; }

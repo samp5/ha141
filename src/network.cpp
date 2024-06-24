@@ -6,6 +6,7 @@
 #include "runtime.hpp"
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
 #include <fstream>
 #include <iomanip>
 #include <pthread.h>
@@ -605,8 +606,27 @@ void SNN::generateGraphiz(bool weights) {
 }
 
 void SNN::generateInputNeuronEvents() {
+
+  int num_events = config->INPUT_PROB_SUCCESS * config->time_per_stimulus;
+
+  // DEBUG
+  std::cout << "number of events: " << num_events << '\n';
+
+  std::vector<int> timestamps(num_events);
+
+  for (int i = 0; i < num_events; i++) {
+    timestamps.at(i) = std::abs(getRandom()) % config->time_per_stimulus;
+  }
+
+  // !DEBUG
+  // std::cout << "events: \n\t";
+  // for (auto i : timestamps) {
+  //   std::cout << i << " ";
+  // }
+  // std::cout << '\n';
+
   for (auto in : input_neurons) {
-    in->generateEvents();
+    in->generateEvents(timestamps);
   }
 }
 
