@@ -174,10 +174,6 @@ void InputNeuron::generateEvents(const std::vector<int> &timestamps) {
 void InputNeuron::generateEvents() {
   SNN *network = group->getNetwork();
 
-  // !TODO repeat digit x number of times (with time_per_stim *
-  // probalility_of_success events per stimulus)
-  //
-  // poisson_distribution with n = time_per_stim and p = probalility_of_success
   static std::poisson_distribution<> d(
       probalility_of_success *
       group->getNetwork()->getConfig()->time_per_stimulus);
