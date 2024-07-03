@@ -70,15 +70,7 @@ NeuronGroup::~NeuronGroup() {
   }
 }
 
-/**
- * @brief Main run cycle for a NeuronGroup.
- *
- * Checks the global bool ::active each cycle. Runs active neurons.
- * Before joining the main thread, transfers data from Neuron::log_data to
- * Log::log_data
- *
- */
-void *NeuronGroup::run() {
+void NeuronGroup::runMultithread() {
 
   // Log running status
   getNetwork()->lg->state(DEBUG, "Group %d running", getID());
@@ -90,15 +82,15 @@ void *NeuronGroup::run() {
   pthread_mutex_unlock(&message_q_tex);
 
   // !DEBUG
-  // size_t max = 0;
+  size_t max = 0;
 
   // Loop through all events in the message q
   while (!empty) {
 
     // !DEBUG
-    // if (message_q.size() > max) {
-    //   max = message_q.size();
-    // }
+    if (message_q.size() > max) {
+      max = message_q.size();
+    }
 
     // retrieve the top message in priority q
     Message *message = getMessage();
@@ -177,7 +169,7 @@ void *NeuronGroup::run() {
   }
 
   // !DEBUG
-  // std::cout << "Max message_q size was: " << max << "\n";
+  std::cout << "Max message_q size was: " << max << "\n";
 
   // Update our timestamp to the maximum possible time to reflect that this
   // group is finished
