@@ -612,6 +612,24 @@ void SNN::generateGraphiz(bool weights) {
   file << "}";
 }
 
+/**
+ * @brief Generate InputNeuron events.
+ *
+ * For all input neurons, generate INPUT_PROB_SUCCESS * time_per_stimulus
+ * events. For each simulus the timestamps for all InputNeuron are the same For
+ * each stimulus the timestamps are random.
+ *
+ *
+ * i.e.
+ * time_per_stimulus = 10
+ * INPUT_PROB_SUCCESS = 0.5;
+ *
+ * Stimulus 1: all InputNeuron recieve something like
+ * { 1, 4, 7, 8, 9}
+ *
+ * Stimulus 2: all InputNeuron recieve something like
+ * { 2, 3, 6, 9}
+ */
 void SNN::generateInputNeuronEvents() {
 
   int num_events = config->INPUT_PROB_SUCCESS * config->time_per_stimulus;
