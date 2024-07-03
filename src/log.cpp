@@ -365,6 +365,23 @@ void Log::value(LogLevel level, const char *message, int value) {
 }
 
 /**
+ * @brief Log a double
+ *
+ */
+void Log::value(LogLevel level, const char *message, double value) {
+  // length
+  int length = snprintf(nullptr, 0, message, value);
+  // allocate
+  char *formatted_msg = new char[length + 1];
+  // format
+  snprintf(formatted_msg, length + 1, message, value);
+  // log
+  this->log(level, formatted_msg);
+  // deallocate
+  delete[] formatted_msg;
+}
+
+/**
  * @brief Log a string
  *
  */

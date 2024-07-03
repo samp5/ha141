@@ -101,6 +101,7 @@ public:
   void print(const char *message, bool newline = true,
              std::ostream &os = std::cout);
   void value(LogLevel level, const char *message, int value);
+  void value(LogLevel level, const char *message, double value);
   const char *activeStatusString(bool active);
   LogLevel debugLevelString(std::string level);
   std::string messageTypeToString(Message_t type);
