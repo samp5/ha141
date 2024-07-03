@@ -643,13 +643,6 @@ void SNN::generateInputNeuronEvents() {
     timestamps.at(i) = std::abs(getRandom()) % config->time_per_stimulus;
   }
 
-  // !DEBUG
-  // std::cout << "events: \n\t";
-  // for (auto i : timestamps) {
-  //   std::cout << i << " ";
-  // }
-  // std::cout << '\n';
-
   for (auto in : input_neurons) {
     in->generateEvents(timestamps);
   }

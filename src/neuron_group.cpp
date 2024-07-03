@@ -230,10 +230,6 @@ void NeuronGroup::runSingleThread() {
   std::cout << "Max message_q size was: " << max << "\n";
 }
 
-
-
-
-
 /**
  * @brief Main run cycle for a NeuronGroup.
  *
