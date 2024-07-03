@@ -655,10 +655,11 @@ void SNN::generateInputNeuronEvents() {
   }
 }
 
-void SNN::generateCSV() {
+int SNN::generateCSV() {
 
   int max_stim = config->STIMULUS_VEC.back();
   int min_stim = config->STIMULUS_VEC.front();
+  int totalActivations = 0;
 
   std::unordered_map<int, std::vector<LogData *>> stim_data;
   const std::vector<LogData *> &lg_data = lg->getLogData();
@@ -666,6 +667,7 @@ void SNN::generateCSV() {
   for (std::vector<LogData *>::size_type i = 0; i < lg_data.size(); i++) {
     LogData *td = lg_data.at(i);
     if (td->message_type == Message_t::Refractory) {
+      totalActivations++;
       if (stim_data.find(td->stimulus_number) != stim_data.end()) {
         stim_data[td->stimulus_number].push_back(td);
       } else {
@@ -705,4 +707,5 @@ void SNN::generateCSV() {
     ret.at(s - min_stim) = row;
   }
   lg->writeCSV(ret);
+  return totalActivations;
 }
