@@ -495,8 +495,8 @@ void SNN::start() {
  *
  */
 void SNN::setNextStim() {
-  static FileReader reader =
-      FileReader(config->INPUT_FILE, config->STIMULUS_VEC.front());
+  static InputFileReader reader =
+      InputFileReader(config->INPUT_FILE, config->STIMULUS_VEC.front());
 
   if (input_neurons.empty()) {
     lg->log(ESSENTIAL, "set_next_line: passed empty input neuron vector?");

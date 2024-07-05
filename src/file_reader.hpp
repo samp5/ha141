@@ -3,7 +3,7 @@
 #include <fstream>
 #include <limits>
 
-class FileReader {
+class InputFileReader {
 public:
   /**
    * @brief Constructor for FileReader.
@@ -11,7 +11,8 @@ public:
    * @param file_path Input file file path
    * @param start_pos Line to start reading
    */
-  FileReader(const std::string &file_path, int start_pos) : file(file_path) {
+  InputFileReader(const std::string &file_path, int start_pos)
+      : file(file_path) {
     for (int i = 0; i < start_pos; i++) {
       file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
