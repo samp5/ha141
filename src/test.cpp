@@ -94,7 +94,7 @@ bool testAdjListParserParseAdjList() {
       }
     }
   }
-  std::filesystem::remove("./parserTest");
+  std::filesystem::remove("./parserTest.txt");
   return pass;
 }
 
