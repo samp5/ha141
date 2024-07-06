@@ -3,20 +3,20 @@
 #       must be divisible by the number of groups
 
 # number of neurons
-neuron_count = 26
+neuron_count = 7840
 
 # number of input type neurons
-input_neuron_count = 10
+input_neuron_count = 784
 
 # number of groups
 group_count = 1
 
 # number of connections
 # option can be "MAX" for maximum edges
-edge_count = "MAX"
+edge_count = 0
 
 # refractory_duration in ms
-refractory_duration = 1
+refractory_duration = 5
 
 # value each neuron is initialized with
 initial_membrane_potential = -6.0
@@ -52,11 +52,11 @@ poisson_prob_of_success = 0.9
 # DEBUG2
 # DEBUG3
 # DEBUG4
-level = "DEBUG4"
+level = "NONE"
 
 [random]
 # options are 'time' for using the current time, or an integer (as a string e.g. "1")
-seed = "10"
+seed = "1"
 
 [runtime_vars]
 # Limit the log output to only Refractory events to limit log size
@@ -72,7 +72,7 @@ time_per_stimulus = 100
 output_file = ""
 
 # file to read input from
-input_file = "./input_files/test.txt"
+input_file = "./input_files/mnist2.txt"
 
 # format should be "x..y" for reading lines x to y (inclusive) or just x for a single line
-line_range = "0..5"
+line_range = "0"
