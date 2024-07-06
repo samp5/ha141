@@ -92,7 +92,8 @@ SNN::SNN(std::vector<std::string> args) {
   generateInputNeuronVec();
   setInputNeuronLatency();
 }
-void SNN::initializeFromSynapseFile(const std::vector<std::string> &args) {
+void SNN::initializeFromSynapseFile(const std::vector<std::string> &args,
+                                    const std::string &adjListFile) {
   lg = new Log(this);
   config = new RuntimConfig(this);
   config->parseArgs(args);
@@ -116,10 +117,8 @@ void SNN::initializeFromSynapseFile(const std::vector<std::string> &args) {
     int y = dimensions.second;
     image = new Image(x, y, config->max_latency);
   }
-  std::string inputFile = "./edgeData/out";
-
   AdjListParser::AdjListInfo adjListInfo;
-  getAdjancyListInfo(inputFile, adjListInfo);
+  getAdjancyListInfo(adjListFile, adjListInfo);
 
   // The total number of neurons will be the number of Nodes from our Synapse
   // file plus the number of specified input neurons

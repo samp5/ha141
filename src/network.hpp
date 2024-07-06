@@ -61,9 +61,10 @@ public:
   ~SNN();
 
   // initialization
-  void initializeFromSynapseFile(const std::vector<std::string> &args);
+  void initializeFromSynapseFile(const std::vector<std::string> &args,
+                                 const std::string &adjListFile);
   void getAdjancyListInfo(const std::string &file_path,
-                          AdjListParser::AdjListInfo &);
+                          AdjListParser::AdjListInfo &info);
   void generateSynapsesFromAdjList(const AdjListParser::AdjList &adjList);
   void setInputNeuronLatency();
 
