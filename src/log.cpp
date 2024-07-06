@@ -49,7 +49,7 @@ std::string neuronTypeString(Neuron_t type) {
 void Log::log(LogLevel level, const char *message,
               std::ostream &os) { // default output stream is standard output
 
-  if (level > network->getConfig()->DEBUG_LEVEL) {
+  if (network != NULL && level > network->getConfig()->DEBUG_LEVEL) {
     return;
   }
 

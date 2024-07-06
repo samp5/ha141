@@ -1,8 +1,56 @@
 #ifndef FILEREADER
 #define FILEREADER
+#include "log.hpp"
 #include <fstream>
 #include <limits>
+#include <optional>
+#include <unordered_map>
+#include <vector>
 
+/* The two output formats of the AdjList include:
+ *
+ * STANDARD
+ * #networkGen.py
+ * # GMT Sat Jul  6 14:59:20 2024
+ * #
+ * 0 2 3
+ * 1 2 3
+ * 2
+ * 3
+ *
+ * DIRECTED_GRID
+ * #networkGen.py
+ * # GMT Sat Jul  6 14:59:20 2024
+ * #
+ * (0, 0) (0, 1) (1, 0)
+ * (0, 1) (0, 0) (1, 1)
+ * (1, 0) (0, 0) (1, 1) (0, 1)
+ * (1, 1) (0, 1) (1, 0) (1, 1)
+ *
+ */
+
+enum AdjListFormat { UnknownFormat, DirectedGrid, Standard };
+class AdjListParser {
+private:
+  std::string file_path;
+  std::streampos current_position;
+  AdjListFormat format;
+  std::optional<int> numColumns;
+
+public:
+  Log lg;
+  using AdjList = std::unordered_map<int, std::vector<int>>;
+  void parseLine(const std::string &line, AdjList &mutAdjList);
+  void openFile(std::ifstream &file);
+  AdjListParser(const std::string &file_path)
+      : file_path(file_path), format(AdjListFormat::UnknownFormat),
+        numColumns({}), lg() {}
+  std::istream &ignoreLine(std::ifstream &in, std::ifstream::pos_type &pos);
+  std::string getLastLine();
+  int maxColumn();
+  AdjList parseAdjList();
+  void assignFormat();
+};
 class InputFileReader {
 public:
   /**

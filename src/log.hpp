@@ -73,7 +73,7 @@ private:
 
 public:
   Log(SNN *network) : start(hr_clock::now()), offset(0.0f), network(network) {}
-  Log();
+  Log() : start(hr_clock::now()), offset(0.0f), network(NULL){};
   ~Log();
   void startClock() { this->start = hr_clock::now(); }
   void writeData();
