@@ -809,3 +809,9 @@ void SNN::generateSynapsesFromAdjList(const AdjListParser::AdjList &adjList) {
     }
   }
 }
+
+void SNN::getAdjancyListInfo(const std::string &file_path,
+                             AdjListParser::AdjListInfo &info) {
+  AdjListParser parser(file_path);
+  info = parser.parseAdjList();
+}

@@ -22,6 +22,7 @@ int AdjListParser::parseLine(const std::string &line, AdjList &mutAdjList) {
     lg.log(ERROR, "AdjsListParse::parseLine : Attempt to parse line with "
                   "AdjListFormat::UnknownFormat");
     exit(1);
+    return -1;
   }
   case AdjListFormat::Standard: {
     std::stringstream stream(line);
