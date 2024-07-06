@@ -1,7 +1,7 @@
 import networkx as nx;
 
 def main():
-    G = nx.navigable_small_world_graph(4)
+    G = nx.navigable_small_world_graph(84)
     nx.write_adjlist(G, "out.adj")
     print(G);
 
