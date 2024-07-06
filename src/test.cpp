@@ -25,7 +25,7 @@ bool testAdjListParserParseAdjList() {
       {3, {}},
   };
   AdjListParser parser("./parserTest.txt");
-  auto list = parser.parseAdjList();
+  auto list = parser.parseAdjList().adjList;
   for (auto pair : list) {
     if (expected.find(pair.first) == expected.end()) {
       parser.lg.value(ERROR,
@@ -68,7 +68,7 @@ bool testAdjListParserParseAdjList() {
       {3, {2, 1, 3}},
   };
   AdjListParser parser1("./parserTest.txt");
-  auto list1 = parser1.parseAdjList();
+  AdjList list1 = parser1.parseAdjList().adjList;
   for (auto pair : list1) {
     if (expected1.find(pair.first) == expected.end()) {
       parser.lg.value(ERROR,
