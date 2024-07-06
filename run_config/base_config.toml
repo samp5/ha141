@@ -3,13 +3,13 @@
 #       must be divisible by the number of groups
 
 # number of neurons
-neuron_count = 1000
+neuron_count = 26
 
 # number of input type neurons
 input_neuron_count = 10
 
 # number of groups
-group_count = 5
+group_count = 1
 
 # number of connections
 # option can be "MAX" for maximum edges
@@ -52,7 +52,7 @@ poisson_prob_of_success = 0.9
 # DEBUG2
 # DEBUG3
 # DEBUG4
-level = "NONE"
+level = "DEBUG4"
 
 [random]
 # options are 'time' for using the current time, or an integer (as a string e.g. "1")
