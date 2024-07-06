@@ -26,6 +26,7 @@ extern/logs/
 plotting/venv/*
 plotting/*.png
 networkX/venv/*
+networkX/*.adj
 
 *.csv
 *.toml
