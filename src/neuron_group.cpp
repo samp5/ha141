@@ -22,6 +22,7 @@ NeuronGroup::NeuronGroup(int _id, int number_neurons, int number_input_neurons,
   getNetwork()->lg->state(DEBUG, "Group %d", id);
 
   number_neurons -= number_input_neurons;
+  getNetwork()->lg->value(DEBUG4, "number_neurons is %d", number_neurons);
   int id = 1;
   while (number_neurons || number_input_neurons) {
 

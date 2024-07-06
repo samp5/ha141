@@ -67,6 +67,7 @@ int AdjListParser::parseLine(const std::string &line, AdjList &mutAdjList) {
     return static_cast<int>(mutAdjList[from].size());
   }
   }
+  return -1;
 }
 void AdjListParser::openFile(std::ifstream &file) {
   file.open(file_path);
@@ -152,7 +153,7 @@ AdjListParser::AdjListInfo AdjListParser::parseAdjList() {
            "... quitting");
     exit(1);
   }
-  AdjListInfo adjListInfo;
+  AdjListInfo adjListInfo = {{}, 0, 0};
   std::ifstream file;
   openFile(file);
   std::string line;

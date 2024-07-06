@@ -57,7 +57,7 @@ public:
   Log *lg;
 
   SNN(std::vector<std::string> args);
-  SNN(){};
+  SNN();
   ~SNN();
 
   // initialization

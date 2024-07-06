@@ -25,7 +25,18 @@ bool testAdjListParserParseAdjList() {
       {3, {}},
   };
   AdjListParser parser("./parserTest.txt");
-  auto list = parser.parseAdjList().adjList;
+  auto info = parser.parseAdjList();
+  auto &list = info.adjList;
+  if (info.numberNodes != 4) {
+    parser.lg.value(ERROR, "Expected AdjInfo to report 4 nodes, got %d",
+                    info.numberNodes);
+    pass = false;
+  }
+  if (info.numberEdges != 4) {
+    parser.lg.value(ERROR, "Expected AdjInfo to report 4 edges, got %d",
+                    info.numberNodes);
+    pass = false;
+  }
   for (auto pair : list) {
     if (expected.find(pair.first) == expected.end()) {
       parser.lg.value(ERROR,
@@ -68,7 +79,18 @@ bool testAdjListParserParseAdjList() {
       {3, {2, 1, 3}},
   };
   AdjListParser parser1("./parserTest.txt");
-  AdjList list1 = parser1.parseAdjList().adjList;
+  auto info1 = parser1.parseAdjList();
+  auto &list1 = info1.adjList;
+  if (info1.numberNodes != 4) {
+    parser.lg.value(ERROR, "Expected AdjInfo to report 4 nodes, got %d",
+                    info.numberNodes);
+    pass = false;
+  }
+  if (info1.numberEdges != 10) {
+    parser.lg.value(ERROR, "Expected AdjInfo to report 4 edges, got %d",
+                    info.numberNodes);
+    pass = false;
+  }
   for (auto pair : list1) {
     if (expected1.find(pair.first) == expected.end()) {
       parser.lg.value(ERROR,

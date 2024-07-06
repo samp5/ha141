@@ -105,6 +105,7 @@ public:
   const char *activeStatusString(bool active);
   LogLevel debugLevelString(std::string level);
   std::string messageTypeToString(Message_t type);
+  void setNetwork(SNN *_network) { network = _network; };
 };
 
 #endif // !LOG

@@ -8,13 +8,13 @@ using std::string;
 
 int main(int argc, char **argv) {
   std::vector<std::string> args(argv, argv + argc);
-  SNN snn = SNN(args);
+  SNN snn = SNN();
 
   auto start = snn.lg->time();
   snn.lg->log(ESSENTIAL, "Assigning neuron groups...");
 
   snn.lg->log(ESSENTIAL, "Adding synapses...");
-  snn.initializeFromSynapseFile(args, "./networkX/out");
+  snn.initializeFromSynapseFile(args, "./networkX/out.adj");
 
   snn.lg->startClock();
   snn.lg->log(ESSENTIAL, "Starting network...");

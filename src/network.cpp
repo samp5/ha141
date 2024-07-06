@@ -92,9 +92,11 @@ SNN::SNN(std::vector<std::string> args) {
   generateInputNeuronVec();
   setInputNeuronLatency();
 }
+SNN::SNN() { lg = new Log(NULL); }
+
 void SNN::initializeFromSynapseFile(const std::vector<std::string> &args,
                                     const std::string &adjListFile) {
-  lg = new Log(this);
+  lg->setNetwork(this);
   config = new RuntimConfig(this);
   config->parseArgs(args);
   config->checkStartCond();
@@ -119,12 +121,14 @@ void SNN::initializeFromSynapseFile(const std::vector<std::string> &args,
   }
   AdjListParser::AdjListInfo adjListInfo;
   getAdjancyListInfo(adjListFile, adjListInfo);
+  lg->value(DEBUG4, "adjListInfo numberNodes is %d", adjListInfo.numberNodes);
+  lg->value(DEBUG4, "adjListInfo numberEdges is %d", adjListInfo.numberEdges);
 
   // The total number of neurons will be the number of Nodes from our Synapse
   // file plus the number of specified input neurons
   config->NUMBER_NEURONS =
       adjListInfo.numberNodes + config->NUMBER_INPUT_NEURONS;
-  config->checkStartCond();
+  lg->value(DEBUG4, "NUMBER_NEURONS now set to %d", config->NUMBER_NEURONS);
 
   int neuron_per_group = config->NUMBER_NEURONS / config->NUMBER_GROUPS;
   int input_neurons_per_group =
