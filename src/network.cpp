@@ -87,11 +87,108 @@ SNN::SNN(std::vector<std::string> args) {
     // add to vector
     groups.push_back(this_group);
   }
-  generateNeuronVec();
+  generateAllNeuronVec();
+  generateNonInputNeuronVec();
   generateInputNeuronVec();
   setInputNeuronLatency();
 }
+void SNN::initializeFromSynapseFile(const std::vector<std::string> &args) {
+  lg = new Log(this);
+  config = new RuntimConfig(this);
+  config->parseArgs(args);
+  config->checkStartCond();
+  mutex = new Mutex;
+  // number of group threads plus the main thread
+  barrier = new Barrier(config->NUMBER_GROUPS + 1);
 
+  gen = std::mt19937(rd());
+  gen.seed(config->RAND_SEED);
+
+  if (Image::isSquare(config->NUMBER_INPUT_NEURONS)) {
+    lg->log(ESSENTIAL, "Assuming square input image");
+    image = new Image(config->NUMBER_INPUT_NEURONS, config->max_latency);
+  } else {
+    lg->log(ESSENTIAL,
+            "Input image not square, using smallest perimeter rectangle");
+
+    auto dimensions = Image::bestRectangle(config->NUMBER_INPUT_NEURONS);
+    int x = dimensions.first;
+    int y = dimensions.second;
+    image = new Image(x, y, config->max_latency);
+  }
+  std::string inputFile = "./edgeData/out";
+
+  AdjListParser::AdjListInfo adjListInfo;
+  getAdjancyListInfo(inputFile, adjListInfo);
+
+  // The total number of neurons will be the number of Nodes from our Synapse
+  // file plus the number of specified input neurons
+  config->NUMBER_NEURONS =
+      adjListInfo.numberNodes + config->NUMBER_INPUT_NEURONS;
+  config->checkStartCond();
+
+  int neuron_per_group = config->NUMBER_NEURONS / config->NUMBER_GROUPS;
+  int input_neurons_per_group =
+      config->NUMBER_INPUT_NEURONS / config->NUMBER_GROUPS;
+
+  /*
+   * The relation between the index of the neuron in the SNN::neurons and Group
+   * is important. The index returned by the synapse file maps to the index in
+   * SNN::nonInputNeurons, which maps to the order in which the group is added.
+   *
+   * SNN::groups
+   *         _______________
+   *        |  1 |  2  | 3  |
+   *         ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+   * NeuronGroup::neurons, see that these include InputNeurons!
+   *           ____      _____      ____
+   *      G1  |0123| G2 |01234| G2 |0123|
+   *           ¯¯¯¯      ¯¯¯¯¯      ¯¯¯¯
+   * So we introduce SNN::nonInputNeurons (index)
+   *         _________
+   *        |012345678|
+   *         ¯¯¯¯¯¯¯¯¯
+   * This matches with the index reported in the keys of
+   * AdjListParser::AdjListInfo::AdjList
+   */
+  for (int i = 0; i < config->NUMBER_GROUPS; i++) {
+    // allocate for this group
+    NeuronGroup *this_group =
+        new NeuronGroup(i + 1, neuron_per_group, input_neurons_per_group, this);
+
+    // add to vector
+    groups.push_back(this_group);
+  }
+  // Generate vectors differentiated by type
+  generateAllNeuronVec();
+  generateInputNeuronVec();
+  generateNonInputNeuronVec();
+
+  // Generate synapses
+  generateSynapsesFromAdjList(adjListInfo.adjList);
+
+  // Set latency
+  setInputNeuronLatency();
+}
+
+void SNN::generateNonInputNeuronVec() {
+  if (!nonInputNeurons.empty()) {
+    lg->log(ERROR,
+            "generateNonInputNeuronVec: this constructs a new vector! "
+            "emptying vector that was passed...\n If Neurons in this vector "
+            "were dynamically allocated, that memory has NOT been freed");
+    nonInputNeurons.clear();
+  }
+
+  for (const auto &group : groups) {
+    for (auto neuron : group->getMutNeuronVec()) {
+      if (neuron->getType() == Input) {
+        continue;
+      }
+      nonInputNeurons.push_back(neuron);
+    }
+  }
+}
 /**
  * @brief Generate a vector of all `InputNeuron`.
  *
@@ -99,7 +196,7 @@ SNN::SNN(std::vector<std::string> args) {
 void SNN::generateInputNeuronVec() {
   if (!input_neurons.empty()) {
     lg->log(ERROR,
-            "get_input_neuron_vector: this constructs a new vector! "
+            "generateInputNeuronVec: this constructs a new vector! "
             "emptying vector that was passed...\n If Neurons in this vector "
             "were dynamically allocated, that memory has NOT been freed");
     input_neurons.clear();
@@ -135,7 +232,7 @@ void SNN::setInputNeuronLatency() {
  * @brief Generate a vector of all `Neuron`s.
  *
  */
-void SNN::generateNeuronVec() {
+void SNN::generateAllNeuronVec() {
   for (auto group : groups) {
     for (auto neuron : group->getMutNeuronVec()) {
       neurons.push_back(neuron);
@@ -261,7 +358,7 @@ void SNN::generateRandomSynapsesAdjMatrixGS() {
 void SNN::generateRandomSynapsesAdjMatrix() {
   auto start = lg->time();
   if (neurons.empty()) {
-    generateNeuronVec();
+    generateAllNeuronVec();
   }
   auto num_n = neurons.size();
 
@@ -340,7 +437,7 @@ void SNN::generateRandomSynapses() {
   auto start = lg->time();
   int synapses_formed = 0;
   if (neurons.empty()) {
-    generateNeuronVec();
+    generateAllNeuronVec();
   }
   std::unordered_map<Neuron *, std::list<Neuron *>> map;
   generateNeighborOptions(map);
@@ -701,4 +798,14 @@ int SNN::generateCSV() {
   }
   lg->writeCSV(ret);
   return totalActivations;
+}
+
+void SNN::generateSynapsesFromAdjList(const AdjListParser::AdjList &adjList) {
+  for (auto pair : adjList) {
+    size_t originIndex = pair.first;
+    Neuron *origin = nonInputNeurons.at(originIndex);
+    for (auto destinationIndex : pair.second) {
+      origin->addNeighbor(nonInputNeurons.at(destinationIndex));
+    }
+  }
 }

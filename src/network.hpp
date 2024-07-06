@@ -1,5 +1,6 @@
 #ifndef NETWORK
 #define NETWORK
+#include "file_reader.hpp"
 #include "input_neuron.hpp"
 #include "stimulus.hpp"
 #include <climits>
@@ -41,6 +42,8 @@ protected:
   std::vector<NeuronGroup *>
       groups;                    /**< Holds pointers to all `NeuronGroup`s */
   std::vector<Neuron *> neurons; /**< Holds pointers to all `Neuron`s */
+  std::vector<Neuron *>
+      nonInputNeurons; /**< Holds pointers to all nonInput`Neuron`s */
   std::vector<InputNeuron *>
       input_neurons;    /**< Holds pointers to all `InputNeuron`s */
   RuntimConfig *config; /**< Holds pointer to RuntimConfig */
@@ -52,30 +55,48 @@ protected:
 
 public:
   Log *lg;
+
   SNN(std::vector<std::string> args);
   SNN(){};
   ~SNN();
-  void start();
-  void join();
-  void reset();
+
+  // initialization
+  void initializeFromSynapseFile(const std::vector<std::string> &args);
+  void getAdjancyListInfo(const std::string &file_path,
+                          AdjListParser::AdjListInfo &);
+  void generateSynapsesFromAdjList(const AdjListParser::AdjList &adjList);
+  void setInputNeuronLatency();
+
+  // In-house synapse generation algorithms
   void generateRandomSynapses();
   void generateRandomSynapsesAdjMatrix();
   void generateRandomSynapsesAdjMatrixGS();
   static void *generateRandomSynapsesAdjMatrixGS_Helper(void *arg);
-  void generateNeuronVec();
-  void generateInputNeuronVec();
-  void generateInputNeuronEvents();
-  int generateCSV();
-  void setInputNeuronLatency();
-  void setNextStim();
-  double getStimulusStart() { return stimlus_start; }
-  void generateGraphiz(bool weights = false);
-  bool switchingStimulus() { return switching_stimulus; }
-  pthread_cond_t *switchCond() { return &stimulus_switch_cond; }
-  static int maximum_edges(int num_i, int num_n);
-  std::vector<InputNeuron *> &getMutInputNeurons() { return input_neurons; }
   void generateNeighborOptions(
       std::unordered_map<Neuron *, std::list<Neuron *>> &map);
+
+  // genereating vectors
+  void generateAllNeuronVec();
+  void generateNonInputNeuronVec();
+  void generateInputNeuronVec();
+  void generateInputNeuronEvents();
+
+  // runtime operations
+  void setNextStim();
+  void start();
+  void join();
+  void reset();
+
+  // output
+  void generateGraphiz(bool weights = false);
+  int generateCSV();
+
+  // Getters
+  double getStimulusStart() { return stimlus_start; }
+  bool switchingStimulus() { return switching_stimulus; }
+  pthread_cond_t *getSwitchCond() { return &stimulus_switch_cond; }
+  static int maximum_edges(int num_i, int num_n);
+  std::vector<InputNeuron *> &getMutInputNeurons() { return input_neurons; }
   RuntimConfig *getConfig() { return config; }
   Mutex *getMutex() { return mutex; }
   Barrier *getBarrier() { return barrier; }

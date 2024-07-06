@@ -8,12 +8,20 @@
 #include <unordered_map>
 #include <vector>
 
-void AdjListParser::parseLine(const std::string &line, AdjList &mutAdjList) {
+/**
+ * @brief Parse a line of the AdjList.
+ *
+ *
+ * @param line Line to parse
+ * @param mutAdjList mutable reference to the AdjList
+ * @return number of edges added for this line.
+ */
+int AdjListParser::parseLine(const std::string &line, AdjList &mutAdjList) {
   switch (format) {
   case AdjListFormat::UnknownFormat: {
     lg.log(ERROR, "AdjsListParse::parseLine : Attempt to parse line with "
                   "AdjListFormat::UnknownFormat");
-    break;
+    exit(1);
   }
   case AdjListFormat::Standard: {
     std::stringstream stream(line);
@@ -25,7 +33,7 @@ void AdjListParser::parseLine(const std::string &line, AdjList &mutAdjList) {
       stream >> to;
       mutAdjList[from].push_back(to);
     }
-    break;
+    return static_cast<int>(mutAdjList[from].size());
   }
   case AdjListFormat::DirectedGrid: {
     if (!numColumns.has_value()) {
@@ -55,7 +63,7 @@ void AdjListParser::parseLine(const std::string &line, AdjList &mutAdjList) {
       mutAdjList[from].push_back(index);
       cursor = line.find('(', parenMatch);
     }
-    break;
+    return static_cast<int>(mutAdjList[from].size());
   }
   }
 }
@@ -135,7 +143,7 @@ int AdjListParser::maxColumn() {
   return x + 1;
 }
 
-std::unordered_map<int, std::vector<int>> AdjListParser::parseAdjList() {
+AdjListParser::AdjListInfo AdjListParser::parseAdjList() {
   assignFormat();
   if (format == AdjListFormat::UnknownFormat) {
     lg.log(LogLevel::ERROR,
@@ -143,7 +151,7 @@ std::unordered_map<int, std::vector<int>> AdjListParser::parseAdjList() {
            "... quitting");
     exit(1);
   }
-  AdjList AdjacencyListRet;
+  AdjListInfo adjListInfo;
   std::ifstream file;
   openFile(file);
   std::string line;
@@ -157,8 +165,9 @@ std::unordered_map<int, std::vector<int>> AdjListParser::parseAdjList() {
     if (!line.size() || line.at(0) == '#') {
       continue;
     }
-    parseLine(line, AdjacencyListRet);
+    adjListInfo.numberEdges += parseLine(line, adjListInfo.adjList);
+    adjListInfo.numberNodes += 1;
   }
   file.close();
-  return AdjacencyListRet;
+  return adjListInfo;
 }

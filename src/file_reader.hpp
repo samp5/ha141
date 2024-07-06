@@ -40,7 +40,12 @@ private:
 public:
   Log lg;
   using AdjList = std::unordered_map<int, std::vector<int>>;
-  void parseLine(const std::string &line, AdjList &mutAdjList);
+  using AdjListInfo = struct _adjListInfo {
+    AdjList adjList;
+    int numberNodes;
+    int numberEdges;
+  };
+  int parseLine(const std::string &line, AdjList &mutAdjList);
   void openFile(std::ifstream &file);
   AdjListParser(const std::string &file_path)
       : file_path(file_path), format(AdjListFormat::UnknownFormat),
@@ -48,7 +53,7 @@ public:
   std::istream &ignoreLine(std::ifstream &in, std::ifstream::pos_type &pos);
   std::string getLastLine();
   int maxColumn();
-  AdjList parseAdjList();
+  AdjListInfo parseAdjList();
   void assignFormat();
 };
 class InputFileReader {
