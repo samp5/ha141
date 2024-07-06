@@ -25,6 +25,7 @@ extern/logs/
 #ingore venv
 plotting/venv/*
 plotting/*.png
+networkX/venv/*
 
 *.csv
 *.toml
