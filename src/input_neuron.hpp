@@ -11,7 +11,7 @@
  */
 class InputNeuron : public Neuron {
 protected:
-  double input_value;            /**< Stimulus value */
+  long double input_value;       /**< Stimulus value */
   double probalility_of_success; /**< Probability of poisson sucess */
   int latency;
 
@@ -20,7 +20,7 @@ public:
   void reset();
   void run(Message *message);
   bool poissonResult() const;
-  void setInputValue(double value);
+  void setInputValue(long double value);
   void setLatency(int latency);
   void generateEvents();
   void generateEvents(const std::vector<int> &timestamps);

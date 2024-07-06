@@ -120,10 +120,10 @@ bool InputNeuron::inRefractory() const {
  *
  * @param value The new value of the InputNeuron
  */
-void InputNeuron::setInputValue(double value) {
+void InputNeuron::setInputValue(long double value) {
   input_value = value;
   group->getNetwork()->lg->neuronValue(
-      DEBUG3, "(Input) (%d) Neuron %d input value set to %f",
+      DEBUG3, "(Input) (%d) Neuron %d input value set to %lf",
       getGroup()->getID(), getID(), value);
 }
 
