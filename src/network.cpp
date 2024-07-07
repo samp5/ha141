@@ -606,11 +606,13 @@ void SNN::setNextStim() {
   std::string line = reader.nextLine();
 
   std::stringstream s(line);
-  double value;
+  long double value;
+  char discard;
 
   for (InputNeuron *input_neuron : input_neurons) {
-    s >> value;
-    input_neuron->setInputValue(value);
+    s >> value >> discard;
+    long double set = value;
+    input_neuron->setInputValue(set);
   }
 }
 
@@ -744,6 +746,9 @@ void SNN::generateInputNeuronEvents() {
   }
 
   for (auto in : input_neurons) {
+    if (in->getInputValue() < 0.000001) {
+      continue;
+    }
     in->generateEvents(timestamps);
   }
 }
