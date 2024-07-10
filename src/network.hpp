@@ -50,6 +50,7 @@ protected:
   Mutex *mutex;         /**< Holds pointer to Mutex structure */
   Barrier *barrier;
   Image *image;
+  InputFileReader *inputFileReader;
   std::mt19937 gen;
   std::random_device rd;
 

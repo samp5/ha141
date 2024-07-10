@@ -61,6 +61,8 @@ SNN::SNN(std::vector<std::string> args) {
   mutex = new Mutex;
   // number of group threads plus the main thread
   barrier = new Barrier(config->NUMBER_GROUPS + 1);
+  inputFileReader =
+      new InputFileReader(config->INPUT_FILE, config->STIMULUS_VEC.front());
 
   gen = std::mt19937(rd());
   gen.seed(config->RAND_SEED);
@@ -599,15 +601,12 @@ void SNN::start() {
  *
  */
 void SNN::setNextStim() {
-  static InputFileReader reader =
-      InputFileReader(config->INPUT_FILE, config->STIMULUS_VEC.front());
-
   if (input_neurons.empty()) {
     lg->log(ESSENTIAL, "set_next_line: passed empty input neuron vector?");
     return;
   }
 
-  std::string line = reader.nextLine();
+  std::string line = inputFileReader->nextLine();
 
   std::stringstream s(line);
   long double value;
