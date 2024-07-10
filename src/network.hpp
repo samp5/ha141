@@ -56,6 +56,7 @@ protected:
 
 public:
   Log *lg;
+  int totalActivations;
 
   SNN(std::vector<std::string> args);
   SNN();

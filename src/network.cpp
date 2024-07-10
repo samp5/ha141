@@ -892,17 +892,28 @@ int SNN::generateCSV() {
     ret.at(s - min_stim) = row;
   }
   lg->writeCSV(ret);
+  this->totalActivations = totalActivations;
   return totalActivations;
 }
 
 void SNN::generateSynapsesFromAdjList(const AdjListParser::AdjList &adjList) {
+  int numEdges = 0;
   for (auto pair : adjList) {
     size_t originIndex = pair.first;
     Neuron *origin = nonInputNeurons.at(originIndex);
     for (auto destinationIndex : pair.second) {
       origin->addNeighbor(nonInputNeurons.at(destinationIndex));
+      numEdges++;
     }
   }
+  size_t increment = nonInputNeurons.size() / input_neurons.size();
+  for (size_t i = 0; i < input_neurons.size(); i++) {
+    InputNeuron *origin = input_neurons.at(i);
+    Neuron *destination = nonInputNeurons.at(i * increment);
+    origin->addNeighbor(destination);
+    numEdges++;
+  }
+  config->NUMBER_EDGES = numEdges;
 }
 
 void SNN::getAdjancyListInfo(const std::string &file_path,
