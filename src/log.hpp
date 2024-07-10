@@ -114,6 +114,7 @@ public:
   LogLevel debugLevelString(std::string level);
   std::string messageTypeToString(Message_t type);
   void setNetwork(SNN *_network) { network = _network; };
+  void printNetworkInfo();
 };
 
 #endif // !LOG
