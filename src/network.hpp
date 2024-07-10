@@ -85,6 +85,9 @@ public:
 
   // runtime operations
   void setNextStim();
+  void forkStart(const std::vector<int> &stimulus);
+  void runChildProcess(const std::vector<int> &stimulus,
+                       std::ofstream &tmpFile);
   void start();
   void join();
   void reset();

@@ -86,6 +86,15 @@ public:
     return line;
   }
 
+  void setToLine(int targetLine) {
+    file.clear();
+    file.seekg(0);
+    for (int i = 0; i < targetLine; i++) {
+      file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+    current_position = file.tellg();
+  }
+
 private:
   std::ifstream file;
   std::streampos current_position;

@@ -533,6 +533,89 @@ void SNN::reset() {
   }
   gen.seed(config->RAND_SEED);
 }
+void SNN::runChildProcess(const std::vector<int> &stimulus,
+                          std::ofstream &tmpfile) {
+  lg->value(LogLevel::DEBUG4, "Child process running, PID: %d",
+            static_cast<int>(getpid()));
+  config->STIMULUS = stimulus.begin();
+  lg->value(LogLevel::DEBUG4, "Child Process: stimulus set to line %d",
+            *config->STIMULUS);
+  config->num_stimulus = stimulus.size();
+  inputFileReader->setToLine(*config->STIMULUS);
+  setNextStim();
+  generateInputNeuronEvents();
+
+  for (int i = 1; i < config->num_stimulus + 1; i++) {
+    for (auto group : groups) {
+      group->startThread();
+    }
+    for (auto group : groups) {
+      pthread_join(group->getThreadID(), NULL);
+    }
+    if (i < config->num_stimulus) {
+      config->STIMULUS++;
+      setNextStim();
+      lg->value(LogLevel::DEBUG4, "Child Process: stimulus set to line %d",
+                *config->STIMULUS);
+      reset();
+      generateInputNeuronEvents();
+    }
+  }
+  lg->writeTempFile(tmpfile, groups);
+}
+
+void SNN::forkStart(const std::vector<int> &stimulus) {
+  std::ofstream outTempFile;
+  std::string tmpFileName = "testout.txt";
+  outTempFile.open(tmpFileName);
+  if (!outTempFile.is_open()) {
+    lg->log(LogLevel::ERROR, "SNN::forkStart: Error opening outTempFile");
+    return;
+  }
+  pid_t cPID = fork();
+  switch (cPID) {
+  case -1: // error state
+    lg->log(
+        LogLevel::ERROR,
+        "SNN::forkStart: failed to spawn child process, fork() returned -1");
+    break;
+  case 0: // child process
+    runChildProcess(stimulus, outTempFile);
+    outTempFile.close();
+    exit(EXIT_SUCCESS);
+    break;
+  default: // parent process
+    int wstatus, w;
+    w = waitpid(cPID, &wstatus, 0);
+    if (w == -1) {
+      lg->log(LogLevel::ERROR, "SNN::forkStart: waitpid() returned -1");
+    }
+
+    lg->value(LogLevel::ESSENTIAL, "Child Process returned exit status %d",
+              WEXITSTATUS(wstatus));
+
+    if (WEXITSTATUS(wstatus) == EXIT_SUCCESS) {
+      std::ifstream inTempFile;
+      inTempFile.open(tmpFileName);
+      if (!inTempFile.is_open()) {
+        lg->log(LogLevel::ERROR, "SNN::forkStart: Error opening intTempFile");
+        return;
+      }
+      while (!inTempFile.eof()) {
+        int nID, gID, t, nt, sn, mt;
+        double p;
+        std::string line;
+        std::getline(inTempFile, line);
+        std::stringstream s(line);
+        s >> nID >> gID >> t >> p >> nt >> mt >> sn;
+        LogData *data =
+            new LogData(nID, gID, t, p, nt, static_cast<Message_t>(mt), sn);
+        lg->addData(data);
+      }
+    }
+    break;
+  }
+}
 
 /**
  * @brief Start network.
