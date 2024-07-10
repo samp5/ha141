@@ -633,6 +633,9 @@ void SNN::start() {
 
   setNextStim();
   generateInputNeuronEvents();
+  lg->value(LogLevel::INFO, "InputNeuronEvents Generated, size %d",
+            config->INPUT_PROB_SUCCESS * config->time_per_stimulus);
+
   if (config->show_stimulus) {
     lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
   }
@@ -660,6 +663,7 @@ void SNN::start() {
       }
     }
 
+    lg->log(LogLevel::INFO, "Starting Groups");
     for (auto group : groups) {
       group->startThread();
     }
@@ -672,8 +676,11 @@ void SNN::start() {
       if (config->show_stimulus) {
         lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
       }
+      lg->log(LogLevel::INFO, "Resetting Network");
       reset();
       generateInputNeuronEvents();
+      lg->value(LogLevel::INFO, "InputNeuronEvents Generated, size %d",
+                config->INPUT_PROB_SUCCESS * config->time_per_stimulus);
     }
   }
   for (auto group : groups) {
@@ -826,9 +833,6 @@ void SNN::generateInputNeuronEvents() {
 
   int num_events = config->INPUT_PROB_SUCCESS * config->time_per_stimulus;
 
-  // DEBUG
-  std::cout << "number of events: " << num_events << '\n';
-
   std::vector<int> timestamps(num_events);
 
   for (int i = 0; i < num_events; i++) {
@@ -836,7 +840,7 @@ void SNN::generateInputNeuronEvents() {
   }
 
   for (auto in : input_neurons) {
-    if (in->getInputValue() < 0.000001) {
+    if (in->getInputValue() < 0.00001) {
       continue;
     }
     in->generateEvents(timestamps);
