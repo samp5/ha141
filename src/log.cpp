@@ -113,6 +113,16 @@ void Log::addData(LogData *data) {
   this->log_data.push_back(data);
   pthread_mutex_unlock(&data_mutex);
 }
+void Log::writeTempFile(std::ofstream &tmpFile,
+                        const std::vector<NeuronGroup *> &neuronGroups) {
+  for (const auto &group : neuronGroups) {
+    for (const auto &neuron : group->getNeuronVec()) {
+      for (const auto &lgData : neuron->getLogData()) {
+        tmpFile << lgData->toTmpFileString();
+      }
+    }
+  }
+}
 
 void Log::writeCSV(const std::vector<std::vector<int>> &mat) {
 

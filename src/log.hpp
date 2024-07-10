@@ -52,9 +52,15 @@ struct LogData {
   Message_t message_type;
   int stimulus_number;
   LogData(){};
-  LogData(int nID, int gID, double t, double p, int nt, Message_t mt, int sn)
+  LogData(int nID, int gID, int t, double p, int nt, Message_t mt, int sn)
       : neuron_id(nID), group_id(gID), timestamp(t), potential(p),
         neuron_type(nt), message_type(mt), stimulus_number(sn) {}
+  std::string toTmpFileString() {
+    char toReturn[81];
+    sprintf(toReturn, "%d %d %d %lf %d %d %d\n", neuron_id, group_id, timestamp,
+            potential, neuron_type, message_type, stimulus_number);
+    return std::string(toReturn);
+  }
 };
 
 using hr_clock = std::chrono::high_resolution_clock;
@@ -77,6 +83,8 @@ public:
   ~Log();
   void startClock() { this->start = hr_clock::now(); }
   void writeData();
+  void writeTempFile(std::ofstream &tmpFile,
+                     const std::vector<NeuronGroup *> &neuronGroups);
   void writeCSV(const std::vector<std::vector<int>> &mat);
   void addData(LogData *data);
   const vector<LogData *> &getLogData() const { return log_data; }

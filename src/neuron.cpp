@@ -444,6 +444,7 @@ const vector<Synapse *> &Neuron::getPostSynaptic() const {
 const vector<Synapse *> &Neuron::getPresynaptic() const {
   return PreSynapticConnections;
 }
+const vector<LogData *> &Neuron::getLogData() const { return log_data; }
 
 void Neuron::addData(int time, Message_t message_type) {
   if (group->getNetwork()->getConfig()->LIMIT_LOG_OUTPUT &&

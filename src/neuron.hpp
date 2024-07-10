@@ -84,6 +84,7 @@ public:
   const list<Message *> &getMessageVector() const;
   const vector<Synapse *> &getPostSynaptic() const;
   const vector<Synapse *> &getPresynaptic() const;
+  const vector<LogData *> &getLogData() const;
 
   int getLastDecay() const;
   int getLastFire() const;
