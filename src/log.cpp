@@ -474,3 +474,17 @@ Log::~Log() {
     delete d;
   }
 }
+
+void Log::printNetworkInfo() {
+  RuntimConfig *cf = network->getConfig();
+  std::cout << "Spiking Neural Network Info\n"
+            << "\t Number Groups: " << cf->NUMBER_GROUPS << "\n"
+            << "\t Total Nodes: " << cf->NUMBER_NEURONS << "\n"
+            << "\t Input Nodes: " << cf->NUMBER_INPUT_NEURONS << "\n"
+            << "\t NonInput Nodes: "
+            << cf->NUMBER_NEURONS - cf->NUMBER_INPUT_NEURONS << "\n"
+            << "\t Number Edges: " << cf->NUMBER_EDGES << "\n"
+            << "\t Total Activations: " << network->totalActivations << "\n"
+            << "\t Number Stimulus: " << cf->STIMULUS_VEC.size() << "\n"
+            << "\t Time per Stimulus: " << cf->time_per_stimulus << "\n";
+}
