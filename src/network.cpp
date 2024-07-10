@@ -110,6 +110,9 @@ void SNN::initializeFromSynapseFile(const std::vector<std::string> &args,
   // number of group threads plus the main thread
   barrier = new Barrier(config->NUMBER_GROUPS + 1);
 
+  inputFileReader =
+      new InputFileReader(config->INPUT_FILE, config->STIMULUS_VEC.front());
+
   gen = std::mt19937(rd());
   gen.seed(config->RAND_SEED);
 
