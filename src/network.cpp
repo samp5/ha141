@@ -7,11 +7,15 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>
+#include <ctime>
 #include <fstream>
 #include <iomanip>
 #include <pthread.h>
 #include <random>
 #include <sstream>
+#include <string>
+#include <sys/wait.h>
+#include <unistd.h>
 #include <vector>
 
 /**
