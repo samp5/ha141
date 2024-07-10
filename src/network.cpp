@@ -566,7 +566,7 @@ void SNN::runChildProcess(const std::vector<int> &stimulus,
 
 void SNN::forkStart(const std::vector<int> &stimulus) {
   std::ofstream outTempFile;
-  std::string tmpFileName = "testout.txt";
+  std::string tmpFileName = "tmp.txt";
   outTempFile.open(tmpFileName);
   if (!outTempFile.is_open()) {
     lg->log(LogLevel::ERROR, "SNN::forkStart: Error opening outTempFile");
@@ -615,6 +615,7 @@ void SNN::forkStart(const std::vector<int> &stimulus) {
     }
     break;
   }
+  remove("tmp.txt");
 }
 
 /**
