@@ -568,13 +568,6 @@ void SNN::runChildProcess(const std::vector<int> &stimulus,
 }
 
 void SNN::forkStart(const std::vector<int> &stimulus) {
-  std::ofstream outTempFile;
-  std::string tmpFileName = "tmp.txt";
-  outTempFile.open(tmpFileName);
-  if (!outTempFile.is_open()) {
-    lg->log(LogLevel::ERROR, "SNN::forkStart: Error opening outTempFile");
-    return;
-  }
   pid_t cPID = fork();
   switch (cPID) {
   case -1: // error state
@@ -582,11 +575,21 @@ void SNN::forkStart(const std::vector<int> &stimulus) {
         LogLevel::ERROR,
         "SNN::forkStart: failed to spawn child process, fork() returned -1");
     break;
-  case 0: // child process
+  case 0: { // child process
+    std::ofstream outTempFile;
+    std::string tmpFileName = std::to_string(getpid());
+    outTempFile.open(tmpFileName);
+    if (!outTempFile.is_open()) {
+      lg->value(LogLevel::ERROR,
+                "Child process %d SNN::forkStart: Error opening outTempFile",
+                getpid());
+      return;
+    }
     runChildProcess(stimulus, outTempFile);
     outTempFile.close();
     exit(EXIT_SUCCESS);
     break;
+  }
   default: // parent process
     int wstatus, w;
     w = waitpid(cPID, &wstatus, 0);
@@ -599,7 +602,7 @@ void SNN::forkStart(const std::vector<int> &stimulus) {
 
     if (WEXITSTATUS(wstatus) == EXIT_SUCCESS) {
       std::ifstream inTempFile;
-      inTempFile.open(tmpFileName);
+      inTempFile.open(std::to_string(cPID));
       if (!inTempFile.is_open()) {
         lg->log(LogLevel::ERROR, "SNN::forkStart: Error opening intTempFile");
         return;
@@ -618,7 +621,7 @@ void SNN::forkStart(const std::vector<int> &stimulus) {
     }
     break;
   }
-  remove("tmp.txt");
+  remove(std::to_string(cPID).c_str());
 }
 
 /**
