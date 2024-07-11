@@ -5,8 +5,10 @@
 #include "neuron_group.hpp"
 #include "runtime.hpp"
 #include <algorithm>
+#include <cerrno>
 #include <cmath>
 #include <cstdlib>
+#include <cstring>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
@@ -567,61 +569,91 @@ void SNN::runChildProcess(const std::vector<int> &stimulus,
   lg->writeTempFile(tmpfile, groups);
 }
 
-void SNN::forkStart(const std::vector<int> &stimulus) {
-  pid_t cPID = fork();
-  switch (cPID) {
-  case -1: // error state
-    lg->log(
-        LogLevel::ERROR,
-        "SNN::forkStart: failed to spawn child process, fork() returned -1");
-    break;
-  case 0: { // child process
-    std::ofstream outTempFile;
-    std::string tmpFileName = std::to_string(getpid());
-    outTempFile.open(tmpFileName);
-    if (!outTempFile.is_open()) {
-      lg->value(LogLevel::ERROR,
-                "Child process %d SNN::forkStart: Error opening outTempFile",
-                getpid());
-      return;
-    }
-    runChildProcess(stimulus, outTempFile);
-    outTempFile.close();
-    exit(EXIT_SUCCESS);
-    break;
-  }
-  default: // parent process
-    int wstatus, w;
-    w = waitpid(cPID, &wstatus, 0);
-    if (w == -1) {
-      lg->log(LogLevel::ERROR, "SNN::forkStart: waitpid() returned -1");
-    }
-
-    lg->value(LogLevel::ESSENTIAL, "Child Process returned exit status %d",
-              WEXITSTATUS(wstatus));
-
-    if (WEXITSTATUS(wstatus) == EXIT_SUCCESS) {
-      std::ifstream inTempFile;
-      inTempFile.open(std::to_string(cPID));
-      if (!inTempFile.is_open()) {
-        lg->log(LogLevel::ERROR, "SNN::forkStart: Error opening intTempFile");
-        return;
+std::list<pid_t>
+SNN::forkStart(const std::vector<std::vector<int>> &stimulusBatches) {
+  std::list<pid_t> children;
+  for (const auto &stimulusBatch : stimulusBatches) {
+    pid_t cPID = fork();
+    switch (cPID) {
+    case -1: // error state
+      lg->log(
+          LogLevel::ERROR,
+          "SNN::forkStart: failed to spawn child process, fork() returned -1");
+      break;
+    case 0: { // child process
+      std::ofstream outTempFile;
+      std::string tmpFileName = std::to_string(getpid()) + ".log";
+      outTempFile.open(tmpFileName);
+      if (!outTempFile.is_open()) {
+        lg->value(LogLevel::ERROR,
+                  "Child process %d SNN::forkStart: Error opening outTempFile",
+                  getpid());
+        return {};
       }
-      while (!inTempFile.eof()) {
-        int nID, gID, t, nt, sn, mt;
-        double p;
-        std::string line;
-        std::getline(inTempFile, line);
-        std::stringstream s(line);
-        s >> nID >> gID >> t >> p >> nt >> mt >> sn;
-        LogData *data =
-            new LogData(nID, gID, t, p, nt, static_cast<Message_t>(mt), sn);
-        lg->addData(data);
+      runChildProcess(stimulusBatch, outTempFile);
+      outTempFile.close();
+      exit(EXIT_SUCCESS);
+      break;
+    }
+    default: // parent process
+      children.push_back(cPID);
+      break;
+    }
+  }
+  return children;
+}
+
+void SNN::forkJoin(std::list<pid_t> &childrenPIDs) {
+  bool done = false;
+  while (!done) {
+    for (pid_t &cPID : childrenPIDs) {
+      // Ignore completed processes
+      if (cPID == -1) {
+        continue;
+      }
+
+      int wstatus, w;
+      w = waitpid(cPID, &wstatus, WNOHANG); // don't wait for running processes
+      if (w == -1) {
+        lg->value(LogLevel::ERROR,
+                  "SNN::forkJoin: waitpid() returned -1 for child PID: %d",
+                  cPID);
+      } else if (WEXITSTATUS(wstatus) == EXIT_SUCCESS) {
+        lg->value(LogLevel::ESSENTIAL, "Child Process %d returned EXIT_SUCCESS",
+                  cPID);
+
+        // open the corresponding file
+        std::ifstream inTempFile;
+        std::string fileName = std::to_string(cPID) + ".log";
+        inTempFile.open(fileName);
+        if (!inTempFile.is_open()) {
+          lg->value(LogLevel::ERROR,
+                    "SNN::forkJoin: Error opening intTempFile with name %d.log",
+                    cPID);
+          lg->string(LogLevel::ERROR, "erno reports that %s", strerror(errno));
+          continue;
+        }
+        while (!inTempFile.eof()) {
+          int nID, gID, t, nt, sn, mt;
+          double p;
+          std::string line;
+          std::getline(inTempFile, line);
+          std::stringstream s(line);
+          s >> nID >> gID >> t >> p >> nt >> mt >> sn;
+          LogData *data =
+              new LogData(nID, gID, t, p, nt, static_cast<Message_t>(mt), sn);
+          lg->addData(data);
+          lg->value(LogLevel::INFO, "Adding data for cPID %d", cPID);
+        }
+        lg->value(LogLevel::INFO, "EOF reached for file %d.log", cPID);
+        inTempFile.close();
+        // remove(fileName.c_str());
+        cPID = -1;
       }
     }
-    break;
+    done = std::all_of(childrenPIDs.begin(), childrenPIDs.end(),
+                       [](pid_t x) { return x == -1; });
   }
-  remove(std::to_string(cPID).c_str());
 }
 
 /**
