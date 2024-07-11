@@ -169,8 +169,8 @@ void NeuronGroup::runMultithread() {
     pthread_mutex_unlock(&message_q_tex);
   }
 
-  // !DEBUG
-  std::cout << "Max message_q size was: " << max << "\n";
+  // // !DEBUG
+  // std::cout << "Max message_q size was: " << max << "\n";
 
   // Update our timestamp to the maximum possible time to reflect that this
   // group is finished
@@ -220,7 +220,7 @@ void NeuronGroup::runSingleThread() {
     empty = message_q.empty();
   }
   // !DEBUG
-  std::cout << "Max message_q size was: " << max << "\n";
+  // std::cout << "Max message_q size was: " << max << "\n";
 }
 
 /**
