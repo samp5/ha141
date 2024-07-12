@@ -40,7 +40,7 @@ max_synapse_delay = 2
 min_synapse_delay = 1
 
 #  Maximum weight for an edge 
-max_weight = 10.0
+max_weight = 100.0
 
 #  poisson_prob_of_success
 poisson_prob_of_success = 0.9
@@ -66,7 +66,7 @@ limit_log_size = true
 show_stimulus = false
 
 # simulated time per stimulus in "ms"
-time_per_stimulus = 100
+time_per_stimulus = 200
 
 # name of output file (if left blank, a timestamp is used
 output_file = ""
