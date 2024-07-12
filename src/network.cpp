@@ -991,10 +991,9 @@ void SNN::generateSynapsesFromAdjList(const AdjListParser::AdjList &adjList) {
       numEdges++;
     }
   }
-  size_t increment = nonInputNeurons.size() / input_neurons.size();
   for (size_t i = 0; i < input_neurons.size(); i++) {
     InputNeuron *origin = input_neurons.at(i);
-    Neuron *destination = nonInputNeurons.at(i * increment);
+    Neuron *destination = nonInputNeurons.at(i);
     origin->addNeighbor(destination);
     numEdges++;
   }
