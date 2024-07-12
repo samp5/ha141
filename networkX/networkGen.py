@@ -2,8 +2,8 @@ import networkx as nx
 import random
 
 def main():
-    G = nx.navigable_small_world_graph(84)
-    nx.write_adjlist(G, "out.adj")
+    G = nx.navigable_small_world_graph(4)
+    nx.write_adjlist(G, "small.adj")
     print(G);
 
     G2 = nx.turan_graph(4, 2);
