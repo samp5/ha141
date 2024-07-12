@@ -5,17 +5,21 @@
 #include "neuron_group.hpp"
 #include "runtime.hpp"
 #include <algorithm>
+#include <asm-generic/ioctls.h>
 #include <cerrno>
 #include <cmath>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <fcntl.h>
 #include <fstream>
 #include <iomanip>
 #include <pthread.h>
 #include <random>
 #include <sstream>
 #include <string>
+#include <sys/ioctl.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <vector>
@@ -538,12 +542,11 @@ void SNN::reset() {
   }
   gen.seed(config->RAND_SEED);
 }
-void SNN::runChildProcess(const std::vector<int> &stimulus,
-                          std::ofstream &tmpfile) {
-  lg->value(LogLevel::DEBUG4, "Child process running, PID: %d",
+void SNN::runChildProcess(const std::vector<int> &stimulus, int fd) {
+  lg->value(LogLevel::INFO, "Child process running, PID: %d",
             static_cast<int>(getpid()));
   config->STIMULUS = stimulus.begin();
-  lg->value(LogLevel::DEBUG4, "Child Process: stimulus set to line %d",
+  lg->value(LogLevel::DEBUG, "Child Process: stimulus set to line %d",
             *config->STIMULUS);
   config->num_stimulus = stimulus.size();
   inputFileReader->setToLine(*config->STIMULUS);
@@ -566,33 +569,41 @@ void SNN::runChildProcess(const std::vector<int> &stimulus,
       generateInputNeuronEvents();
     }
   }
-  lg->writeTempFile(tmpfile, groups);
+  lg->writeToFD(fd, groups);
+  exit(EXIT_SUCCESS);
 }
 
-std::list<pid_t>
-SNN::forkStart(const std::vector<std::vector<int>> &stimulusBatches) {
-  std::list<pid_t> children;
-  for (const auto &stimulusBatch : stimulusBatches) {
+void SNN::forkRun(const std::vector<std::vector<int>> &stimulusBatches) {
+  config->STIMULUS_VEC.clear();
+  std::vector<pid_t> children;
+  std::vector<int *> pipes;
+  for (size_t i = 0; i < stimulusBatches.size(); i++) {
+    config->STIMULUS_VEC.insert(config->STIMULUS_VEC.end(),
+                                stimulusBatches.at(i).begin(),
+                                stimulusBatches.at(i).end());
+    int *pipefd = (int *)malloc(sizeof(int) * 2);
+    int r = pipe(pipefd);
+    if (r == -1) {
+      lg->log(LogLevel::ERROR, "SNN::forkRun: pipe failed to create pipe "
+                               "file descriptors, pipe() returned -1");
+      lg->string(LogLevel::ERROR, "erno reports %s", strerror(errno));
+    }
+    pipes.push_back(pipefd);
+  }
+  for (size_t i = 0; i < stimulusBatches.size(); i++) {
     pid_t cPID = fork();
     switch (cPID) {
     case -1: // error state
-      lg->log(
-          LogLevel::ERROR,
-          "SNN::forkStart: failed to spawn child process, fork() returned -1");
+      lg->value(LogLevel::ERROR,
+                "SNN::forkRun: failed to spawn child process, fork() "
+                "returned -1, batch with first stimulus of line %d NOT run",
+                stimulusBatches.at(i).front());
+      lg->string(LogLevel::ERROR, "erno reports %s", strerror(errno));
       break;
-    case 0: { // child process
-      std::ofstream outTempFile;
-      std::string tmpFileName = std::to_string(getpid()) + ".log";
-      outTempFile.open(tmpFileName);
-      if (!outTempFile.is_open()) {
-        lg->value(LogLevel::ERROR,
-                  "Child process %d SNN::forkStart: Error opening outTempFile",
-                  getpid());
-        return {};
-      }
-      runChildProcess(stimulusBatch, outTempFile);
-      outTempFile.close();
-      exit(EXIT_SUCCESS);
+    case 0: {                    // child process
+      int *pipefd = pipes.at(i); // get the corresponding pipe array
+      close(pipefd[0]);          // close the read end
+      runChildProcess(stimulusBatches.at(i), pipefd[1]);
       break;
     }
     default: // parent process
@@ -600,59 +611,91 @@ SNN::forkStart(const std::vector<std::vector<int>> &stimulusBatches) {
       break;
     }
   }
-  return children;
+  forkRead(children, pipes);
 }
 
-void SNN::forkJoin(std::list<pid_t> &childrenPIDs) {
+void setNonBlocking(int fd) {
+  int flags = fcntl(fd, F_GETFL, 0);
+  fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+}
+
+void SNN::forkRead(std::vector<pid_t> &childrenPIDs,
+                   std::vector<int *> &pipes) {
   bool done = false;
+  for (auto pipefd : pipes) {
+    setNonBlocking(pipefd[0]);
+    close(pipefd[1]); // close write pipe
+  }
+
+  int numRecords = 0;
   while (!done) {
-    for (pid_t &cPID : childrenPIDs) {
+    for (size_t i = 0; i < childrenPIDs.size(); i++) {
       // Ignore completed processes
+      pid_t cPID = childrenPIDs.at(i);
       if (cPID == -1) {
         continue;
       }
 
-      int wstatus, w;
-      w = waitpid(cPID, &wstatus, WNOHANG); // don't wait for running processes
-      if (w == -1) {
-        lg->value(LogLevel::ERROR,
-                  "SNN::forkJoin: waitpid() returned -1 for child PID: %d",
-                  cPID);
-      } else if (WEXITSTATUS(wstatus) == EXIT_SUCCESS) {
-        lg->value(LogLevel::ESSENTIAL, "Child Process %d returned EXIT_SUCCESS",
-                  cPID);
+      int *pipefd = pipes.at(i); // get corresponding pipe
+      double arrBuf[7];
+      double buf;
+      int nbytes;
 
-        // open the corresponding file
-        std::ifstream inTempFile;
-        std::string fileName = std::to_string(cPID) + ".log";
-        inTempFile.open(fileName);
-        if (!inTempFile.is_open()) {
-          lg->value(LogLevel::ERROR,
-                    "SNN::forkJoin: Error opening intTempFile with name %d.log",
-                    cPID);
-          lg->string(LogLevel::ERROR, "erno reports that %s", strerror(errno));
-          continue;
+      lg->value(LogLevel::INFO, "Reading in data for Child Process %d", cPID);
+      lg->value(LogLevel::INFO, "Reading from FD %d", pipefd[0]);
+      // !DEBUG
+      // ioctl(pipefd[0], FIONREAD, &nbytes);
+      // lg->value(LogLevel::INFO, "FD has  %d bytes available", nbytes);
+
+      size_t NEURON_ID = 0;
+      size_t GROUP_ID = 1;
+      size_t TIMESTAMP = 2;
+      size_t POTENTIAL = 3;
+      size_t NEURON_TYPE = 4;
+      size_t MESSAGE_TYPE = 5;
+      size_t STIMULUS_NUMBER = 6;
+
+      int dataRead = 0;
+      while (read(pipefd[0], &buf, sizeof(double)) > 0) {
+        arrBuf[dataRead] = buf;
+        dataRead++;
+        if (dataRead == 7) {
+          // !DEBUG
+          // std::cout << "READ" << numRecords << ": ";
+          // for (int bufI = 0; bufI < 7; bufI++) {
+          //   std::cout << arrBuf[bufI] << " ";
+          // }
+          // std::cout << "\n";
+          numRecords++;
+          dataRead = 0;
+          LogData *toAdd = new LogData(
+              arrBuf[NEURON_ID], arrBuf[GROUP_ID], arrBuf[TIMESTAMP],
+              arrBuf[POTENTIAL], arrBuf[NEURON_TYPE],
+              static_cast<Message_t>(arrBuf[MESSAGE_TYPE]),
+              arrBuf[STIMULUS_NUMBER]);
+          lg->addData(toAdd);
         }
-        while (!inTempFile.eof()) {
-          int nID, gID, t, nt, sn, mt;
-          double p;
-          std::string line;
-          std::getline(inTempFile, line);
-          std::stringstream s(line);
-          s >> nID >> gID >> t >> p >> nt >> mt >> sn;
-          LogData *data =
-              new LogData(nID, gID, t, p, nt, static_cast<Message_t>(mt), sn);
-          lg->addData(data);
-          lg->value(LogLevel::INFO, "Adding data for cPID %d", cPID);
-        }
-        lg->value(LogLevel::INFO, "EOF reached for file %d.log", cPID);
-        inTempFile.close();
-        // remove(fileName.c_str());
-        cPID = -1;
+        // !DEBUG
+        // ioctl(pipefd[0], FIONREAD, &nbytes);
+        // lg->value(LogLevel::INFO, "FD has  %d bytes available", nbytes);
       }
+
+      int wstatus;
+      if (waitpid(cPID, &wstatus, WNOHANG)) {
+        lg->value(LogLevel::INFO, "SNN::forkRead: Closing FD %d", pipefd[0]);
+        close(pipefd[0]);
+        childrenPIDs.at(i) = -1;
+      }
+      lg->value(LogLevel::INFO, "Finished data read for Child Process %d",
+                cPID);
+      lg->value(LogLevel::INFO, "Read %d total records from pipe", numRecords);
     }
     done = std::all_of(childrenPIDs.begin(), childrenPIDs.end(),
                        [](pid_t x) { return x == -1; });
+  }
+
+  for (auto pPipeArr : pipes) {
+    free(pPipeArr);
   }
 }
 
@@ -883,7 +926,7 @@ void SNN::generateInputNeuronEvents() {
 }
 
 int SNN::generateCSV() {
-
+  std::sort(config->STIMULUS_VEC.begin(), config->STIMULUS_VEC.end());
   int max_stim = config->STIMULUS_VEC.back();
   int min_stim = config->STIMULUS_VEC.front();
   int totalActivations = 0;

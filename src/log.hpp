@@ -61,6 +61,15 @@ struct LogData {
             potential, neuron_type, message_type, stimulus_number);
     return std::string(toReturn);
   }
+  void storeDataIn(double ret[]) {
+    ret[0] = static_cast<double>(neuron_id);
+    ret[1] = static_cast<double>(group_id);
+    ret[2] = static_cast<double>(timestamp);
+    ret[3] = potential;
+    ret[4] = static_cast<double>(neuron_type);
+    ret[5] = static_cast<double>(message_type);
+    ret[6] = static_cast<double>(stimulus_number);
+  };
 };
 
 using hr_clock = std::chrono::high_resolution_clock;
@@ -83,8 +92,7 @@ public:
   ~Log();
   void startClock() { this->start = hr_clock::now(); }
   void writeData();
-  void writeTempFile(std::ofstream &tmpFile,
-                     const std::vector<NeuronGroup *> &neuronGroups);
+  void writeToFD(int fd, const std::vector<NeuronGroup *> &neuronGroups);
   void writeCSV(const std::vector<std::vector<int>> &mat);
   void addData(LogData *data);
   const vector<LogData *> &getLogData() const { return log_data; }

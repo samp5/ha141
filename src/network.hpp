@@ -86,10 +86,9 @@ public:
 
   // runtime operations
   void setNextStim();
-  std::list<pid_t> forkStart(const std::vector<std::vector<int>> &stimulusSets);
-  void forkJoin(std::list<pid_t> &childrenPIDs);
-  void runChildProcess(const std::vector<int> &stimulus,
-                       std::ofstream &tmpFile);
+  void forkRun(const std::vector<std::vector<int>> &stimulusSets);
+  void forkRead(std::vector<pid_t> &childrenPIDs, std::vector<int *> &pipes);
+  void runChildProcess(const std::vector<int> &stimulus, int fd);
   void start();
   void join();
   void reset();

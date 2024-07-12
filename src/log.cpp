@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <string>
 #include <sys/time.h>
+#include <unistd.h>
 
 pthread_mutex_t data_mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -113,15 +114,37 @@ void Log::addData(LogData *data) {
   this->log_data.push_back(data);
   pthread_mutex_unlock(&data_mutex);
 }
-void Log::writeTempFile(std::ofstream &tmpFile,
-                        const std::vector<NeuronGroup *> &neuronGroups) {
+void Log::writeToFD(int fd, const std::vector<NeuronGroup *> &neuronGroups) {
+  this->value(LogLevel::INFO, "Log::writeToFD: Writing for Child Process %d",
+              getpid());
+  int numRecordWritten = 0;
   for (const auto &group : neuronGroups) {
     for (const auto &neuron : group->getNeuronVec()) {
       for (const auto &lgData : neuron->getLogData()) {
-        tmpFile << lgData->toTmpFileString();
+        //! DEBUG
+        // std::cout << "WRITE" << numRecordWritten << ": ";
+        double arr[7];
+        lgData->storeDataIn(arr);
+        // !DEBUG
+        // for (size_t k = 0; k < 7; k++) {
+        //   std::cout << arr[k] << " ";
+        // }
+        int writeRet = write(fd, &arr, 7 * sizeof(double));
+        if (writeRet == -1) {
+          this->log(LogLevel::ERROR, "Log::writeToFD returned -1");
+        } else if (writeRet != 7 * sizeof(double)) {
+          this->value(LogLevel::ERROR, "Log::writeToFD returned %d", writeRet);
+        }
+        //! DEBUG
+        // std::cout << "\n";
+        numRecordWritten += 1;
       }
     }
   }
+  this->value(LogLevel::INFO, "Log::writeToFD: Wrote %d Records to pipe",
+              numRecordWritten);
+  this->value(LogLevel::INFO, "Log::writeToFD: Closing FD: %d", fd);
+  close(fd);
 }
 
 void Log::writeCSV(const std::vector<std::vector<int>> &mat) {
