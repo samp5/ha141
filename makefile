@@ -28,11 +28,11 @@ buildTest:  $(filter-out ./src/main.cpp, $(files)) $(deps)
 	@$(CXX) $(CXXFLAGS) $(filter-out ./src/main.cpp, $(files)) -o ./build/test.exe
 	@echo Done!
 
-pybind: $(files) $(deps) ./src/pybind/snn.hpp ./src/pybind/snn.cpp
+pybind: $(filter-out ./src/test.cpp, $(files)) $(deps) ./src/pybind/snn.hpp ./src/pybind/snn.cpp
 	@echo Target $@
 	@echo New Prerequsites: $? 
 	@echo Compiling...
-	@$(CXX2) $(PYFLAGS) $(files) ./src/pybind/snn.cpp -o ./extern/snn$(shell python3-config --extension-suffix)	
+	@$(CXX2) $(PYFLAGS) $(filter-out ./src/test.cpp, $(files)) ./src/pybind/snn.cpp -o ./extern/snn$(shell python3-config --extension-suffix)	
 	@echo Done!
 
 testpy: ./src/pybind/snn.cpp

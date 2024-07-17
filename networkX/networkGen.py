@@ -2,24 +2,31 @@ import networkx as nx
 import random
 
 def main():
-    G = nx.navigable_small_world_graph(4)
-    nx.write_adjlist(G, "small.adj")
+    G = nx.navigable_small_world_graph(10, seed=1)
     print(G);
+    print(type(nx.to_dict_of_dicts(G)));
+    print(nx.to_dict_of_dicts(G));
 
-    G2 = nx.turan_graph(4, 2);
-    nx.write_adjlist(G2, "out2.adj")
-    print(G2);
+    edgeWeights = {}
+    for n in G:
+        for nbr in G[n]:
+            G[n][nbr]["weight"] = random.random()
+            edgeDict = {}
+            edgeDict["weight"] = G[n][nbr]["weight"]
+            edgeWeights[n, nbr] = edgeDict
 
-
-    # edgeWeights = {}
-    # for n in G:
-    #     for nbr in G[n]:
-    #         G[n][nbr]["weight"] = random.random()
-    #         edgeDict = {}
-    #         edgeDict["weight"] = G[n][nbr]["weight"]
-    #         edgeWeights[n, nbr] = edgeDict
-    #
-
+    dod = nx.to_dict_of_dicts(G);
+    print(type(dod))
+    print(dod);
+    firstLevel = dod[0,0]
+    print(type(firstLevel))
+    print(firstLevel)
+    secondLevel = firstLevel[0,1];
+    print(type(secondLevel))
+    print(secondLevel)
+    thirdLevel = secondLevel["weight"];
+    print(type(thirdLevel))
+    print(thirdLevel)
     # for key, val in edgeWeights.items():
     #     edgeWeights[key]["weight"] = val["weight"]+ 10;
     #

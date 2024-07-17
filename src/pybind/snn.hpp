@@ -1,19 +1,29 @@
 #include "../../extern/pybind/include/pybind11/numpy.h"
 #include "../../extern/pybind/include/pybind11/pybind11.h"
 #include "../network.hpp"
+#include <map>
+#include <string>
+#include <tuple>
 #include <vector>
 
 namespace py = pybind11;
+using AdjDict =
+    std::map<std::tuple<int, int>,
+             std::map<std::tuple<int, int>, std::map<std::string, float>>>;
 
 class pySNN : public SNN {
 private:
   std::vector<std::vector<double>> data;
+  AdjDict adjList;
+  size_t maxLayer; // maximum "layer", aka maximum number of columns
 
 public:
   pySNN(std::vector<std::string> args);
-  void pyStart(py::buffer);
+  void pyStart();
   void pySetNextStim();
   void pyWrite();
+  void initialize(AdjDict dict, py::buffer buff);
+  void updateEdgeWeights(AdjDict dict);
   void processPyBuff(py::buffer &buff);
   void overrideConfigValues();
   py::array_t<int> pyOutput();
@@ -30,12 +40,16 @@ PYBIND11_MODULE(snn, m) {
       .def(py::init<std::vector<std::string>>())
       .def("generateSynapses", &pySNN::generateRandomSynapsesAdjMatrixGS,
            "Generate random neural connections")
+      .def("updateWeights", &pySNN::updateEdgeWeights,
+           "Generate random neural connections")
       .def("start", &pySNN::pyStart, "Start the neural network")
       .def("join", &SNN::join, "Wait for all threads to join")
       .def("writeData", &pySNN::pyWrite,
            "Write activation data to a file in ./logs")
       .def("getActivation", &pySNN::pyOutput,
-           "Get the activation data in the form of a numpy array");
+           "Get the activation data in the form of a numpy array")
+      .def("initialize", &pySNN::initialize,
+           "Initilize network from dict of dicts");
 }
 
 int add(int i, int j);

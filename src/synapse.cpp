@@ -9,7 +9,7 @@
 Synapse::Synapse(Neuron *from, Neuron *to, double w, double delay)
     : _origin(from), _destination(to),
       network(_origin->getGroup()->getNetwork()),
-      _weight(w == -1 ? randomWeight() : delay),
+      _weight(w == -1 ? randomWeight() : w),
       delay(delay == -1 ? randomDelay() : delay){};
 
 /**
@@ -55,4 +55,8 @@ double Synapse::randomWeight() {
                    static_cast<double>(RAND_MAX)) *
                   network->getConfig()->max_weight;
   return weight;
+}
+void Synapse::updateWeight(double newWeight) {
+  _lastWeight = _weight;
+  _weight = newWeight;
 }

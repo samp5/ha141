@@ -19,7 +19,7 @@ public:
   void propagate();
   int randomDelay();
   double randomWeight();
-  void alterWeight(double weight);
+  void updateWeight(double newWeight);
   double getWeight() { return _weight; }
 
 private:
@@ -27,6 +27,7 @@ private:
   Neuron *_destination = nullptr;
   SNN *network = nullptr;
   double _weight = 0.0;
+  double _lastWeight = 0.0;
   int delay = -1;
 };
 

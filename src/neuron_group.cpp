@@ -234,7 +234,6 @@ void NeuronGroup::runSingleThread() {
 void *NeuronGroup::run() {
 
   if (network->getConfig()->NUMBER_GROUPS == 1) {
-
     runSingleThread();
   } else {
     runMultithread();
@@ -287,11 +286,11 @@ void NeuronGroup::reset() {
       }
       network->lg->groupNeuronState(WARNING, "Group %d remaining messages", id,
                                     0);
-      for (auto m : message_q) {
-        network->lg->groupNeuronState(
-            WARNING, "\tFrom: %d Time: %d",
-            m->presynaptic_neuron->getGroup()->getID(), m->timestamp);
-      }
+      // for (auto m : message_q) {
+      //   network->lg->groupNeuronState(
+      //       WARNING, "\tFrom: %d Time: %d",
+      //       m->presynaptic_neuron->getGroup()->getID(), m->timestamp);
+      // }
     }
     neuron->reset();
   }

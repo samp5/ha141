@@ -104,6 +104,8 @@ SNN::SNN(std::vector<std::string> args) {
   generateInputNeuronVec();
   setInputNeuronLatency();
 }
+
+// default constructor for pySNN
 SNN::SNN() { lg = new Log(NULL); }
 
 void SNN::initializeFromSynapseFile(const std::vector<std::string> &args,
@@ -134,6 +136,7 @@ void SNN::initializeFromSynapseFile(const std::vector<std::string> &args,
     int y = dimensions.second;
     image = new Image(x, y, config->max_latency);
   }
+
   AdjListParser::AdjListInfo adjListInfo;
   getAdjancyListInfo(adjListFile, adjListInfo);
   lg->value(DEBUG4, "adjListInfo numberNodes is %d", adjListInfo.numberNodes);
@@ -639,7 +642,7 @@ void SNN::forkRead(std::vector<pid_t> &childrenPIDs,
       int *pipefd = pipes.at(i); // get corresponding pipe
       double arrBuf[7];
       double buf;
-      int nbytes;
+      // int nbytes;
 
       lg->value(LogLevel::INFO, "Reading in data for Child Process %d", cPID);
       lg->value(LogLevel::INFO, "Reading from FD %d", pipefd[0]);
