@@ -994,7 +994,8 @@ void SNN::generateSynapsesFromAdjList(const AdjListParser::AdjList &adjList) {
       numEdges++;
     }
   }
-  for (size_t i = 0; i < input_neurons.size(); i++) {
+  size_t minIndex = std::min(input_neurons.size(), nonInputNeurons.size());
+  for (size_t i = 0; i < minIndex; i++) {
     InputNeuron *origin = input_neurons.at(i);
     Neuron *destination = nonInputNeurons.at(i);
     origin->addNeighbor(destination);
