@@ -12,12 +12,14 @@
 int add(int i, int j) { return i + j; }
 
 pySNN::pySNN(std::vector<std::string> args) : SNN() {
-  lg->setNetwork(this);
+  lg->setNetwork(this); // log gets allocated in SNN()
   config = new RuntimConfig(this);
   config->parseArgs(args);
   config->checkStartCond();
   mutex = new Mutex;
+
   barrier = new Barrier(config->NUMBER_GROUPS + 1);
+  // no need for input file reader
 
   gen = std::mt19937(rd());
   gen.seed(config->RAND_SEED);
@@ -38,9 +40,9 @@ void pySNN::updateEdgeWeights(AdjDict dict) {
 
   for (auto adjacencyPair : dict) {
 
-    // !DEBUG
-    std::cout << "Updating weights for (" << std::get<0>(adjacencyPair.first)
-              << ", " << std::get<1>(adjacencyPair.first) << ")\n";
+    // // !DEBUG
+    // std::cout << "Updating weights for (" << std::get<0>(adjacencyPair.first)
+    //           << ", " << std::get<1>(adjacencyPair.first) << ")\n";
 
     int originIndex = getIndex(adjacencyPair.first, maxLayer);
 
@@ -54,9 +56,10 @@ void pySNN::updateEdgeWeights(AdjDict dict) {
       double weight = edgeWeightPair.second.at("weight");
 
       // !DEBUG
-      std::cout << "\t(" << std::get<0>(edgeWeightPair.first) << ", "
-                << std::get<1>(edgeWeightPair.first) << ") updated weight to "
-                << weight << "\n";
+      // std::cout << "\t(" << std::get<0>(edgeWeightPair.first) << ", "
+      //           << std::get<1>(edgeWeightPair.first) << ") updated weight to
+      //           "
+      //           << weight << "\n";
 
       Neuron *destination = nonInputNeurons.at(destinationIndex);
       bool updated = false;
@@ -76,11 +79,42 @@ void pySNN::updateEdgeWeights(AdjDict dict) {
   }
 }
 
-void pySNN::initialize(AdjDict dict, py::buffer buff) {
+void pySNN::updateConfigToBuffDim() {
+  config->STIMULUS_VEC.clear();
+  std::vector<int>::size_type number_lines = data.size();
+  for (std::vector<int>::size_type i = 0; i < number_lines; i++) {
+    config->STIMULUS_VEC.push_back(i);
+  }
+  config->STIMULUS = config->STIMULUS_VEC.begin();
+  config->num_stimulus = config->STIMULUS_VEC.size();
+}
 
-  processPyBuff(buff);
-  overrideConfigValues();
+void pySNN::generateImageFromBuff() {
+  // Adjust the number of input neurons if needed
+  if (static_cast<size_t>(config->NUMBER_INPUT_NEURONS) !=
+      data.front().size()) {
+    lg->value(WARNING,
+              "Number of input neurons does not equal the number of "
+              "elements per stimulus, setting number of input neurons to %d",
+              (int)data.front().size());
+  }
+  config->NUMBER_INPUT_NEURONS = data.front().size();
 
+  // Make the image based on squareness
+  if (Image::isSquare(config->NUMBER_INPUT_NEURONS)) {
+    lg->log(ESSENTIAL, "Assuming square input image");
+    image = new Image(config->NUMBER_INPUT_NEURONS, config->max_latency);
+  } else {
+    lg->log(ESSENTIAL,
+            "Input image not square, using smallest perimeter rectangle");
+
+    auto dimensions = Image::bestRectangle(config->NUMBER_INPUT_NEURONS);
+    int x = dimensions.first;
+    int y = dimensions.second;
+    image = new Image(x, y, config->max_latency);
+  }
+}
+void pySNN::updateConfigToAdjList(const AdjDict &dict) {
   // overrides based on input
   int numberNonInput = dict.size();
   lg->value(LogLevel::INFO, "numberNonInput is %d", numberNonInput);
@@ -89,10 +123,21 @@ void pySNN::initialize(AdjDict dict, py::buffer buff) {
             config->NUMBER_INPUT_NEURONS);
   config->NUMBER_NEURONS = config->NUMBER_INPUT_NEURONS + numberNonInput;
   lg->value(LogLevel::DEBUG, "NUMBER_NEURONS is %d", config->NUMBER_NEURONS);
+}
+void pySNN::initialize(AdjDict dict, py::buffer buff) {
 
+  processPyBuff(buff);
+  // update the NUMBER_INPUT_NEURONS to match the buffer dimensions
+  updateConfigToBuffDim();
+  generateImageFromBuff();
+  updateConfigToAdjList(dict);
+
+  // Neurons per group
   int neuronPerGroup = config->NUMBER_NEURONS / config->NUMBER_GROUPS;
   int inputNeuronPerGroup =
       config->NUMBER_INPUT_NEURONS / config->NUMBER_GROUPS;
+
+  // Remainders
   int neuronPerGroupRe = config->NUMBER_NEURONS % config->NUMBER_GROUPS;
   int inputNeuronPerGroupRe =
       config->NUMBER_INPUT_NEURONS % config->NUMBER_GROUPS;
@@ -114,10 +159,13 @@ void pySNN::initialize(AdjDict dict, py::buffer buff) {
   generateAllNeuronVec();
   lg->value(LogLevel::INFO, "all neuron vector has size %d",
             (int)neurons.size());
+
   lg->log(LogLevel::INFO, "Generating input neuron vector");
   generateInputNeuronVec();
+  setInputNeuronLatency();
   lg->value(LogLevel::INFO, "Input neuron vector has size %d",
             (int)input_neurons.size());
+
   lg->log(LogLevel::INFO, "Generating non-input neuron vector");
   generateNonInputNeuronVec();
   lg->value(LogLevel::INFO, "non-input neuron vector has size %d",
@@ -130,16 +178,16 @@ void pySNN::initialize(AdjDict dict, py::buffer buff) {
   for (auto adjacencyPair : dict) {
 
     // !DEBUG
-    std::cout << "(" << std::get<0>(adjacencyPair.first) << ", "
-              << std::get<1>(adjacencyPair.first) << ")\n";
+    // std::cout << "(" << std::get<0>(adjacencyPair.first) << ", "
+    //           << std::get<1>(adjacencyPair.first) << ")\n";
 
     int originIndex = getIndex(adjacencyPair.first, maxLayer);
 
     for (auto edgeWeightPair : adjacencyPair.second) {
 
       // !DEBUG
-      std::cout << "\t(" << std::get<0>(edgeWeightPair.first) << ", "
-                << std::get<1>(edgeWeightPair.first) << ")\n";
+      // std::cout << "\t(" << std::get<0>(edgeWeightPair.first) << ", "
+      //           << std::get<1>(edgeWeightPair.first) << ")\n";
 
       int destinationIndex = getIndex(edgeWeightPair.first, maxLayer);
       double weight = edgeWeightPair.second.at("weight");
@@ -164,8 +212,6 @@ void pySNN::initialize(AdjDict dict, py::buffer buff) {
     origin->addNeighbor(destination, 1);
     numEdges++;
   }
-
-  setInputNeuronLatency();
 }
 
 void pySNN::processPyBuff(py::buffer &buff) {
@@ -188,43 +234,6 @@ void pySNN::processPyBuff(py::buffer &buff) {
       row.push_back(*(row_ptr + j * info.strides.at(1) / sizeof(double)));
     }
     data.push_back(row);
-  }
-}
-
-// !TODO This funciton is bad and should probably be moved elsewhere
-void pySNN::overrideConfigValues() {
-
-  // override stimulus
-  config->STIMULUS_VEC.clear();
-  std::vector<int>::size_type number_lines = data.size();
-  for (std::vector<int>::size_type i = 0; i < number_lines; i++) {
-    config->STIMULUS_VEC.push_back(i);
-  }
-  config->STIMULUS = config->STIMULUS_VEC.begin();
-  config->num_stimulus = config->STIMULUS_VEC.size();
-
-  if (static_cast<size_t>(config->NUMBER_INPUT_NEURONS) !=
-      data.front().size()) {
-    lg->value(WARNING,
-              "Number of input neurons does not equal the number of "
-              "elements per stimulus, setting to %d",
-              (int)data.front().size());
-  }
-  config->NUMBER_INPUT_NEURONS = data.front().size();
-
-  // This is just here so that we can ensure that the images is updated based on
-  // the buffer
-  if (Image::isSquare(config->NUMBER_INPUT_NEURONS)) {
-    lg->log(ESSENTIAL, "Assuming square input image");
-    image = new Image(config->NUMBER_INPUT_NEURONS, config->max_latency);
-  } else {
-    lg->log(ESSENTIAL,
-            "Input image not square, using smallest perimeter rectangle");
-
-    auto dimensions = Image::bestRectangle(config->NUMBER_INPUT_NEURONS);
-    int x = dimensions.first;
-    int y = dimensions.second;
-    image = new Image(x, y, config->max_latency);
   }
 }
 

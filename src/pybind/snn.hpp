@@ -25,7 +25,9 @@ public:
   void initialize(AdjDict dict, py::buffer buff);
   void updateEdgeWeights(AdjDict dict);
   void processPyBuff(py::buffer &buff);
-  void overrideConfigValues();
+  void updateConfigToBuffDim();
+  void generateImageFromBuff();
+  void updateConfigToAdjList(const AdjDict &dict);
   py::array_t<int> pyOutput();
 };
 
@@ -41,7 +43,7 @@ PYBIND11_MODULE(snn, m) {
       .def("generateSynapses", &pySNN::generateRandomSynapsesAdjMatrixGS,
            "Generate random neural connections")
       .def("updateWeights", &pySNN::updateEdgeWeights,
-           "Generate random neural connections")
+           "Update edge weights based on dict of dicts")
       .def("start", &pySNN::pyStart, "Start the neural network")
       .def("join", &SNN::join, "Wait for all threads to join")
       .def("writeData", &pySNN::pyWrite,
