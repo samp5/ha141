@@ -580,6 +580,15 @@ void SNN::forkRun(const std::vector<std::vector<int>> &stimulusBatches) {
   config->STIMULUS_VEC.clear();
   std::vector<pid_t> children;
   std::vector<int *> pipes;
+
+  // All the stimulus "lines" get inserted into the stimulus vector
+  // for the following reason:
+  //
+  // When we access activation data, the line number passed as the
+  // stimulus number is connected to the activation log. The way the
+  // max and min stimulus number is determined is by the max and min element
+  // in the config->STIMULUS_VEC
+  //
   for (size_t i = 0; i < stimulusBatches.size(); i++) {
     config->STIMULUS_VEC.insert(config->STIMULUS_VEC.end(),
                                 stimulusBatches.at(i).begin(),
