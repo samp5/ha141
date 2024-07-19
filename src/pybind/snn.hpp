@@ -23,8 +23,13 @@ public:
   void pySetNextStim();
   void pyWrite();
   void initialize(AdjDict dict, py::buffer buff);
+  void initialize(AdjDict dict, size_t NUMBER_INPUT_NEURONS);
+  void initialize(AdjDict &dict);
+  void runBatch(py::buffer &buff);
   void updateEdgeWeights(AdjDict dict);
   void processPyBuff(py::buffer &buff);
+  void forkRun();
+  void runChildProcess(int fd);
   void updateStimulusVectorToBuffDim();
   void generateImage();
   void updateConfigToAdjList(const AdjDict &dict);
@@ -50,8 +55,12 @@ PYBIND11_MODULE(snn, m) {
            "Write activation data to a file in ./logs")
       .def("getActivation", &pySNN::pyOutput,
            "Get the activation data in the form of a numpy array")
-      .def("initialize", &pySNN::initialize,
-           "Initilize network from dict of dicts");
+      .def("initialize",
+           py::overload_cast<AdjDict, py::buffer>(&pySNN::initialize),
+           "Initilize network from dict of dicts")
+      .def("initialize", py::overload_cast<AdjDict, size_t>(&pySNN::initialize),
+           "Initilize network from dict of dicts")
+      .def("runBatch", &pySNN::runBatch, "Run a batch in a child process");
 }
 
 int add(int i, int j);
