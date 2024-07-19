@@ -26,6 +26,25 @@ pySNN::pySNN(std::vector<std::string> args) : SNN() {
   image = nullptr; // we have to wait to initalize the images until we know the
                    // size of the python buffer
 }
+
+/**
+ * @brief Transform the coordinate of a 2D array into a 1D index.
+ *
+ *
+ * Returns the index as if the rows of the 2D array were laid end to end
+ *
+ * Given (x,y) such that (x, y) identify a point in an n by m matrix,
+ * return an index of a 1D matrix of n * m elements.
+ *
+ * (0,0) => 0
+ * (m, n) => m*n - 1.
+ *
+ * For (a, b) => j, (c,d) => k, if a > c, j > k.
+ *
+ * @param pair coordinate (x,y) in a tuple
+ * @param maxLayer the value of m (number of rows)
+ * @return index of the 1D array
+ */
 int getIndex(const std::tuple<int, int> &pair, int maxLayer) {
   int x = std::get<0>(pair);
   int y = std::get<1>(pair);
@@ -34,15 +53,17 @@ int getIndex(const std::tuple<int, int> &pair, int maxLayer) {
   return index;
 }
 
+/**
+ * @brief update the Edge weights based on a dict of dicts.
+ *
+ * @param dict a AdjDict representing the graph
+ *
+ */
 void pySNN::updateEdgeWeights(AdjDict dict) {
 
   using std::get;
 
-  for (auto adjacencyPair : dict) {
-
-    // // !DEBUG
-    // std::cout << "Updating weights for (" << std::get<0>(adjacencyPair.first)
-    //           << ", " << std::get<1>(adjacencyPair.first) << ")\n";
+  for (const auto &adjacencyPair : dict) {
 
     int originIndex = getIndex(adjacencyPair.first, maxLayer);
 
@@ -50,16 +71,10 @@ void pySNN::updateEdgeWeights(AdjDict dict) {
         nonInputNeurons.at(originIndex)
             ->getPostSynaptic(); // get outgoing connections
 
-    for (auto edgeWeightPair : adjacencyPair.second) {
+    for (const auto &edgeWeightPair : adjacencyPair.second) {
 
       int destinationIndex = getIndex(edgeWeightPair.first, maxLayer);
       double weight = edgeWeightPair.second.at("weight");
-
-      // !DEBUG
-      // std::cout << "\t(" << std::get<0>(edgeWeightPair.first) << ", "
-      //           << std::get<1>(edgeWeightPair.first) << ") updated weight to
-      //           "
-      //           << weight << "\n";
 
       Neuron *destination = nonInputNeurons.at(destinationIndex);
       bool updated = false;
@@ -70,6 +85,7 @@ void pySNN::updateEdgeWeights(AdjDict dict) {
           break;
         }
       }
+
       if (!updated) {
         lg->log(LogLevel::ERROR,
                 "pySNN::updateEdgeWeights: While updating weight, destination "
@@ -79,7 +95,7 @@ void pySNN::updateEdgeWeights(AdjDict dict) {
   }
 }
 
-void pySNN::updateConfigToBuffDim() {
+void pySNN::updateStimulusVectorToBuffDim() {
   config->STIMULUS_VEC.clear();
   std::vector<int>::size_type number_lines = data.size();
   for (std::vector<int>::size_type i = 0; i < number_lines; i++) {
@@ -90,7 +106,15 @@ void pySNN::updateConfigToBuffDim() {
 }
 
 void pySNN::generateImageFromBuff() {
-  // Adjust the number of input neurons if needed
+  /*
+   * The passed buffer (which is at this point stored in pySNN::data
+   * Has dimensions m x n, where m is the number of stimulus in this batch
+   * and n is the number of input neurons required to observe the stimulus
+   *
+   * Here, we update the number of inputNeurons (that was previously parsed
+   * from the configuraiton file) to match the required number specifed by
+   * the passed buffer
+   */
   if (static_cast<size_t>(config->NUMBER_INPUT_NEURONS) !=
       data.front().size()) {
     lg->value(WARNING,
@@ -100,7 +124,16 @@ void pySNN::generateImageFromBuff() {
   }
   config->NUMBER_INPUT_NEURONS = data.front().size();
 
-  // Make the image based on squareness
+  lg->value(LogLevel::INFO, "NUMBER_INPUT_NEURONS is %d",
+            config->NUMBER_INPUT_NEURONS);
+
+  /*
+   * The number of input neurons affects the calulated latency
+   * via Image::getLatency.
+   *
+   * Test if the number of input neurons is a perfect square
+   * otherwise using a rectangle with the smallest possible perimeter
+   */
   if (Image::isSquare(config->NUMBER_INPUT_NEURONS)) {
     lg->log(ESSENTIAL, "Assuming square input image");
     image = new Image(config->NUMBER_INPUT_NEURONS, config->max_latency);
@@ -114,22 +147,47 @@ void pySNN::generateImageFromBuff() {
     image = new Image(x, y, config->max_latency);
   }
 }
+
 void pySNN::updateConfigToAdjList(const AdjDict &dict) {
   // overrides based on input
+  //
+
+  /*
+   * The passed dictionary determines the number of neurons
+   * (as opposed to the configuration file).
+   *
+   * Here we update those values and associated values
+   */
   int numberNonInput = dict.size();
+
   lg->value(LogLevel::INFO, "numberNonInput is %d", numberNonInput);
-  config->NUMBER_INPUT_NEURONS = image->width * image->height;
-  lg->value(LogLevel::INFO, "NUMBER_INPUT_NEURONS is %d",
-            config->NUMBER_INPUT_NEURONS);
+
   config->NUMBER_NEURONS = config->NUMBER_INPUT_NEURONS + numberNonInput;
+
   lg->value(LogLevel::DEBUG, "NUMBER_NEURONS is %d", config->NUMBER_NEURONS);
 }
+
 void pySNN::initialize(AdjDict dict, py::buffer buff) {
 
   processPyBuff(buff);
-  // update the NUMBER_INPUT_NEURONS to match the buffer dimensions
-  updateConfigToBuffDim();
+
+  /*
+   * Here we break the normal flow to update the configuration values based on
+   * the passed buffer and dictionary
+   */
+  updateStimulusVectorToBuffDim();
+
+  /*
+   * Generate and images based on the buffer dimensions
+   */
   generateImageFromBuff();
+
+  /*
+   * The graph generation is completely decided based on the passed
+   * NetworkX dict of dicts.
+   *
+   * Update the Neuron counts based on that dictionary
+   */
   updateConfigToAdjList(dict);
 
   // Neurons per group
@@ -143,33 +201,39 @@ void pySNN::initialize(AdjDict dict, py::buffer buff) {
       config->NUMBER_INPUT_NEURONS % config->NUMBER_GROUPS;
 
   lg->log(LogLevel::INFO, "Adding NeuronGroups");
+
   for (int i = 0; i < config->NUMBER_GROUPS; i++) {
-    int npgRe = neuronPerGroupRe ? 1 : 0;
-    int inpgRe = inputNeuronPerGroupRe ? 1 : 0;
-    // allocate for this group
+    int npgRe = neuronPerGroupRe ? 1 : 0;       // apply a paritial remainder?
+    int inpgRe = inputNeuronPerGroupRe ? 1 : 0; // apply a paritial remainder?
+
     NeuronGroup *this_group = new NeuronGroup(
         i + 1, neuronPerGroup + npgRe, inputNeuronPerGroup + inpgRe, this);
 
-    // add to vector
     groups.push_back(this_group);
   }
 
   // Generate vectors differentiated by type
-  lg->log(LogLevel::INFO, "Generating all neuron vector");
-  generateAllNeuronVec();
-  lg->value(LogLevel::INFO, "all neuron vector has size %d",
-            (int)neurons.size());
+  // lg->log(LogLevel::INFO, "Generating all neuron vector");
 
-  lg->log(LogLevel::INFO, "Generating input neuron vector");
+  generateAllNeuronVec();
+
+  // lg->value(LogLevel::INFO, "all neuron vector has size %d",
+  //           (int)neurons.size());
+
+  // lg->log(LogLevel::INFO, "Generating input neuron vector");
+
   generateInputNeuronVec();
   setInputNeuronLatency();
-  lg->value(LogLevel::INFO, "Input neuron vector has size %d",
-            (int)input_neurons.size());
 
-  lg->log(LogLevel::INFO, "Generating non-input neuron vector");
+  // lg->value(LogLevel::INFO, "Input neuron vector has size %d",
+  //           (int)input_neurons.size());
+
+  //  lg->log(LogLevel::INFO, "Generating non-input neuron vector");
+
   generateNonInputNeuronVec();
-  lg->value(LogLevel::INFO, "non-input neuron vector has size %d",
-            (int)nonInputNeurons.size());
+
+  // lg->value(LogLevel::INFO, "non-input neuron vector has size %d",
+  //           (int)nonInputNeurons.size());
 
   using std::get;
   maxLayer = std::get<0>((*dict.end()).first); // set the max layer
@@ -177,17 +241,9 @@ void pySNN::initialize(AdjDict dict, py::buffer buff) {
 
   for (auto adjacencyPair : dict) {
 
-    // !DEBUG
-    // std::cout << "(" << std::get<0>(adjacencyPair.first) << ", "
-    //           << std::get<1>(adjacencyPair.first) << ")\n";
-
     int originIndex = getIndex(adjacencyPair.first, maxLayer);
 
     for (auto edgeWeightPair : adjacencyPair.second) {
-
-      // !DEBUG
-      // std::cout << "\t(" << std::get<0>(edgeWeightPair.first) << ", "
-      //           << std::get<1>(edgeWeightPair.first) << ")\n";
 
       int destinationIndex = getIndex(edgeWeightPair.first, maxLayer);
       double weight = edgeWeightPair.second.at("weight");
@@ -206,6 +262,7 @@ void pySNN::initialize(AdjDict dict, py::buffer buff) {
             "and nonInputNeurons vector is 0?");
     return;
   }
+
   for (size_t i = 0; i < max_size; i++) {
     InputNeuron *origin = input_neurons.at(i);
     Neuron *destination = nonInputNeurons.at(i);
