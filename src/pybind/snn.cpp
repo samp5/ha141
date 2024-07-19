@@ -95,6 +95,13 @@ void pySNN::updateEdgeWeights(AdjDict dict) {
   }
 }
 
+/**
+ * @brief Set RuntimConfig::STIMULUS_VEC and RuntimConfig::Stimulus to align
+ * with pySNN::data.
+ *
+ *  description
+ *
+ */
 void pySNN::updateStimulusVectorToBuffDim() {
   config->STIMULUS_VEC.clear();
   std::vector<int>::size_type number_lines = data.size();
@@ -155,9 +162,6 @@ void pySNN::generateImage() {
 }
 
 void pySNN::updateConfigToAdjList(const AdjDict &dict) {
-  // overrides based on input
-  //
-
   /*
    * The passed dictionary determines the number of neurons
    * (as opposed to the configuration file).
@@ -173,20 +177,11 @@ void pySNN::updateConfigToAdjList(const AdjDict &dict) {
   lg->value(LogLevel::DEBUG, "NUMBER_NEURONS is %d", config->NUMBER_NEURONS);
 }
 
-void pySNN::initialize(AdjDict dict, py::buffer buff) {
-
-  processPyBuff(buff);
-
-  /*
-   * Here we break the normal flow to update the configuration values based on
-   * the passed buffer and dictionary
-   */
-  updateStimulusVectorToBuffDim();
-
+void pySNN::initialize(AdjDict &dict) {
   /*
    * Generate and images based on the buffer dimensions
    */
-  generateImageFromBuff();
+  generateImage();
 
   /*
    * The graph generation is completely decided based on the passed
@@ -277,6 +272,25 @@ void pySNN::initialize(AdjDict dict, py::buffer buff) {
   }
 }
 
+void pySNN::initialize(AdjDict dict, size_t nInputNeurons) {
+  config->NUMBER_INPUT_NEURONS = nInputNeurons;
+  initialize(dict);
+}
+
+void pySNN::initialize(AdjDict dict, py::buffer buff) {
+  processPyBuff(buff);
+  initialize(dict);
+}
+
+/**
+ * @brief initialize pySNN::data with data from buffer
+ *
+ * Given a numpy array of type py::buffer, generate a matrix
+ * (std::vector<std::vector<double>>) that is a copy of that
+ * matrix and store it in pySNN::data
+ *
+ * @param buff reference to py::buffer (numpy array)
+ */
 void pySNN::processPyBuff(py::buffer &buff) {
   // get buffer
   py::buffer_info info = buff.request();
@@ -302,8 +316,15 @@ void pySNN::processPyBuff(py::buffer &buff) {
 
 void pySNN::pyStart() {
 
+  /*
+   * Here we break the normal flow to update the configuration values based on
+   * the passed buffer and dictionary
+   */
+  updateStimulusVectorToBuffDim();
+
   pySetNextStim();
   generateInputNeuronEvents();
+
   if (config->show_stimulus) {
     lg->value(ESSENTIAL, "Set stimulus to line %d", *config->STIMULUS);
   }
