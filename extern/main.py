@@ -23,7 +23,7 @@ print(f"-> Done, took {(end - start):.5f} seconds")
 
 print("-> Mapping scale function to dataset...")
 start = time.time()
-images = images.to_numpy()[0:10]
+images = images.to_numpy()[0:5]
 vectorized_div = np.vectorize(div)
 images = vectorized_div(images)
 end = time.time()
@@ -49,9 +49,9 @@ for n in G:
 print("-> Starting network...")
 args = ["dummy", "base_config.toml"]
 net = snn.pySNN(args)
-net.initialize(nx.to_dict_of_dicts(G), images);
+net.initialize(nx.to_dict_of_dicts(G), 784)
 start = time.time()
-net.start()
+net.runBatch(images)
 end = time.time()
 
 # for n in G:
