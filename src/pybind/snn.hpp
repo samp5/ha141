@@ -26,7 +26,7 @@ public:
   void updateEdgeWeights(AdjDict dict);
   void processPyBuff(py::buffer &buff);
   void updateStimulusVectorToBuffDim();
-  void generateImageFromBuff();
+  void generateImage();
   void updateConfigToAdjList(const AdjDict &dict);
   py::array_t<int> pyOutput();
 };

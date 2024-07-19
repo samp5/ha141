@@ -105,7 +105,7 @@ void pySNN::updateStimulusVectorToBuffDim() {
   config->num_stimulus = config->STIMULUS_VEC.size();
 }
 
-void pySNN::generateImageFromBuff() {
+void pySNN::generateImage() {
   /*
    * The passed buffer (which is at this point stored in pySNN::data
    * Has dimensions m x n, where m is the number of stimulus in this batch
@@ -115,14 +115,20 @@ void pySNN::generateImageFromBuff() {
    * from the configuraiton file) to match the required number specifed by
    * the passed buffer
    */
-  if (static_cast<size_t>(config->NUMBER_INPUT_NEURONS) !=
-      data.front().size()) {
+  if (data.empty()) {
+    lg->log(
+        LogLevel::INFO,
+        "pySNN::data is empty, trusting "
+        "RuntimConfig::NUMBER_INPUT_NEURONS is correct (this value is set by "
+        "either configuration file, or overridden by pySNN::initialize)");
+  } else if (static_cast<size_t>(config->NUMBER_INPUT_NEURONS) !=
+             data.front().size()) {
     lg->value(WARNING,
               "Number of input neurons does not equal the number of "
               "elements per stimulus, setting number of input neurons to %d",
               (int)data.front().size());
+    config->NUMBER_INPUT_NEURONS = data.front().size();
   }
-  config->NUMBER_INPUT_NEURONS = data.front().size();
 
   lg->value(LogLevel::INFO, "NUMBER_INPUT_NEURONS is %d",
             config->NUMBER_INPUT_NEURONS);
