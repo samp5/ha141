@@ -201,20 +201,7 @@ void NeuronGroup::runSingleThread() {
     // retrieve the top message in priority q
     Message *message = getMessage();
 
-    // run neuron on message
-    switch (message->post_synaptic_neuron->getType()) {
-    case Neuron_t::Input: {
-      InputNeuron *in =
-          dynamic_cast<InputNeuron *>(message->post_synaptic_neuron);
-      in->run(message);
-      break;
-    }
-    case Neuron_t::None: {
-      Neuron *n = message->post_synaptic_neuron;
-      n->run(message);
-      break;
-    }
-    }
+    message->post_synaptic_neuron->run(message);
 
     // Update our empty bool
     empty = message_q.empty();

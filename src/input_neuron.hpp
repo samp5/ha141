@@ -17,8 +17,8 @@ protected:
 
 public:
   InputNeuron(int _id, NeuronGroup *group, int latency);
-  void reset();
-  void run(Message *message);
+  void reset() override;
+  void run(Message *message) override;
   bool poissonResult() const;
   void setInputValue(long double value);
   void setLatency(int latency);
