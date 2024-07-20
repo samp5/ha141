@@ -286,11 +286,16 @@ void NeuronGroup::reset() {
       }
       network->lg->groupNeuronState(WARNING, "Group %d remaining messages", id,
                                     0);
-      // for (auto m : message_q) {
-      //   network->lg->groupNeuronState(
-      //       WARNING, "\tFrom: %d Time: %d",
-      //       m->presynaptic_neuron->getGroup()->getID(), m->timestamp);
-      // }
+
+      // nullptr check covers the case of stimulus messages
+      for (auto m : message_q) {
+        network->lg->groupNeuronState(
+            WARNING, "\tFrom: %d Time: %d",
+            m->presynaptic_neuron == nullptr
+                ? -1
+                : m->presynaptic_neuron->getGroup()->getID(),
+            m->timestamp);
+      }
     }
     neuron->reset();
   }
