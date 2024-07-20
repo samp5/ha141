@@ -3,6 +3,8 @@
 #include "../runtime.hpp"
 #include <algorithm>
 #include <climits>
+#include <cstring>
+#include <iomanip>
 #include <numeric>
 #include <pthread.h>
 #include <stdexcept>
@@ -270,6 +272,8 @@ void pySNN::initialize(AdjDict &dict) {
     origin->addNeighbor(destination, 1);
     numEdges++;
   }
+
+  config->NUMBER_EDGES = numEdges;
 }
 
 void pySNN::initialize(AdjDict dict, size_t nInputNeurons) {
@@ -521,4 +525,27 @@ void pySNN::batchReset() {
   reset();
   lg->batchReset();
   data.clear();
+}
+
+void pySNN::outputState() {
+  std::string underline(60, '=');
+  std::cout << std::setw(30 - strlen("Python SNN State") / 2) << " ";
+  std::cout << "Python SNN State\n";
+  std::cout << std::setw(30 - strlen("Python SNN State") / 2) << " ";
+  std::cout << std::setw(0) << underline;
+  std::cout << std::setw(35) << "Number of Neurons: " << std::setw(10)
+            << config->NUMBER_NEURONS << "\n";
+  std::cout << std::setw(35) << "Number of InputNeurons: " << std::setw(10)
+            << config->NUMBER_INPUT_NEURONS << "\n";
+  std::cout << std::setw(35) << "Number of non-input Neurons: " << std::setw(10)
+            << config->NUMBER_NEURONS - config->NUMBER_INPUT_NEURONS << "\n";
+  std::cout << std::setw(35) << "Number of NeuronGroups: " << std::setw(10)
+            << config->NUMBER_GROUPS << "\n";
+  std::cout << std::setw(35) << "Number of Edges: " << std::setw(10)
+            << config->NUMBER_EDGES << "\n";
+  std::cout << std::setw(35) << "Data dimensions: " << std::setw(10)
+            << data.size() << " stimulus, " << data.front().size()
+            << " inputs per stimulus" << "\n";
+  std::cout << std::setw(35) << "Log size: " << std::setw(10)
+            << lg->getLogData().size() << "\n";
 }

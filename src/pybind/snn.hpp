@@ -35,6 +35,7 @@ public:
   void updateConfigToAdjList(const AdjDict &dict);
   void batchReset();
   py::array_t<int> pyOutput();
+  void outputState();
 };
 
 PYBIND11_MODULE(snn, m) {
@@ -61,7 +62,9 @@ PYBIND11_MODULE(snn, m) {
            "Initilize network from dict of dicts")
       .def("initialize", py::overload_cast<AdjDict, size_t>(&pySNN::initialize),
            "Initilize network from dict of dicts")
-      .def("runBatch", &pySNN::runBatch, "Run a batch in a child process");
+      .def("runBatch", &pySNN::runBatch, "Run a batch in a child process")
+      .def("batchReset", &pySNN::batchReset, "Reset network after a batch run")
+      .def("outputState", &pySNN::outputState, "Output state");
 }
 
 int add(int i, int j);
