@@ -90,6 +90,15 @@ public:
   Log(SNN *network) : start(hr_clock::now()), offset(0.0f), network(network) {}
   Log() : start(hr_clock::now()), offset(0.0f), network(NULL){};
   ~Log();
+  void batchReset() {
+    start = hr_clock::now();
+    offset = 0.0f;
+    for (auto &data : log_data) {
+      delete data;
+      data = nullptr;
+    }
+    log_data.clear();
+  }
   void startClock() { this->start = hr_clock::now(); }
   void writeData();
   void writeToFD(int fd, const std::vector<NeuronGroup *> &neuronGroups);

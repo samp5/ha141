@@ -516,3 +516,9 @@ py::array_t<int> pySNN::pyOutput() {
 }
 
 void pySNN::pyWrite() { lg->writeData(); };
+
+void pySNN::batchReset() {
+  reset();
+  lg->batchReset();
+  data.clear();
+}

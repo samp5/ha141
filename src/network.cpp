@@ -545,6 +545,27 @@ void SNN::reset() {
   }
   gen.seed(config->RAND_SEED);
 }
+
+/**
+ * @brief Resets the network to a fresh state, as if it had encountered no
+ * input.
+ *
+ * Removes all log data. If the log data is needed from the previous batch,
+ * collect it before calling this function
+ *
+ */
+void SNN::batchReset() {
+  // normal reset
+  reset();
+
+  // delete all log data
+  lg->batchReset();
+
+  // clear stim vec
+  config->STIMULUS_VEC.clear();
+  config->STIMULUS = config->STIMULUS_VEC.end();
+}
+
 void SNN::runChildProcess(const std::vector<int> &stimulus, int fd) {
   lg->value(LogLevel::INFO, "Child process running, PID: %d",
             static_cast<int>(getpid()));

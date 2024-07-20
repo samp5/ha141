@@ -33,6 +33,7 @@ public:
   void updateStimulusVectorToBuffDim();
   void generateImage();
   void updateConfigToAdjList(const AdjDict &dict);
+  void batchReset();
   py::array_t<int> pyOutput();
 };
 

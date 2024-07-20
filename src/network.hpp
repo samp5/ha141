@@ -92,6 +92,7 @@ public:
   void start();
   void join();
   void reset();
+  void batchReset();
 
   // output
   void generateGraphiz(bool weights = false);
