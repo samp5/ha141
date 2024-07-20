@@ -65,7 +65,7 @@ for i in range(1,101):
 
 with open ('batchSizeVsTime.txt', 'w') as f:
     for i in range(0, len(x)):
-        f.write(f"{x[i]} {y[i]}")
+        f.write(f"{x[i]} {y[i]}\n")
 # for n in G:
 #     for nbr in G[n]:
 #         old_weight = G[n][nbr]["weight"]
