@@ -25,17 +25,17 @@ void Synapse::propagate() {
     return;
   }
 
-  int preGroupID = _origin->getGroup()->getID();
-  int postGroupID = _destination->getGroup()->getID();
-  int preID = _origin->getID();
-  int postID = _destination->getID();
-
+  // int preGroupID = _origin->getGroup()->getID();
+  // int postGroupID = _destination->getGroup()->getID();
+  // int preID = _origin->getID();
+  // int postID = _destination->getID();
+  
   double message_value =
       _origin->getPotential() * getWeight() * _origin->getBias();
 
-  _origin->getGroup()->getNetwork()->lg->neuronInteraction(
-      DEBUG, "Group %d: Neuron %d is sending a mesage to Group %d: Neuron %d",
-      preGroupID, preID, postGroupID, postID);
+  // _origin->getGroup()->getNetwork()->lg->neuronInteraction(
+  //     DEBUG, "Group %d: Neuron %d is sending a mesage to Group %d: Neuron %d",
+  //     preGroupID, preID, postGroupID, postID);
 
   Message *message_to_send =
       new Message(message_value, _origin, _destination, From_Neighbor,

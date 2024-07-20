@@ -29,6 +29,8 @@ protected:
   NeuronGroup *group;
   bool active = false;
   int refractory_duration;
+  double activationThreshold;
+  double refractory_potential;
 
   // timestamp data
   int last_decay = -1; /**< The timestamp of the most recent decay */

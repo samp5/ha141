@@ -31,6 +31,9 @@ Neuron::Neuron(int _id, NeuronGroup *_g, Neuron_t _t) {
   excit_inhib_value = generateInhibitoryStatus();
   last_decay = -1;
   refractory_duration = _g->getNetwork()->getConfig()->REFRACTORY_DURATION;
+  activationThreshold = _g->getNetwork()->getConfig()->ACTIVATION_THRESHOLD;
+  refractory_potential =
+      _g->getNetwork()->getConfig()->REFRACTORY_MEMBRANE_POTENTIAL;
 
   const char *inhib = excit_inhib_value == -1 ? "excitatory\0" : "inhibitory\0";
 
@@ -183,10 +186,10 @@ void Neuron::sendMessages() {
     synapse->propagate();
   }
 
-  group->getNetwork()->lg->groupNeuronState(
-      DEBUG,
-      "(%d) Neuron %d reached activation threshold, entering refractory phase",
-      group->getID(), id);
+  // group->getNetwork()->lg->groupNeuronState(
+  //     DEBUG,
+  //     "(%d) Neuron %d reached activation threshold, entering refractory
+  //     phase", group->getID(), id);
 
   refractory();
 }
@@ -202,9 +205,9 @@ void Neuron::run(Message *message) {
 
   // check refractory
   if (message->timestamp < refractory_start + refractory_duration) {
-    group->getNetwork()->lg->groupNeuronState(
-        DEBUG, "(%d) Neuron %d is still in refractory period, ignoring message",
-        getGroup()->getID(), getID());
+    // group->getNetwork()->lg->groupNeuronState(
+    //     DEBUG, "(%d) Neuron %d is still in refractory period, ignoring
+    //     message", getGroup()->getID(), getID());
     delete message;
     deactivate();
     return;
@@ -214,8 +217,7 @@ void Neuron::run(Message *message) {
 
   accumulatePotential(message->message);
 
-  if (membrane_potential >=
-      group->getNetwork()->getConfig()->ACTIVATION_THRESHOLD) {
+  if (membrane_potential >= activationThreshold) {
     last_fire = message->timestamp;
     sendMessages();
   }
@@ -238,14 +240,13 @@ void Neuron::run(Message *message) {
 void Neuron::refractory() {
   refractory_start = last_fire;
 
-  pthread_mutex_lock(&group->getNetwork()->getMutex()->potential);
-  membrane_potential =
-      group->getNetwork()->getConfig()->REFRACTORY_MEMBRANE_POTENTIAL;
-  pthread_mutex_unlock(&group->getNetwork()->getMutex()->potential);
+  // pthread_mutex_lock(&group->getNetwork()->getMutex()->potential);
+  membrane_potential = refractory_potential;
+  // pthread_mutex_unlock(&group->getNetwork()->getMutex()->potential);
 
-  group->getNetwork()->lg->neuronValue(
-      DEBUG, "(%d) Neuron %d in refractory state: potential set to %f",
-      group->getID(), id, membrane_potential);
+  // group->getNetwork()->lg->neuronValue(
+  //     DEBUG, "(%d) Neuron %d in refractory state: potential set to %f",
+  //     group->getID(), id, membrane_potential);
 
   addData(refractory_start, Message_t::Refractory);
 }
@@ -341,9 +342,6 @@ void Neuron::retroactiveDecay(int from, int to) {
   int first_decay = from;
   int i;
 
-  // ASKPEDRAM, seems like a first order linear equation that we could just
-  // calculate
-
   for (i = first_decay; i < to; i += decay_time_step) {
 
     double decay_value = (membrane_potential - v_rest) / tau;
@@ -364,9 +362,9 @@ void Neuron::activate() {
 }
 
 void Neuron::deactivate() {
-  pthread_mutex_lock(&group->getNetwork()->getMutex()->activation);
+  // pthread_mutex_lock(&group->getNetwork()->getMutex()->activation);
   active = false;
-  pthread_mutex_unlock(&group->getNetwork()->getMutex()->activation);
+  // pthread_mutex_unlock(&group->getNetwork()->getMutex()->activation);
 }
 
 /**
@@ -383,9 +381,9 @@ void Neuron::setType(Neuron_t type) { type = type; }
  * @param value value to be added
  */
 void Neuron::accumulatePotential(double value) {
-  pthread_mutex_lock(&group->getNetwork()->getMutex()->potential);
+  // pthread_mutex_lock(&group->getNetwork()->getMutex()->potential);
   membrane_potential += value;
-  pthread_mutex_unlock(&group->getNetwork()->getMutex()->potential);
+  // pthread_mutex_unlock(&group->getNetwork()->getMutex()->potential);
 }
 
 const list<Message *> &Neuron::getMessageVector() const { return messages; }

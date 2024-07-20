@@ -41,10 +41,10 @@ InputNeuron::InputNeuron(int _id, NeuronGroup *group, int latency)
 void InputNeuron::run(Message *message) {
 
   if (message->timestamp < refractory_start + refractory_duration) {
-    group->getNetwork()->lg->groupNeuronState(
-        DEBUG,
-        "INPUT: (%d) Neuron %d is still in refractory period, ignoring input",
-        getGroup()->getID(), getID());
+    // group->getNetwork()->lg->groupNeuronState(
+    //     DEBUG,
+    //     "INPUT: (%d) Neuron %d is still in refractory period, ignoring
+    //     input", getGroup()->getID(), getID());
     return;
   }
 
@@ -54,8 +54,7 @@ void InputNeuron::run(Message *message) {
   accumulatePotential(message->message);
 
   // Check to see if we need to send messages
-  if (membrane_potential >=
-      group->getNetwork()->getConfig()->ACTIVATION_THRESHOLD) {
+  if (membrane_potential >= activationThreshold) {
     last_fire = message->timestamp;
     sendMessages();
   }

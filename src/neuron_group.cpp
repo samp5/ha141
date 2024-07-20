@@ -187,16 +187,8 @@ void NeuronGroup::runSingleThread() {
 
   bool empty = message_q.empty();
 
-  // !DEBUG
-  size_t max = 0;
-
   // Loop through all events in the message q
   while (!empty) {
-
-    // !DEBUG
-    if (message_q.size() > max) {
-      max = message_q.size();
-    }
 
     // retrieve the top message in priority q
     Message *message = getMessage();
@@ -206,8 +198,6 @@ void NeuronGroup::runSingleThread() {
     // Update our empty bool
     empty = message_q.empty();
   }
-  // !DEBUG
-  // std::cout << "Max message_q size was: " << max << "\n";
 }
 
 /**
