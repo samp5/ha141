@@ -292,6 +292,9 @@ void pySNN::initialize(AdjDict dict, py::buffer buff) {
  * @param buff reference to py::buffer (numpy array)
  */
 void pySNN::processPyBuff(py::buffer &buff) {
+  if (!data.empty()) {
+    data.clear();
+  }
   // get buffer
   py::buffer_info info = buff.request();
 
