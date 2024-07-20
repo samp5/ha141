@@ -121,6 +121,9 @@ void Log::writeToFD(int fd, const std::vector<NeuronGroup *> &neuronGroups) {
   for (const auto &group : neuronGroups) {
     for (const auto &neuron : group->getNeuronVec()) {
       for (const auto &lgData : neuron->getLogData()) {
+        if (lgData->message_type != Message_t::Refractory) {
+          continue;
+        }
         //! DEBUG
         // std::cout << "WRITE" << numRecordWritten << ": ";
         double arr[7];

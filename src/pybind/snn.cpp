@@ -321,18 +321,15 @@ void pySNN::processPyBuff(py::buffer &buff) {
   }
 }
 void pySNN::runChildProcess(int fd) {
-  lg->value(LogLevel::INFO, "Child process running, PID: %d",
-            static_cast<int>(getpid()));
+  // lg->value(LogLevel::INFO, "Child process running, PID: %d",
+  //           static_cast<int>(getpid()));
 
   pySetNextStim();
   generateInputNeuronEvents();
 
   for (int i = 1; i < config->num_stimulus + 1; i++) {
     for (auto group : groups) {
-      group->startThread();
-    }
-    for (auto group : groups) {
-      pthread_join(group->getThreadID(), NULL);
+      group->run();
     }
     if (i < config->num_stimulus) {
       config->STIMULUS++;
@@ -454,6 +451,7 @@ void pySNN::pySetNextStim() {
     lg->log(ESSENTIAL, "set_next_line: passed empty input neuron vector?");
     return;
   }
+
   for (std::vector<InputNeuron *>::size_type i = 0; i < input_neurons.size();
        i++) {
     input_neurons.at(i)->setInputValue(data.at(*config->STIMULUS).at(i));

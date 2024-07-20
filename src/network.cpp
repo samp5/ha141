@@ -567,11 +567,11 @@ void SNN::batchReset() {
 }
 
 void SNN::runChildProcess(const std::vector<int> &stimulus, int fd) {
-  lg->value(LogLevel::INFO, "Child process running, PID: %d",
-            static_cast<int>(getpid()));
+  // lg->value(LogLevel::INFO, "Child process running, PID: %d",
+  //           static_cast<int>(getpid()));
   config->STIMULUS = stimulus.begin();
-  lg->value(LogLevel::DEBUG, "Child Process: stimulus set to line %d",
-            *config->STIMULUS);
+  // lg->value(LogLevel::DEBUG, "Child Process: stimulus set to line %d",
+  //           *config->STIMULUS);
   config->num_stimulus = stimulus.size();
   inputFileReader->setToLine(*config->STIMULUS);
   setNextStim();
@@ -674,8 +674,8 @@ void SNN::forkRead(std::vector<pid_t> &childrenPIDs,
       double buf;
       // int nbytes;
 
-      lg->value(LogLevel::INFO, "Reading in data for Child Process %d", cPID);
-      lg->value(LogLevel::INFO, "Reading from FD %d", pipefd[0]);
+      // lg->value(LogLevel::INFO, "Reading in data for Child Process %d",
+      // cPID); lg->value(LogLevel::INFO, "Reading from FD %d", pipefd[0]);
       // !DEBUG
       // ioctl(pipefd[0], FIONREAD, &nbytes);
       // lg->value(LogLevel::INFO, "FD has  %d bytes available", nbytes);
@@ -688,11 +688,11 @@ void SNN::forkRead(std::vector<pid_t> &childrenPIDs,
       size_t MESSAGE_TYPE = 5;
       size_t STIMULUS_NUMBER = 6;
 
-      int dataRead = 0;
+      size_t doublesRead = 0;
       while (read(pipefd[0], &buf, sizeof(double)) > 0) {
-        arrBuf[dataRead] = buf;
-        dataRead++;
-        if (dataRead == 7) {
+        arrBuf[doublesRead] = buf;
+        doublesRead++;
+        if (doublesRead == 7L) {
           // !DEBUG
           // std::cout << "READ" << numRecords << ": ";
           // for (int bufI = 0; bufI < 7; bufI++) {
@@ -700,7 +700,7 @@ void SNN::forkRead(std::vector<pid_t> &childrenPIDs,
           // }
           // std::cout << "\n";
           numRecords++;
-          dataRead = 0;
+          doublesRead = 0;
           LogData *toAdd = new LogData(
               arrBuf[NEURON_ID], arrBuf[GROUP_ID], arrBuf[TIMESTAMP],
               arrBuf[POTENTIAL], arrBuf[NEURON_TYPE],
@@ -715,13 +715,14 @@ void SNN::forkRead(std::vector<pid_t> &childrenPIDs,
 
       int wstatus;
       if (waitpid(cPID, &wstatus, WNOHANG)) {
-        lg->value(LogLevel::INFO, "SNN::forkRead: Closing FD %d", pipefd[0]);
+        // lg->value(LogLevel::INFO, "SNN::forkRead: Closing FD %d", pipefd[0]);
         close(pipefd[0]);
         childrenPIDs.at(i) = -1;
       }
-      lg->value(LogLevel::INFO, "Finished data read for Child Process %d",
-                cPID);
-      lg->value(LogLevel::INFO, "Read %d total records from pipe", numRecords);
+      // lg->value(LogLevel::INFO, "Finished data read for Child Process %d",
+      //           cPID);
+      // lg->value(LogLevel::INFO, "Read %d total records from pipe",
+      // numRecords);
     }
     done = std::all_of(childrenPIDs.begin(), childrenPIDs.end(),
                        [](pid_t x) { return x == -1; });
