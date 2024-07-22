@@ -467,3 +467,26 @@ int Neuron::getID() const { return id; }
 const vector<Synapse *> &Neuron::getSynapses() const {
   return PostSynapticConnnections;
 }
+
+LogDataArray Neuron::getRefractoryArray() {
+  LogDataArray dataArray;
+
+  LogData *array = nullptr;
+  size_t nActivations =
+      std::count_if(log_data.begin(), log_data.end(), [](LogData *d) {
+        return d->message_type == Message_t::Refractory;
+      });
+
+  dataArray.arrSize = nActivations;
+
+  array = new LogData[nActivations];
+  size_t arrIndex = 0;
+  for (const auto &data : log_data) {
+    if (data->message_type == Message_t::Refractory) {
+      array[arrIndex] = *data;
+      arrIndex++;
+    }
+  }
+  dataArray.array = array;
+  return dataArray;
+}

@@ -120,27 +120,18 @@ void Log::writeToFD(int fd, const std::vector<NeuronGroup *> &neuronGroups) {
   int numRecordWritten = 0;
   for (const auto &group : neuronGroups) {
     for (const auto &neuron : group->getNeuronVec()) {
-      for (const auto &lgData : neuron->getLogData()) {
-        if (lgData->message_type != Message_t::Refractory) {
-          continue;
-        }
-        //! DEBUG
-        // std::cout << "WRITE" << numRecordWritten << ": ";
-        double arr[7];
-        lgData->storeDataIn(arr);
-        // !DEBUG
-        // for (size_t k = 0; k < 7; k++) {
-        //   std::cout << arr[k] << " ";
-        // }
-        int writeRet = write(fd, &arr, 7 * sizeof(double));
-        if (writeRet == -1) {
-          this->log(LogLevel::ERROR, "Log::writeToFD returned -1");
-        } else if (writeRet != 7 * sizeof(double)) {
-          this->value(LogLevel::ERROR, "Log::writeToFD returned %d", writeRet);
-        }
-        //! DEBUG
-        // std::cout << "\n";
-        numRecordWritten += 1;
+      LogDataArray DataArray = neuron->getRefractoryArray();
+
+      // for (size_t i = 0; i < DataArray.arrSize; i++) {
+      //   std::cout << "WRITE " << numRecordWritten << ": \n\t"
+      //             << DataArray.array[i];
+      //   numRecordWritten++;
+      // }
+
+      int writeRet =
+          write(fd, DataArray.array, DataArray.arrSize * sizeof(LogData));
+      if (writeRet == -1) {
+        this->log(LogLevel::ERROR, "Log::writeToFD returned -1");
       }
     }
   }

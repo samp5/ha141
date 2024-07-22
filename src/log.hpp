@@ -55,6 +55,7 @@ struct LogData {
   LogData(int nID, int gID, int t, double p, int nt, Message_t mt, int sn)
       : neuron_id(nID), group_id(gID), timestamp(t), potential(p),
         neuron_type(nt), message_type(mt), stimulus_number(sn) {}
+  LogData(const LogData &other) = default;
   std::string toTmpFileString() {
     char toReturn[81];
     sprintf(toReturn, "%d %d %d %lf %d %d %d\n", neuron_id, group_id, timestamp,
@@ -70,6 +71,18 @@ struct LogData {
     ret[5] = static_cast<double>(message_type);
     ret[6] = static_cast<double>(stimulus_number);
   };
+  friend std::ostream &operator<<(std::ostream &out, const LogData &rhs) {
+    out << "DATA FOR N" << rhs.neuron_id << "G" << rhs.group_id
+        << " TYPE: " << rhs.message_type << " POTENTIAL: " << rhs.potential
+        << " STIMULUS: " << rhs.stimulus_number
+        << " TIMESTAMP: " << rhs.timestamp << "\n";
+    return out;
+  }
+};
+
+struct LogDataArray {
+  LogData *array;
+  size_t arrSize;
 };
 
 using hr_clock = std::chrono::high_resolution_clock;

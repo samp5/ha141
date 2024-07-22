@@ -670,8 +670,7 @@ void SNN::forkRead(std::vector<pid_t> &childrenPIDs,
       }
 
       int *pipefd = pipes.at(i); // get corresponding pipe
-      double arrBuf[7];
-      double buf;
+      LogData buf;
       // int nbytes;
 
       // lg->value(LogLevel::INFO, "Reading in data for Child Process %d",
@@ -680,34 +679,13 @@ void SNN::forkRead(std::vector<pid_t> &childrenPIDs,
       // ioctl(pipefd[0], FIONREAD, &nbytes);
       // lg->value(LogLevel::INFO, "FD has  %d bytes available", nbytes);
 
-      size_t NEURON_ID = 0;
-      size_t GROUP_ID = 1;
-      size_t TIMESTAMP = 2;
-      size_t POTENTIAL = 3;
-      size_t NEURON_TYPE = 4;
-      size_t MESSAGE_TYPE = 5;
-      size_t STIMULUS_NUMBER = 6;
+      while (read(pipefd[0], &buf, sizeof(LogData)) > 0) {
+        numRecords++;
+        LogData *toAdd = new LogData(buf);
+        // !DEBUG
+        // std::cout << "READ " << numRecords << ": \n\t" << *toAdd;
 
-      size_t doublesRead = 0;
-      while (read(pipefd[0], &buf, sizeof(double)) > 0) {
-        arrBuf[doublesRead] = buf;
-        doublesRead++;
-        if (doublesRead == 7L) {
-          // !DEBUG
-          // std::cout << "READ" << numRecords << ": ";
-          // for (int bufI = 0; bufI < 7; bufI++) {
-          //   std::cout << arrBuf[bufI] << " ";
-          // }
-          // std::cout << "\n";
-          numRecords++;
-          doublesRead = 0;
-          LogData *toAdd = new LogData(
-              arrBuf[NEURON_ID], arrBuf[GROUP_ID], arrBuf[TIMESTAMP],
-              arrBuf[POTENTIAL], arrBuf[NEURON_TYPE],
-              static_cast<Message_t>(arrBuf[MESSAGE_TYPE]),
-              arrBuf[STIMULUS_NUMBER]);
-          lg->addData(toAdd);
-        }
+        lg->addData(toAdd);
         // !DEBUG
         // ioctl(pipefd[0], FIONREAD, &nbytes);
         // lg->value(LogLevel::INFO, "FD has  %d bytes available", nbytes);

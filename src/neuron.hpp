@@ -96,6 +96,7 @@ public:
 
   // log operations
   void addData(int time, Message_t message_type);
+  LogDataArray getRefractoryArray();
   void transferData();
 };
 
