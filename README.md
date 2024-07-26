@@ -45,7 +45,7 @@ mkdir run_config
 
 - The `snn` module has a small interface but deep functionality.
 
-#### `snn.pySNN(configFile = "base_config.toml": string)`
+#### `pySNN(configFile = "base_config.toml": string)`
 
 - Return a spiking neural network object.
 
@@ -59,7 +59,7 @@ net = snn.pySNN("my_custom_config.toml")
 net = snn.pySNN()
 ```
 
-#### `snn.pySNN.initialize( adjacencyDict : dict[tuple[int, int] : dict[tuple[int, int] : dict[string : float]]],  numberInput : int | stimulus : numpyArray )`
+#### `pySNN.initialize( adjacencyDict : dict[tuple[int, int] : dict[tuple[int, int] : dict[string : float]]],  numberInput : int | stimulus : numpyArray )`
 
 ##### A note on the adjacencyDict:
 - The adjacencyDict should be a dictionary with the following structure
@@ -125,20 +125,20 @@ net.batchReset()
 
 
 
-#### `snn.pySNN.updateWeights( adjacencyDict : dict[tuple[int, int] : dict[tuple[int, int] : dict[string : float]]] )`
+#### `pySNN.updateWeights( adjacencyDict : dict[tuple[int, int] : dict[tuple[int, int] : dict[string : float]]] )`
 
 Updates synapse weight for connection between `(x,y)` and `(a,b)` based on `adjacencyDict[(x,y)][(a,b)]["weight"]`
 
-#### `snn.pySNN.runBatch(buffer : numpy array)`
+#### `pySNN.runBatch(buffer : numpy array)`
 
 Starts a child process of the network in order to run the given stimulus set.
 
-#### `snn.pySNN.getActivation() -> numpyArray`
+#### `pySNN.getActivation() -> numpyArray`
 
 Outputs a numpy array with "time per stimulus" columns and "number of stimulus" rows
 
 
-#### `snn.pySNN.batchReset()` 
+#### `pySNN.batchReset()` 
 
 Reset the network to be ready to run another batch.
 
