@@ -90,7 +90,8 @@ net = snn.pySNN()
 
 The function is overloaded to either accept a  python numpy array and automatically detemine the number of input neurons from the number of stimulus inputs in a single dimension of the array (the number of columns) or a integer representing the desired number of input neurons.
 
-> [!warning] For size $n$ stimulus with $m$ input neurons
+> [!IMPORTANT]
+> For size $n$ stimulus with $m$ input neurons
 > Only the first $m$ stimulus inputs will be read.
 
 
