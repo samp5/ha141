@@ -45,7 +45,7 @@ void RuntimConfig::generateNewConfig() {
   file << "input_neuron_count = 2" << '\n';
   file << '\n';
   file << "# number of groups" << '\n';
-  file << "group_count = 2" << '\n';
+  file << "group_count = 1" << '\n';
   file << '\n';
   file << "# number of connections" << '\n';
   file << "# option can be \"MAX\" for maximum edges" << '\n';
@@ -55,13 +55,13 @@ void RuntimConfig::generateNewConfig() {
   file << "refractory_duration = 10" << '\n';
   file << '\n';
   file << "# value each neuron is initialized with" << '\n';
-  file << "initial_membrane_potential = -60.0" << '\n';
+  file << "initial_membrane_potential = -6.0" << '\n';
   file << '\n';
   file << "# minimum potential at which a neuron will fire" << '\n';
-  file << "activation_threshold = -55.0" << '\n';
+  file << "activation_threshold = -5.50" << '\n';
   file << '\n';
   file << "# value that each neuron is set to after firing" << '\n';
-  file << "refractory_membrane_potential = -70.0" << '\n';
+  file << "refractory_membrane_potential = -7.0" << '\n';
   file << '\n';
   file << "#  tau for the linearlization of the decay function\n";
   file << "tau = 100.0\n";
@@ -76,10 +76,10 @@ void RuntimConfig::generateNewConfig() {
   file << "min_synapse_delay = 1\n";
   file << '\n';
   file << "#  Maximum weight for an edge \n";
-  file << "max_weight = 0.2\n";
+  file << "max_weight = 10.0\n";
   file << '\n';
   file << "#  poisson_prob_of_success\n";
-  file << "poisson_prob_of_success = 0.1";
+  file << "poisson_prob_of_success = 0.9";
   file << '\n';
   file << "[debug]" << '\n';
   file << "# Options are" << '\n';
@@ -103,7 +103,7 @@ void RuntimConfig::generateNewConfig() {
   file << "limit_log_size = true" << '\n';
   file << '\n';
   file << "# Show the current stimlus number" << '\n';
-  file << "show_stimulus = true" << '\n';
+  file << "show_stimulus = false" << '\n';
   file << '\n';
   file << "# simulated time per stimulus in \"ms\"" << '\n';
   file << "time_per_stimulus = 250" << '\n';
