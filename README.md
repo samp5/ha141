@@ -102,7 +102,7 @@ The `adjacencyDict` can be automatically generated from `networkx` as long as th
 ```python
 import networkx as nx
 import numpy as np
-G = nx.navigable_small_world_graph(84, seed=1)
+G = nx.navigable_small_world_graph(10, seed=1)
 
 # since a directed grid is NOT weighted, you have to add weights
 for n in G:
@@ -137,10 +137,86 @@ Starts a child process of the network in order to run the given stimulus set.
 
 Outputs a numpy array with "time per stimulus" columns and "number of stimulus" rows
 
+##### Example usage
+
+```python
+import snn
+import networkx as nx
+import time
+import random
+from datetime import datetime
+import numpy as np
+
+images = [[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
+          [2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0],
+          [3.0,3.0,3.0,3.0,3.0,3.0,3.0,3.0,3.0],
+          [4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0], 
+          [5.0,5.0,5.0,5.0,5.0,5.0,5.0,5.0,5.0]]
+dataset = "dummy"
+v = 0
+images = np.array(images)
+
+
+print("-> NetworkX generating graph...")
+start = time.time()
+G = nx.navigable_small_world_graph(10, seed=1)
+end = time.time()
+print(f"-> Done, took {(end - start):.5f} seconds")
+
+print("-> Generating random edge weights...")
+for n in G:
+    for nbr in G[n]:
+        G[n][nbr]["weight"] = random.random() * 10
+
+print("-> Starting network...")
+net = snn.pySNN()
+net.initialize(nx.to_dict_of_dicts(G), images)
+start = time.time()
+net.runBatch(images)
+end = time.time()
+
+print(f"-> Done, took {(end - start):.5f} seconds")
+
+print("-> Fetching data from network")
+out = net.getActivation()
+print("-> Done")
+
+filestr = datetime.now().strftime("%m%d_%H%M")
+print(f"-> Writing to file {dataset}v{v}_{filestr}.csv")
+np.savetxt(f"{dataset}v{v}_{filestr}.csv", out,delimiter=",", fmt = '%d')
+print("-> Done")
+
+```
+
+<details>
+<summary>Output stored in `dummyv0_0726_1142.csv`</summary>
+<br>
+
+```csv
+4,3,8,2,1,0,5,7,5,1,1,0,9,6,3,1,0,9,6,0,3,1,0,0,0,0,0,0,5,8,6,0,0,0,0,0,9,7,3,0,0,0,0,9,7,3,0,0,0,9,7,3,0,0,9,7,3,0,0,0,0,4,3,4,6,0,4,3,4,1,0,5,0,1,3,6,5,0,1,3,0,2,0,0,9,3,3,0,0,0,0,0,0,0,0,0,0,0,9,5,0,1,0,0,0,4,8,3,0,0,0,9,5,1,0,0,9,5,1,1,0,1,0,5,2,6,1,1,1,5,2,2,1,0,0,0,0,0,9,4,0,2,2,0,0,5,6,6,1,1,5,2,5,5,0,5,2,5,1,0,4,5,2,5,1,0,9,2,5,1,0,0,0,9,6,2,0,0,9,0,6,2,0,0,0,0,5,7,5,0,0,0,9,6,2,0,0,9,6,0
+4,3,5,2,4,4,3,4,2,4,4,3,4,1,5,4,3,4,1,5,0,0,4,3,4,1,0,0,9,5,3,0,0,0,0,9,6,2,0,0,9,6,2,0,0,9,6,2,0,0,9,6,2,0,0,9,6,2,0,0,9,6,2,0,0,9,0,6,2,0,0,9,6,3,0,0,9,6,3,0,0,0,9,6,3,0,0,9,6,3,0,0,9,6,3,1,0,0,9,0,6,3,1,0,9,6,3,1,0,9,6,3,1,0,9,6,3,1,0,9,6,3,1,0,9,6,3,1,0,0,9,6,3,0,1,0,0,0,9,7,3,0,0,9,7,3,0,0,0,9,7,3,0,0,9,7,3,0,0,9,7,3,0,0,9,7,0,3,0,0,0,9,7,3,0,0,0,9,7,3,0,0,9,7,3,0,0,9,7,3,0,0,9,7,3,0,0,9,7,0
+4,3,5,2,4,4,3,4,2,4,4,3,4,1,5,4,3,4,1,5,0,0,4,3,4,1,0,0,9,5,3,0,0,0,9,6,2,0,0,9,0,6,2,0,0,9,6,2,0,0,9,6,2,0,0,9,6,2,0,0,9,6,2,0,0,9,6,2,0,0,9,6,2,0,0,9,6,2,0,0,0,0,9,6,2,0,0,9,6,2,0,0,9,6,2,0,0,0,9,6,3,0,0,9,6,3,0,0,9,6,3,0,0,9,6,3,0,0,9,0,6,3,0,0,9,6,3,0,0,0,9,6,3,0,0,0,0,9,6,3,1,0,9,6,3,1,0,0,9,6,3,1,0,9,6,3,1,0,9,0,6,3,1,0,9,6,3,1,0,0,9,6,3,1,0,0,9,6,3,1,0,9,6,3,1,0,9,6,3,1,0,9,6,3,1,0,9,6,3,0
+4,3,5,2,4,4,3,5,3,4,4,3,5,2,5,4,3,5,2,5,0,0,4,3,5,2,0,0,9,5,4,1,0,0,0,9,6,3,1,0,9,6,3,1,0,9,6,3,1,0,9,6,3,1,0,9,6,3,1,0,9,6,3,1,0,9,0,6,3,1,0,9,6,3,1,0,9,6,3,1,0,0,9,6,3,1,0,9,6,3,1,0,9,6,3,1,0,0,9,0,6,3,1,0,9,6,3,1,0,9,6,3,1,0,9,6,3,1,0,9,6,3,1,0,9,6,3,1,0,0,9,6,3,0,1,0,0,0,9,7,3,0,0,9,7,3,0,0,0,9,7,3,0,0,9,7,3,0,0,9,7,3,0,0,9,7,0,3,0,0,0,9,7,3,0,0,0,9,7,3,0,0,9,7,3,0,0,9,7,3,0,0,9,7,3,0,0,9,7,0
+4,0,0,0,4,7,5,2,1,4,7,5,2,0,5,7,5,2,0,5,3,4,5,0,0,0,0,0,9,6,2,0,0,0,0,9,6,2,0,0,9,6,2,0,0,9,6,2,0,0,9,6,2,0,0,9,6,4,0,0,9,6,4,0,0,9,0,6,4,0,0,9,6,4,0,0,9,6,4,0,0,0,9,7,3,0,0,9,7,3,0,0,9,7,3,0,0,0,9,0,7,3,0,0,9,7,3,0,0,9,7,3,0,0,9,7,3,0,0,9,7,3,0,0,9,7,3,0,0,0,9,7,3,0,0,0,0,0,9,7,3,0,0,9,7,3,0,0,0,9,7,3,0,0,9,7,3,0,0,9,7,3,0,0,9,7,0,3,0,0,0,9,7,3,0,0,0,9,7,3,0,0,9,7,3,0,0,9,7,3,0,0,9,7,3,0,0,9,7,0
+```
+
+</details>
+
 
 #### `pySNN.batchReset()` 
 
 Reset the network to be ready to run another batch.
+
+
+### Optimal batch sizes
+
+Batch size has little effect on runtime per stimulus, except for small batches with "normal" activation levels.
+
+The jump in runtime per stimulus is due to read write operations to a pipe beween parent and child processes. (For small batches the pipe capacity is smaller than the total amount of data passed).
+
+Heres my optimization graph (because its so fast now)
+
+![Optimization graph](./images/optimization.jpg)
 
 
 
