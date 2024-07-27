@@ -1,6 +1,7 @@
 #ifndef GLOBALS
 #define GLOBALS
 #include "log.hpp"
+#include <map>
 #include <vector>
 
 /**
@@ -132,6 +133,7 @@ struct RuntimConfig {
 public:
   vector<int> parse_line_range(const std::string &in);
   int setOptions();
+  void setOptions(std::map<std::string, double> &);
   void generateNewConfig();
   void useBaseToml();
   int parseArgs(std::vector<std::string>);

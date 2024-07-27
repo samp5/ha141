@@ -11,14 +11,22 @@ using AdjDict =
     std::map<std::tuple<int, int>,
              std::map<std::tuple<int, int>, std::map<std::string, float>>>;
 
+typedef std::map<std::string, double> ConfigDict;
+
 class pySNN : public SNN {
 private:
   std::vector<std::vector<double>> data;
   AdjDict adjList;
   size_t maxLayer; // maximum "layer", aka maximum number of columns
+  ConfigDict configDict;
 
 public:
   pySNN(std::vector<std::string> args);
+  pySNN(std::string configFile);
+  pySNN(ConfigDict dict = {});
+
+  static ConfigDict getDefaultConfig();
+
   void pyStart();
   void pySetNextStim();
   void pyWrite();

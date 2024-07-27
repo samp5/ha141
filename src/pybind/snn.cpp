@@ -13,6 +13,69 @@
 
 int add(int i, int j) { return i + j; }
 
+pySNN::pySNN(ConfigDict dict) : SNN(), configDict(dict) {
+  lg->setNetwork(this); // log gets allocated in SNN()
+  config = new RuntimConfig(this);
+  if (configDict.empty()) {
+    configDict = getDefaultConfig();
+  }
+  config->setOptions(configDict);
+  mutex = new Mutex;
+
+  barrier = new Barrier(config->NUMBER_GROUPS + 1);
+  // no need for input file reader
+
+  gen = std::mt19937(rd());
+  gen.seed(config->RAND_SEED);
+  image = nullptr; // we have to wait to initalize the images until we know
+  // size of the python buffer
+}
+
+ConfigDict pySNN::getDefaultConfig() {
+
+  ConfigDict dict = {{"neuron_count", 0},
+                     {"input_neuron_count", 0},
+                     {"group_count", 1},
+                     {"edge_count", 0},
+                     {"refractory_duration", 5},
+                     {"initial_membrane_potential", -6.0},
+                     {"activation_threshold", -5.0},
+                     {"refractory_membrane_potential", -7.0},
+                     {"tau", 100.0},
+                     {"max_latency", 10},
+                     {"max_synapse_delay", 2},
+                     {"min_synapse_delay", 1},
+                     {"max_weight", 10.0},
+                     {"poisson_prob_of_success", 0.8},
+                     {"debug_level", LogLevel::NONE},
+                     {"limit_log_size", true},
+                     {"show_stimulus", false},
+                     {"time_per_stimulus", 200},
+                     {"seed", -1}};
+  return dict;
+}
+
+pySNN::pySNN(std::string configFile) : SNN() {
+  lg->setNetwork(this); // log gets allocated in SNN()
+  config = new RuntimConfig(this);
+  if (configFile == "") {
+    config->parseArgs({""});
+  } else {
+    config->parseArgs({"", configFile});
+  }
+  config->checkStartCond();
+  mutex = new Mutex;
+
+  barrier = new Barrier(config->NUMBER_GROUPS + 1);
+  // no need for input file reader
+
+  gen = std::mt19937(rd());
+  gen.seed(config->RAND_SEED);
+  image = nullptr; // we have to wait to initalize the images until we know
+  // the
+  //  size of the python buffer
+}
+
 pySNN::pySNN(std::vector<std::string> args) : SNN() {
   lg->setNetwork(this); // log gets allocated in SNN()
   config = new RuntimConfig(this);

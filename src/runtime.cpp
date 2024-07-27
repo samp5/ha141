@@ -18,6 +18,35 @@ void Mutex::destroy_mutexes() {
   pthread_mutex_destroy(&stimulus);
 }
 
+void RuntimConfig::setOptions(std::map<std::string, double> &dict) {
+  NUMBER_NEURONS = dict.at("neuron_count");
+  NUMBER_INPUT_NEURONS = dict.at("input_neuron_count");
+  NUMBER_GROUPS = dict.at("group_count");
+  NUMBER_EDGES = dict.at("edge_count");
+  REFRACTORY_DURATION = dict.at("refractory_duration");
+  INITIAL_MEMBRANE_POTENTIAL = dict.at("initial_membrane_potential");
+  ACTIVATION_THRESHOLD = dict.at("activation_threshold");
+  REFRACTORY_MEMBRANE_POTENTIAL = dict.at("refractory_membrane_potential");
+  TAU = dict.at("tau");
+  max_latency = dict.at("max_latency");
+  max_synapse_delay = dict.at("max_synapse_delay");
+  min_synapse_delay = dict.at("min_synapse_delay");
+  max_weight = dict.at("max_weight");
+  INPUT_PROB_SUCCESS = dict.at("poisson_prob_of_success");
+  DEBUG_LEVEL = static_cast<LogLevel>(dict.at("debug_level"));
+  LIMIT_LOG_OUTPUT = dict.at("limit_log_size");
+  show_stimulus = dict.at("show_stimulus");
+  time_per_stimulus = dict.at("time_per_stimulus");
+
+  hr_clock::time_point now = hr_clock::now();
+  RAND_SEED =
+      dict.at("seed") == -1 ? now.time_since_epoch().count() : dict.at("seed");
+  STIMULUS_VEC = {};
+  STIMULUS = STIMULUS_VEC.begin();
+  INPUT_FILE = "";
+  CONFIG_FILE = "";
+  num_stimulus = -1;
+};
 /**
  * @brief Write a new config file to run_config/base_config.toml.
  *
