@@ -311,10 +311,16 @@ void pySNN::initialize(AdjDict &dict) {
     for (auto edgeWeightPair : adjacencyPair.second) {
 
       int destinationIndex = getIndex(edgeWeightPair.first, maxLayer);
-      double weight = edgeWeightPair.second.at("weight");
-
+      double weight = -1;
+      if (edgeWeightPair.second.count("weight")) {
+        weight = edgeWeightPair.second.at("weight");
+      }
+      int delay = -1;
+      if (edgeWeightPair.second.count("delay")) {
+        delay = edgeWeightPair.second.at("delay");
+      }
       nonInputNeurons.at(originIndex)
-          ->addNeighbor(nonInputNeurons.at(destinationIndex), weight);
+          ->addNeighbor(nonInputNeurons.at(destinationIndex), weight, delay);
       numEdges++;
     }
   }
@@ -331,7 +337,7 @@ void pySNN::initialize(AdjDict &dict) {
   for (size_t i = 0; i < max_size; i++) {
     InputNeuron *origin = input_neurons.at(i);
     Neuron *destination = nonInputNeurons.at(i);
-    origin->addNeighbor(destination, 1);
+    origin->addNeighbor(destination, 1, 0);
     numEdges++;
   }
 

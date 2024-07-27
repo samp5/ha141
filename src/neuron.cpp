@@ -70,7 +70,7 @@ void Neuron::transferData() {
  * @param neighbor Target connection
  * @param weight Weight for this edge
  */
-void Neuron::addNeighbor(Neuron *neighbor, double weight) {
+void Neuron::addNeighbor(Neuron *neighbor, double weight, double synapseDelay) {
 
   if (neighbor->getType() == Input) {
     group->getNetwork()->lg->log(ERROR,
@@ -78,8 +78,8 @@ void Neuron::addNeighbor(Neuron *neighbor, double weight) {
     exit(1);
   }
 
-  Synapse *new_connection = new Synapse(this, neighbor, weight);
-  Synapse *return_record = new Synapse(neighbor, this, weight);
+  Synapse *new_connection = new Synapse(this, neighbor, weight, synapseDelay);
+  Synapse *return_record = new Synapse(neighbor, this, weight, synapseDelay);
 
   addPostSynapticConnection(new_connection);
   addPreSynapticConnection(return_record);
