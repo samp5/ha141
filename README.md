@@ -2,7 +2,7 @@
 
 ## Python API
 
-First clone the repository if you haven't 
+First clone the repository
 
 ```bash
 git clone https://github.com/samp5/ha141.git snn
@@ -32,7 +32,7 @@ source venv/bin/activate
 pip install networkx numpy pandas scikit-learn
 ```
 
-Crate the neccessay local directories
+Create the neccessay local directories
 
 ```bash
 mkdir run_config
@@ -189,7 +189,7 @@ print("-> Done")
 ```
 
 <details>
-<summary>Output stored in `dummyv0_0726_1142.csv`</summary>
+<summary>Output stored in <code>dummyv0_0726_1142.csv</code></summary>
 <br>
 
 ```csv
@@ -207,14 +207,132 @@ print("-> Done")
 
 Reset the network to be ready to run another batch.
 
+#### Accessors and Mutators for Configuration variables
+
+
+<details>
+<summary><code>pySNN.setProbabilityOfSuccess(pSuccess: float)</code></summary>
+<br>
+
+- Sets the probability of success for input neurons 
+    - For a time per stimulus of 100ms and probability of success of 0.5, on average, input neurons will recieve 50 stimulus events.
+
+- Accessor: `getProbabilityOfSucess()`
+
+</details>
+
+<details>
+<summary><code>pySNN.setMaxLatency(mLatency: int, update = true : bool)</code></summary>
+<br>
+
+
+- The latency of an input neuron is calculated via their distance the the "center" of an image. 
+- For an image with dimensions 5 x 5, and a maximum latency of 10ms input neurons at each "corner" of the image will have a latency of 10ms whereas those in the center will have a latency of (integer rounding) 0. 
+- The latency for a given input neuron is calculated as follows:
+    1. The index of the input neuron is transformed into a coordinate as if the 1-D stimulus was a 2-D square (or a rectangle of the smallest perimeter)
+    2. The distance of the input neuron to the center of the image is calculated
+    3. The latency of the input neuron is $d_{\textrm{input}}/d_{\textrm{max}} \times$ `max_latency` interpretted as an integer
+- Becuase the image is stored in memory, the default argument `update` rebuilds the image and updates the latency data member of all `InputNeurons`. If for some reason you do not want the latency to be immediately updated, `False` can be specified
+
+- Accessor: `pySNN.getProbabilityOfSucess()`
+
+</details>
+
+<details>
+<summary><code>pySNN.setTau(Tau: float)</code></summary>
+<br>
+
+- Sets tau, which is used to calculate the decay rate of the membrane potential of a neuron according to
+
+$$    \frac{dV}{dt} = \frac{V(t) - V_{\textrm{rest}}}{\tau} $$
+Where $V_{\textrm{rest}}$ is the refractory membrane potential
+
+- Accessor: `pySNN.getTau()`
+
+</details>
+
+<details>
+<summary><code>pySNN.setRefractoryDuration(duration: int, update = true : bool)</code></summary>
+<br>
+
+
+- Sets the length of time for which a neuron will not acknowledge messages after firing
+
+- Becuase some frequently accesses configuration variables are copied and stored as `Neuron` data members,  the default argument `update` calls the approapriate mutators and updates these values. If for some reason you do not want the values to be immediately updated, `False` can be specified
+
+- Accessor: `pySNN.getRefractoryDuration()`
+
+</details>
+
+<details>
+<summary><code>pySNN.setRefractoryMembranePotential(refractoryMembranePotential: float, update = true: bool);</code></summary>
+<br>
+
+
+-  Set the membrane potential each neuron is set to after firing
+
+- Becuase some frequently accesses configuration variables are copied and stored as `Neuron` data members,  the default argument `update` calls the approapriate mutators and updates these values. If for some reason you do not want the values to be immediately updated, `False` can be specified
+
+- Accessor: `pySNN.getRefractoryMembranePotential()`
+
+</details>
+
+<details>
+<summary><code>pySNN.setTimePerStimulus(timePerStimulus: int)</code></summary>
+<br>
+
+- Sets the simuluated length of time each stimulus recieves
+
+> [!NOTE] 
+> This will linearly increase runtime
+
+- Accessor: `pySNN.getTimePerStimulus()`
+
+</details>
+
+<details>
+<summary><code>pySNN.setSeed(seed: int)</code></summary>
+<br>
+
+
+- Seeds random number generator
+    - Uses Mersenne Twister random number generator ([`std::mt19937`](https://cplusplus.com/reference/random/mt19937/))
+  
+</details>
+
+<details>
+<summary><code>pySNN.setInitialMembranePotential(initialMembranePotential: float)</code></summary>
+<br>
+
+- Sets the membrane potential that initializes each `Neuron`
+
+- Accessor: `pySNN.getInitialMembranePotential()`
+
+</details>
+
+<details>
+<summary><code>pySNN.setActivationThreshold(activationThreshold: float, update = True: bool)</code></summary>
+<br>
+
+
+- Sets the membrance potential at which a neuron will fire
+
+- Becuase some frequently accesses configuration variables are copied and stored as `Neuron` data members,  the default argument `update` calls the approapriate mutators and updates these values. If for some reason you do not want the values to be immediately updated, `False` can be specified
+
+- Accessor: `pySNN.getActivationThreshold()`
+
+
+</details>
 
 ### Optimal batch sizes
 
 Batch size has little effect on runtime per stimulus, except for small batches with "normal" activation levels.
 
-The jump in runtime per stimulus is due to read write operations to a pipe beween parent and child processes. (For small batches the pipe capacity is smaller than the total amount of data passed).
+The following graph shows runtimes for the MNIST data set for a network of ~8000 neurons where total activation for the network for each stimulus ~20,000 activations.
 
-Heres my optimization graph (because its so fast now)
+The jump in runtime per stimulus around 15 stimuli is due to read write operations to a pipe beween parent and child processes. (For small batches the pipe capacity is smaller than the total amount of data passed).
+
+
 
 ![Optimization graph](./images/optimization.jpg)
 
