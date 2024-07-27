@@ -94,6 +94,17 @@ public:
   Neuron_t getType() const;
   int getID() const;
 
+  // Mutators
+  void setRefractoryDuration(double refractoryDuration) {
+    refractory_duration = refractoryDuration;
+  }
+  void setRefractoryMembranePotential(double refractoryMembranePotential) {
+    refractory_potential = refractoryMembranePotential;
+  }
+  void setActivationThreshold(double activation_threshold) {
+    activationThreshold = activation_threshold;
+  }
+
   // log operations
   void addData(int time, Message_t message_type);
   LogDataArray getRefractoryArray();

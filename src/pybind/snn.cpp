@@ -5,7 +5,6 @@
 #include <climits>
 #include <cstring>
 #include <iomanip>
-#include <numeric>
 #include <pthread.h>
 #include <stdexcept>
 #include <unordered_map>
@@ -609,4 +608,110 @@ void pySNN::outputState() {
             << " inputs per stimulus" << "\n";
   std::cout << std::setw(35) << "Log size: " << std::setw(10)
             << lg->getLogData().size() << "\n";
+}
+
+void pySNN::setProbabilityOfSuccess(double pSuccess) {
+  config->INPUT_PROB_SUCCESS = pSuccess;
+}
+
+void pySNN::setMaxLatency(double mLatency, bool update) {
+  config->max_latency = mLatency;
+  if (update) {
+    updateImage();
+  }
+}
+
+void pySNN::setTau(double Tau) { config->TAU = Tau; }
+
+void pySNN::setRefractoryDuration(int refractory_duration, bool update) {
+  config->REFRACTORY_DURATION = refractory_duration;
+  if (update) {
+    updateNeuronParameters();
+  }
+}
+
+void pySNN::setTimePerStimulus(int timePer) {
+  config->time_per_stimulus = timePer;
+}
+
+double pySNN::getProbabilityOfSucess() { return config->INPUT_PROB_SUCCESS; }
+
+double pySNN::getMaxLatency() { return config->max_latency; }
+
+double pySNN::getTau() { return config->TAU; }
+
+int pySNN::getRefractoryDuration() { return config->REFRACTORY_DURATION; }
+
+int pySNN::getTimePerStimulus() { return config->time_per_stimulus; }
+
+void pySNN::updateImage() {
+  image->max_latency = config->max_latency;
+  setInputNeuronLatency();
+}
+
+void pySNN::setSeed(int seed) {
+  config->RAND_SEED = seed;
+  gen.seed(seed);
+}
+void pySNN::setInitialMembranePotential(double initialMembranePotential) {
+  config->INITIAL_MEMBRANE_POTENTIAL = initialMembranePotential;
+}
+void pySNN::setRefractoryMembranePotential(double refractoryMembranePotential,
+                                           bool update) {
+  config->REFRACTORY_MEMBRANE_POTENTIAL = refractoryMembranePotential;
+  if (update) {
+    updateNeuronParameters();
+  }
+}
+
+double pySNN::getInitialMembranePotential() {
+  return config->INITIAL_MEMBRANE_POTENTIAL;
+}
+
+double pySNN::getRefractoryMembranePotential() {
+  return config->REFRACTORY_MEMBRANE_POTENTIAL;
+}
+
+double pySNN::getActivationThreshold() { return config->ACTIVATION_THRESHOLD; }
+
+void pySNN::setActivationThreshold(double activationThreshold, bool update) {
+  config->ACTIVATION_THRESHOLD = activationThreshold;
+  if (update) {
+    updateNeuronParameters();
+  }
+}
+
+/**
+ * @brief Update data members of Neuron with new values.
+ *
+ * Some of the configuration parameters are copied and held
+ * as data members of the Neuron class because they are accessed so often.
+ * This updates the values of those data members based on the current
+ * configuraiton
+ *
+ */
+void pySNN::updateNeuronParameters() {
+  for (auto &n : neurons) {
+    n->setActivationThreshold(config->ACTIVATION_THRESHOLD);
+    n->setRefractoryDuration(config->REFRACTORY_DURATION);
+    n->setRefractoryMembranePotential(config->REFRACTORY_MEMBRANE_POTENTIAL);
+  }
+}
+
+void pySNN::updateConfig(ConfigDict dict) {
+  config->setOptions(dict);
+
+  if (dict.at("activation_threshold") !=
+          configDict.at("activation_threshold") ||
+      dict.at("refractory_duration") != configDict.at("refractory_duration") ||
+      dict.at("refractory_membrane_potential") !=
+          configDict.at("refractory_membrane_potential")) {
+    updateNeuronParameters();
+  }
+
+  if (dict.at("max_latency") != configDict.at("max_latency")) {
+    updateImage();
+  }
+
+  configDict = dict;
 }

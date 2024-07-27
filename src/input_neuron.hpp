@@ -22,6 +22,7 @@ public:
   bool poissonResult() const;
   void setInputValue(long double value);
   void setLatency(int latency);
+  void setProbabilityOfSucess(double pSucc) { probalility_of_success = pSucc; }
   void generateEvents();
   void generateEvents(const std::vector<int> &timestamps);
   bool inRefractory() const;

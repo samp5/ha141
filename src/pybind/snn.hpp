@@ -44,6 +44,33 @@ public:
   void batchReset();
   py::array_t<int> pyOutput();
   void outputState();
+
+  void updateImage();
+  void updateNeuronParameters();
+  void updateConfig(ConfigDict dict);
+
+  // setters
+  void setProbabilityOfSuccess(double pSuccess);
+  void setMaxLatency(double mLatency, bool update = true);
+  void setTau(double Tau);
+  void setRefractoryDuration(int duration, bool update = true);
+  void setTimePerStimulus(int timePerStimulus);
+  void setSeed(int seed);
+
+  void setInitialMembranePotential(double initialMembranePotential);
+  void setRefractoryMembranePotential(double refractoryMembranePotential,
+                                      bool update = true);
+  void setActivationThreshold(double activationThreshold, bool update = true);
+
+  // getters
+  double getProbabilityOfSucess();
+  double getMaxLatency();
+  double getTau();
+  int getRefractoryDuration();
+  int getTimePerStimulus();
+  double getInitialMembranePotential();
+  double getRefractoryMembranePotential();
+  double getActivationThreshold();
 };
 
 PYBIND11_MODULE(snn, m) {
