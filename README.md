@@ -2,19 +2,20 @@
 
 ## Python API
 
-First clone the repository
+Clone the repository
 
 ```bash
 git clone https://github.com/samp5/ha141.git snn
 ```
 
-Change to the repo and initialize the Pybind11 submodule with 
+Initialize the Pybind11 submodule with 
 
 ```bash
 cd snn
 git submodule update --init
 ```
-Create the library with
+
+Create the python library with
 
 ```bash 
 make pybind
@@ -38,30 +39,79 @@ Create the neccessay local directories
 mkdir run_config
 ```
 
-`./run_config` holds  `toml` files that specify runtime parameters for the network. If no file is specified in the initial arguement list passed to `snn.pySNN(args: [str])`, `base_config.toml` is used or created and used if it does not exist.
+`./extern/run_config` holds  `toml` files that specify runtime parameters for the network. If an empty string is specified in the initial arguement list passed to `snn.pySNN(args: [str])`, `base_config.toml` is used or created and used if it does not exist.
+
+> [!NOTE] 
+> Alternative initialization parameters exist that do not require this directory and the usage of `toml` files. 
+> See [Constructing a Network](#network-constructors)
 
 
 ### Python interface and usage
 
 - The `snn` module has a small interface but deep functionality.
+ 
+#### Network Constructors
 
-#### `pySNN(configFile = "base_config.toml": string)`
+##### `pySNN(dict: dict[string : double] = DEFAULT_DICT)`
 
-- Return a spiking neural network object.
+- The easier way to construct a SNN object.
+
+- A copy of a default dictionary can be obtained via the static member funciton
+`pySNN.getDefaultConfig() -> dict[string: double]`
+
+- If no dictionary is specified, the following is used (and is the same returned by `getDefaultConfig`)
+
+```c++
+  ConfigDict dict = {{"neuron_count", 0}, // determine by later networkX graph
+                     {"input_neuron_count", 0}, // determined by stimulus or pySNN::initialize
+                     {"group_count", 1}, // ALWAYS
+                     {"edge_count", 0},  // determined by later networkX graph
+                     {"refractory_duration", 5},  // Mod
+                     {"initial_membrane_potential", -6.0}, // Mod
+                     {"activation_threshold", -5.0}, // Mod
+                     {"refractory_membrane_potential", -7.0}, // Mod
+                     {"tau", 100.0}, // Mod
+                     {"max_latency", 10}, // Mod
+                     {"max_synapse_delay", 2}, // MUST BE SET PRIOR TO INITIALIZATION
+                     {"min_synapse_delay", 1}, // MUST BE SET PRIOR TO INITIALIZATION
+                     {"max_weight", 0.0}, // determined by later networkX graph 
+                     {"poisson_prob_of_success", 0.8}, // Mod
+                     {"time_per_stimulus", 200}, // Mod
+                     {"seed", -1}}; // uses System time
+
+```
+
+Some of the above values are 0 and any change to this value will be overwritten when the network is intialized by `pySNN.initialze(adjacencyDict)`
+
+Any key value pair marked with `// Mod` is easily modifiable post-initialization via the mutators detailed in [Accessors and Mutators](#accessors-and-mutators-for-configuration-variables). 
+
+The function `pySNN.updateConfig(dict: dict[string: double])` can be used in place of calling multiple mutators.
+
+> [!NOTE] 
+> Max and min synapse delay must be set prior to initialization and will not affect the network's behavior if altered later.
+
+> [!WARNING] 
+> Altering the number of groups results in erroneous network behavior and is a work in progress
+
+
+##### `pySNN(configFile: string)`
+
+- Expects to find `configFile` in `./extern/run_config/`
+- Passing an empty string will generate a `base_config.toml` in the `./extern/run_config/` folder
+
+- Returns a spiking neural network object with parameters set in the toml file.
 
 ```python
 import snn
 
 net = snn.pySNN("my_custom_config.toml")
 
-# or to use base_config.toml
-
-net = snn.pySNN()
 ```
 
-#### `pySNN.initialize( adjacencyDict : dict[tuple[int, int] : dict[tuple[int, int] : dict[string : float]]],  numberInput : int | stimulus : numpyArray )`
+#### Network initialization
+##### `pySNN.initialize( adjacencyDict : dict[tuple[int, int] : dict[tuple[int, int] : dict[string : float]]],  numberInput : int | stimulus : numpyArray )`
 
-##### A note on the adjacencyDict:
+###### A note on the adjacencyDict:
 - The adjacencyDict should be a dictionary with the following structure
 ```
 {
@@ -88,16 +138,17 @@ net = snn.pySNN()
 ```
 
 
-The function is overloaded to either accept a  python numpy array and automatically detemine the number of input neurons from the number of stimulus inputs in a single dimension of the array (the number of columns) or a integer representing the desired number of input neurons.
+The function is overloaded to accept an adjacencyDict **and** either a
+1. Numpy array. This automatically detemines the number of input neurons from the number of stimulus inputs in a single dimension of the array (the number of columns)
+2. Integer representing the desired number of input neurons.
 
 > [!IMPORTANT]
 > For size $n$ stimulus with $m$ input neurons
 > Only the first $m$ stimulus inputs will be read.
 
-
 The `adjacencyDict` can be automatically generated from `networkx` as long as the Graph is a **directed grid**
 
-##### Example usage
+###### Example usage
 
 ```python
 import networkx as nx
@@ -125,19 +176,27 @@ net.batchReset()
 
 
 
-#### `pySNN.updateWeights( adjacencyDict : dict[tuple[int, int] : dict[tuple[int, int] : dict[string : float]]] )`
+#### Other Network Operations
+##### `pySNN.updateWeights( adjacencyDict : dict[tuple[int, int] : dict[tuple[int, int] : dict[string : float]]] )`
 
 Updates synapse weight for connection between `(x,y)` and `(a,b)` based on `adjacencyDict[(x,y)][(a,b)]["weight"]`
 
-#### `pySNN.runBatch(buffer : numpy array)`
+##### `pySNN.runBatch(buffer : numpy array)`
 
 Starts a child process of the network in order to run the given stimulus set.
 
-#### `pySNN.getActivation() -> numpyArray`
+##### `pySNN.getActivation() -> numpyArray`
 
 Outputs a numpy array with "time per stimulus" columns and "number of stimulus" rows
 
-##### Example usage
+#### `pySNN.batchReset()` 
+
+Reset the network to be ready to run another batch.
+
+> [!WARNING] 
+> Thi will delete any logging data held in the network. Be sure to call `pySNN.getActivation()` before reseting for another batch to avoid overwritting your activation data.
+
+#### Example usage
 
 ```python
 import snn
@@ -203,9 +262,6 @@ print("-> Done")
 </details>
 
 
-#### `pySNN.batchReset()` 
-
-Reset the network to be ready to run another batch.
 
 #### Accessors and Mutators for Configuration variables
 
