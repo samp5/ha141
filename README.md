@@ -74,7 +74,7 @@ mkdir run_config
                      {"max_latency", 10}, // Mod
                      {"max_synapse_delay", 2}, // MUST BE SET PRIOR TO INITIALIZATION
                      {"min_synapse_delay", 1}, // MUST BE SET PRIOR TO INITIALIZATION
-                     {"max_weight", 0.0}, // determined by later networkX graph 
+                     {"max_weight", 1.0}, // determined by later networkX graph 
                      {"poisson_prob_of_success", 0.8}, // Mod
                      {"time_per_stimulus", 200}, // Mod
                      {"seed", -1}}; // uses System time
@@ -118,24 +118,30 @@ net = snn.pySNN("my_custom_config.toml")
    (0,0) : {
             (0,1) : {
                     "weight" : 1.0
+                    "delay" : 1.0
                     }
             (0,2) : {
                     "weight" : 2.0
+                    "delay" : 1.0
                     }
 
             }
    (0,1) : {
             (1,1) : {
                     "weight" : 1.0
+                    "delay" : 2.0
                     }
             (0,2) : {
                     "weight" : 2.0
+                    "delay" : 1.0
                     }
 
             }
     ...
 }
 ```
+> [!NOTE] 
+> The final dictionary layer keys, `weight` and `delay` are optional and if omitted, will be randomly deteremined via a random number generator
 
 
 The function is overloaded to accept an adjacencyDict **and** either a
@@ -156,9 +162,11 @@ import numpy as np
 G = nx.navigable_small_world_graph(10, seed=1)
 
 # since a directed grid is NOT weighted, you have to add weights
+# optionally add delays
 for n in G:
     for nbr in G[n]:
         G[n][nbr]["weight"] = random.random()
+        G[n][nbr]["delay"] = random.randint(2, 10)
 
 stimulus = np.array([[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
                      [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
@@ -179,7 +187,10 @@ net.batchReset()
 #### Other Network Operations
 ##### `pySNN.updateWeights( adjacencyDict : dict[tuple[int, int] : dict[tuple[int, int] : dict[string : float]]] )`
 
-Updates synapse weight for connection between `(x,y)` and `(a,b)` based on `adjacencyDict[(x,y)][(a,b)]["weight"]`
+Does two things:
+
+1. Updates synapse weight for connection between `(x,y)` and `(a,b)` based on `adjacencyDict[(x,y)][(a,b)]["weight"]`
+2. Updates synapse delay for connection between `(x,y)` and `(a,b)` based on `adjacencyDict[(x,y)][(a,b)]["delay"]`
 
 ##### `pySNN.runBatch(buffer : numpy array)`
 
@@ -222,10 +233,12 @@ G = nx.navigable_small_world_graph(10, seed=1)
 end = time.time()
 print(f"-> Done, took {(end - start):.5f} seconds")
 
-print("-> Generating random edge weights...")
+print("-> Generating random edge weights and delays...")
 for n in G:
     for nbr in G[n]:
         G[n][nbr]["weight"] = random.random() * 10
+        G[n][nbr]["delay"] = random.randint(1, 11)
+
 
 print("-> Starting network...")
 net = snn.pySNN()
