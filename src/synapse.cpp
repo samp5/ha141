@@ -60,3 +60,5 @@ void Synapse::updateWeight(double newWeight) {
   _lastWeight = _weight;
   _weight = newWeight;
 }
+
+void Synapse::updateDelay(int delay) { this->delay = delay; }

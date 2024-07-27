@@ -20,6 +20,7 @@ public:
   int randomDelay();
   double randomWeight();
   void updateWeight(double newWeight);
+  void updateDelay(int delay);
   double getWeight() { return _weight; }
 
 private:

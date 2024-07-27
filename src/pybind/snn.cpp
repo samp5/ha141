@@ -138,13 +138,21 @@ void pySNN::updateEdgeWeights(AdjDict dict) {
     for (const auto &edgeWeightPair : adjacencyPair.second) {
 
       int destinationIndex = getIndex(edgeWeightPair.first, maxLayer);
-      double weight = edgeWeightPair.second.at("weight");
+      double weight = 1;
+      if (edgeWeightPair.second.count("weight")) {
+        weight = edgeWeightPair.second.at("weight");
+      }
+      int delay = 1;
+      if (edgeWeightPair.second.count("delay")) {
+        delay = edgeWeightPair.second.at("delay");
+      }
 
       Neuron *destination = nonInputNeurons.at(destinationIndex);
       bool updated = false;
       for (auto &synapse : synapseRef) {
         if (synapse->getPostSynaptic() == destination) {
           synapse->updateWeight(weight);
+          synapse->updateDelay(delay);
           updated = true;
           break;
         }
