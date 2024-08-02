@@ -31,7 +31,7 @@ void Synapse::propagate() {
   // int postID = _destination->getID();
   //
   double message_value =
-      _origin->getPotential() * getWeight() * _origin->getBias();
+      std::abs(_origin->getPotential()) * getWeight() * _origin->getBias();
 
   // _origin->getGroup()->getNetwork()->lg->neuronInteraction(
   //     DEBUG, "Group %d: Neuron %d is sending a mesage to Group %d: Neuron

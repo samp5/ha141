@@ -28,17 +28,17 @@ Neuron::Neuron(int _id, NeuronGroup *_g, Neuron_t _t) {
   group = _g;
   membrane_potential =
       _g->getNetwork()->getConfig()->INITIAL_MEMBRANE_POTENTIAL;
-  excit_inhib_value = generateInhibitoryStatus();
+  excit_inhib_value = 1;
   last_decay = -1;
   refractory_duration = _g->getNetwork()->getConfig()->REFRACTORY_DURATION;
   activationThreshold = _g->getNetwork()->getConfig()->ACTIVATION_THRESHOLD;
   refractory_potential =
       _g->getNetwork()->getConfig()->REFRACTORY_MEMBRANE_POTENTIAL;
 
-  const char *inhib = excit_inhib_value == -1 ? "excitatory\0" : "inhibitory\0";
+  const char *inhib = excit_inhib_value == 1 ? "excitatory\0" : "inhibitory\0";
 
-  _g->getNetwork()->lg->neuronType(DEBUG, "Regular (%d) Neuron %d added: %s",
-                                   group->getID(), _id, inhib);
+  // _g->getNetwork()->lg->neuronType(DEBUG, "Regular (%d) Neuron %d added: %s",
+  //                                  group->getID(), _id, inhib);
 }
 
 Neuron::~Neuron() {
