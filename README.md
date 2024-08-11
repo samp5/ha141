@@ -23,7 +23,7 @@ make pybind
 
 This will create a python package is `snn/extern`.
 
-Create a virtual enviroment (if you want) and install the necessary dependencies
+Create a virtual environment (if you want) and install the necessary dependencies
 
 ```bash
 cd extern
@@ -33,13 +33,13 @@ source venv/bin/activate
 pip install networkx numpy pandas scikit-learn
 ```
 
-Create the neccessay local directories
+Create the necessary local directories
 
 ```bash
 mkdir run_config
 ```
 
-`./extern/run_config` holds  `toml` files that specify runtime parameters for the network. If an empty string is specified in the initial arguement list passed to `snn.pySNN(args: [str])`, `base_config.toml` is used or created and used if it does not exist.
+`./extern/run_config` holds  `toml` files that specify runtime parameters for the network. If an empty string is specified in the initial argument list passed to `snn.pySNN(args: [str])`, `base_config.toml` is used or created and used if it does not exist.
 
 > [!NOTE] 
 > Alternative initialization parameters exist that do not require this directory and the usage of `toml` files. 
@@ -56,7 +56,7 @@ mkdir run_config
 
 - The easier way to construct a SNN object.
 
-- A copy of a default dictionary can be obtained via the static member funciton
+- A copy of a default dictionary can be obtained via the static member function
 `pySNN.getDefaultConfig() -> dict[string: double]`
 
 - If no dictionary is specified, the following is used (and is the same returned by `getDefaultConfig`)
@@ -81,7 +81,7 @@ mkdir run_config
 
 ```
 
-Some of the above values are 0 and any change to this value will be overwritten when the network is intialized by `pySNN.initialze(adjacencyDict)`
+Some of the above values are 0 and any change to this value will be overwritten when the network is initialized by `pySNN.initialze(adjacencyDict)`
 
 Any key value pair marked with `// Mod` is easily modifiable post-initialization via the mutators detailed in [Accessors and Mutators](#accessors-and-mutators-for-configuration-variables). 
 
@@ -120,7 +120,7 @@ The function `pySNN.updateConfig(dict: dict[string: double])` can be used in pla
 ```
 
 > [!NOTE] 
-> You do not need `./run_config` if you are using the reccomended constructor. See Above.
+> You do not need `./run_config` if you are using the recommended constructor. See Above.
 
 ```python
 import snn
@@ -162,11 +162,11 @@ net = snn.pySNN("my_custom_config.toml")
 }
 ```
 > [!NOTE] 
-> The final dictionary layer keys, `weight` and `delay` are optional and if omitted, will be randomly deteremined via a random number generator
+> The final dictionary layer keys, `weight` and `delay` are optional and if omitted, will be randomly determined via a random number generator
 
 
 The function is overloaded to accept an adjacencyDict **and** either a
-1. Numpy array. This automatically detemines the number of input neurons from the number of stimulus inputs in a single dimension of the array (the number of columns)
+1. Numpy array. This automatically determines the number of input neurons from the number of stimulus inputs in a single dimension of the array (the number of columns)
 2. Integer representing the desired number of input neurons.
 
 > [!IMPORTANT]
@@ -226,7 +226,7 @@ Outputs a numpy array with "time per stimulus" columns and "number of stimulus" 
 Reset the network to be ready to run another batch.
 
 > [!WARNING] 
-> Thi will delete any logging data held in the network. Be sure to call `pySNN.getActivation()` before reseting for another batch to avoid overwritting your activation data.
+> This will delete any logging data held in the network. Be sure to call `pySNN.getActivation()` before resetting for another batch to avoid overwriting your activation data.
 
 #### Example usage
 
@@ -305,7 +305,7 @@ print("-> Done")
 <br>
 
 - Sets the probability of success for input neurons 
-    - For a time per stimulus of 100ms and probability of success of 0.5, on average, input neurons will recieve 50 stimulus events.
+    - For a time per stimulus of 100ms and probability of success of 0.5, on average, input neurons will receive 50 stimulus events.
 
 - Accessor: `getProbabilityOfSucess()`
 
@@ -316,13 +316,13 @@ print("-> Done")
 <br>
 
 
-- The latency of an input neuron is calculated via their distance the the "center" of an image. 
+- The latency of an input neuron is calculated via their distance the "center" of an image. 
 - For an image with dimensions 5 x 5, and a maximum latency of 10ms input neurons at each "corner" of the image will have a latency of 10ms whereas those in the center will have a latency of (integer rounding) 0. 
 - The latency for a given input neuron is calculated as follows:
     1. The index of the input neuron is transformed into a coordinate as if the 1-D stimulus was a 2-D square (or a rectangle of the smallest perimeter)
     2. The distance of the input neuron to the center of the image is calculated
-    3. The latency of the input neuron is $d_{\textrm{input}}/d_{\textrm{max}} \times$ `max_latency` interpretted as an integer
-- Becuase the image is stored in memory, the default argument `update` rebuilds the image and updates the latency data member of all `InputNeurons`. If for some reason you do not want the latency to be immediately updated, `False` can be specified
+    3. The latency of the input neuron is $d_{\textrm{input}}/d_{\textrm{max}} \times$ `max_latency` interpreted as an integer
+- Because the image is stored in memory, the default argument `update` rebuilds the image and updates the latency data member of all `InputNeurons`. If for some reason you do not want the latency to be immediately updated, `False` can be specified
 
 - Accessor: `pySNN.getProbabilityOfSucess()`
 
@@ -348,7 +348,7 @@ Where $V_{\textrm{rest}}$ is the refractory membrane potential
 
 - Sets the length of time for which a neuron will not acknowledge messages after firing
 
-- Becuase some frequently accesses configuration variables are copied and stored as `Neuron` data members,  the default argument `update` calls the approapriate mutators and updates these values. If for some reason you do not want the values to be immediately updated, `False` can be specified
+- Because some frequently accesses configuration variables are copied and stored as `Neuron` data members,  the default argument `update` calls the appropriate mutators and updates these values. If for some reason you do not want the values to be immediately updated, `False` can be specified
 
 - Accessor: `pySNN.getRefractoryDuration()`
 
@@ -361,7 +361,7 @@ Where $V_{\textrm{rest}}$ is the refractory membrane potential
 
 -  Set the membrane potential each neuron is set to after firing
 
-- Becuase some frequently accesses configuration variables are copied and stored as `Neuron` data members,  the default argument `update` calls the approapriate mutators and updates these values. If for some reason you do not want the values to be immediately updated, `False` can be specified
+- Because some frequently accesses configuration variables are copied and stored as `Neuron` data members,  the default argument `update` calls the appropriate mutators and updates these values. If for some reason you do not want the values to be immediately updated, `False` can be specified
 
 - Accessor: `pySNN.getRefractoryMembranePotential()`
 
@@ -371,7 +371,7 @@ Where $V_{\textrm{rest}}$ is the refractory membrane potential
 <summary><code>pySNN.setTimePerStimulus(timePerStimulus: int)</code></summary>
 <br>
 
-- Sets the simuluated length of time each stimulus recieves
+- Sets the simulated length of time each stimulus receives
 
 > [!NOTE] 
 > This will linearly increase runtime
@@ -405,9 +405,9 @@ Where $V_{\textrm{rest}}$ is the refractory membrane potential
 <br>
 
 
-- Sets the membrance potential at which a neuron will fire
+- Sets the membrane potential at which a neuron will fire
 
-- Becuase some frequently accesses configuration variables are copied and stored as `Neuron` data members,  the default argument `update` calls the approapriate mutators and updates these values. If for some reason you do not want the values to be immediately updated, `False` can be specified
+- Because some frequently accesses configuration variables are copied and stored as `Neuron` data members,  the default argument `update` calls the appropriate mutators and updates these values. If for some reason you do not want the values to be immediately updated, `False` can be specified
 
 - Accessor: `pySNN.getActivationThreshold()`
 
@@ -418,9 +418,9 @@ Where $V_{\textrm{rest}}$ is the refractory membrane potential
 
 Batch size has little effect on runtime per stimulus, except for small batches with "normal" activation levels.
 
-The following graph shows runtimes for the MNIST data set for a network of ~8000 neurons where total activation for the network for each stimulus ~20,000 activations.
+The following graph shows run-times for the MNIST data set for a network of ~8000 neurons where total activation for the network for each stimulus ~20,000 activations.
 
-The jump in runtime per stimulus around 15 stimuli is due to read write operations to a pipe beween parent and child processes. (For small batches the pipe capacity is smaller than the total amount of data passed).
+The jump in runtime per stimulus around 15 stimuli is due to read write operations to a pipe between parent and child processes. (For small batches the pipe capacity is smaller than the total amount of data passed).
 
 
 
