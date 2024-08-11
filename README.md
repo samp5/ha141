@@ -96,10 +96,31 @@ The function `pySNN.updateConfig(dict: dict[string: double])` can be used in pla
 
 ##### `pySNN(configFile: string)`
 
-- Expects to find `configFile` in `./extern/run_config/`
 - Passing an empty string will generate a `base_config.toml` in the `./extern/run_config/` folder
 
 - Returns a spiking neural network object with parameters set in the toml file.
+
+> [!NOTE] 
+> This method of constructing a `pySNN` object is slower than passing a configuration dictionary. See above.
+
+- Expects to find `configFile` in the `run_config` subdirectory of the directory in which your python file is running.
+    - In the case of this repository, the python example files are located `./extern` and the python package is generated in the same location, so configuration files should be located in `./extern/run_config/`.
+
+- If the python package is generated elsewhere the file structure should look like
+```
+.
+├── snn.cpython-312-x86_64-linux-gnu.so
+│    ( or system equivalent)
+├── main.py
+│    ( your script )
+└── run_config
+    ├── base_config.toml
+    └── custom_config.toml
+
+```
+
+> [!NOTE] 
+> You do not need `./run_config` if you are using the reccomended constructor. See Above.
 
 ```python
 import snn
