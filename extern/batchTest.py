@@ -47,13 +47,14 @@ for n in G:
         G[n][nbr]["weight"] = random.random() * 10
 
 print("-> Starting network...")
+
 args = ["dummy", "base_config.toml"]
 net = snn.pySNN(args)
 net.initialize(nx.to_dict_of_dicts(G), 784)
 x = []
 y = []
 
-for i in range(1,101):
+for i in range(1,5):
     start = time.time()
     net.runBatch(images[0:i])
     end = time.time()
@@ -61,6 +62,16 @@ for i in range(1,101):
     y.append(end - start)
     print(f"-> {i} stimulus, took {(end - start):.5f} seconds")
     print(f"-> Running batch reset")
+
+    print("-> Fetching data from network")
+    out = net.getActivation()
+    print("-> Done")
+    filestr = datetime.now().strftime("%m%d_%H%M")
+    print(f"-> Writing to file {dataset}v{v}_{filestr}.csv")
+    np.savetxt(f"{dataset}v{v}_{filestr}.csv", out,delimiter=",", fmt = '%d')
+    print("-> Done")
+    v = v + 1
+
     net.batchReset()
 
 with open ('batchSizeVsTime.txt', 'w') as f:
