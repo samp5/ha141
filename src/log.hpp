@@ -45,9 +45,9 @@ enum LogLevel {
  */
 struct LogData {
   int neuron_id;
-  int group_id;
+  int group_id; // ! TODO remove or change to char
   int timestamp;
-  double potential;
+  double potential; // ! TODO CHANGE to float
   int neuron_type = 0;
   Message_t message_type;
   int stimulus_number;

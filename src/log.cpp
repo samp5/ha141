@@ -117,7 +117,7 @@ void Log::addData(LogData *data) {
 void Log::writeToFD(int fd, const std::vector<NeuronGroup *> &neuronGroups) {
   this->value(LogLevel::INFO, "Log::writeToFD: Writing for Child Process %d",
               getpid());
-  int numRecordWritten = 0;
+  // int numRecordWritten = 0;
   for (const auto &group : neuronGroups) {
     for (const auto &neuron : group->getNeuronVec()) {
       LogDataArray DataArray = neuron->getRefractoryArray();

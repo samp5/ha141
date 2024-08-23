@@ -680,7 +680,7 @@ void SNN::forkRead(std::vector<pid_t> &childrenPIDs,
       // lg->value(LogLevel::INFO, "FD has  %d bytes available", nbytes);
 
       while (read(pipefd[0], &buf, sizeof(LogData)) > 0) {
-        numRecords++;
+        // numRecords++;
         LogData *toAdd = new LogData(buf);
         // !DEBUG
         // std::cout << "READ " << numRecords << ": \n\t" << *toAdd;
