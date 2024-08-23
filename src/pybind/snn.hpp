@@ -16,6 +16,7 @@ typedef std::map<std::string, double> ConfigDict;
 class pySNN : public SNN {
 private:
   std::vector<std::vector<double>> data;
+  std::vector<double> dataToRun;
   AdjDict adjList;
   size_t maxLayer; // maximum "layer", aka maximum number of columns
   ConfigDict configDict;

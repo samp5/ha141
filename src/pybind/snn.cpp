@@ -397,55 +397,57 @@ void pySNN::processPyBuff(py::buffer &buff) {
   }
 }
 void pySNN::runChildProcess(int fd) {
-  // lg->value(LogLevel::INFO, "Child process running, PID: %d",
-  //           static_cast<int>(getpid()));
+  // set input neuron options
+  for (std::vector<InputNeuron *>::size_type i = 0; i < input_neurons.size();
+       i++) {
+    input_neurons.at(i)->setInputValue(dataToRun.at(i));
+  }
 
-  pySetNextStim();
   generateInputNeuronEvents();
 
-  for (int i = 1; i < config->num_stimulus + 1; i++) {
-    for (auto group : groups) {
-      group->run();
-    }
-    if (i < config->num_stimulus) {
-      config->STIMULUS++;
-      pySetNextStim();
-      reset();
-      generateInputNeuronEvents();
-    }
+  for (auto group : groups) {
+    group->run();
   }
+
   lg->writeToFD(fd, groups);
   exit(EXIT_SUCCESS);
 }
 
 void pySNN::forkRun() {
-  int *pipefd = (int *)malloc(sizeof(int) * 2);
-  int r = pipe(pipefd);
-  if (r == -1) {
-    lg->log(LogLevel::ERROR, "pySNN::forkRun: pipe failed to create pipe "
-                             "file descriptors, pipe() returned -1");
-    lg->string(LogLevel::ERROR, "erno reports %s", strerror(errno));
-  }
-  pid_t cPID = fork();
-  switch (cPID) {
-  case -1: // error state
-    lg->log(LogLevel::ERROR,
-            "pySNN::forkRun: failed to spawn child process, fork() "
-            "returned -1");
-    lg->string(LogLevel::ERROR, "erno reports %s", strerror(errno));
-    break;
-  case 0: {           // child process
-    close(pipefd[0]); // close the read end
-    runChildProcess(pipefd[1]);
-    break;
-  }
-  default: // parent process
-    break;
-  }
+  std::vector<pid_t> children;
+  std::vector<int *> pipes;
 
-  // TODO this is ugly, might adjust the  C++ or just rewrite here
-  std::vector<pid_t> children = {cPID};
-  std::vector<int *> pipes = {pipefd};
+  for (auto &v : data) {
+    dataToRun = v; // set the childs data
+    int *pipefd = (int *)malloc(sizeof(int) * 2);
+    int r = pipe(pipefd);
+    if (r == -1) {
+      lg->log(LogLevel::ERROR, "pySNN::forkRun: pipe failed to create pipe "
+                               "file descriptors, pipe() returned -1");
+      lg->string(LogLevel::ERROR, "erno reports %s", strerror(errno));
+    }
+    pid_t cPID = fork();
+    switch (cPID) {
+    case -1: // error state
+      lg->log(LogLevel::ERROR,
+              "pySNN::forkRun: failed to spawn child process, fork() "
+              "returned -1");
+      lg->string(LogLevel::ERROR, "erno reports %s", strerror(errno));
+      break;
+    case 0: {           // child process
+      close(pipefd[0]); // close the read end
+      runChildProcess(pipefd[1]);
+      break;
+    }
+    default: // parent process
+
+      config->STIMULUS++; // this is so each child processes "config->STIMULUS"
+                          // references the right stimulus number
+      pipes.push_back(&pipefd[0]);
+      children.push_back(cPID);
+      break;
+    }
+  }
   forkRead(children, pipes);
 }
 void pySNN::runBatch(py::buffer &buff) {
