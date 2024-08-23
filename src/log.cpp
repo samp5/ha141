@@ -127,11 +127,12 @@ void Log::writeToFD(int fd, const std::vector<NeuronGroup *> &neuronGroups) {
       //             << DataArray.array[i];
       //   numRecordWritten++;
       // }
-
-      int writeRet =
-          write(fd, DataArray.array, DataArray.arrSize * sizeof(LogData));
-      if (writeRet == -1) {
-        this->log(LogLevel::ERROR, "Log::writeToFD returned -1");
+      if (DataArray.arrSize != 0) {
+        int writeRet =
+            write(fd, DataArray.array, DataArray.arrSize * sizeof(LogData));
+        if (writeRet == -1) {
+          this->log(LogLevel::ERROR, "Log::writeToFD returned -1");
+        }
       }
     }
   }
