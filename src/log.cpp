@@ -135,9 +135,9 @@ void Log::writeToFD(int fd, const std::vector<NeuronGroup *> &neuronGroups) {
       }
     }
   }
-  this->value(LogLevel::INFO, "Log::writeToFD: Wrote %d Records to pipe",
-              numRecordWritten);
-  this->value(LogLevel::INFO, "Log::writeToFD: Closing FD: %d", fd);
+  // this->value(LogLevel::INFO, "Log::writeToFD: Wrote %d Records to pipe",
+  //             numRecordWritten);
+  // this->value(LogLevel::INFO, "Log::writeToFD: Closing FD: %d", fd);
   close(fd);
 }
 

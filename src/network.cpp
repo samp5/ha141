@@ -609,7 +609,7 @@ void SNN::forkRun(const std::vector<std::vector<int>> &stimulusBatches) {
   // stimulus number is connected to the activation log. The way the
   // max and min stimulus number is determined is by the max and min element
   // in the config->STIMULUS_VEC
-  //
+
   for (size_t i = 0; i < stimulusBatches.size(); i++) {
     config->STIMULUS_VEC.insert(config->STIMULUS_VEC.end(),
                                 stimulusBatches.at(i).begin(),
