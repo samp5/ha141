@@ -21,10 +21,11 @@ InputNeuron::InputNeuron(int _id, NeuronGroup *group, int latency)
           group->getNetwork()->getConfig()->INPUT_PROB_SUCCESS),
       latency(latency) {
   excit_inhib_value = 1;
-  const char *inhib = excit_inhib_value == 1 ? "excitatory\0" : "inhibitory\0";
+  // const char *inhib = excit_inhib_value == 1 ? "excitatory\0" :
+  // "inhibitory\0";
 
-  group->getNetwork()->lg->neuronType(DEBUG, "INPUT (%d) Neuron %d added: %s",
-                                      group->getID(), _id, inhib);
+  // group->getNetwork()->lg->neuronType(DEBUG, "INPUT (%d) Neuron %d added:
+  // %s", group->getID(), _id, inhib);
 
   activate();
 }

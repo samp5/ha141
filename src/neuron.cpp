@@ -35,7 +35,8 @@ Neuron::Neuron(int _id, NeuronGroup *_g, Neuron_t _t) {
   refractory_potential =
       _g->getNetwork()->getConfig()->REFRACTORY_MEMBRANE_POTENTIAL;
 
-  const char *inhib = excit_inhib_value == 1 ? "excitatory\0" : "inhibitory\0";
+  // const char *inhib = excit_inhib_value == 1 ? "excitatory\0" :
+  // "inhibitory\0";
 
   // _g->getNetwork()->lg->neuronType(DEBUG, "Regular (%d) Neuron %d added: %s",
   //                                  group->getID(), _id, inhib);

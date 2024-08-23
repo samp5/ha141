@@ -660,7 +660,7 @@ void SNN::forkRead(std::vector<pid_t> &childrenPIDs,
     close(pipefd[1]); // close write pipe
   }
 
-  int numRecords = 0;
+  // int numRecords = 0;
   while (!done) {
     for (size_t i = 0; i < childrenPIDs.size(); i++) {
       // Ignore completed processes
