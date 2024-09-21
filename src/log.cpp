@@ -129,7 +129,7 @@ void Log::writeToFD(int fd, const std::vector<NeuronGroup *> &neuronGroups) {
       // }
       if (DataArray.arrSize != 0) {
         int writeRet =
-            write(fd, DataArray.array, DataArray.arrSize * sizeof(LogData));
+            write(fd, DataArray.array, DataArray.arrSize * sizeof(LogData4_t));
         if (writeRet == -1) {
           this->log(LogLevel::ERROR, "Log::writeToFD returned -1");
         }
@@ -506,3 +506,7 @@ void Log::printNetworkInfo() {
             << "\t Number Stimulus: " << cf->STIMULUS_VEC.size() << "\n"
             << "\t Time per Stimulus: " << cf->time_per_stimulus << "\n";
 }
+
+LogData::LogData(const LogData4_t &lg_data4_t)
+    : timestamp(lg_data4_t.timestamp), message_type(Message_t::Refractory),
+      stimulus_number(lg_data4_t.stimulus_number) {}

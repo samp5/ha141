@@ -20,7 +20,6 @@ int main(int argc, char **argv) {
   snn.lg->startClock();
   snn.lg->log(ESSENTIAL, "Starting network...");
   snn.forkRun({{0, 1, 2, 3, 4, 5, 6}});
-  // snn.start();
 
   snn.lg->log(ESSENTIAL, "Transfering data from Neurons to Log...");
 

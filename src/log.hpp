@@ -4,6 +4,7 @@
 
 #include "message.hpp"
 #include <chrono>
+#include <cstdint>
 #include <iostream>
 #include <vector>
 
@@ -11,6 +12,7 @@ class SNN;
 using std::cout;
 using std::ostream;
 using std::vector;
+struct LogData4_t;
 
 /**
  * \enum LogLevel
@@ -52,6 +54,7 @@ struct LogData {
   Message_t message_type;
   int stimulus_number;
   LogData(){};
+  LogData(const LogData4_t &lg_data4_t);
   LogData(int nID, int gID, int t, double p, int nt, Message_t mt, int sn)
       : neuron_id(nID), group_id(gID), timestamp(t), potential(p),
         neuron_type(nt), message_type(mt), stimulus_number(sn) {}
@@ -62,15 +65,6 @@ struct LogData {
             potential, neuron_type, message_type, stimulus_number);
     return std::string(toReturn);
   }
-  void storeDataIn(double ret[]) {
-    ret[0] = static_cast<double>(neuron_id);
-    ret[1] = static_cast<double>(group_id);
-    ret[2] = static_cast<double>(timestamp);
-    ret[3] = potential;
-    ret[4] = static_cast<double>(neuron_type);
-    ret[5] = static_cast<double>(message_type);
-    ret[6] = static_cast<double>(stimulus_number);
-  };
   friend std::ostream &operator<<(std::ostream &out, const LogData &rhs) {
     out << "DATA FOR N" << rhs.neuron_id << "G" << rhs.group_id
         << " TYPE: " << rhs.message_type << " POTENTIAL: " << rhs.potential
@@ -80,11 +74,20 @@ struct LogData {
   }
 };
 
-struct LogDataArray {
-  LogData *array;
-  size_t arrSize;
+struct LogData4_t {
+  uint16_t timestamp = 0;
+  uint16_t stimulus_number = 0;
+  LogData4_t(const LogData &lg_data) {
+    timestamp = static_cast<uint16_t>(lg_data.timestamp);
+    stimulus_number = static_cast<uint16_t>(lg_data.stimulus_number);
+  }
+  LogData4_t() {}
 };
 
+struct LogDataArray {
+  LogData4_t *array;
+  size_t arrSize;
+};
 using hr_clock = std::chrono::high_resolution_clock;
 using duration = std::chrono::duration<double>;
 

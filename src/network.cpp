@@ -670,7 +670,7 @@ void SNN::forkRead(std::vector<pid_t> &childrenPIDs,
       }
 
       int *pipefd = pipes.at(i); // get corresponding pipe
-      LogData buf;
+      LogData4_t buf;
       // int nbytes;
 
       // lg->value(LogLevel::INFO, "Reading in data for Child Process %d",
@@ -679,7 +679,7 @@ void SNN::forkRead(std::vector<pid_t> &childrenPIDs,
       // ioctl(pipefd[0], FIONREAD, &nbytes);
       // lg->value(LogLevel::INFO, "FD has  %d bytes available", nbytes);
 
-      while (read(pipefd[0], &buf, sizeof(LogData)) > 0) {
+      while (read(pipefd[0], &buf, sizeof(LogData4_t)) > 0) {
         // numRecords++;
         LogData *toAdd = new LogData(buf);
         // !DEBUG
