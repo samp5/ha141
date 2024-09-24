@@ -469,10 +469,11 @@ const vector<Synapse *> &Neuron::getSynapses() const {
   return PostSynapticConnnections;
 }
 
+// O(n)
 LogDataArray Neuron::getRefractoryArray() {
   LogDataArray dataArray;
-
   LogData4_t *array = nullptr;
+
   size_t nActivations =
       std::count_if(log_data.begin(), log_data.end(), [](LogData *d) {
         return d->message_type == Message_t::Refractory;

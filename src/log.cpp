@@ -109,24 +109,14 @@ void Log::log(LogLevel level, const char *message,
  *
  * @param data LogData instance
  */
-void Log::addData(LogData *data) {
-  pthread_mutex_lock(&data_mutex);
-  this->log_data.push_back(data);
-  pthread_mutex_unlock(&data_mutex);
-}
+void Log::addData(LogData *data) { this->log_data.push_back(data); }
 void Log::writeToFD(int fd, const std::vector<NeuronGroup *> &neuronGroups) {
   this->value(LogLevel::INFO, "Log::writeToFD: Writing for Child Process %d",
               getpid());
-  // int numRecordWritten = 0;
   for (const auto &group : neuronGroups) {
     for (const auto &neuron : group->getNeuronVec()) {
-      LogDataArray DataArray = neuron->getRefractoryArray();
-
-      // for (size_t i = 0; i < DataArray.arrSize; i++) {
-      //   std::cout << "WRITE " << numRecordWritten << ": \n\t"
-      //             << DataArray.array[i];
-      //   numRecordWritten++;
-      // }
+      LogDataArray DataArray =
+          neuron->getRefractoryArray(); // O(number log data)
       if (DataArray.arrSize != 0) {
         int writeRet =
             write(fd, DataArray.array, DataArray.arrSize * sizeof(LogData4_t));
@@ -136,9 +126,6 @@ void Log::writeToFD(int fd, const std::vector<NeuronGroup *> &neuronGroups) {
       }
     }
   }
-  // this->value(LogLevel::INFO, "Log::writeToFD: Wrote %d Records to pipe",
-  //             numRecordWritten);
-  // this->value(LogLevel::INFO, "Log::writeToFD: Closing FD: %d", fd);
   close(fd);
 }
 

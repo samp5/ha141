@@ -2,11 +2,13 @@
 #include "../../extern/pybind/include/pybind11/stl.h"
 #include "../runtime.hpp"
 #include <algorithm>
+#include <chrono>
 #include <climits>
 #include <cstring>
 #include <iomanip>
 #include <pthread.h>
 #include <stdexcept>
+#include <unistd.h>
 #include <unordered_map>
 #include <vector>
 
@@ -397,6 +399,7 @@ void pySNN::processPyBuff(py::buffer &buff) {
   }
 }
 void pySNN::runChildProcess(int fd) {
+  auto start = std::chrono::high_resolution_clock::now();
   // set input neuron options
   for (std::vector<InputNeuron *>::size_type i = 0; i < input_neurons.size();
        i++) {
@@ -408,8 +411,18 @@ void pySNN::runChildProcess(int fd) {
   for (auto group : groups) {
     group->run();
   }
+  auto end = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> elapsed = end - start;
+  std::cout << "stimulus process time elapsed for pid:" << getpid()
+            << " is : " << elapsed.count() << "\n";
 
+  start = std::chrono::high_resolution_clock::now();
   lg->writeToFD(fd, groups);
+  end = std::chrono::high_resolution_clock::now();
+  elapsed = end - start;
+  std::cout << "fd write time elapsed for pid:" << getpid()
+            << " is : " << elapsed.count() << "\n";
+
   exit(EXIT_SUCCESS);
 }
 
@@ -448,7 +461,11 @@ void pySNN::forkRun() {
       break;
     }
   }
+  auto start = std::chrono::high_resolution_clock::now();
   forkRead(children, pipes);
+  auto end = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> elapsed = end - start;
+  std::cout << "forkread time elapsed is " << elapsed.count() << "\n";
 }
 void pySNN::runBatch(py::buffer &buff) {
   processPyBuff(buff);

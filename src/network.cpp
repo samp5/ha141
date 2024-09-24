@@ -644,7 +644,11 @@ void SNN::forkRun(const std::vector<std::vector<int>> &stimulusBatches) {
       break;
     }
   }
+  auto start = std::chrono::high_resolution_clock::now();
   forkRead(children, pipes);
+  auto end = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> elapsed = end - start;
+  std::cout << "forkread time elapsed is " << elapsed.count() << "\n";
 }
 
 void setNonBlocking(int fd) {
@@ -660,7 +664,6 @@ void SNN::forkRead(std::vector<pid_t> &childrenPIDs,
     close(pipefd[1]); // close write pipe
   }
 
-  // int numRecords = 0;
   while (!done) {
     for (size_t i = 0; i < childrenPIDs.size(); i++) {
       // Ignore completed processes
@@ -671,36 +674,17 @@ void SNN::forkRead(std::vector<pid_t> &childrenPIDs,
 
       int *pipefd = pipes.at(i); // get corresponding pipe
       LogData4_t buf;
-      // int nbytes;
-
-      // lg->value(LogLevel::INFO, "Reading in data for Child Process %d",
-      // cPID); lg->value(LogLevel::INFO, "Reading from FD %d", pipefd[0]);
-      // !DEBUG
-      // ioctl(pipefd[0], FIONREAD, &nbytes);
-      // lg->value(LogLevel::INFO, "FD has  %d bytes available", nbytes);
 
       while (read(pipefd[0], &buf, sizeof(LogData4_t)) > 0) {
-        // numRecords++;
         LogData *toAdd = new LogData(buf);
-        // !DEBUG
-        // std::cout << "READ " << numRecords << ": \n\t" << *toAdd;
-
         lg->addData(toAdd);
-        // !DEBUG
-        // ioctl(pipefd[0], FIONREAD, &nbytes);
-        // lg->value(LogLevel::INFO, "FD has  %d bytes available", nbytes);
       }
 
       int wstatus;
       if (waitpid(cPID, &wstatus, WNOHANG)) {
-        // lg->value(LogLevel::INFO, "SNN::forkRead: Closing FD %d", pipefd[0]);
         close(pipefd[0]);
         childrenPIDs.at(i) = -1;
       }
-      // lg->value(LogLevel::INFO, "Finished data read for Child Process %d",
-      //           cPID);
-      // lg->value(LogLevel::INFO, "Read %d total records from pipe",
-      // numRecords);
     }
     done = std::all_of(childrenPIDs.begin(), childrenPIDs.end(),
                        [](pid_t x) { return x == -1; });
