@@ -417,6 +417,13 @@ void pySNN::runChildProcess(int fd) {
   std::chrono::duration<double> elapsed = end - start;
   std::ostringstream oSS;
 
+  if (elapsed.count() > 0.09) {
+    for (const auto &d : dataToRun) {
+      oSS << d << " ";
+    }
+    oSS << "\n";
+  }
+
   // pid,evaluationtime
   oSS << getpid() << "," << elapsed.count();
 
