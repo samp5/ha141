@@ -5,8 +5,10 @@
 #include <chrono>
 #include <climits>
 #include <cstring>
+#include <fstream>
 #include <iomanip>
 #include <pthread.h>
+#include <sstream>
 #include <stdexcept>
 #include <unistd.h>
 #include <unordered_map>
@@ -413,15 +415,28 @@ void pySNN::runChildProcess(int fd) {
   }
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = end - start;
-  std::cout << "stimulus process time elapsed for pid:" << getpid()
-            << " is : " << elapsed.count() << "\n";
+  std::ostringstream oSS;
 
+  // pid,evaluationtime
+  oSS << getpid() << "," << elapsed.count();
+
+  int sum = 0;
+  for (const auto &g : groups) {
+    for (const auto &n : g->getNeuronVec()) {
+      sum += std::count_if(
+          n->getLogData().begin(), n->getLogData().end(),
+          [](LogData *d) { return d->message_type == Message_t::Refractory; });
+    }
+  }
+  // ,activations
+  oSS << "," << sum;
   start = std::chrono::high_resolution_clock::now();
   lg->writeToFD(fd, groups);
   end = std::chrono::high_resolution_clock::now();
   elapsed = end - start;
-  std::cout << "fd write time elapsed for pid:" << getpid()
-            << " is : " << elapsed.count() << "\n";
+  // ,writetime\n
+  oSS << "," << elapsed.count() << "\n";
+  cout << oSS.str();
 
   exit(EXIT_SUCCESS);
 }
