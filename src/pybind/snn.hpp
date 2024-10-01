@@ -87,7 +87,7 @@ PYBIND11_MODULE(snn, m) {
       .def(py::init<ConfigDict &>())
       .def("generateSynapses", &pySNN::generateRandomSynapsesAdjMatrixGS,
            "Generate random neural connections")
-      .def("updateWeights", &pySNN::updateEdgeWeights,
+      .def("updateSynapses", &pySNN::updateEdgeWeights,
            "Update edge weights based on dict of dicts")
       .def("start", &pySNN::pyStart, "Start the neural network")
       .def("join", &SNN::join, "Wait for all threads to join")
