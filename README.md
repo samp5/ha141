@@ -80,7 +80,7 @@ Any key value pairs are easily modifiable post-initialization via the mutators d
 The function `pySNN.updateConfig(dict: dict[string: double])` can be used in place of calling multiple mutators.
 
 > [!NOTE] 
-> Max and min synapse delay must be set prior to initialization and will not affect the network's behavior if altered later. These values are only important if you are **not** including synapse delays in the initalization dictionary. See [Network Initialization](#Network-initialization>)
+> Max and min synapse delay must be set prior to initialization and will not affect the network's behavior if altered later. These values are only important if you are **not** including synapse delays in the initalization dictionary. See [Network Initialization](#network-initialization)
 
 
 ##### `pySNN(configFile: string)`
