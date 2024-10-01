@@ -54,44 +54,33 @@ mkdir run_config
 
 ##### `pySNN(dict: dict[string : double] = DEFAULT_DICT)`
 
-- The easier way to construct a SNN object.
+- The recommended way to construct a SNN object.
 
-- A copy of a default dictionary can be obtained via the static member function
-`pySNN.getDefaultConfig() -> dict[string: double]`
-
-- If no dictionary is specified, the following is used (and is the same returned by `getDefaultConfig`)
+- To obtain a "default" dictionary, `default = snn.pySNN.getDefaultConfig()` which return this:
 
 ```c++
-  ConfigDict dict = {{"neuron_count", 0}, // determine by later networkX graph
-                     {"input_neuron_count", 0}, // determined by stimulus or pySNN::initialize
-                     {"group_count", 1}, // ALWAYS
-                     {"edge_count", 0},  // determined by later networkX graph
-                     {"refractory_duration", 5},  // Mod
-                     {"initial_membrane_potential", -6.0}, // Mod
-                     {"activation_threshold", -5.0}, // Mod
-                     {"refractory_membrane_potential", -7.0}, // Mod
-                     {"tau", 100.0}, // Mod
-                     {"max_latency", 10}, // Mod
-                     {"max_synapse_delay", 2}, // MUST BE SET PRIOR TO INITIALIZATION
-                     {"min_synapse_delay", 1}, // MUST BE SET PRIOR TO INITIALIZATION
-                     {"max_weight", 1.0}, // determined by later networkX graph 
-                     {"poisson_prob_of_success", 0.8}, // Mod
-                     {"time_per_stimulus", 200}, // Mod
-                     {"seed", -1}}; // uses System time
+  ConfigDict dict = {
+                     {"refractory_duration", 5},
+                     {"initial_membrane_potential", -6.0},
+                     {"activation_threshold", -5.0}, 
+                     {"refractory_membrane_potential", -7.0},
+                     {"tau", 100.0},
+                     {"max_latency", 10},
+                     {"max_synapse_delay", 2},
+                     {"min_synapse_delay", 1},
+                     {"max_weight", 1.0},
+                     {"poisson_prob_of_success", 0.8},
+                     {"time_per_stimulus", 200},
+                     {"seed", -1}}; // uses system time, otherwise specify a seed
 
 ```
 
-Some of the above values are 0 and any change to this value will be overwritten when the network is initialized by `pySNN.initialze(adjacencyDict)`
-
-Any key value pair marked with `// Mod` is easily modifiable post-initialization via the mutators detailed in [Accessors and Mutators](#accessors-and-mutators-for-configuration-variables). 
+Any key value pairs are easily modifiable post-initialization via the mutators detailed in [Accessors and Mutators](#accessors-and-mutators-for-configuration-variables). 
 
 The function `pySNN.updateConfig(dict: dict[string: double])` can be used in place of calling multiple mutators.
 
 > [!NOTE] 
-> Max and min synapse delay must be set prior to initialization and will not affect the network's behavior if altered later.
-
-> [!WARNING] 
-> Altering the number of groups results in erroneous network behavior and is a work in progress
+> Max and min synapse delay must be set prior to initialization and will not affect the network's behavior if altered later. These values are only important if you are **not** including synapse delays in the initalization dictionary. See [Network Initialization](#Network-initialization>)
 
 
 ##### `pySNN(configFile: string)`
@@ -130,7 +119,9 @@ net = snn.pySNN("my_custom_config.toml")
 ```
 
 #### Network initialization
-##### `pySNN.initialize( adjacencyDict : dict[tuple[int, int] : dict[tuple[int, int] : dict[string : float]]],  numberInput : int | stimulus : numpyArray )`
+##### `pySNN.initialize( adjacencyDict : dict[tuple[int, int] : dict[tuple[int, int] : dict[string : float]]],  numberInput : int )`
+
+This method is used to set the number of neurons, their connections, and the attributes of those connections.
 
 ###### A note on the adjacencyDict:
 - The adjacencyDict should be a dictionary with the following structure
@@ -161,21 +152,36 @@ net = snn.pySNN("my_custom_config.toml")
     ...
 }
 ```
+This structure can be obtained from `networkx` for example.
+```python
+# get a graph with 7056 neurons
+G = nx.navigable_small_world_graph(84, seed=1)
+
+# add attributes to that graph
+for n in G:
+    for nbr in G[n]:
+        G[n][nbr]["weight"] = random.random() * 9 + 1 # weight in [1, 10]
+        G[n][nbr]["delay"] = random.random() * 7 + 1 # delay in [1, 8]
+
+default = snn.pySNN.getDefaultConfig(); # get the default config
+default["tau"] = 300.0 # set something custom
+net = snn.pySNN(default) # construct our network
+
+# initialize our network with the dictionary!
+net.initialize(nx.to_dict_of_dicts(G), 784)
+```
+
 > [!NOTE] 
-> The final dictionary layer keys, `weight` and `delay` are optional and if omitted, will be randomly determined via a random number generator
+> The final dictionary layer keys, `weight` and `delay` are optional and if omitted, will be randomly determined via a random number generator based on `max_synapse_delay` and `min_synapse_delay` as specified in the configuration dictionary.
 
-
-The function is overloaded to accept an adjacencyDict **and** either a
-1. Numpy array. This automatically determines the number of input neurons from the number of stimulus inputs in a single dimension of the array (the number of columns)
-2. Integer representing the desired number of input neurons.
 
 > [!IMPORTANT]
 > For size $n$ stimulus with $m$ input neurons
 > Only the first $m$ stimulus inputs will be read.
 
-The `adjacencyDict` can be automatically generated from `networkx` as long as the Graph is a **directed grid**
+The `adjacencyDict` can be automatically generated from `networkx` as long as the graph has type **directed grid**. For example see [`networkx.navigable_small_world_graph`](https://networkx.org/documentation/stable/reference/generated/networkx.generators.geometric.navigable_small_world_graph.html)
 
-###### Example usage
+###### Complete Example usage
 
 ```python
 import networkx as nx
@@ -195,18 +201,16 @@ stimulus = np.array([[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
                      [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
                      [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0]])
 
-net = snn.pySNN(); # Create the network
-net.initialize(nx.to_dict_of_dicts(G), stimulus) # initialize the network
+net = snn.pySNN(); # Create the network withe default configuration dictionary
+net.initialize(nx.to_dict_of_dicts(G), stimulus.size) # initialize the network
 
 net.runBatch(stimulus[0:2]) # Run the batch
 activation = net.getActivation() # Get activation
 net.batchReset()
 ```
 
-
-
 #### Other Network Operations
-##### `pySNN.updateWeights( adjacencyDict : dict[tuple[int, int] : dict[tuple[int, int] : dict[string : float]]] )`
+##### `pySNN.updateSynapses( adjacencyDict : dict[tuple[int, int] : dict[tuple[int, int] : dict[string : float]]] )`
 
 Does two things:
 
@@ -263,7 +267,7 @@ for n in G:
 
 print("-> Starting network...")
 net = snn.pySNN()
-net.initialize(nx.to_dict_of_dicts(G), images)
+net.initialize(nx.to_dict_of_dicts(G), images.size)
 start = time.time()
 net.runBatch(images)
 end = time.time()
