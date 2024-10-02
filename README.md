@@ -221,9 +221,29 @@ Does two things:
 
 Starts a child process of the network in order to run the given stimulus set.
 
-##### `pySNN.getActivation() -> numpyArray`
+##### `pySNN.getActivation(bins = -1) -> numpyArray`
 
-Outputs a numpy array with "time per stimulus" columns and "number of stimulus" rows
+Returns a numpy array with "time per stimulus" columns and "bins" rows. 
+
+Given a `bins` argument, the timesteps will be split into `bins` discrete categories. If `bins` is omitted, then `time_per_stimulus + 1` bins are used (there will be a "bin" for each timestamp).
+
+If the `time_per_stimulus` is not divisible by `bins`, and produce a remainder `k`, the first `k` bins capture `1` additional element.
+
+For exampple, with 10 neurons, simluating 15ms runtimes on 20 stimulus, a call `netobj.getActivation(3)` will return a matrix with 20 rows and 3 columns. In this case the first column represents the sum of activations that occured in `[0,5]`, the second in timestamps `[6, 10]`, and the third in timestamps `[11, 15]`.
+
+##### `pySNN.getIndividualActivation(bins = -1) -> numpyArray`
+
+Returns a numpy array with dimensions `(number_stimulus, number_neurons, bins)`
+
+That is, for a network with 5 total neurons (input or otherwise), run on a batch with 10 examples, where each example was evaluated for a simulated 15 ms. A call `netobj.getIndividualActivation()` will return a tensor which contains 10 "layers", each of which consists of a matrix with 5 rows and 16 columns.
+
+Given a `bins` argument, the timesteps will be split into `bins` discrete categories. If `bins` is omitted, then `time_per_stimulus + 1` bins are used (there will be a "bin" for each timestamp).
+
+With the same network as above, a call `netobj.getindividualactivation(2)` will return a tensor containing 10 "layers", each of which consists of a matrix with 5 rows and 2 columns. In this case the first column represents the sum of activations that occured in `[0,7]`, the second in timestamps `[8, 15]`.
+
+If the `time_per_stimulus` is not divisible by `bins`, and produce a remainder `k`, the first `k` bins capture `1` additional element.
+
+With the same network as above, a call `netobj.getindividualactivation(3)` will return a tensor contains 10 "layers", each of which consists of a matrix with 5 rows and 3 columns. In this case the first column represents the sum of activations that occured in `[0,5]`, the second in timestamps `[6, 10]`, and the third in timestamps `[11, 15]`.
 
 #### `pySNN.batchReset()` 
 
