@@ -43,7 +43,8 @@ public:
   void generateImage();
   void updateConfigToAdjList(const AdjDict &dict);
   void batchReset();
-  py::array_t<int> pyOutput();
+  py::array_t<int> getActivations(int bins = -1);
+  py::array_t<int> getIndividualActivations(int bins = -1);
   void outputState();
 
   void updateImage();
@@ -93,8 +94,12 @@ PYBIND11_MODULE(snn, m) {
       .def("join", &SNN::join, "Wait for all threads to join")
       .def("writeData", &pySNN::pyWrite,
            "Write activation data to a file in ./logs")
-      .def("getActivation", &pySNN::pyOutput,
+      .def("getActivation", &pySNN::getActivations, py::arg("bins") = -1,
            "Get the activation data in the form of a numpy array")
+      .def("getIndividualActivation", &pySNN::getIndividualActivations,
+           py::arg("bins") = -1,
+           "Get the activation data for individual neurons in the form of a "
+           "numpy tensor")
       .def("initialize",
            py::overload_cast<AdjDict, py::buffer>(&pySNN::initialize),
            "Initilize network from dict of dicts")

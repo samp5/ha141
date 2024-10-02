@@ -575,64 +575,175 @@ void pySNN::pySetNextStim() {
   }
 };
 
-py::array_t<int> pySNN::pyOutput() {
-
-  int max_stim = config->STIMULUS_VEC.back();
-  int min_stim = config->STIMULUS_VEC.front();
-
-  std::unordered_map<int, std::vector<LogData *>> stim_data;
-  const std::vector<LogData *> &lg_data = lg->getLogData();
-
-  for (std::vector<LogData *>::size_type i = 0; i < lg_data.size(); i++) {
-    LogData *td = lg_data.at(i);
-    if (td->message_type == Message_t::Refractory) {
-      if (stim_data.find(td->stimulus_number) != stim_data.end()) {
-        stim_data[td->stimulus_number].push_back(td);
-      } else {
-        stim_data[td->stimulus_number] = {td};
-      }
+std::vector<size_t> get_thresholds(size_t num_bins, size_t max_timestamp) {
+  size_t range = max_timestamp + 1; // number of possible values
+  size_t bin_size = range / num_bins;
+  size_t remainder = range % num_bins;
+  std::vector<size_t> thresholds(num_bins, 0);
+  size_t sum = 0;
+  for (auto &el : thresholds) {
+    if (remainder) {
+      el += 1;
+      remainder -= 1;
+    }
+    el += bin_size;
+    int t = el;
+    el += sum;
+    sum += t;
+  }
+  return thresholds;
+}
+size_t bindex(size_t time_stamp, const std::vector<size_t> &thresholds) {
+  for (size_t i = 0; i < thresholds.size(); i++) {
+    if (time_stamp < thresholds.at(i)) {
+      return i;
     }
   }
 
-  int bins = config->time_per_stimulus;
-  auto ret =
-      py::array_t<int, py::array::c_style>((max_stim - min_stim + 1) * bins);
+  return thresholds.size() - 1;
+}
+
+py::array_t<int> pySNN::getIndividualActivations(int bins) {
+  int activations = 0;
+  size_t time_bins = bins < 0 ? config->time_per_stimulus + 1 : bins;
+  size_t neuron_id = neurons.size();
+  size_t num_stimulus = config->STIMULUS_VEC.size();
+
+  // cout << "time_bins: " << time_bins << "\n";
+  // cout << "neuron_id: " << neurons.size() << "\n";
+  // cout << "num_stimulus: " << config->STIMULUS_VEC.size() << "\n";
+
+  size_t shape[3] = {num_stimulus, neuron_id, time_bins};
+  auto ret = py::array_t<int, py::array::c_style>(shape);
+  ret[py::make_tuple(py::ellipsis())] = 0;
 
   auto info = ret.request();
-  int *pRet = reinterpret_cast<int *>(info.ptr);
 
-  for (int s = min_stim; s <= max_stim; s++) {
-    // if the key does not exist (there were no activations for this stimulus)
-    if (stim_data.find(s) == stim_data.end()) {
-      for (int i = 0; i < bins; i++) {
-        ssize_t index = ((s - min_stim) * bins + i);
-        pRet[index] = 0.0;
-      }
-      continue;
-    }
-    std::vector<LogData *> &sd = stim_data[s];
+  // cout << "shape: (" << info.shape.at(0) << ", " << info.shape.at(1) << ", "
+  //      << info.shape.at(2) << ")\n";
 
-    std::sort(sd.begin(), sd.end(), [](LogData *a, LogData *b) {
-      return a->timestamp < b->timestamp;
-    });
+  const std::vector<LogData *> &lg_data = lg->getLogData();
 
-    double timestep =
-        double(sd.back()->timestamp - sd.front()->timestamp) / bins;
-    double l = sd.front()->timestamp;
-    double u = l + timestep;
+  const std::vector<size_t> thresholds =
+      get_thresholds(time_bins, config->time_per_stimulus);
 
-    for (int i = 0; i < bins; i++) {
-      ssize_t index = ((s - min_stim) * bins + i);
-      pRet[index] = std::count_if(sd.begin(), sd.end(), [l, u](LogData *ld) {
-        return (ld->timestamp < u) && (ld->timestamp >= l);
-      });
-      l = u;
-      u = u + timestep;
+  for (auto &data_point : lg_data) {
+    if (data_point->message_type == Message_t::Refractory) {
+      activations += 1;
+      size_t stim = data_point->stimulus_number;
+      size_t neuron = data_point->neuron_id;
+      size_t time_bin = bindex(data_point->timestamp, thresholds);
+      // cout << "stim " << stim << "\n";
+      // cout << "neuron: " << neuron << "\n";
+      // cout << "time_bin: " << time_bin << "\n";
+      // cout << "calc index: " << ret.index_at(stim, neuron, time_bin) <<
+      // "\n";
+      ret.mutable_at(stim, neuron, time_bin) += 1;
     }
   }
-  ret.resize({(max_stim - min_stim + 1), bins});
+  // cout << "num activations = " << activations << "\n";
   return ret;
 }
+
+py::array_t<int> pySNN::getActivations(int bins) {
+  int activations = 0;
+  size_t time_bins = bins < 0 ? config->time_per_stimulus + 1 : bins;
+  size_t num_stimulus = config->STIMULUS_VEC.size();
+
+  // cout << "time_bins: " << time_bins << "\n";
+  // cout << "neuron_id: " << neurons.size() << "\n";
+  // cout << "num_stimulus: " << config->STIMULUS_VEC.size() << "\n";
+
+  size_t shape[2] = {num_stimulus, time_bins};
+  auto ret = py::array_t<int, py::array::c_style>(shape);
+  ret[py::make_tuple(py::ellipsis())] = 0;
+
+  auto info = ret.request();
+
+  // cout << "shape: (" << info.shape.at(0) << ", " << info.shape.at(1) << ", "
+  //      << info.shape.at(2) << ")\n";
+
+  const std::vector<LogData *> &lg_data = lg->getLogData();
+
+  const std::vector<size_t> thresholds =
+      get_thresholds(time_bins, config->time_per_stimulus);
+
+  for (auto &data_point : lg_data) {
+    if (data_point->message_type == Message_t::Refractory) {
+      activations += 1;
+      size_t stim = data_point->stimulus_number;
+      size_t neuron = data_point->neuron_id;
+      size_t time_bin = bindex(data_point->timestamp, thresholds);
+      // cout << "stim " << stim << "\n";
+      // cout << "neuron: " << neuron << "\n";
+      // cout << "time_bin: " << time_bin << "\n";
+      // cout << "calc index: " << ret.index_at(stim, neuron, time_bin) <<
+      // "\n";
+      ret.mutable_at(stim, time_bin) += 1;
+    }
+  }
+  // cout << "num activations = " << activations << "\n";
+  return ret;
+}
+
+// py::array_t<int> pySNN::getActivations() {
+//
+//   int max_stim = config->STIMULUS_VEC.back();
+//   int min_stim = config->STIMULUS_VEC.front();
+//
+//   std::unordered_map<int, std::vector<LogData *>> stim_data;
+//   const std::vector<LogData *> &lg_data = lg->getLogData();
+//
+//   for (std::vector<LogData *>::size_type i = 0; i < lg_data.size(); i++) {
+//     LogData *td = lg_data.at(i);
+//     if (td->message_type == Message_t::Refractory) {
+//       if (stim_data.find(td->stimulus_number) != stim_data.end()) {
+//         stim_data[td->stimulus_number].push_back(td);
+//       } else {
+//         stim_data[td->stimulus_number] = {td};
+//       }
+//     }
+//   }
+//
+//   int bins = config->time_per_stimulus;
+//   auto ret =
+//       py::array_t<int, py::array::c_style>((max_stim - min_stim + 1) * bins);
+//
+//   auto info = ret.request();
+//   int *pRet = reinterpret_cast<int *>(info.ptr);
+//
+//   for (int s = min_stim; s <= max_stim; s++) {
+//     // if the key does not exist (there were no activations for this
+//     stimulus) if (stim_data.find(s) == stim_data.end()) {
+//       for (int i = 0; i < bins; i++) {
+//         ssize_t index = ((s - min_stim) * bins + i);
+//         pRet[index] = 0.0;
+//       }
+//       continue;
+//     }
+//     std::vector<LogData *> &sd = stim_data[s];
+//
+//     std::sort(sd.begin(), sd.end(), [](LogData *a, LogData *b) {
+//       return a->timestamp < b->timestamp;
+//     });
+//
+//     double timestep =
+//         double(sd.back()->timestamp - sd.front()->timestamp) / bins;
+//     double l = sd.front()->timestamp;
+//     double u = l + timestep;
+//
+//     for (int i = 0; i < bins; i++) {
+//       ssize_t index = ((s - min_stim) * bins + i);
+//       pRet[index] = std::count_if(sd.begin(), sd.end(), [l, u](LogData *ld) {
+//         return (ld->timestamp < u) && (ld->timestamp >= l);
+//       });
+//       l = u;
+//       u = u + timestep;
+//     }
+//   }
+//   ret.resize({(max_stim - min_stim + 1), bins});
+//   return ret;
+// }
 
 void pySNN::pyWrite() { lg->writeData(); };
 
