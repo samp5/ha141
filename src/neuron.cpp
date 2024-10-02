@@ -472,7 +472,7 @@ const vector<Synapse *> &Neuron::getSynapses() const {
 // O(n)
 LogDataArray Neuron::getRefractoryArray() {
   LogDataArray dataArray;
-  LogData4_t *array = nullptr;
+  LogData *array = nullptr;
 
   size_t nActivations =
       std::count_if(log_data.begin(), log_data.end(), [](LogData *d) {
@@ -481,11 +481,11 @@ LogDataArray Neuron::getRefractoryArray() {
 
   dataArray.arrSize = nActivations;
 
-  array = new LogData4_t[nActivations];
+  array = new LogData[nActivations];
   size_t arrIndex = 0;
   for (const auto &data : log_data) {
     if (data->message_type == Message_t::Refractory) {
-      array[arrIndex] = LogData4_t(*data);
+      array[arrIndex] = *data;
       arrIndex++;
     }
   }

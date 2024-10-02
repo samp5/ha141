@@ -673,9 +673,10 @@ void SNN::forkRead(std::vector<pid_t> &childrenPIDs,
       }
 
       int *pipefd = pipes.at(i); // get corresponding pipe
-      LogData4_t buf;
+      // LogData4_t buf;
+      LogData buf;
 
-      while (read(pipefd[0], &buf, sizeof(LogData4_t)) > 0) {
+      while (read(pipefd[0], &buf, sizeof(LogData)) > 0) {
         LogData *toAdd = new LogData(buf);
         lg->addData(toAdd);
       }

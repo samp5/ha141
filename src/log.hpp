@@ -12,7 +12,7 @@ class SNN;
 using std::cout;
 using std::ostream;
 using std::vector;
-struct LogData4_t;
+// struct LogData4_t;
 
 /**
  * \enum LogLevel
@@ -53,8 +53,8 @@ struct LogData {
   int neuron_type = 0;
   Message_t message_type;
   int stimulus_number;
-  LogData(){};
-  LogData(const LogData4_t &lg_data4_t);
+  LogData() {};
+  // LogData(const LogData4_t &lg_data4_t);
   LogData(int nID, int gID, int t, double p, int nt, Message_t mt, int sn)
       : neuron_id(nID), group_id(gID), timestamp(t), potential(p),
         neuron_type(nt), message_type(mt), stimulus_number(sn) {}
@@ -74,18 +74,18 @@ struct LogData {
   }
 };
 
-struct LogData4_t {
-  uint16_t timestamp = 0;
-  uint16_t stimulus_number = 0;
-  LogData4_t(const LogData &lg_data) {
-    timestamp = static_cast<uint16_t>(lg_data.timestamp);
-    stimulus_number = static_cast<uint16_t>(lg_data.stimulus_number);
-  }
-  LogData4_t() {}
-};
+// struct LogData4_t {
+//   uint16_t timestamp = 0;
+//   uint16_t stimulus_number = 0;
+//   LogData4_t(const LogData &lg_data) {
+//     timestamp = static_cast<uint16_t>(lg_data.timestamp);
+//     stimulus_number = static_cast<uint16_t>(lg_data.stimulus_number);
+//   }
+//   LogData4_t() {}
+// };
 
 struct LogDataArray {
-  LogData4_t *array;
+  LogData *array;
   size_t arrSize;
 };
 using hr_clock = std::chrono::high_resolution_clock;
@@ -104,7 +104,7 @@ private:
 
 public:
   Log(SNN *network) : start(hr_clock::now()), offset(0.0f), network(network) {}
-  Log() : start(hr_clock::now()), offset(0.0f), network(NULL){};
+  Log() : start(hr_clock::now()), offset(0.0f), network(NULL) {};
   ~Log();
   void batchReset() {
     start = hr_clock::now();
