@@ -1,6 +1,10 @@
+#ifndef PYSNN_H
+#define PYSNN_H
 #include "../../extern/pybind/include/pybind11/numpy.h"
 #include "../../extern/pybind/include/pybind11/pybind11.h"
+#include "../funciton_id.h"
 #include "../network.hpp"
+#include "snn_connect.h"
 #include <map>
 #include <string>
 #include <tuple>
@@ -20,11 +24,14 @@ private:
   AdjDict adjList;
   size_t maxLayer; // maximum "layer", aka maximum number of columns
   ConfigDict configDict;
+  bool rpc = false;
+  ;
 
 public:
   pySNN(std::vector<std::string> args);
   pySNN(std::string configFile);
   pySNN(ConfigDict dict = {});
+  void rpc_construct(ConfigDict dict = {});
 
   static ConfigDict getDefaultConfig();
 
@@ -34,6 +41,7 @@ public:
   void initialize(AdjDict dict, py::buffer buff);
   void initialize(AdjDict dict, size_t NUMBER_INPUT_NEURONS);
   void initialize(AdjDict &dict);
+  void runBatch_rpc(py::buffer &buff);
   void runBatch(py::buffer &buff);
   void updateEdgeWeights(AdjDict dict);
   void processPyBuff(py::buffer &buff);
@@ -141,3 +149,4 @@ PYBIND11_MODULE(snn, m) {
 int add(int i, int j);
 
 template <typename T> void test(py::buffer buff);
+#endif

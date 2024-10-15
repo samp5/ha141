@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <chrono>
 #include <climits>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <fstream>
 #include <iomanip>
@@ -31,6 +33,24 @@ pySNN::pySNN(ConfigDict dict) : SNN(), configDict(dict) {
   gen = std::mt19937(rd());
   gen.seed(config->RAND_SEED);
   image = nullptr; // we have to wait to initalize the images until we know
+  if (configDict.at("rpc")) {
+    rpc = true;
+    // access returns 0 if the flags are ok!
+    if (access("rpc_server.out", X_OK | F_OK) == 0) {
+      pid_t pid = fork(); // fork out
+      if (pid == -1) {    // err
+        lg->log(ERROR, "fork() error in pySNN::pySNN(ConfigDict d)");
+      }
+      if (pid == 0) { // child
+        if (execl("./rpc_server.out", "", NULL) == -1) {
+          lg->log(ERROR, "execl error");
+        }
+      }
+    } else {
+      lg->log(ERROR, "rpc set in configDict but rpc_server.out is either not "
+                     "in working directory or not executable");
+    }
+  }
   // size of the python buffer
 }
 
@@ -54,7 +74,8 @@ ConfigDict pySNN::getDefaultConfig() {
                      {"limit_log_size", true},
                      {"show_stimulus", false},
                      {"time_per_stimulus", 200},
-                     {"seed", -1}};
+                     {"seed", -1},
+                     {"rpc", false}};
   return dict;
 }
 
@@ -489,6 +510,11 @@ void pySNN::forkRun() {
   std::chrono::duration<double> elapsed = end - start;
   std::cout << "forkread time elapsed is " << elapsed.count() << "\n";
 }
+
+void pySNN::runBatch_rpc(py::buffer &buff) {
+  // !TODO
+}
+
 void pySNN::runBatch(py::buffer &buff) {
   processPyBuff(buff);
 
@@ -672,7 +698,6 @@ py::array_t<int> pySNN::getActivations(int bins) {
     if (data_point->message_type == Message_t::Refractory) {
       activations += 1;
       size_t stim = data_point->stimulus_number;
-      size_t neuron = data_point->neuron_id;
       size_t time_bin = bindex(data_point->timestamp, thresholds);
       // cout << "stim " << stim << "\n";
       // cout << "neuron: " << neuron << "\n";
