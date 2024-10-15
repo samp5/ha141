@@ -183,7 +183,7 @@ void NeuronGroup::runMultithread() {
 
 void NeuronGroup::runSingleThread() {
   // Log running status
-  getNetwork()->lg->state(DEBUG, "Group %d running", getID());
+  // getNetwork()->lg->state(DEBUG, "Group %d running", getID());
 
   bool empty = message_q.empty();
 
@@ -282,11 +282,11 @@ void NeuronGroup::reset() {
 }
 
 Message *NeuronGroup::getMessage() {
-  pthread_mutex_lock(&message_q_tex);
+  // pthread_mutex_lock(&message_q_tex);
   // std::cout << id << " locked message_q_tex\n";
   Message *ret = *message_q.begin();
   message_q.erase(message_q.begin());
-  pthread_mutex_unlock(&message_q_tex);
+  // pthread_mutex_unlock(&message_q_tex);
   // std::cout << id << " unlocked message_q_tex\n";
   return ret;
 }

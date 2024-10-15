@@ -401,7 +401,7 @@ void pySNN::processPyBuff(py::buffer &buff) {
   }
 }
 void pySNN::runChildProcess(int fd) {
-  auto start = std::chrono::high_resolution_clock::now();
+  // auto start = std::chrono::high_resolution_clock::now();
   // set input neuron options
   for (std::vector<InputNeuron *>::size_type i = 0; i < input_neurons.size();
        i++) {
@@ -413,19 +413,19 @@ void pySNN::runChildProcess(int fd) {
   for (auto group : groups) {
     group->run();
   }
-  auto end = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double> elapsed = end - start;
-  std::ostringstream oSS;
+  // auto end = std::chrono::high_resolution_clock::now();
+  // std::chrono::duration<double> elapsed = end - start;
+  // std::ostringstream oSS;
 
-  if (elapsed.count() > 0.09) {
-    for (const auto &d : dataToRun) {
-      oSS << d << " ";
-    }
-    oSS << "\n";
-  }
+  // if (elapsed.count() > 0.09) {
+  //   for (const auto &d : dataToRun) {
+  //     oSS << d << " ";
+  //   }
+  //   oSS << "\n";
+  // }
 
   // pid,evaluationtime
-  oSS << getpid() << "," << elapsed.count();
+  // oSS << getpid() << "," << elapsed.count();
 
   int sum = 0;
   for (const auto &g : groups) {
@@ -436,14 +436,14 @@ void pySNN::runChildProcess(int fd) {
     }
   }
   // ,activations
-  oSS << "," << sum;
-  start = std::chrono::high_resolution_clock::now();
+  // oSS << "," << sum;
+  // start = std::chrono::high_resolution_clock::now();
   lg->writeToFD(fd, groups);
-  end = std::chrono::high_resolution_clock::now();
-  elapsed = end - start;
-  // ,writetime\n
-  oSS << "," << elapsed.count() << "\n";
-  cout << oSS.str();
+  // end = std::chrono::high_resolution_clock::now();
+  // elapsed = end - start;
+  // // ,writetime\n
+  // oSS << "," << elapsed.count() << "\n";
+  // cout << oSS.str();
 
   exit(EXIT_SUCCESS);
 }
