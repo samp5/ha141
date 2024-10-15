@@ -166,7 +166,7 @@ int Neuron::recieveMessage() {
       DEBUG, "(%d) Neuron %d recieved message, accumulated equal to %f",
       group->getID(), id, membrane_potential);
 
-  addData(incoming_message->timestamp, incoming_message->message_type);
+  // addData(incoming_message->timestamp, incoming_message->message_type);
 
   // Deallocate this message
   if (incoming_message) {
@@ -446,13 +446,7 @@ const vector<Synapse *> &Neuron::getPresynaptic() const {
 const vector<LogData *> &Neuron::getLogData() const { return log_data; }
 
 void Neuron::addData(int time, Message_t message_type) {
-  if (group->getNetwork()->getConfig()->LIMIT_LOG_OUTPUT &&
-      message_type == Message_t::Refractory) {
-    LogData *d =
-        new LogData(id, group->getID(), time, membrane_potential, type,
-                    message_type, *group->getNetwork()->getConfig()->STIMULUS);
-    log_data.push_back(d);
-  } else if (!group->getNetwork()->getConfig()->LIMIT_LOG_OUTPUT) {
+  if (message_type == Message_t::Refractory) {
     LogData *d =
         new LogData(id, group->getID(), time, membrane_potential, type,
                     message_type, *group->getNetwork()->getConfig()->STIMULUS);
