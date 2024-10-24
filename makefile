@@ -2,10 +2,9 @@ CXXFLAGS := -g -pthread -Wall -Wpedantic -Wextra -Wlogical-op
 CXX := g++
 CXX2 := c++
 PYFLAGS := -g -pthread -O3 -Wall -shared -fPIC $(shell python3-config --includes) -Ipybind11/include
-
+SERVER_FLAGS := -pthread -Wall -Wpedantic -Wextra -Wlogical-op
 files = $(wildcard ./src/*.cpp)
 deps = $(wildcard ./src/*.hpp)
-
 
 build:  $(filter-out ./src/test.cpp, $(files)) $(deps)
 	@echo Target $@
@@ -28,7 +27,7 @@ buildTest:  $(filter-out ./src/main.cpp, $(files)) $(deps)
 	@$(CXX) $(CXXFLAGS) $(filter-out ./src/main.cpp, $(files)) -o ./build/test.exe
 	@echo Done!
 
-pybind: $(filter-out ./src/test.cpp, $(files)) $(deps) ./src/pybind/snn.hpp ./src/pybind/snn.cpp
+pybind: $(filter-out ./src/test.cpp, $(files)) $(deps) ./src/pybind/snn.hpp ./src/pybind/snn.cpp ./src/pybind/py_module.cpp
 	@echo Target $@
 	@echo New Prerequsites: $? 
 	@echo Compiling...
@@ -41,6 +40,13 @@ testpy: ./src/pybind/snn.cpp
 	@echo Compiling...
 	@$(CXX2) $(PYFLAGS) ./src/pybind/snn.cpp -o ./extern/snn$(shell python3-config --extension-suffix)	
 	@echo Done!
+
+SERVER_FILTER_OUTS=./src/test.cpp ./src/main.cpp
+build_server: ./src/server/*
+	mkdir -p build/server
+	$(CXX) $(SERVER_FLAGS) ./src/server/*.cpp  $(filter-out $(SERVER_FILTER_OUTS), $(files)) -o ./build/server/server.out
+
+server: build_server
 
 run:
 	@echo Running build/ex2
