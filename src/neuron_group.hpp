@@ -79,7 +79,7 @@ public:
 struct IGlimit {
   NeuronGroup *limitingGroup;
   int timestamp;
-  IGlimit(NeuronGroup *_g, int _t) : limitingGroup(_g), timestamp(_t){};
+  IGlimit(NeuronGroup *_g, int _t) : limitingGroup(_g), timestamp(_t) {};
   pthread_cond_t &getLimitCond() { return limitingGroup->getLimitCond(); }
   pthread_mutex_t &getLimitTex() { return limitingGroup->getLimitTex(); }
   void updateTimestamp() { timestamp = limitingGroup->getTimestamp(); }
