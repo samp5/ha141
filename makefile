@@ -2,7 +2,7 @@ CXXFLAGS := -g -pthread -Wall -Wpedantic -Wextra -Wlogical-op
 CXX := g++
 CXX2 := c++
 PYFLAGS := -g -pthread -O3 -Wall -shared -fPIC $(shell python3-config --includes) -Ipybind11/include
-SERVER_FLAGS := -pthread -Wall -Wpedantic -Wextra -Wlogical-op
+SERVER_FLAGS := -g -pthread -Wall -Wpedantic -Wextra -Wlogical-op
 files = $(wildcard ./src/*.cpp)
 deps = $(wildcard ./src/*.hpp)
 
@@ -27,7 +27,7 @@ buildTest:  $(filter-out ./src/main.cpp, $(files)) $(deps)
 	@$(CXX) $(CXXFLAGS) $(filter-out ./src/main.cpp, $(files)) -o ./build/test.exe
 	@echo Done!
 
-pybind: $(filter-out ./src/test.cpp, $(files)) $(deps) ./src/pybind/snn.hpp ./src/pybind/snn.cpp ./src/pybind/py_module.cpp
+pybind: $(filter-out ./src/test.cpp, $(files)) $(deps) ./src/pybind/snn.hpp ./src/pybind/snn.cpp ./src/pybind/pySNN_py_module.cpp
 	@echo Target $@
 	@echo New Prerequsites: $? 
 	@echo Compiling...
@@ -47,6 +47,15 @@ build_server: ./src/server/*
 	$(CXX) $(SERVER_FLAGS) ./src/server/*.cpp  $(filter-out $(SERVER_FILTER_OUTS), $(files)) -o ./build/server/server.out
 
 server: build_server
+
+
+CPP_CLIENT_FILTER_OUTS=./src/test.cpp ./src/main.cpp
+CPP_CLIENT_FILES = $(filter-out $(CPP_CLIENT_FILTER_OUTS), $(files)) ./src/rpc/rpc_main.cpp ./src/pybind/snn_connnect.cpp
+build_cpp_client:  $(CPP_CLIENT_FILES)
+	mkdir -p build/client
+	$(CXX) $(CXXFLAGS) $(CPP_CLIENT_FILES) -o ./build/client/client.out
+
+cpp_client: build_cpp_client
 
 run:
 	@echo Running build/ex2
