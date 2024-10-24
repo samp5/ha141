@@ -18,11 +18,11 @@
 NeuronGroup::NeuronGroup(int _id, int number_neurons, int number_input_neurons,
                          SNN *network)
     : id(_id), most_recent_timestamp(0), network(network) {
-  getNetwork()->lg->state(DEBUG, "Adding Group %d", _id);
-  getNetwork()->lg->state(DEBUG, "Group %d", id);
+  // getNetwork()->lg->state(DEBUG, "Adding Group %d", _id);
+  // getNetwork()->lg->state(DEBUG, "Group %d", id);
 
   number_neurons -= number_input_neurons;
-  getNetwork()->lg->value(DEBUG4, "number_neurons is %d", number_neurons);
+  // getNetwork()->lg->value(DEBUG4, "number_neurons is %d", number_neurons);
   int id = 1;
   while (number_neurons || number_input_neurons) {
 

@@ -276,13 +276,13 @@ NeuronGroup *Neuron::getGroup() const { return group; }
 void Neuron::addMessage(Message *message) {
 
   if (messages.empty()) {
-    pthread_mutex_lock(&group->getNetwork()->getMutex()->message);
+    // pthread_mutex_lock(&group->getNetwork()->getMutex()->message);
     messages.push_back(message);
-    pthread_mutex_unlock(&group->getNetwork()->getMutex()->message);
+    // pthread_mutex_unlock(&group->getNetwork()->getMutex()->message);
 
   } else {
 
-    pthread_mutex_lock(&group->getNetwork()->getMutex()->message);
+    // pthread_mutex_lock(&group->getNetwork()->getMutex()->message);
     list<Message *>::const_iterator it = messages.begin();
 
     while (it != messages.end() && message->timestamp > (*it)->timestamp) {
@@ -290,7 +290,7 @@ void Neuron::addMessage(Message *message) {
     }
 
     messages.insert(it, message);
-    pthread_mutex_unlock(&group->getNetwork()->getMutex()->message);
+    // pthread_mutex_unlock(&group->getNetwork()->getMutex()->message);
   }
 }
 
@@ -301,19 +301,19 @@ void Neuron::addMessage(Message *message) {
  */
 Message *Neuron::retrieveMessage() {
 
-  pthread_mutex_lock(&group->getNetwork()->getMutex()->message);
+  // pthread_mutex_lock(&group->getNetwork()->getMutex()->message);
   // Return if messages is empty
   if (messages.empty()) {
-    pthread_mutex_unlock(&group->getNetwork()->getMutex()->message);
+    // pthread_mutex_unlock(&group->getNetwork()->getMutex()->message);
     group->getNetwork()->lg->groupNeuronState(
         DEBUG, "No additional messages for (%d) Neuron %d", getGroup()->getID(),
         getID());
     return NULL;
   }
-  pthread_mutex_unlock(&group->getNetwork()->getMutex()->message);
+  // pthread_mutex_unlock(&group->getNetwork()->getMutex()->message);
 
   // Get least recent message and remove it from the queue
-  pthread_mutex_lock(&group->getNetwork()->getMutex()->message);
+  // pthread_mutex_lock(&group->getNetwork()->getMutex()->message);
   Message *last = messages.front();
   messages.pop_front();
   pthread_mutex_unlock(&group->getNetwork()->getMutex()->message);
@@ -356,11 +356,7 @@ void Neuron::retroactiveDecay(int from, int to) {
   last_decay = i;
 }
 
-void Neuron::activate() {
-  pthread_mutex_lock(&group->getNetwork()->getMutex()->activation);
-  active = true;
-  pthread_mutex_unlock(&group->getNetwork()->getMutex()->activation);
-}
+void Neuron::activate() { active = true; }
 
 void Neuron::deactivate() {
   // pthread_mutex_lock(&group->getNetwork()->getMutex()->activation);
@@ -390,9 +386,9 @@ void Neuron::accumulatePotential(double value) {
 const list<Message *> &Neuron::getMessageVector() const { return messages; }
 
 double Neuron::getPotential() const {
-  pthread_mutex_lock(&group->getNetwork()->getMutex()->potential);
+  // pthread_mutex_lock(&group->getNetwork()->getMutex()->potential);
   double potential = membrane_potential;
-  pthread_mutex_unlock(&group->getNetwork()->getMutex()->potential);
+  // pthread_mutex_unlock(&group->getNetwork()->getMutex()->potential);
 
   return potential;
 }
@@ -406,12 +402,12 @@ void Neuron::addPreSynapticConnection(Synapse *synapse) {
 
 void Neuron::reset() {
 
-  pthread_mutex_lock(&getGroup()->getNetwork()->getMutex()->potential);
+  // pthread_mutex_lock(&getGroup()->getNetwork()->getMutex()->potential);
   membrane_potential =
       group->getNetwork()->getConfig()->INITIAL_MEMBRANE_POTENTIAL;
-  pthread_mutex_unlock(&getGroup()->getNetwork()->getMutex()->potential);
+  // pthread_mutex_unlock(&getGroup()->getNetwork()->getMutex()->potential);
 
-  pthread_mutex_lock(&getGroup()->getNetwork()->getMutex()->message);
+  // pthread_mutex_lock(&getGroup()->getNetwork()->getMutex()->message);
   for (auto message : messages) {
     if (message) {
       delete message;
@@ -419,7 +415,7 @@ void Neuron::reset() {
     }
   }
   messages.clear();
-  pthread_mutex_unlock(&getGroup()->getNetwork()->getMutex()->message);
+  // pthread_mutex_unlock(&getGroup()->getNetwork()->getMutex()->message);
 
   last_decay = 0;
   refractory_start = -INT_MAX;
