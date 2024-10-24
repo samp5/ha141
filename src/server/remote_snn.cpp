@@ -157,12 +157,12 @@ void rpcSNN::initialize(char *packed_adj_dict, int number_input_neurons) {
 // so cursed
 int rpcSNN::getNumberNeuronFromPackedData(char *packed_data) {
   int length = strlen(packed_data);
-  if (length == 0) {
+  if (length < 2) {
     lg->log(ERROR, "Passed empty packed_data to "
                    "rpcSNN::set_number_neuron_from_packed_data");
     exit(1);
   }
-  size_t index = length - 1;
+  size_t index = length - 2; // get rid of the last \n
   while (index > 0 && packed_data[index] != '\n') {
     index--;
   }

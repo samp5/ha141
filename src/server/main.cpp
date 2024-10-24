@@ -5,7 +5,9 @@
 #include <cstdlib>
 #include <iostream>
 #define BUFF_SIZE 10000
+#ifndef NUMBER_INPUT_NEURONS_CONST
 #define NUMBER_INPUT_NEURONS_CONST 784
+#endif // !NUMBER_INPUT_NEURONS_CONST
 
 /*
  * This is the server main function
@@ -35,6 +37,9 @@ void recieve_initialization_parameters(int sockfd, char **packed_adj_list,
     perror("recv");
     exit(1);
   }
+  // the first char of the buffer is our function identifier
+  // obviously the issue with this is if we have > 10 functions
+  // but this is a dry run
   buffer[bytes_recv] = '\0';
   if (match_function(buffer[0]) != FunctionIdentifier::Initiaize) {
     perror("Second function recieved did not initialize the network, cannot "
