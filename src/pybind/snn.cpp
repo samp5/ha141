@@ -218,6 +218,10 @@ void pySNN::generateImage() {
    * Here, we update the number of inputNeurons (that was previously parsed
    * from the configuraiton file) to match the required number specifed by
    * the passed buffer
+   *
+   * Alternatively, NUMBER_INPUT_NEURONS can be set by an initization function,
+   * at which point the flow trusts the input vaue and enters the first if block
+   * below
    */
   if (data.empty()) {
     lg->log(
@@ -334,6 +338,9 @@ void pySNN::initialize(AdjDict &dict) {
   //           (int)nonInputNeurons.size());
 
   using std::get;
+
+  // this calculation is cursed but effectively we are just peeking at
+  // the last origin neuron, and seeing what it's first "coordinate" is
   maxLayer = std::get<0>((*dict.end()).first); // set the max layer
   int numEdges = 0;
 
