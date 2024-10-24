@@ -1,6 +1,7 @@
 #ifndef CONNECT_H
 #define CONNECT_H
-#include "../pybind/snn.hpp"
+#include "../funciton_id.h"
+#include "remote_snn.hpp"
 #include <arpa/inet.h>
 #include <cstdio>
 #include <map>
@@ -16,7 +17,9 @@
 #include <unistd.h>
 
 void *get_in_addr(struct sockaddr *sa);
-FunctionIdentifier unpack(char *packed_data, std::map<std::string, float> &m);
+FunctionIdentifier unpack(char *packed_data, std::map<std::string, double> &m);
+void initialize_from_packed_data(rpcSNN &network, char *packed_data);
+FunctionIdentifier match_function(char func_id_char);
 int get_and_bind_socket();
 int pack(int x);
 

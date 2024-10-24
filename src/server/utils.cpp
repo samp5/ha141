@@ -1,37 +1,26 @@
 #include "utils.h"
 #include <vector>
 
-bool print_map(const std::map<std::string, int> &m) {
+bool print_map(const std::map<std::string, double> &m) {
   for (const auto &[k, v] : m) {
     std::cout << "Key: " << k << " Value: " << v << "\n";
   }
   return true;
 }
 
-int sum_map(const std::map<std::string, int> &m) {
-  int sum = 0;
-  for (const auto &[k, v] : m) {
-    sum += v;
-  }
-  return sum;
-}
+/* (0,0) => 0
+ * (m, n) => m*n - 1.
+ *
+ * For (a, b) => j, (c,d) => k, if a > c, j > k.
+ *
+ * @param pair coordinate (x,y) in a tuple
+ * @param maxLayer the value of m (number of rows)
+ * @return index of the 1D array
+ */
+int get_index(const std::tuple<int, int> &pair, int maxLayer) {
+  int x = std::get<0>(pair);
+  int y = std::get<1>(pair);
 
-bool remove_duplicates(std::map<std::string, int> &m) {
-  std::map<int, std::string> rev;
-  std::vector<std::string> to_remove;
-  for (const auto &[k, v] : m) {
-    if (rev.count(v) == 0) {
-      rev.emplace(v, k);
-    } else {
-      to_remove.push_back(k);
-    }
-  }
-  if (to_remove.empty()) {
-    return false;
-  } else {
-    for (const auto &s : to_remove) {
-      m.erase(s);
-    }
-    return true;
-  }
+  int index = x + y * maxLayer;
+  return index;
 }

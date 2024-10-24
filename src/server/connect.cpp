@@ -1,5 +1,7 @@
 #include "connect.h"
-#include <iostream>
+#include <cstring>
+#include <string>
+
 #define SERVERPORT "5005"
 int pack(int x) { return htonl(x); }
 FunctionIdentifier match_function(char func_id_char) {
@@ -16,6 +18,9 @@ void *get_in_addr(struct sockaddr *sa) {
     return &(((struct sockaddr_in6 *)sa)->sin6_addr);
   }
 }
+/*
+ * Unpack a std::map<std::string, double>
+ */
 FunctionIdentifier unpack(char *packed_data, std::map<std::string, double> &m) {
   std::istringstream s_stream(packed_data);
   char f_id_char;
@@ -30,10 +35,28 @@ FunctionIdentifier unpack(char *packed_data, std::map<std::string, double> &m) {
   return f_id;
 }
 
+//    std::map<std::tuple<int, int>,
+//             std::map<std::tuple<int, int>, std::map<std::string, float>>>
+//    {
+//      { (0,0), { (0,0), { "string", val, ... },
+//                 ...
+//               }
+//      }
+//      { (1,1), { (1,1), { "string", val, ... },
+//                 ...
+//               }
+//      }
+//      ...
+//    }
+//    "0,1:0.1:5"
+// void initialize_from_packed_data(pySNN &network, char *packed_data) {
+//   return f_id;
+// }
+
 int get_and_bind_socket() {
   int sockfd;
   struct addrinfo hints, *server_info, *p;
-  int number_of_bytes;
+  // int number_of_bytes;
 
   memset(&hints, 0, sizeof hints);
   hints.ai_family = AF_UNSPEC;
